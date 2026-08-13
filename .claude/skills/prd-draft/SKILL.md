@@ -56,6 +56,19 @@ normalmente senza bloccarti.
      Markdown libero. Chiedi (non presumere) `measurement_window_weeks`
      se l'utente/referente tecnico ha un'aspettativa diversa dal default
      nel template.
+   - **Per ciascuna KPI, chiedi esplicitamente `data_source`**: "come
+     pensi di recuperare questo dato — lo controlli tu (manuale), o
+     l'istanza ha un'integrazione che può leggerlo in autonomia
+     (automatizzata)?" Non presumere mai la risposta, e non default a
+     "automated" solo perché sembra la scelta più moderna — è una
+     decisione del PM, va scritta nella sezione Metriche del PRD stesso
+     (non solo in `measurement.yaml`) prima di procedere. Se risponde
+     "automatizzata" ma l'istanza non ha ancora un'integrazione
+     configurata (il caso comune oggi — vedi
+     `framework/docs/future-work.md`), scrivi comunque `mode: automated`
+     come intento dichiarato: `measurement-watch` si comporterà come
+     manuale finché quell'integrazione non esiste davvero, senza
+     bloccare la stesura del PRD per questo.
    - **Caso senza KPI di business** (tipico per iniziative di mera
      compliance, spesso `classification: mandate`): se durante la
      stesura emerge che non c'è un'ipotesi "questo migliorerà la metrica

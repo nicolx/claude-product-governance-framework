@@ -35,6 +35,17 @@ not_applicable_reason: null        # perché non c'è una KPI di business, se kp
 #   baseline: null
 #   target: null
 #   unit: ""                        # es. "%", "giorni", "€"
+#   data_source:
+#     mode: manual                   # manual | automated — scelta esplicita del PM, dichiarata nel PRD stesso (sezione Metriche), mai presunta da questa skill
+#     description: ""                 # come si recupera il dato — es. "DataBricks, query conversion funnel" o "report manuale mensile da Sales"
+#     # Se mode: manual, la KPI non entra mai nell'osservazione
+#     # automatica: measurement-watch chiede sempre il valore al PM (comportamento di oggi).
+#     # Se mode: automated, measurement-watch tenta la lettura automatica SOLO se
+#     # l'istanza ha configurato localmente un'integrazione (mai credenziali su
+#     # git — vedi framework/docs/future-work.md, "Integrazione DB/analytics in
+#     # lettura"). Finché quell'integrazione non esiste, si comporta come manual.
+#     # In entrambi i casi il valore letto compare nel riepilogo del run, per
+#     # trasparenza — non è un gate di approvazione.
 #   readings: []
 #   # Esempio di singola lettura (append-only):
 #   # - date: "2026-03-01"

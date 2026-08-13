@@ -57,12 +57,23 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
    - Se non ancora passata: `measurement_status: pending`, non serve
      fare nulla — non è ancora il momento di aspettarsi impatti.
    - Se passata e `readings` è vuoto: `measurement_status: check_due` —
-     **questo è il caso centrale**: chiedi al PM il valore attuale della
-     metrica (ha accesso agli strumenti di analytics dell'istanza, per
-     playbook). Se il PM lo fornisce, appendi una nuova voce a
-     `readings` con `date`, `value`, `source`. Se il PM non lo sa ancora,
-     lascialo `check_due` e segnalalo comunque nel riepilogo — non è un
-     errore, è un'informazione che manca.
+     **questo è il caso centrale**. Guarda `data_source.mode`:
+     - `manual` — chiedi al PM il valore attuale della metrica (ha
+       accesso agli strumenti di analytics dell'istanza, per playbook).
+     - `automated` — se l'istanza ha una vera integrazione configurata
+       localmente (vedi `framework/docs/future-work.md` — non esiste
+       ancora nel framework di base), tenta la lettura da lì; **se non
+       esiste**, comportati esattamente come `manual` e chiedi al PM —
+       non bloccare né inventare un valore solo perché il PRD dichiara
+       "automated" come intento. In entrambi i casi, quando ottieni un
+       valore (dal PM o da un'integrazione reale), **mostralo sempre nel
+       riepilogo del run prima/al momento di scriverlo** — è
+       trasparenza, non un gate di approvazione: non serve una conferma
+       aggiuntiva per una lettura automatica riuscita.
+     Se ottieni un valore, appendi una nuova voce a `readings` con
+     `date`, `value`, `source`. Se resta senza valore, lascialo
+     `check_due` e segnalalo comunque nel riepilogo — non è un errore, è
+     un'informazione che manca.
    - Se passata e ci sono già `readings`: confronta l'ultima lettura con
      `baseline`/`target` (attenzione alla direzione attesa — un
      miglioramento può essere un aumento o una diminuzione a seconda
@@ -132,3 +143,8 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
   PM in questa conversazione — nemmeno per le iniziative senza KPI:
   "non c'è nulla da misurare" non equivale a "possiamo chiuderla senza
   chiedere".
+- Non simulare o inventare una lettura "automatica" quando
+  `data_source.mode: automated` ma non esiste ancora un'integrazione
+  reale configurata — è esattamente il tipo di dato inventato che questo
+  framework vieta ovunque. Se l'integrazione non c'è, chiedi al PM come
+  faresti in modalità manuale.
