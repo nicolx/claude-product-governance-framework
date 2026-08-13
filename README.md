@@ -60,9 +60,13 @@ inizializzata) e scaffolda `apps/` e `product/`.
 ├── apps/                                    ← submodule dei repository applicativi
 │   └── <nome-repo>/
 └── product/                                 ← artefatti di Product Management di QUESTA istanza
+    ├── inbox/                   ← raccoglitore universale, NON tracciato da git (.gitignore)
+    │                              qualsiasi cosa arrivi a casaccio (email, thread, trascrizioni,
+    │                              allegati, immagini) si butta qui; la skill inbox-triage la
+    │                              analizza, classifica e smista, poi la svuota
     ├── ideas/{YYYY-MM-DD}-{slug}/
     │   ├── idea.yaml
-    │   └── source/            (email, trascrizioni, allegati)
+    │   └── source/            (email, trascrizioni, allegati — arrivati via inbox-triage o diretti)
     ├── prds/{slug}/
     │   ├── prd.md              (o prd-1-*.md, prd-2-*.md se spaccato)
     │   └── source/
@@ -75,6 +79,17 @@ inizializzata) e scaffolda `apps/` e `product/`.
         ├── product-lines.yaml
         └── friction-log.yaml
 ```
+
+**Il punto d'ingresso per il materiale grezzo non ordinato è
+`product/inbox/`**: il PM ci butta dentro qualsiasi cosa arrivi (una
+mail, un thread, la trascrizione di un workshop, immagini) senza doverla
+pre-classificare. La skill **`inbox-triage`** la analizza e decide, per
+ciascun elemento: nuova idea, aggiornamento di un'idea/PRD già
+esistente, bug, Strategic Exception, o — se è troppo ambiguo — un'idea
+con `status: needs_clarification` e una bozza di domanda pronta da
+rispedire a chi l'ha mandato. Alla fine del run, `product/inbox/` resta
+vuota: tutto quello che deve sopravvivere è già stato spostato in una
+cartella tracciata.
 
 Perché non si chiama tutto "governance": quella parola qui indica solo la
 *configurazione* di come questa istanza è impostata, non il contenitore dei

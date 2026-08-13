@@ -1,0 +1,10 @@
+# product/inbox/ è il raccoglitore universale del materiale grezzo non
+# ancora triagiato (email, thread, trascrizioni, allegati, immagini, di
+# dimensione imprevedibile). Non va mai committato: la skill inbox-triage
+# lo svuota spostando ogni elemento nel posto corretto (product/ideas/,
+# product/prds/, ecc.) non appena lo classifica.
+product/inbox/*
+!product/inbox/.gitkeep
+
+# Artefatti locali comuni
+.DS_Store

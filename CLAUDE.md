@@ -28,9 +28,11 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 
 | Cartella | Proprietà | Chi scrive |
 |---|---|---|
-| `bootstrap.sh`, `.githooks/`, `framework/`, `.claude/skills/` | Framework (upstream) | Solo PR sul canonico, mai un'istanza |
+| `bootstrap.sh`, `.githooks/`, `framework/`, `.claude/skills/`, `.gitignore` | Framework (upstream) | Solo PR sul canonico, mai un'istanza |
 | `apps/` | Istanza | Solo `init-governance-project` (aggiunta submodule) |
-| `product/` | Istanza | Le skill, sempre passando dalla coda di approvazione |
+| `product/inbox/` | Istanza, NON tracciata da git | `inbox-triage` la svuota spostando ogni elemento altrove; nessuna approvazione richiesta per lo spostamento in sé |
+| `product/ideas/`, `product/prds/` (creazione) | Istanza | `idea-intake`, `inbox-triage`, `prd-draft` — creazione diretta, non passa da approvazione (non è ancora una decisione di priorità) |
+| `product/ideas/*/rice_history`, `product/roadmap/`, comunicazioni in uscita | Istanza | Solo tramite `product/approvals/pending/` — vedi regola sotto |
 | `.governance/config.yaml` | Istanza | Solo `init-governance-project`, in scrittura successiva solo su richiesta esplicita dell'utente |
 
 Non spostare mai contenuto da `framework/` verso cartelle di istanza per

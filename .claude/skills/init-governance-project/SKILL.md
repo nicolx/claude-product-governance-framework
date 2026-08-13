@@ -67,8 +67,11 @@ che serve da lì e chiedi solo quello che manca.
 3. `product/reference/friction-log.yaml` (da template, vuoto).
 4. Scaffold vuoto: `product/ideas/`, `product/prds/`,
    `product/roadmap/snapshots/`, `product/ceremonies/`,
-   `product/approvals/pending/`, `product/approvals/decided/` (con
-   `.gitkeep` dove servono, git non traccia cartelle vuote).
+   `product/approvals/pending/`, `product/approvals/decided/`,
+   `product/inbox/` (con `.gitkeep` dove servono, git non traccia
+   cartelle vuote). `product/inbox/` è già coperta dal `.gitignore` di
+   root (contenuto non tracciato — vedi skill `inbox-triage`): non
+   toglierla dal `.gitignore` per questa istanza.
 
 ## Dopo l'inizializzazione
 
