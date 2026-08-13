@@ -1,0 +1,58 @@
+# Template per product/ideas/{YYYY-MM-DD}-{slug}/idea.yaml
+#
+# Un'idea nasce da materiale grezzo (email, trascrizione, segnalazione) e
+# viene classificata secondo il playbook (sezione "Alimentazione del bucket
+# delle idee"): idea normale, bug (bypassa il RICE, va su Jira), o
+# Strategic Exception (bypassa il RICE, richiede approvazione CEO/CPO-CTO).
+#
+# rice_history è APPEND-ONLY: ogni revisione del RICE (nuova evidenza,
+# discussione) aggiunge una voce nuova, non sovrascrive le precedenti —
+# serve a rispondere a "perché questa idea è cambiata di priorità?" in
+# un MBR/MTR senza dover ricostruire la storia a memoria.
+
+id: "2026-01-08-slug-descrittivo"   # coincide col nome della cartella
+title: ""                            # per convenzione: oggetto della mail/segnalazione originale
+proposer: ""                         # [NOME] di chi ha proposto l'idea
+
+source:
+  type: email                        # email | meeting_transcript | slack | other
+  ref: ""                            # citazione/pointer al materiale in source/ (es. "source/email-2026-01-08.eml")
+
+product_line: ""                     # deve corrispondere a un name in product/reference/product-lines.yaml
+classification: idea                 # idea | bug | strategic_exception
+
+status: bucket
+# bucket -> prioritized -> in_backlog_refinement -> in_analysis -> in_prd -> in_roadmap -> in_jira -> done | aborted
+
+created_at: "2026-01-08"
+
+# --- Solo per classification: idea (bug e strategic_exception saltano il RICE) ---
+rice_history: []
+# Esempio di singola voce (aggiungerne una nuova ad ogni revisione, mai modificare le precedenti):
+# - date: "2026-01-08"
+#   reach_percent: 15          # 0-100, normalizzato sulla popolazione della product_line — MAI valore assoluto
+#   reach_absolute_note: ""    # opzionale: es. "30% di un 50% di ricevute non riconosciute"
+#   impact_points: 5           # scala 1-10, EBITDA incrementale atteso vs. target annuale della product line
+#   confidence_score: 10       # 1-10
+#   confidence_evidence_tier: quantitative_multi_source
+#   # opinion (1-3) | anecdotal (3-6) | quantitative_single_source (6-8) | quantitative_multi_source (>8)
+#   effort_weeks: 1
+#   score: null                 # calcolato: reach_percent * impact_points * confidence_score / effort_weeks
+#   rationale: ""               # perché questi valori — riferimento alla discussione/evidenza
+#   approved_by: ""             # referente tecnico e/o stakeholder che ha validato la stima
+#   ceremony_ref: null          # opzionale: link a product/ceremonies/... se la revisione è nata lì
+
+# --- Solo per classification: strategic_exception ---
+strategic_exception:
+  approved_by: null             # "CEO" | "CPO/CTO" | null
+  reason: null
+
+# --- Popolato solo al momento della prioritizzazione/push su Jira ---
+jira:
+  card_id: null
+  url: null
+  last_polled_at: null
+  status: null
+
+links:
+  prd_ids: []                   # slug dei PRD collegati in product/prds/

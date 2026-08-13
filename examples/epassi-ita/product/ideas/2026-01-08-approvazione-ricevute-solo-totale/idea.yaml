@@ -1,0 +1,54 @@
+# Esempio di validazione dello schema, ricostruito dalle Cronache di
+# EPASSI ITA (Episodi 1-2 del playbook completo in docs/playbook-v4.md).
+# Non è un'idea operativa reale di un'istanza viva: dimostra che lo schema
+# in framework/schema/idea.template.yaml regge un caso narrativo concreto.
+
+id: "2026-01-08-approvazione-ricevute-solo-totale"
+title: "Idea per il motore di approvazione ricevute"
+proposer: "Filiberto (Head of Operations)"
+
+source:
+  type: email
+  ref: "source/segnalazione-filiberto.md"
+
+product_line: "Onboarding and integration"
+classification: idea
+
+status: done
+# L'arco narrativo completo (Episodi 1,2,4,5,6,8) copre l'intero ciclo
+# fino alla Measurement: per questo lo stato qui è 'done', a differenza
+# di un'idea reale appena presa in carico che partirebbe da 'bucket'.
+
+created_at: "2026-01-08"
+
+rice_history:
+  - date: "2026-01-09"
+    reach_percent: 15
+    reach_absolute_note: >-
+      30% delle ricevute non riconosciute (che sono il 30% del totale) —
+      Reach totale stimato 15%.
+    impact_points: 5
+    confidence_score: 10
+    confidence_evidence_tier: quantitative_multi_source
+    effort_weeks: 1
+    score: 750   # 15 * 5 * 10 / 1
+    rationale: >-
+      Stima condivisa in meeting con Filiberto (proponente) e Franco
+      (referente tecnico): 4 FTE/anno risparmiati stimati (~100k EBITDA),
+      dato quantitativo con evidenze chiare, effort minimo (rimozione di
+      una regola filtro nel motore esistente).
+    approved_by: "Franco (referente tecnico)"
+    ceremony_ref: null
+
+strategic_exception:
+  approved_by: null
+  reason: null
+
+jira:
+  card_id: null
+  url: null
+  last_polled_at: null
+  status: null
+
+links:
+  prd_ids: []

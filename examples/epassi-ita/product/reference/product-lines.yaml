@@ -1,0 +1,67 @@
+# Product Line reali di Epassi ITA — esempio di reference/product-lines.yaml
+# popolato per un'istanza reale (vedi docs/playbook-v4.md per il contesto
+# completo). Nota sui reach_denominator: alla data di questo documento non
+# erano ancora formalizzati per nessuna Product Line — coerente col
+# playbook, che tratta il Reach normalizzato come approssimazione finché
+# il denominatore non è dichiarato con fonte e owner.
+
+- name: Conversion and engagement
+  description: Frontend platforms. Employee satisfaction e happiness.
+  nsm:
+    - "+ GMV used (%)"
+    - "+ Time to first purchase"
+    - "+ Active employee"
+  stakeholders: [Elisa, Felice]
+  reach_denominator:
+    value: null
+    source: null
+    owner: null
+
+- name: Onboarding and integration
+  description: Employee acquisition e reporting. Efficienza interna e processi di backoffice.
+  nsm:
+    - "+ CR prospect → customer"
+    - "+ FTE staff efficiency"
+    - "+ GMV per Employee (avg)"
+    - "+ Employee per employer"
+  stakeholders: [Elisa, Filiberto, Felice]
+  reach_denominator:
+    value: null
+    source: null
+    owner: null
+
+- name: Merchant Success
+  description: Rendere il Merchant felice può guidare fee migliori.
+  nsm:
+    - "+ Transacted fees (product mix)"
+    - "+ Employee access frequency"
+    - "+ Merchant distributed MS"
+  stakeholders: [Elisa, Felice, Filiberto]
+  reach_denominator:
+    value: null
+    source: null
+    owner: null
+
+- name: Web frontend and acquisition
+  description: >-
+    Il sito Epassi Italia deve convertire lead in funnel di vendita
+    promuovendo benefit chiari e di default.
+  nsm:
+    - "+ New B2B leads"
+    - "+ Total fees"
+    - "+ Discount fees amount"
+  stakeholders: [Elisa, Felice]
+  reach_denominator:
+    value: null
+    source: null
+    owner: null
+
+- name: EPASSI synergy
+  description: Promuovere e facilitare l'integrazione dei prodotti EPASSI.
+  nsm:
+    - "platform KPIs (da definire)"
+  stakeholders: [IT]
+  reach_denominator:
+    value: null
+    source: null
+    owner: null

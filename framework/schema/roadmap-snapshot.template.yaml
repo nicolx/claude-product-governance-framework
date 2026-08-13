@@ -1,0 +1,26 @@
+# Template per product/roadmap/snapshots/{YYYY-Www}.yaml
+#
+# Output della cerimonia di Backlog Refinement (+ conferma della Roadmap
+# Update & Iteration Planning). Ogni settimana un nuovo file, mai
+# sovrascritto — la serie storica dei file È lo storico dei Gantt
+# settimanali citato nel brief.
+#
+# Va SEMPRE generato/aggiornato passando prima da
+# product/approvals/pending/ (tipo roadmap_snapshot) — mai scritto
+# direttamente dalla skill roadmap-snapshot.
+
+week: "2026-W02"
+generated_at: "2026-01-08"
+iteration_goal: ""
+ceremony_refs:                      # cerimonie che hanno contribuito a questo snapshot
+  - "ceremonies/backlog-refinement/2026-W02"
+  - "ceremonies/roadmap-iteration-planning/2026-W02"
+
+initiatives:
+  - idea_id: ""
+    prd_id: null
+    jira_card_id: null
+    status: ""                      # libero, riflette lo stato reale (es. "in sviluppo", "bloccato", "shipped 70%")
+    completion_pct: null
+
+retro_notes: ""                     # mini-retrospettiva dell'iterazione precedente (facoltativa)

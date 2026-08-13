@@ -1,0 +1,33 @@
+# Template per product/ceremonies/{tipo}/{settimana-o-data}/decisions.yaml
+#
+# Ogni cerimonia collettiva (Backlog Refinement, Roadmap Update & Iteration
+# Planning, ecc.) produce discussione qualitativa che va tracciata: la
+# trascrizione grezza sta in source/, qui va l'esito strutturato — cosa è
+# stato deciso e cosa quella decisione ha impattato altrove nel repo.
+#
+# tipo tipico: backlog-refinement | roadmap-iteration-planning |
+#              measurement-retro | strategic-exception-review | other
+# (le discussioni di RICE scoring legate a UNA singola idea vivono invece
+# dentro product/ideas/{slug}/source/, non qui — sono 1:1 con un'idea,
+# non un rito ricorrente del team.)
+
+ceremony_type: backlog-refinement
+period: "2026-W02"                 # settimana ISO, o data per cerimonie non settimanali
+date: "2026-01-08"
+facilitator: ""
+participants: []
+
+source_ref: "source/trascrizione.md"   # pointer al materiale grezzo nella stessa cartella
+
+# Cosa è stato deciso in questa cerimonia — lista di decisioni atomiche,
+# ciascuna con riferimento a cosa ha impattato nel repo (nessuna scrittura
+# diretta: se una decisione qui cambia un RICE o produce uno snapshot di
+# roadmap, il cambiamento passa comunque da product/approvals/pending/).
+decisions:
+  - summary: ""
+    impacts:
+      idea_ids: []                 # eventuali idee la cui priorità/RICE è stata ridiscussa
+      roadmap_snapshot: null        # es. "roadmap/snapshots/2026-W02.yaml", se questa cerimonia lo ha generato
+      approval_id: null             # id della voce in product/approvals/pending/ (o decided/) generata da questa decisione
+
+retro_notes: ""                    # es. % completamento iterazione precedente, impedimenti — solo per backlog-refinement

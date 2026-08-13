@@ -1,0 +1,20 @@
+# Template per product/reference/product-lines.yaml
+#
+# Popolato durante l'inizializzazione dell'istanza (skill
+# init-governance-project). Ogni idea deve referenziare uno di questi
+# 'name' nel proprio campo product_line.
+#
+# reach_denominator: il playbook è esplicito su questo — finché il
+# denominatore non è dichiarato con una fonte e un owner, il Reach
+# normalizzato di ogni RICE su questa product line resta un'approssimazione
+# e va trattato come tale nelle decisioni di priorità. Non calcolarlo "a
+# occhio" ogni volta: va mantenuto qui come dato di riferimento condiviso.
+
+- name: ""
+  description: ""
+  nsm: []                           # North Star Metric + eventuali altri KPI di riferimento
+  stakeholders: []                  # nomi (o ruoli) dei referenti principali
+  reach_denominator:
+    value: null
+    source: null                    # es. "DataBricks", "HR system export"
+    owner: null                     # chi è responsabile di tenerlo aggiornato

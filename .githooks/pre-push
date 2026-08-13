@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Blocca il push se 'origin' risulta essere il repo CANONICO del framework.
+#
+# Questo è un livello di protezione client-side: aggira gli errori più comuni
+# (push accidentale sul repo sbagliato) ma è bypassabile (--no-verify, o
+# semplicemente non avendo installato gli hook). La protezione reale è la
+# branch protection lato server sul repo canonico (vedi README.md).
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+[ -z "$REPO_ROOT" ] && exit 0
+cd "$REPO_ROOT"
+
+CANONICAL_FILE="framework/canonical-remote.txt"
+[ -f "$CANONICAL_FILE" ] || exit 0
+
+normalize() {
+  printf '%s' "$1" \
+    | sed -E 's#^git@github\.com:#https://github.com/#' \
+    | sed -E 's#\.git/?$##' \
+    | tr -d '[:space:]'
+}
+
+CANONICAL_URL="$(grep -vE '^\s*#' "$CANONICAL_FILE" | grep -vE '^\s*$' | head -n1)"
+[[ "$(normalize "$CANONICAL_URL")" == *PLACEHOLDER-ORG* ]] && exit 0
+
+ORIGIN_URL="$(git remote get-url origin 2>/dev/null || true)"
+[ -z "$ORIGIN_URL" ] && exit 0
+
+if [ "$(normalize "$ORIGIN_URL")" = "$(normalize "$CANONICAL_URL")" ]; then
+  echo "🚫 Push bloccato: 'origin' è il repo CANONICO del framework." >&2
+  echo "   Questo repo deve restare un fork pulito, senza dati di istanza." >&2
+  echo "   Per contribuire al metodo: apri una Pull Request dal tuo fork." >&2
+  exit 1
+fi
+
+exit 0

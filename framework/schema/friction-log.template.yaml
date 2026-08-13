@@ -1,0 +1,17 @@
+# Template per product/reference/friction-log.yaml
+#
+# Rollup leggero e APPEND-ONLY del "registro delle frizioni" (playbook,
+# sezione "Come gestire le frizioni con gli stakeholder"). Il dettaglio
+# completo (trascrizione, contesto) va in una cartella
+# product/ceremonies/friction-resolution/{data}-{slug}/ — qui resta solo
+# la riga sintetica con link, per poter individuare pattern (es. la stessa
+# persona che invoca Strategic Exception ogni settimana) con un solo file.
+
+entries: []
+# Esempio di voce:
+# - date: "2026-01-08"
+#   who: ""
+#   scenario: ""                    # es. "bypass_process" | "recurring_strategic_exception" | "priority_pushback" | "top_down_pressure"
+#   summary: ""
+#   outcome: ""
+#   ceremony_ref: null              # link a product/ceremonies/... se c'è una registrazione/trascrizione completa

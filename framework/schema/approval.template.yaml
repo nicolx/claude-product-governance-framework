@@ -1,0 +1,31 @@
+# Template per product/approvals/pending/{id}.yaml
+#
+# Meccanismo UNICO di "pending approval": usato sia per i diff di roadmap/
+# RICE proposti automaticamente, sia per ogni comunicazione in uscita
+# (mail settimanale, roadmap trimestrale). Nulla viene applicato o inviato
+# senza revisione umana esplicita — l'automazione propone, non decide.
+#
+# Ciclo di vita: una skill scrive qui con decision: pending. Un umano
+# rivede payload (e target_file, se presente) e:
+#   - approva  -> la skill applica il payload a target_file (se presente),
+#                 poi SPOSTA questo file in product/approvals/decided/
+#   - rifiuta  -> nessuna scrittura su target_file, il file si sposta
+#                 comunque in decided/ con decision: rejected (per audit)
+
+id: "2026-01-08-slug-descrittivo"
+type: rice_diff                     # rice_diff | roadmap_snapshot | outbound_comm
+proposed_at: "2026-01-08"
+proposed_by: ""                     # nome della skill che ha generato la proposta (es. rice-update)
+
+# Cosa verrebbe applicato se approvato. Forma libera in base a 'type':
+# - rice_diff: la nuova voce da appendere a rice_history di un'idea
+# - roadmap_snapshot: il contenuto completo del nuovo snapshot
+# - outbound_comm: oggetto + corpo della comunicazione, e a chi
+payload: {}
+
+target_file: null                   # es. "product/ideas/2026-01-08-slug/idea.yaml" — null per outbound_comm
+
+decision: pending                   # pending | approved | rejected
+decided_by: null
+decided_at: null
+notes: null

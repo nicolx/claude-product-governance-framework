@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Avvisa se questa istanza non è ancora stata inizializzata.
+# Si attiva dopo 'git checkout' e dopo il checkout iniziale di 'git clone'
+# (una volta che ./bootstrap.sh ha attivato core.hooksPath).
+#
+# Non blocca nulla: è solo un promemoria. La protezione vera contro i push
+# accidentali sul canonico è nel pre-push hook + nella branch protection
+# server-side sul repo canonico.
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+[ -z "$REPO_ROOT" ] && exit 0
+cd "$REPO_ROOT"
+
+if [ ! -f ".governance/config.yaml" ]; then
+  echo ""
+  echo "⚠️  Questa istanza del framework non è ancora inizializzata."
+  echo "    Se non l'hai già fatto: ./bootstrap.sh, poi apri Claude Code qui"
+  echo "    e lancia la skill 'init-governance-project'."
+  echo ""
+fi
+
+exit 0
