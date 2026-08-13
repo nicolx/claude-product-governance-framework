@@ -1,6 +1,6 @@
 ---
 name: inbox-triage
-description: Svuota product/inbox/ classificando ogni elemento grezzo che il PM ci ha buttato dentro (email, thread, trascrizioni, allegati, immagini) — idea nuova, aggiornamento di un'idea/PRD esistente, bug, strategic exception, o materiale troppo ambiguo da richiedere un chiarimento al mittente. È il punto d'ingresso raccomandato per il materiale grezzo non ancora ordinato.
+description: Svuota product/inbox/ classificando ogni elemento grezzo che il PM ci ha buttato dentro (email, thread, trascrizioni, allegati, immagini) — idea nuova, aggiornamento di un'idea/PRD esistente, bug, strategic exception, mandate/iniziativa mandataria, o materiale troppo ambiguo da richiedere un chiarimento al mittente. È il punto d'ingresso raccomandato per il materiale grezzo non ancora ordinato.
 ---
 
 # inbox-triage
@@ -109,8 +109,8 @@ a un'idea/PRD già esistente (passo 4).
    collegamento è peggio di una domanda in più.
 
 5. **Classifica** ogni unità in uno di questi esiti. Prima di scegliere
-   idea/bug/strategic_exception/aggiornamento (cioè prima di scartare
-   `needs_clarification`), verifica di poter rispondere, **solo dal
+   idea/bug/strategic_exception/mandate/aggiornamento (cioè prima di
+   scartare `needs_clarification`), verifica di poter rispondere, **solo dal
    materiale a disposizione o da una domanda di livello 1 già fatta al
    PM**, a queste domande minime:
    - Chi è il proponente (o almeno un canale/fonte identificabile)?
@@ -159,6 +159,18 @@ a un'idea/PRD già esistente (passo 4).
      (Questo è distinto dal caso in cui un'idea normale salta la coda più
      avanti, in Backlog Refinement — vedi skill `log-ceremony`.)
 
+   - **Mandate (iniziativa mandataria)** — stessa regola di
+     `idea-intake`: iniziativa imposta dall'alto, "critical" per
+     leadership, o con scadenza esterna fissa (playbook, "Iniziative
+     Mandatarie"). `classification: mandate` — salta solo il RICE, non
+     l'analisi. `mandated_by`/`rationale` sempre chiesti esplicitamente,
+     mai presunti (nessun vincolo di ruolo su chi può dichiararlo, quindi
+     la disciplina nel chiedere conta di più). Se c'è una `due_date`,
+     chiedi anche una prima stima di `lead_time_weeks` (da validare poi
+     con un referente tecnico — se non disponibile, lascia `null` con
+     nota, non bloccare). Mai compilare `analysis_start_by`/
+     `escalation_status` — li calcola `mandate-watch`.
+
    - **Troppo ambiguo per classificare (dubbio di livello 2)** — **non
      forzare una classificazione indovinando**. Crea comunque
      `product/ideas/{data}-{slug-provvisorio}/` con:
@@ -182,7 +194,7 @@ a un'idea/PRD già esistente (passo 4).
 
 6. **Chiudi il run con un riepilogo**, non solo con le scritture fatte:
    quanti elementi processati, in quante unità si sono decomposti, quante
-   nuove idee / aggiornamenti / bug / strategic exception /
+   nuove idee / aggiornamenti / bug / strategic exception / mandate /
    needs_clarification ne sono derivate — **raggruppa nel riepilogo le
    unità nate dallo stesso elemento**, non elencarle come se fossero
    scollegate — e se qualcosa non è stato processato per un problema

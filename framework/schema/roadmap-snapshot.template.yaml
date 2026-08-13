@@ -24,3 +24,19 @@ initiatives:
     completion_pct: null
 
 retro_notes: ""                     # mini-retrospettiva dell'iterazione precedente (facoltativa)
+
+# mandates_status elenca TUTTE le idee classification: mandate ancora
+# aperte (status diverso da done/aborted) — non solo quelle già in
+# initiatives sopra. È il punto in cui un'iniziativa mandataria diventa
+# visibile in un MBR/MTR anche PRIMA di essere entrata in lavorazione:
+# se aspettassimo che sia in initiatives per vederla, il rischio di
+# scoprire la scadenza troppo tardi resterebbe intatto. Popolato da
+# roadmap-snapshot leggendo escalation_status calcolato da mandate-watch
+# su ciascuna idea (non ricalcolato qui).
+mandates_status:
+  - idea_id: ""
+    mandated_by: ""
+    due_date: null
+    analysis_start_by: null
+    escalation_status: ""             # pending_review | on_track | due_soon | overdue
+    current_status: ""                 # status corrente dell'idea (bucket, in_analysis, ecc.)

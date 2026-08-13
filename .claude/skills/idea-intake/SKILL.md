@@ -1,6 +1,6 @@
 ---
 name: idea-intake
-description: Trasforma materiale grezzo (email, trascrizione, segnalazione) in una nuova idea strutturata in product/ideas/, classificandola come idea/bug/strategic exception secondo il playbook. Usala quando l'utente allega o incolla materiale nuovo da valutare.
+description: Trasforma materiale grezzo (email, trascrizione, segnalazione) in una nuova idea strutturata in product/ideas/, classificandola come idea/bug/strategic exception/mandate secondo il playbook. Usala quando l'utente allega o incolla materiale nuovo da valutare.
 ---
 
 # idea-intake
@@ -72,6 +72,23 @@ presente nel materiale di origine.
      a `strategic_exceptions` con `invoked_at_stage: intake` —
      `approved_by`/`reason` restano da confermare con l'utente, **non
      assumere l'approvazione**, chiedila esplicitamente.
+   - **Mandate (iniziativa mandataria)** — se l'iniziativa è imposta
+     dall'alto (leadership/board), marcata "critical" indipendentemente
+     dai numeri, o vincolata a una scadenza esterna fissa (compliance,
+     contratto, evento) — playbook, sezione "Iniziative Mandatarie". A
+     differenza di bug/strategic exception, **non salta l'analisi**: va
+     comunque in `in_analysis`/`in_prd` come un'idea normale, salta solo
+     il RICE. Imposta `classification: mandate` e compila il blocco
+     `mandate`: `mandated_by` e `rationale` **vanno sempre chiesti
+     esplicitamente**, mai presunti dal ruolo o dal tono del mittente —
+     non c'è un vincolo di ruolo su chi può dichiarare un mandate, per
+     questo la disciplina nel chiedere conta di più, non di meno. Se
+     emerge una `due_date`, chiedi anche una prima stima di
+     `lead_time_weeks` (segnala che andrebbe validata con un referente
+     tecnico appena possibile — se non disponibile subito, lascia `null`
+     con una nota, non bloccare la creazione). Non compilare mai
+     `analysis_start_by`/`escalation_status` — sono calcolati dalla
+     skill `mandate-watch`, non a mano.
    - **Idea normale** — il caso di default.
 
 4. **Determina titolo, proponente, Product Line** (per la singola unità

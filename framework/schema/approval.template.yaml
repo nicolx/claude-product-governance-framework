@@ -13,7 +13,7 @@
 #                 comunque in decided/ con decision: rejected (per audit)
 
 id: "2026-01-08-slug-descrittivo"
-type: rice_diff                     # rice_diff | roadmap_snapshot | outbound_comm | strategic_exception_flag
+type: rice_diff                     # rice_diff | roadmap_snapshot | outbound_comm | strategic_exception_flag | mandate_update
 proposed_at: "2026-01-08"
 proposed_by: ""                     # nome della skill che ha generato la proposta (es. rice-update, log-ceremony)
 
@@ -25,6 +25,12 @@ proposed_by: ""                     # nome della skill che ha generato la propos
 #   strategic_exceptions di un'idea (es. invoked_at_stage:
 #   backlog_refinement, rilevata da log-ceremony durante il Backlog
 #   Refinement — vedi framework/schema/idea.template.yaml)
+# - mandate_update: i nuovi valori per due_date/lead_time_weeks/
+#   mandated_by/rationale/is_critical sul blocco mandate di un'idea —
+#   SOLO per modifiche dopo la creazione iniziale (la creazione stessa
+#   non passa da qui, è cattura non decisione). Non include mai
+#   analysis_start_by/escalation_status: quelli sono calcolati da
+#   mandate-watch e scritti direttamente, non proposti.
 payload: {}
 
 target_file: null                   # es. "product/ideas/2026-01-08-slug/idea.yaml" — null per outbound_comm

@@ -32,7 +32,8 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `apps/` | Istanza | Solo `init-governance-project` (aggiunta submodule) |
 | `product/inbox/` | Istanza, NON tracciata da git | `inbox-triage` la svuota spostando ogni elemento altrove; nessuna approvazione richiesta per lo spostamento in sé |
 | `product/ideas/`, `product/prds/` (creazione) | Istanza | `idea-intake`, `inbox-triage`, `prd-draft` — creazione diretta, non passa da approvazione (non è ancora una decisione di priorità) |
-| `product/ideas/*/rice_history`, `product/ideas/*/strategic_exceptions`, `product/roadmap/`, comunicazioni in uscita | Istanza | Solo tramite `product/approvals/pending/` — vedi regola sotto |
+| `product/ideas/*/rice_history`, `product/ideas/*/strategic_exceptions`, `product/ideas/*/mandate` (dopo la creazione), `product/roadmap/`, comunicazioni in uscita | Istanza | Solo tramite `product/approvals/pending/` — vedi regola sotto |
+| `product/ideas/*/mandate.analysis_start_by`, `product/ideas/*/mandate.escalation_status` | Istanza | Solo `mandate-watch` — fatti calcolati, non decisioni, scrittura diretta senza approvazione (stesso principio di `jira.status`) |
 | `.governance/config.yaml` | Istanza | Solo `init-governance-project`, in scrittura successiva solo su richiesta esplicita dell'utente |
 
 Non spostare mai contenuto da `framework/` verso cartelle di istanza per
@@ -56,6 +57,10 @@ Nessuna skill scrive mai direttamente in `product/ideas/`, `product/prds/`,
   invocate già all'intake seguono invece `idea-intake`/`inbox-triage` e
   non passano da qui, perché non c'è ancora un `target_file` esistente da
   modificare (l'idea nasce già così)
+- Ogni modifica a `due_date`/`lead_time_weeks`/`mandated_by`/`rationale`/
+  `is_critical` di un'iniziativa mandataria **dopo** la creazione (la
+  creazione stessa non passa da qui, stessa logica delle idee normali) —
+  vedi `idea.template.yaml`, blocco `mandate`, e skill `mandate-watch`
 
 L'automazione propone (scrive in `pending/` con il diff/contenuto
 proposto), un umano approva esplicitamente (la voce si sposta in

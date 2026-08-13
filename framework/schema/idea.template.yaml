@@ -2,8 +2,12 @@
 #
 # Un'idea nasce da materiale grezzo (email, trascrizione, segnalazione) e
 # viene classificata secondo il playbook (sezione "Alimentazione del bucket
-# delle idee"): idea normale, bug (bypassa il RICE, va su Jira), o
-# Strategic Exception (bypassa il RICE, richiede approvazione CEO/CPO-CTO).
+# delle idee"): idea normale, bug (bypassa il RICE, va su Jira), Strategic
+# Exception (bypassa il RICE, richiede approvazione CEO/CPO-CTO), o
+# Iniziativa Mandataria/mandate (bypassa SOLO il RICE — non l'analisi —
+# perché imposta dall'alto, marcata "critical" da leadership, o vincolata
+# a una scadenza esterna fissa; vedi playbook, sezione "Iniziative
+# Mandatarie", e il blocco `mandate` più sotto).
 #
 # rice_history è APPEND-ONLY: ogni revisione del RICE (nuova evidenza,
 # discussione) aggiunge una voce nuova, non sovrascrive le precedenti —
@@ -19,7 +23,7 @@ source:
   ref: ""                            # citazione/pointer al materiale in source/ (es. "source/email-2026-01-08.eml")
 
 product_line: ""                     # deve corrispondere a un name in product/reference/product-lines.yaml — può restare "" se status è needs_clarification
-classification: idea                 # idea | bug | strategic_exception — può restare provvisoria se status è needs_clarification
+classification: idea                 # idea | bug | strategic_exception | mandate — può restare provvisoria se status è needs_clarification
 
 status: bucket
 # needs_clarification -> bucket -> prioritized -> in_backlog_refinement -> in_analysis -> in_prd -> in_roadmap -> in_jira -> done | aborted
@@ -28,6 +32,12 @@ status: bucket
 # tipicamente bucket -> in_jira -> done direttamente (bug) o, per strategic
 # exception, bucket -> in_jira -> done non appena approvata — non passano
 # né da prioritized (niente RICE) né dal Backlog Refinement per priorità.
+#
+# classification: mandate salta SOLO prioritized (niente RICE): segue lo
+# stesso percorso di un'idea normale per il resto — bucket ->
+# in_backlog_refinement -> in_analysis -> in_prd -> in_roadmap -> in_jira
+# -> done. L'ingresso in analisi è forzato dalla scadenza (vedi blocco
+# `mandate` e skill mandate-watch), non dal ranking RICE.
 
 created_at: "2026-01-08"
 
@@ -91,6 +101,33 @@ strategic_exceptions: []
 #   approved_by: "CPO/CTO"                  # chi ha autorizzato il bypass — mai presunto, va confermato esplicitamente
 #   reason: ""                              # perché è stata accolta comunque
 #   ceremony_ref: "product/ceremonies/backlog-refinement/2026-W02"  # null se invocata all'intake
+
+# --- Solo per classification: mandate ---
+#
+# A differenza di strategic_exceptions (che tiene uno storico di eventi
+# distinti), mandate è un blocco che si AGGIORNA — descrive un'unica
+# iniziativa mandataria, non una sequenza di invocazioni. mandated_by e
+# rationale non vanno mai presunti (stesso principio garantista di
+# idea-intake/inbox-triage): vanno chiesti esplicitamente, indipendentemente
+# dal ruolo di chi propone — non c'è un vincolo di ruolo su chi può
+# dichiarare un mandate (a differenza delle Strategic Exception, che
+# richiedono CEO/CPO-CTO), il controllo di eventuali abusi della categoria
+# avviene a posteriori rendendo il pattern visibile in mandates_status
+# (roadmap-snapshot), non bloccando a priori.
+#
+# analysis_start_by e escalation_status sono CALCOLATI dalla skill
+# mandate-watch (fatti derivati, non decisioni) — non vanno mai compilati
+# a mano. Le modifiche a due_date/lead_time_weeks/mandated_by dopo la
+# creazione iniziale passano invece da product/approvals/pending/
+# (type: mandate_update) come un diff RICE.
+mandate:
+  mandated_by: null             # persona/organo che impone l'iniziativa — mai presunto
+  rationale: null                # perché è mandataria (compliance, direttiva strategica, contratto, evento fisso)
+  is_critical: false              # true se leadership la marca "critical" indipendentemente da una data
+  due_date: null                   # scadenza fissa esterna, se esiste (null se non c'è)
+  lead_time_weeks: null            # runway stimato prima della due_date — andrebbe validato con un referente tecnico
+  analysis_start_by: null          # calcolato da mandate-watch: due_date - lead_time_weeks
+  escalation_status: pending_review   # pending_review | on_track | due_soon | overdue — calcolato da mandate-watch
 
 # --- Popolato solo al momento della prioritizzazione/push su Jira ---
 jira:

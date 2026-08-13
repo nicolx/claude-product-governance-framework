@@ -358,6 +358,77 @@ sempre la Strategic Exception.
 - [ ] L'idea è stata confrontata con le prime posizioni del backlog per coerenza del ranking?
 - [ ] Se il RICE score è basso: è stata comunicata la motivazione allo stakeholder?
 
+## Iniziative Mandatarie
+
+*"Work expands so as to fill the time available for its completion." —
+C. Northcote Parkinson*
+
+Non tutte le iniziative nascono da un'idea che compete per priorità.
+Alcune sono **imposte dall'alto** (una direttiva di leadership o board),
+**marcate "critical"** indipendentemente da qualunque numero, o vincolate
+a una **scadenza esterna fissa** che il framework non controlla
+(compliance normativa, un contratto firmato con una data, un evento a
+calendario). Chiamiamo queste iniziative **Iniziative Mandatarie**
+(`mandate`).
+
+Una Iniziativa Mandataria **non compete sul RICE** — non ha senso
+calcolare Reach/Impact/Confidence/Effort per decidere se "vale la pena":
+non è una domanda che il framework è chiamato a rispondere in questo
+caso, la priorità è già stata data da chi ha il mandato per farlo. Ma
+questo non significa che salti l'analisi: un'iniziativa mandataria
+attraversa comunque Preliminary Analysis, Complete Analysis, PRD — deve
+comunque essere capita, scoperta nelle sue implicazioni tecniche,
+dimensionata. Salta solo la domanda "conviene farla ora rispetto al
+resto?". La domanda a cui risponde invece è diversa e più urgente:
+**"abbiamo abbastanza tempo prima della scadenza per farla bene?"**
+
+Questa è la parte che il citazione di Parkinson coglie: senza un
+meccanismo che forzi l'attenzione ad anticiparsi, il lavoro (o la sua
+mancanza) si espande fino a riempire tutto il tempo disponibile — e la
+scadenza si scopre quando è troppo tardi per rispettarla con qualità. Per
+questo ogni Iniziativa Mandataria con una scadenza nota richiede una
+stima di **lead time**: quante settimane servono, prima della scadenza,
+per completare analisi, PRD e sviluppo. Questa stima **va fatta con un
+referente tecnico**, con lo stesso spirito con cui l'Effort del RICE
+viene validato ad alto livello nella prioritizzazione — non è un numero
+che il PM inventa da solo.
+
+**Chi può dichiarare un'iniziativa come mandataria?** Non c'è un vincolo
+di ruolo esplicito, a differenza della Strategic Exception (che richiede
+un'approvazione CEO/CPO-CTO): chiunque può proporla. Ma proprio per
+questo, **chi la impone e perché** vanno sempre dichiarati esplicitamente
+e mai presunti — non basta il tono o il ruolo del mittente per giustificare
+il bypass del RICE. Il controllo non è a priori (nessun blocco), ma a
+posteriori: ogni Iniziativa Mandataria resta visibile nei report di
+roadmap con la sua scadenza e il suo stato, per chiunque — così un abuso
+sistematico della categoria (usarla per bypassare il RICE senza un vero
+mandato) diventa visibile con la stessa logica con cui il framework
+intercetta le Strategic Exception ricorrenti.
+
+**Verifica ad ogni Backlog Refinement.** Ogni ciclo di Backlog
+Refinement è anche il momento in cui si controlla lo stato di avanzamento
+di ogni Iniziativa Mandataria aperta rispetto alla sua scadenza: siamo in
+tempo per iniziare l'analisi, siamo a ridosso, o è già tardi? Questo
+controllo non è occasionale — deve accadere ogni settimana,
+automaticamente, non solo quando qualcuno se ne ricorda. Un'iniziativa
+mandataria senza una scadenza nota (il caso "critical ma senza data") non
+è esente da questo controllo: resta in stato di verifica finché qualcuno
+non la chiarisce, comparendo ogni settimana finché non viene risolta.
+
+*Principi Agile da incarnare in questa fase:*
+- *La nostra massima priorità è soddisfare il cliente rilasciando
+  software di valore, fin da subito ed in maniera continua.*
+- *A intervalli regolari il team riflette su come diventare più
+  efficace, poi regola il proprio comportamento di conseguenza.*
+
+**Checklist operativa**
+- [ ] Chi impone l'iniziativa (`mandated_by`) e perché (`rationale`) sono stati dichiarati esplicitamente, non presunti?
+- [ ] Se esiste una scadenza esterna: è stata registrata come data precisa, non come "presto" o "appena possibile"?
+- [ ] È stata fatta una stima di lead time con un referente tecnico?
+- [ ] L'iniziativa è stata controllata all'ultimo Backlog Refinement, indipendentemente da quanto sembri lontana la scadenza?
+- [ ] Se la scadenza è a rischio: è stato segnalato esplicitamente al PM, non lasciato in un file che nessuno rilegge?
+- [ ] L'iniziativa mandataria compare nei report di roadmap anche se non è ancora entrata in lavorazione?
+
 ## Product Backlog Refinement
 
 *"Plans are useless, but planning is indispensable." — Dwight D.
@@ -767,6 +838,14 @@ per la propria Product Line.
 **Strategic Exception** — Meccanismo che consente a una richiesta di
 bypassare il normale processo di prioritizzazione, su approvazione di un
 livello dirigenziale definito dall'istanza. Deve essere rara e motivata.
+
+**Iniziativa Mandataria (mandate)** — Iniziativa che bypassa il RICE
+perché imposta dall'alto, marcata "critical" da leadership, o vincolata a
+una scadenza esterna fissa — non l'analisi, che resta necessaria. A
+differenza della Strategic Exception, non richiede un'approvazione di
+ruolo specifico, ma richiede sempre di dichiarare esplicitamente chi la
+impone e perché, e una stima di lead time verificata ad ogni Backlog
+Refinement. Vedi sezione "Iniziative Mandatarie".
 
 **Ideas Bucket** — Il repository dove vengono raccolte tutte le idee,
 richieste e segnalazioni prima di essere valutate. Non è una coda di

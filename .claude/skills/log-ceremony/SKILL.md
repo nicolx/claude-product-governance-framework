@@ -1,6 +1,6 @@
 ---
 name: log-ceremony
-description: Registra una cerimonia collettiva (Backlog Refinement, Roadmap & Iteration Planning, ecc.) a partire dalla sua trascrizione grezza, producendo un record strutturato di decisioni collegato a idee/roadmap impattati. Usala dopo una riunione di team.
+description: Registra una cerimonia collettiva (Backlog Refinement, Roadmap & Iteration Planning, ecc.) a partire dalla sua trascrizione grezza, producendo un record strutturato di decisioni collegato a idee/roadmap impattati. Per il Backlog Refinement rileva anche reprioritizzazioni fuori RICE e richiama mandate-watch sulle iniziative mandatarie a rischio. Usala dopo una riunione di team.
 ---
 
 # log-ceremony
@@ -81,8 +81,21 @@ ricorrente del team.
    2): se la stessa persona invoca Strategic Exception ogni settimana,
    deve emergere dai dati, non restare un'impressione.
 
-8. Mostra un riepilogo delle decisioni estratte all'utente prima di
+8. **Per `backlog-refinement`, richiama `mandate-watch`.** È il
+   meccanismo che garantisce il controllo periodico "con congruo
+   anticipo" sulle iniziative mandatarie (playbook, "Iniziative
+   Mandatarie"): ad ogni Backlog Refinement, non solo quando qualcuno se
+   ne ricorda. Se emergono mandate `overdue`, `due_soon`, o
+   `pending_review`, includili esplicitamente come input alla riunione
+   nel riepilogo mostrato al PM (passo 9) — **solo segnalazione**, non
+   generare comunicazioni o proposte automatiche da questo passo:
+   `mandate-watch` non ne genera, e `log-ceremony` non ne aggiunge di
+   proprie.
+
+9. Mostra un riepilogo delle decisioni estratte all'utente prima di
    considerare il log completo — è più facile correggere un
    fraintendimento ora che scoprirlo settimane dopo in una revisione.
    Se sono state rilevate reprioritizzazioni, includile esplicitamente
-   nel riepilogo, distinguendo le due categorie.
+   nel riepilogo, distinguendo le due categorie. Se `mandate-watch` ha
+   segnalato mandate a rischio, includili con la stessa evidenza — non
+   in coda, non come nota a margine.
