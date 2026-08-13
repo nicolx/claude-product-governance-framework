@@ -54,3 +54,21 @@ unscored_ideas:
     status: ""                          # fresh | aging | stale | blocked_on:{waiting_on}
     blocked_reason: null
     waiting_on: null
+
+# measurements_status elenca le KPI delle iniziative già rilasciate
+# (idea status: done) che meritano attenzione — non solo check_due/
+# at_risk/invalidated, ma la serie storica di questa sezione nel tempo
+# (uno snapshot per settimana) È il tracciamento delle metriche su Git
+# richiesto per prendere decisioni informate su dove veicolare gli
+# investimenti futuri: non serve aspettare un livello derivato/DB per
+# iniziare ad accumularlo. Popolato leggendo measurement_status
+# calcolato da measurement-watch su ciascun product/prds/*/measurement.yaml
+# (non ricalcolato qui). Le KPI concluded non compaiono più qui.
+measurements_status:
+  - idea_id: ""
+    prd_ref: ""
+    kpi_name: ""
+    weeks_since_done: null
+    measurement_status: ""              # check_due | on_track | achieved | at_risk | invalidated | inconclusive
+    latest_reading: null
+    target: null

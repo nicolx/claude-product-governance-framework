@@ -136,9 +136,12 @@ misurazione e feedback.
 > dell'iterazione. Le sezioni relative all'implementazione tecnica
 > (Product Design, Development, Rollout) sono di competenza del CTO/tech
 > lead di ogni istanza e vanno integrate localmente. La sezione
-> Measurement resta essenziale finché un'istanza non ha un datalake
-> strutturato — potenziarla è un obiettivo di maturità, non un requisito
-> di partenza.
+> Measurement non richiede un datalake strutturato per iniziare: il
+> tracciamento delle KPI (baseline, target, letture nel tempo) vive in
+> Git accanto al PRD fin da subito, con le letture riportate dal PM a
+> mano — vedi skill `measurement-watch`. Un datalake resta comunque
+> l'obiettivo di maturità per automatizzare la raccolta delle letture,
+> non un prerequisito per cominciare a tracciare.
 
 Questo processo è progettato per governare **decisioni**, non solo
 attività. Ogni iniziativa è valutata in termini di rischio cognitivo e
@@ -455,6 +458,17 @@ nell'agenda del team nei prossimi giorni/settimane. Si usa la metafora
 delle "iterazioni settimanali" per dare un'idea delle possibili date di
 rilascio in termini di periodizzazione, non di giorno esatto.
 
+**La riunione si apre guardando indietro, non avanti.** Prima di
+discutere cosa entra in agenda, si controlla lo stato di ciò che è già
+stato rilasciato e di ciò che ha una scadenza in avvicinamento: quali
+iniziative stanno mostrando gli impatti attesi sulle metriche e quali
+no (sezione "Measurement"), quali iniziative mandatarie richiedono
+attenzione per la loro scadenza (sezione "Iniziative Mandatarie"), quali
+idee restano senza RICE da troppo tempo (sezione "Ideas prioritization").
+Solo dopo si passa a decidere le priorità del prossimo periodo — è più
+facile prioritizzare bene quando si parte da un quadro aggiornato di cosa
+sta già funzionando, invece di scoprirlo a posteriori.
+
 > **Nota su Scrum vs Kanban.** Un approccio più Kanban (una cosa dopo
 > l'altra, ben ordinate per priorità) è spesso preferibile a un
 > commitment rigido per sprint: un Gantt che promette la feature X nello
@@ -736,6 +750,22 @@ Si presentano i risultati, si celebrano i successi con i dati. Quando va
 storto, si celebra di aver imparato. Nessuna sfera di cristallo: solo la
 ricerca di un circolo virtuoso.
 
+**Il rischio non è misurare male — è dimenticarsi di misurare.** Un'idea
+consegnata "Done" (codice in produzione, playbook "Product Design,
+development and rollout") non risponde da sola alla domanda se ha
+funzionato: qualcuno deve tornare a controllare le sue KPI, e "qualcuno
+tornerà a controllare" senza un meccanismo esplicito diventa in pratica
+"nessuno lo farà mai". Per questo il controllo va integrato nel ciclo
+ricorrente, non lasciato alla buona volontà: **ad ogni Backlog
+Refinement, prima ancora di guardare cosa entra in agenda, si controllano
+le iniziative già rilasciate** — quali stanno mostrando l'impatto atteso,
+quali sono ancora troppo giovani per giudicarle, quali non lo stanno
+mostrando e meritano un follow-up o una chiusura consapevole. Questo
+tracciamento, accumulato settimana dopo settimana in Git accanto ai PRD,
+è ciò che nel tempo permette di vedere pattern e decidere con più
+sicurezza dove veicolare gli investimenti futuri — non solo "abbiamo
+consegnato tanto", ma "quello che abbiamo consegnato ha reso".
+
 *Principi Agile da incarnare in questa fase:*
 - *A intervalli regolari il team riflette su come diventare più efficace,
   poi regola il proprio comportamento di conseguenza.*
@@ -748,6 +778,8 @@ ricerca di un circolo virtuoso.
 - [ ] Se il target non è stato raggiunto: è stato avviato un processo di analisi causa-effetto?
 - [ ] Il debito tecnico generato è stato annotato?
 - [ ] Le nuove idee emerse dalla misurazione sono state aggiunte al bucket?
+- [ ] Le iniziative rilasciate da tempo sufficiente sono state riviste all'ultimo Backlog Refinement, in apertura, non come ripensamento a fine riunione?
+- [ ] Per le iniziative il cui impatto non convince: è stata presa una decisione esplicita (follow-up o chiusura), invece di lasciarle in un limbo?
 
 ---
 

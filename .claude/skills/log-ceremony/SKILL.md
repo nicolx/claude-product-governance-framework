@@ -1,6 +1,6 @@
 ---
 name: log-ceremony
-description: Registra una cerimonia collettiva (Backlog Refinement, Roadmap & Iteration Planning, ecc.) a partire dalla sua trascrizione grezza, producendo un record strutturato di decisioni collegato a idee/roadmap impattati. Per il Backlog Refinement rileva anche reprioritizzazioni fuori RICE e richiama mandate-watch e rice-watch per segnalare iniziative mandatarie a rischio e idee ancora senza RICE. Usala dopo una riunione di team.
+description: Registra una cerimonia collettiva (Backlog Refinement, Roadmap & Iteration Planning, ecc.) a partire dalla sua trascrizione grezza, producendo un record strutturato di decisioni collegato a idee/roadmap impattati. Per il Backlog Refinement rileva anche reprioritizzazioni fuori RICE e richiama measurement-watch, mandate-watch e rice-watch per segnalare impatti mancati, iniziative mandatarie a rischio e idee ancora senza RICE. Usala dopo una riunione di team.
 ---
 
 # log-ceremony
@@ -81,29 +81,40 @@ ricorrente del team.
    2): se la stessa persona invoca Strategic Exception ogni settimana,
    deve emergere dai dati, non restare un'impressione.
 
-8. **Per `backlog-refinement`, richiama `mandate-watch`.** È il
-   meccanismo che garantisce il controllo periodico "con congruo
-   anticipo" sulle iniziative mandatarie (playbook, "Iniziative
-   Mandatarie"): ad ogni Backlog Refinement, non solo quando qualcuno se
-   ne ricorda. Se emergono mandate `overdue`, `due_soon`, o
-   `pending_review`, includili esplicitamente come input alla riunione
-   nel riepilogo mostrato al PM (passo 9) — **solo segnalazione**, non
-   generare comunicazioni o proposte automatiche da questo passo:
-   `mandate-watch` non ne genera, e `log-ceremony` non ne aggiunge di
-   proprie.
+8. **Per `backlog-refinement`, richiama `measurement-watch` — idealmente
+   per prima, prima ancora delle altre watch.** Il playbook descrive
+   questa cerimonia come l'occasione per chiedersi, in apertura, quali
+   iniziative già rilasciate stanno mostrando impatti e quali no, prima
+   di guardare cosa entra in agenda dopo (playbook, "Product Backlog
+   Refinement" / "Measurement"). Se emergono KPI `check_due` (la
+   finestra di misurazione è passata ma manca ancora una lettura) o
+   `at_risk`/`invalidated`, includile esplicitamente nel riepilogo (passo
+   11) — è tracciare le metriche nel tempo, su Git, che permette
+   decisioni migliori su dove veicolare gli investimenti futuri.
 
-9. **Per `backlog-refinement`, richiama anche `rice-watch`.** Stesso
-   principio del passo precedente, ma per le idee normali senza RICE:
-   senza questo controllo periodico, un'idea in attesa di
-   un'informazione da uno stakeholder rischia di restare dimenticata nel
-   bucket. Se emergono idee `stale` o `blocked_on`, includile
-   esplicitamente nel riepilogo (passo 10) — anche qui, solo
-   segnalazione, nessuna azione automatica.
+9. **Richiama anche `mandate-watch`.** È il meccanismo che garantisce il
+   controllo periodico "con congruo anticipo" sulle iniziative
+   mandatarie (playbook, "Iniziative Mandatarie"): ad ogni Backlog
+   Refinement, non solo quando qualcuno se ne ricorda. Se emergono
+   mandate `overdue`, `due_soon`, o `pending_review`, includili
+   esplicitamente come input alla riunione nel riepilogo mostrato al PM
+   (passo 11) — **solo segnalazione**, non generare comunicazioni o
+   proposte automatiche da questo passo: `mandate-watch` non ne genera,
+   e `log-ceremony` non ne aggiunge di proprie.
 
-10. Mostra un riepilogo delle decisioni estratte all'utente prima di
+10. **Richiama anche `rice-watch`.** Stesso principio, ma per le idee
+    normali senza RICE: senza questo controllo periodico, un'idea in
+    attesa di un'informazione da uno stakeholder rischia di restare
+    dimenticata nel bucket. Se emergono idee `stale` o `blocked_on`,
+    includile esplicitamente nel riepilogo (passo 11) — anche qui, solo
+    segnalazione, nessuna azione automatica.
+
+11. Mostra un riepilogo delle decisioni estratte all'utente prima di
     considerare il log completo — è più facile correggere un
     fraintendimento ora che scoprirlo settimane dopo in una revisione.
     Se sono state rilevate reprioritizzazioni, includile esplicitamente
-    nel riepilogo, distinguendo le due categorie. Se `mandate-watch` o
-    `rice-watch` hanno segnalato elementi a rischio, includili con la
-    stessa evidenza — non in coda, non come nota a margine.
+    nel riepilogo, distinguendo le due categorie. Se `measurement-watch`,
+    `mandate-watch` o `rice-watch` hanno segnalato elementi a rischio,
+    includili con la stessa evidenza — non in coda, non come nota a
+    margine, e apri il riepilogo proprio con `measurement-watch` se ha
+    trovato qualcosa: è la prima domanda della cerimonia, per playbook.
