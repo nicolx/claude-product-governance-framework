@@ -18,6 +18,49 @@ imprevedibili: email intere, registrazioni, allegati). Tutto quello che
 deve sopravvivere passa da qui a una cartella tracciata come parte di
 questo processo.
 
+**Questa skill non è un passaggio obbligato.** È una comodità per il
+materiale che arriva disordinato. Un PM può sempre, in alternativa:
+creare/modificare file sotto `product/ideas/` o `product/prds/` a mano,
+o chiedere direttamente a `idea-intake`/`prd-draft` di processare del
+materiale senza mai passare da `product/inbox/`. Non presumere mai che
+tutto debba transitare da qui.
+
+## Principio guida: garantista, non produttivista
+
+**Meglio una domanda in più che un'idea scritta male.** Questa skill non
+è misurata su quante cartelle crea per run, ma su quanto è affidabile
+quello che scrive. Un'idea o un aggiornamento pieno di dati inferiti o
+indovinati è **peggio** di non averlo ancora creato: qualcuno ci lavorerà
+sopra, prioritizzerà su basi sbagliate, e l'errore si scopre solo dopo
+aver bruciato tempo reale. Se non basta rileggere il materiale una
+seconda volta per essere ragionevolmente sicuri, non indovinare — chiedi.
+
+Ci sono **due livelli di dubbio**, e vanno trattati diversamente:
+
+1. **Dubbio che il PM davanti a te può risolvere subito, in conversazione**
+   (es. "questa email sembra riferirsi alla Product Line A o B, quale
+   delle due?", "questo materiale è un aggiornamento dell'idea
+   `2026-01-08-xyz` o è scollegato?", "il proponente è lo stesso Filiberto
+   di Operations o un omonimo?"). **Fai la domanda subito, nella
+   conversazione corrente**, prima di scrivere qualunque file — non
+   serve creare un record `needs_clarification` per questo, il PM ha
+   l'informazione a portata di mano.
+
+2. **Dubbio che solo chi ha mandato il materiale originale può risolvere**
+   (dati mancanti che il PM stesso non conosce: un numero, un dettaglio
+   del problema, chi sia davvero il beneficiario coinvolto). Questo è il
+   caso che diventa `status: needs_clarification` (vedi passo 4 sotto) —
+   con domande specifiche pronte per essere rispedite al mittente.
+
+In entrambi i casi, la regola è la stessa: **non scrivere un campo con un
+valore inventato o indovinato solo per completare lo schema.** Se un dato
+non è nel materiale e nessuno dei due livelli sopra lo risolve subito,
+lascialo esplicitamente vuoto/null con una nota, non riempirlo a caso.
+
+Non vale solo per la classificazione: vale anche per numeri, nomi,
+percentuali, product line, e per l'ipotesi che un elemento sia collegato
+a un'idea/PRD già esistente (passo 3).
+
 ## Passi
 
 1. **Elenca tutto ciò che c'è in `product/inbox/`.** Non assumere che sia
@@ -35,11 +78,23 @@ questo processo.
    (Why/What, non serve leggere tutto il corpo per uno screening
    iniziale). Se il contenuto sembra riferirsi chiaramente a un'idea o
    PRD già esistente, tratta l'elemento come **aggiornamento**, non come
-   nuova idea. Se il collegamento è plausibile ma non certo, chiedi
-   conferma all'utente invece di decidere da solo — un falso collegamento
-   è peggio di una domanda in più.
+   nuova idea. Se il collegamento è plausibile ma non certo, è un dubbio
+   di **livello 1** (vedi sopra): chiedi conferma al PM nella
+   conversazione, subito, invece di decidere da solo — un falso
+   collegamento è peggio di una domanda in più.
 
-4. **Classifica** ogni elemento in uno di questi esiti:
+4. **Classifica** ogni elemento in uno di questi esiti. Prima di scegliere
+   idea/bug/strategic_exception/aggiornamento (cioè prima di scartare
+   `needs_clarification`), verifica di poter rispondere, **solo dal
+   materiale a disposizione o da una domanda di livello 1 già fatta al
+   PM**, a queste domande minime:
+   - Chi è il proponente (o almeno un canale/fonte identificabile)?
+   - Qual è il problema o la richiesta, in termini comprensibili?
+   - Perché sembra rilevante, anche minimamente?
+
+   Se anche una sola di queste tre resta senza risposta dopo aver provato
+   il livello 1, non forzare la classificazione: vai su
+   `needs_clarification` (livello 2, sotto).
 
    - **Nuova idea** — segui gli stessi passi della skill `idea-intake`
      per struttura della cartella, naming dello slug e classificazione
@@ -77,8 +132,8 @@ questo processo.
      esplicitamente — non presumere l'approvazione solo perché il
      mittente ha un ruolo senior.
 
-   - **Troppo ambiguo per classificare** — **non forzare una
-     classificazione indovinando**. Crea comunque
+   - **Troppo ambiguo per classificare (dubbio di livello 2)** — **non
+     forzare una classificazione indovinando**. Crea comunque
      `product/ideas/{data}-{slug-provvisorio}/` con:
      - `status: needs_clarification`
      - `classification` lasciata come miglior tentativo provvisorio (può
@@ -111,6 +166,10 @@ questo processo.
 
 ## Cosa NON fare
 
+- Non inventare o indovinare un valore per completare uno schema — nel
+  dubbio, chiedi (livello 1 o 2, vedi sopra) o lascia il campo vuoto con
+  una nota. Meglio un record incompleto e onesto che uno completo e
+  sbagliato.
 - Non creare mai voci di `rice_history` da questa skill — è compito di
   `rice-update`, con la sua propria coda di approvazione.
 - Non riscrivere PRD esistenti — è compito di `prd-draft`, su richiesta

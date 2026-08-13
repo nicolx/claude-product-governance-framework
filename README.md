@@ -91,6 +91,16 @@ rispedire a chi l'ha mandato. Alla fine del run, `product/inbox/` resta
 vuota: tutto quello che deve sopravvivere è già stato spostato in una
 cartella tracciata.
 
+`product/inbox/` è una comodità, **non un passaggio obbligato**: un PM
+può sempre creare/modificare file sotto `product/ideas/` o
+`product/prds/` direttamente (a mano, o chiedendo a `idea-intake`/
+`prd-draft` di processare del materiale senza mai passare da lì).
+
+`inbox-triage` è deliberatamente **garantista**: nel dubbio chiede,
+invece di scrivere un record con dati inferiti o indovinati — un'idea
+piena di errori fa lavorare il team su basi sbagliate, il che costa più
+di una domanda in più (vedi il principio guida nella skill stessa).
+
 Perché non si chiama tutto "governance": quella parola qui indica solo la
 *configurazione* di come questa istanza è impostata, non il contenitore dei
 dati. Il codice va in `apps/`, gli artefatti di prodotto in `product/` —

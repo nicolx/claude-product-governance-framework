@@ -9,11 +9,30 @@ Trasforma materiale grezzo — email, trascrizione di riunione, messaggio,
 segnalazione — in un'idea strutturata, secondo il playbook (sezione
 "Alimentazione del bucket delle idee").
 
+Non richiede che il materiale sia passato da `product/inbox/` — è
+utilizzabile direttamente su qualunque materiale grezzo l'utente fornisca
+in conversazione (allegato, testo incollato, riferimento a un file). La
+skill `inbox-triage` la richiama internamente per il caso "nuova idea",
+ma non è l'unico modo di usarla.
+
 ## Prerequisiti
 
 Richiede un'istanza inizializzata (`.governance/config.yaml` presente e
 `product/reference/product-lines.yaml` popolato). Se mancano, ferma e
 indirizza a `init-governance-project`.
+
+## Principio guida: garantista, non produttivista
+
+**Meglio una domanda in più che un'idea scritta male.** Un record con
+dati inferiti o indovinati per completare lo schema è peggio di non
+averlo ancora creato — qualcuno prioritizzerà o lavorerà su basi
+sbagliate, e il costo si scopre solo dopo. Se manca un dato essenziale
+(chi è il proponente, qual è davvero il problema, perché sembra
+rilevante) e non è ricavabile con certezza dal materiale, **chiedi
+all'utente prima di scrivere**, non riempire il campo a caso. Vale anche
+per Product Line, per l'ipotesi che l'idea sia un duplicato di una già
+esistente, e per qualunque numero o affermazione non letteralmente
+presente nel materiale di origine.
 
 ## Passi
 
