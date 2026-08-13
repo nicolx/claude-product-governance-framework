@@ -1,6 +1,6 @@
 ---
 name: log-ceremony
-description: Registra una cerimonia collettiva (Backlog Refinement, Roadmap & Iteration Planning, ecc.) a partire dalla sua trascrizione grezza, producendo un record strutturato di decisioni collegato a idee/roadmap impattati. Per il Backlog Refinement rileva anche reprioritizzazioni fuori RICE e richiama mandate-watch sulle iniziative mandatarie a rischio. Usala dopo una riunione di team.
+description: Registra una cerimonia collettiva (Backlog Refinement, Roadmap & Iteration Planning, ecc.) a partire dalla sua trascrizione grezza, producendo un record strutturato di decisioni collegato a idee/roadmap impattati. Per il Backlog Refinement rileva anche reprioritizzazioni fuori RICE e richiama mandate-watch e rice-watch per segnalare iniziative mandatarie a rischio e idee ancora senza RICE. Usala dopo una riunione di team.
 ---
 
 # log-ceremony
@@ -92,10 +92,18 @@ ricorrente del team.
    `mandate-watch` non ne genera, e `log-ceremony` non ne aggiunge di
    proprie.
 
-9. Mostra un riepilogo delle decisioni estratte all'utente prima di
-   considerare il log completo — è più facile correggere un
-   fraintendimento ora che scoprirlo settimane dopo in una revisione.
-   Se sono state rilevate reprioritizzazioni, includile esplicitamente
-   nel riepilogo, distinguendo le due categorie. Se `mandate-watch` ha
-   segnalato mandate a rischio, includili con la stessa evidenza — non
-   in coda, non come nota a margine.
+9. **Per `backlog-refinement`, richiama anche `rice-watch`.** Stesso
+   principio del passo precedente, ma per le idee normali senza RICE:
+   senza questo controllo periodico, un'idea in attesa di
+   un'informazione da uno stakeholder rischia di restare dimenticata nel
+   bucket. Se emergono idee `stale` o `blocked_on`, includile
+   esplicitamente nel riepilogo (passo 10) — anche qui, solo
+   segnalazione, nessuna azione automatica.
+
+10. Mostra un riepilogo delle decisioni estratte all'utente prima di
+    considerare il log completo — è più facile correggere un
+    fraintendimento ora che scoprirlo settimane dopo in una revisione.
+    Se sono state rilevate reprioritizzazioni, includile esplicitamente
+    nel riepilogo, distinguendo le due categorie. Se `mandate-watch` o
+    `rice-watch` hanno segnalato elementi a rischio, includili con la
+    stessa evidenza — non in coda, non come nota a margine.

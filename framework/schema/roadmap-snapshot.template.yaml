@@ -40,3 +40,17 @@ mandates_status:
     analysis_start_by: null
     escalation_status: ""             # pending_review | on_track | due_soon | overdue
     current_status: ""                 # status corrente dell'idea (bucket, in_analysis, ecc.)
+
+# unscored_ideas elenca le idee classification: idea ancora con
+# rice_history vuoto — stesso principio di mandates_status: renderle
+# visibili anche se non sono ancora in initiatives, perché è esattamente
+# lì che si perdono (nessuno le nota finché non è troppo tardi). Popolato
+# leggendo rice_status calcolato da rice-watch su ciascuna idea (non
+# ricalcolato qui).
+unscored_ideas:
+  - idea_id: ""
+    title: ""
+    days_unscored: null                # calcolato al momento dello snapshot, non un campo persistito sull'idea
+    status: ""                          # fresh | aging | stale | blocked_on:{waiting_on}
+    blocked_reason: null
+    waiting_on: null

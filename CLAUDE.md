@@ -34,6 +34,7 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `product/ideas/`, `product/prds/` (creazione) | Istanza | `idea-intake`, `inbox-triage`, `prd-draft` — creazione diretta, non passa da approvazione (non è ancora una decisione di priorità) |
 | `product/ideas/*/rice_history`, `product/ideas/*/strategic_exceptions`, `product/ideas/*/mandate` (dopo la creazione), `product/roadmap/`, comunicazioni in uscita | Istanza | Solo tramite `product/approvals/pending/` — vedi regola sotto |
 | `product/ideas/*/mandate.analysis_start_by`, `product/ideas/*/mandate.escalation_status` | Istanza | Solo `mandate-watch` — fatti calcolati, non decisioni, scrittura diretta senza approvazione (stesso principio di `jira.status`) |
+| `product/ideas/*/rice_status` | Istanza | Solo `rice-watch` — `flagged_since` è un fatto osservato; `blocked_reason`/`waiting_on` sono cattura di contesto (chiesti al PM, mai presunti), non decisioni di priorità: nessuna delle due passa da approvazione |
 | `.governance/config.yaml` | Istanza | Solo `init-governance-project`, in scrittura successiva solo su richiesta esplicita dell'utente |
 
 Non spostare mai contenuto da `framework/` verso cartelle di istanza per

@@ -66,6 +66,22 @@ rice_history: []
 #   approved_by: ""             # referente tecnico e/o stakeholder che ha validato la stima
 #   ceremony_ref: null          # opzionale: link a product/ceremonies/... se la revisione è nata lì
 
+# rice_status esiste per rispondere a una domanda diversa da rice_history:
+# non "qual è il RICE", ma "perché questa idea non ce l'ha ancora". Un'idea
+# classification: idea che resta con rice_history vuoto per settimane
+# rischia di essere dimenticata nel bucket — spesso perché manca
+# un'informazione da uno stakeholder per calibrare Reach/Impact
+# correttamente, non per semplice disattenzione. Calcolato/aggiornato dalla
+# skill rice-watch: flagged_since è un fatto (prima volta rilevata come non
+# quotata), blocked_reason/waiting_on sono annotati SOLO se noti — mai
+# presunti, chiesti esplicitamente al PM quando rice-watch la rileva.
+# Non passa da product/approvals/pending/: è cattura di contesto, non una
+# decisione di priorità (stessa logica della creazione dell'idea stessa).
+rice_status:
+  flagged_since: null           # data della prima volta che rice-watch l'ha rilevata senza RICE — null se ha già uno score o non è mai stata scansionata
+  blocked_reason: null           # perché non è ancora stata quotata, se noto (es. "manca stima Impact da Sales")
+  waiting_on: null                # chi dovrebbe fornire l'informazione mancante
+
 # strategic_exceptions è APPEND-ONLY, come rice_history — una Strategic
 # Exception può essere invocata in DUE momenti distinti della vita di
 # un'idea, e vanno tracciati entrambi (playbook, "Come gestire le

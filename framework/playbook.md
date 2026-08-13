@@ -343,6 +343,19 @@ Essere in priorità 1 non significa che il team si fionda immediatamente
 sull'attività: per interrompere l'agenda con un'attività immediata serve
 sempre la Strategic Exception.
 
+**Cosa succede a un'idea che non riesce ad avere un RICE.** Non tutte le
+idee arrivano con abbastanza informazione per essere quotate subito —
+spesso manca un dato da uno stakeholder (un numero, una conferma, una
+priorità di business che solo lui conosce). Questo è normale e non va
+forzato: **meglio un'idea che resta senza RICE in attesa di
+un'informazione reale, che un RICE inventato per far procedere qualcosa**
+(lo stesso principio del "nel dubbio, chiedi" applicato all'intake vale
+qui). Il rischio non è avere idee in attesa — è **perderle di vista**: se
+nessuno controlla periodicamente cosa è rimasto senza quotazione,
+un'idea può restare ferma per mesi senza che nessuno se ne accorga. Per
+questo il controllo va fatto ad ogni Backlog Refinement, non solo quando
+qualcuno se ne ricorda.
+
 *Principi Agile da incarnare in questa fase:*
 - *Committenti e sviluppatori devono lavorare insieme quotidianamente per
   tutta la durata del progetto.*
@@ -357,6 +370,8 @@ sempre la Strategic Exception.
 - [ ] Lo stakeholder proponente ha confermato Reach e Impact?
 - [ ] L'idea è stata confrontata con le prime posizioni del backlog per coerenza del ranking?
 - [ ] Se il RICE score è basso: è stata comunicata la motivazione allo stakeholder?
+- [ ] Le idee ancora senza RICE sono state riviste all'ultimo Backlog Refinement, indipendentemente da quanto sembrino vecchie o marginali?
+- [ ] Per le idee senza RICE da più di qualche settimana: è chiaro cosa manca e a chi è stato chiesto?
 
 ## Iniziative Mandatarie
 
