@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
-# Blocca il push se 'origin' risulta essere il repo CANONICO del framework.
+# Blocca SOLO il push diretto sul branch protetto (main) quando 'origin' è
+# il repo CANONICO del framework. Push di altri branch (tipicamente per
+# aprire una Pull Request) restano permessi anche verso il canonico — è il
+# flusso corretto anche per chi mantiene il framework stesso.
 #
 # Questo è un livello di protezione client-side: aggira gli errori più comuni
-# (push accidentale sul repo sbagliato) ma è bypassabile (--no-verify, o
+# (push diretto accidentale su main) ma è bypassabile (--no-verify, o
 # semplicemente non avendo installato gli hook). La protezione reale è la
 # branch protection lato server sul repo canonico (vedi README.md).
 
 set -euo pipefail
+
+PROTECTED_BRANCH="main"
 
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 [ -z "$REPO_ROOT" ] && exit 0
@@ -28,10 +33,22 @@ CANONICAL_URL="$(grep -vE '^\s*#' "$CANONICAL_FILE" | grep -vE '^\s*$' | head -n
 ORIGIN_URL="$(git remote get-url origin 2>/dev/null || true)"
 [ -z "$ORIGIN_URL" ] && exit 0
 
-if [ "$(normalize "$ORIGIN_URL")" = "$(normalize "$CANONICAL_URL")" ]; then
-  echo "🚫 Push bloccato: 'origin' è il repo CANONICO del framework." >&2
-  echo "   Questo repo deve restare un fork pulito, senza dati di istanza." >&2
-  echo "   Per contribuire al metodo: apri una Pull Request dal tuo fork." >&2
+[ "$(normalize "$ORIGIN_URL")" = "$(normalize "$CANONICAL_URL")" ] || exit 0
+
+# Da qui in poi: origin È il canonico. Blocca solo se tra i ref pushati
+# c'è refs/heads/<PROTECTED_BRANCH>. Formato stdin di pre-push:
+# <local ref> <local oid> <remote ref> <remote oid>
+BLOCKED=0
+while read -r _local_ref _local_oid remote_ref _remote_oid; do
+  if [ "$remote_ref" = "refs/heads/${PROTECTED_BRANCH}" ]; then
+    BLOCKED=1
+    break
+  fi
+done
+
+if [ "$BLOCKED" = "1" ]; then
+  echo "🚫 Push bloccato: stai pushando direttamente su '${PROTECTED_BRANCH}' sul repo CANONICO." >&2
+  echo "   Apri invece un branch e una Pull Request." >&2
   exit 1
 fi
 
