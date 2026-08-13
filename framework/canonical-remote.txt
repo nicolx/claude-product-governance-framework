@@ -1,9 +1,4 @@
 # URL del repo canonico del framework (upstream).
 # Usato da bootstrap.sh e da .githooks/pre-push per riconoscere se il repo
 # in cui ci si trova è ANCORA il canonico o è già un fork/istanza.
-#
-# TODO: sostituire con l'URL reale non appena questo repo viene pubblicato
-# su GitHub (es. https://github.com/epassi/claude-product-governance-framework).
-# Finché resta il placeholder sotto, bootstrap.sh e il pre-push hook non
-# potranno distinguere canonico da fork e lo segnaleranno esplicitamente.
-https://github.com/PLACEHOLDER-ORG/claude-product-governance-framework.git
+https://github.com/nicolx/claude-product-governance-framework.git
