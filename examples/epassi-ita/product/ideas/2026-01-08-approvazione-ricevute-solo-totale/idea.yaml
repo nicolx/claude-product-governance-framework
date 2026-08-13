@@ -19,7 +19,19 @@ status: done
 # fino alla Measurement: per questo lo stato qui è 'done', a differenza
 # di un'idea reale appena presa in carico che partirebbe da 'bucket'.
 
+done_at: "2026-02-09"
+# Plausibile in base alla narrativa (Episodio 6: lo sviluppo slitta di
+# 10 giorni rispetto all'iteration planning; Episodio 8 è la Measurement
+# successiva) — non una data letterale dal testo originale.
+
 created_at: "2026-01-08"
+
+clarification:
+  needed: false
+  questions: []
+  draft_message: null
+  sent_at: null
+  resolved_at: null
 
 rice_history:
   - date: "2026-01-09"
@@ -40,9 +52,9 @@ rice_history:
     approved_by: "Franco (referente tecnico)"
     ceremony_ref: null
 
-strategic_exception:
-  approved_by: null
-  reason: null
+strategic_exceptions: []
+# Questa idea non ha mai saltato la coda: è entrata in iterazione seguendo
+# il suo RICE score regolare (Episodio 6), nessuna Strategic Exception.
 
 jira:
   card_id: null

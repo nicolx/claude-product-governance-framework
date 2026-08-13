@@ -28,9 +28,16 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 
 | Cartella | Proprietà | Chi scrive |
 |---|---|---|
-| `bootstrap.sh`, `.githooks/`, `framework/`, `.claude/skills/` | Framework (upstream) | Solo PR sul canonico, mai un'istanza |
+| `bootstrap.sh`, `.githooks/`, `framework/`, `.claude/skills/`, `.gitignore` | Framework (upstream) | Solo PR sul canonico, mai un'istanza |
 | `apps/` | Istanza | Solo `init-governance-project` (aggiunta submodule) |
-| `product/` | Istanza | Le skill, sempre passando dalla coda di approvazione |
+| `product/inbox/` | Istanza, NON tracciata da git | `inbox-triage` la svuota spostando ogni elemento altrove; nessuna approvazione richiesta per lo spostamento in sé |
+| `product/ideas/`, `product/prds/` (creazione) | Istanza | `idea-intake`, `inbox-triage`, `prd-draft` — creazione diretta, non passa da approvazione (non è ancora una decisione di priorità) |
+| `product/ideas/*/rice_history`, `product/ideas/*/strategic_exceptions`, `product/ideas/*/mandate` (dopo la creazione), `product/roadmap/`, comunicazioni in uscita | Istanza | Solo tramite `product/approvals/pending/` — vedi regola sotto |
+| `product/ideas/*/mandate.analysis_start_by`, `product/ideas/*/mandate.escalation_status` | Istanza | Solo `mandate-watch` — fatti calcolati, non decisioni, scrittura diretta senza approvazione (stesso principio di `jira.status`) |
+| `product/ideas/*/rice_status` | Istanza | Solo `rice-watch` — `flagged_since` è un fatto osservato; `blocked_reason`/`waiting_on` sono cattura di contesto (chiesti al PM, mai presunti), non decisioni di priorità: nessuna delle due passa da approvazione |
+| `product/prds/*/measurement*.yaml` (creazione) | Istanza | Solo `prd-draft`, contestualmente alla creazione del PRD — non passa da approvazione (stessa logica della creazione di idee/PRD) |
+| `product/prds/*/measurement*.yaml` (readings, measurement_status, follow_up_needed, closure) | Istanza | Solo `measurement-watch` — letture riportate dal PM e `closure` sono cattura di decisioni/fatti già espressi in conversazione (mai presunti, mai chiusi di iniziativa propria), `measurement_status` è calcolato dai dati. Nessuno di questi passa da approvazione |
+| `product/reference/nsm-tracking.yaml` | Istanza | Solo `nsm-watch` — creato lazy al primo run (non da `init-governance-project`), scritto direttamente: `readings`/`trend_status`/`alert.status` sono fatti/calcoli osservati, `discovery_focus_confirmed`/`resolved_*` sono cattura di decisioni già espresse dal PM in conversazione. Nessuno di questi passa da approvazione |
 | `.governance/config.yaml` | Istanza | Solo `init-governance-project`, in scrittura successiva solo su richiesta esplicita dell'utente |
 
 Non spostare mai contenuto da `framework/` verso cartelle di istanza per
@@ -48,6 +55,16 @@ Nessuna skill scrive mai direttamente in `product/ideas/`, `product/prds/`,
 - Ogni diff di RICE proposto da nuova evidenza
 - Ogni snapshot di roadmap generato da una cerimonia
 - Ogni comunicazione in uscita (mail settimanale, roadmap trimestrale)
+- Ogni Strategic Exception rilevata durante il Backlog Refinement quando
+  un'iniziativa salta la coda rispetto al suo RICE score (vedi
+  `log-ceremony` e `idea.template.yaml`, `strategic_exceptions`) — quelle
+  invocate già all'intake seguono invece `idea-intake`/`inbox-triage` e
+  non passano da qui, perché non c'è ancora un `target_file` esistente da
+  modificare (l'idea nasce già così)
+- Ogni modifica a `due_date`/`lead_time_weeks`/`mandated_by`/`rationale`/
+  `is_critical` di un'iniziativa mandataria **dopo** la creazione (la
+  creazione stessa non passa da qui, stessa logica delle idee normali) —
+  vedi `idea.template.yaml`, blocco `mandate`, e skill `mandate-watch`
 
 L'automazione propone (scrive in `pending/` con il diff/contenuto
 proposto), un umano approva esplicitamente (la voce si sposta in

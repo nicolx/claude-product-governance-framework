@@ -2,8 +2,15 @@
 #
 # Un'idea nasce da materiale grezzo (email, trascrizione, segnalazione) e
 # viene classificata secondo il playbook (sezione "Alimentazione del bucket
-# delle idee"): idea normale, bug (bypassa il RICE, va su Jira), o
-# Strategic Exception (bypassa il RICE, richiede approvazione CEO/CPO-CTO).
+# delle idee"): idea normale, bug (bypassa il RICE, va su Jira), Strategic
+# Exception (bypassa il RICE, richiede approvazione CEO/CPO-CTO),
+# Iniziativa Mandataria/mandate (bypassa SOLO il RICE — non l'analisi —
+# perché imposta dall'alto, marcata "critical" da leadership, o vincolata
+# a una scadenza esterna fissa; vedi playbook, sezione "Iniziative
+# Mandatarie", e il blocco `mandate` più sotto), o platform (debito
+# tecnico/devops puro — bypassa il RICE perché la priorità è giudizio del
+# team tech dentro una capacità protetta, non valore di business né
+# autorità esterna; vedi il blocco `platform` più sotto).
 #
 # rice_history è APPEND-ONLY: ogni revisione del RICE (nuova evidenza,
 # discussione) aggiunge una voce nuova, non sovrascrive le precedenti —
@@ -18,13 +25,51 @@ source:
   type: email                        # email | meeting_transcript | slack | other
   ref: ""                            # citazione/pointer al materiale in source/ (es. "source/email-2026-01-08.eml")
 
-product_line: ""                     # deve corrispondere a un name in product/reference/product-lines.yaml
-classification: idea                 # idea | bug | strategic_exception
+product_line: ""                     # deve corrispondere a un name in product/reference/product-lines.yaml — può restare "" se status è needs_clarification, o restare vuoto per classification: platform se non è legata a una Product Line specifica
+classification: idea                 # idea | bug | strategic_exception | mandate | platform — può restare provvisoria se status è needs_clarification
 
 status: bucket
-# bucket -> prioritized -> in_backlog_refinement -> in_analysis -> in_prd -> in_roadmap -> in_jira -> done | aborted
+# needs_clarification -> bucket -> prioritized -> in_backlog_refinement -> in_analysis -> in_prd -> in_roadmap -> in_jira -> done | aborted
+#
+# classification: bug e strategic_exception saltano quasi tutta la catena:
+# tipicamente bucket -> in_jira -> done direttamente (bug) o, per strategic
+# exception, bucket -> in_jira -> done non appena approvata — non passano
+# né da prioritized (niente RICE) né dal Backlog Refinement per priorità.
+#
+# classification: mandate salta SOLO prioritized (niente RICE): segue lo
+# stesso percorso di un'idea normale per il resto — bucket ->
+# in_backlog_refinement -> in_analysis -> in_prd -> in_roadmap -> in_jira
+# -> done. L'ingresso in analisi è forzato dalla scadenza (vedi blocco
+# `mandate` e skill mandate-watch), non dal ranking RICE.
+#
+# classification: platform salta SOLO prioritized, come mandate — segue
+# lo stesso percorso per il resto, inclusa l'eventuale Complete Analysis/
+# PRD per le iniziative di dimensione importante (le più piccole possono
+# saltare direttamente a in_jira, a giudizio del team tech). Entra
+# comunque in product/roadmap/snapshots/ come qualunque altra iniziativa
+# quando entra in iterazione — non è lavoro invisibile, solo non
+# RICE-ranked.
+
+done_at: null
+# Data in cui status è passato a "done" (Definition of Done: codice in
+# produzione — playbook, "Product Design, development and rollout"). Un
+# fatto, non una decisione: chi/cosa porta l'idea a status: done scrive
+# anche questa data, scrittura diretta senza approvazione. Se status è
+# già "done" ma questo campo è ancora null (idea più vecchia di
+# quest'aggiunta allo schema), va chiesto al PM, mai presunto "oggi" —
+# serve a measurement-watch per calcolare da quanto tempo un'iniziativa
+# è in produzione.
 
 created_at: "2026-01-08"
+
+# --- Solo se status: needs_clarification (materiale arrivato in product/inbox/
+# troppo ambiguo per essere classificato senza altre informazioni) ---
+clarification:
+  needed: false                # true se status è needs_clarification
+  questions: []                 # domande da porre a chi ha mandato il materiale originale
+  draft_message: null           # bozza di messaggio di richiesta chiarimento, pronta per l'invio (mai inviata in automatico)
+  sent_at: null
+  resolved_at: null             # quando arriva la risposta e l'idea può essere riclassificata
 
 # --- Solo per classification: idea (bug e strategic_exception saltano il RICE) ---
 rice_history: []
@@ -42,10 +87,98 @@ rice_history: []
 #   approved_by: ""             # referente tecnico e/o stakeholder che ha validato la stima
 #   ceremony_ref: null          # opzionale: link a product/ceremonies/... se la revisione è nata lì
 
-# --- Solo per classification: strategic_exception ---
-strategic_exception:
-  approved_by: null             # "CEO" | "CPO/CTO" | null
-  reason: null
+# rice_status esiste per rispondere a una domanda diversa da rice_history:
+# non "qual è il RICE", ma "perché questa idea non ce l'ha ancora". Un'idea
+# classification: idea che resta con rice_history vuoto per settimane
+# rischia di essere dimenticata nel bucket — spesso perché manca
+# un'informazione da uno stakeholder per calibrare Reach/Impact
+# correttamente, non per semplice disattenzione. Calcolato/aggiornato dalla
+# skill rice-watch: flagged_since è un fatto (prima volta rilevata come non
+# quotata), blocked_reason/waiting_on sono annotati SOLO se noti — mai
+# presunti, chiesti esplicitamente al PM quando rice-watch la rileva.
+# Non passa da product/approvals/pending/: è cattura di contesto, non una
+# decisione di priorità (stessa logica della creazione dell'idea stessa).
+rice_status:
+  flagged_since: null           # data della prima volta che rice-watch l'ha rilevata senza RICE — null se ha già uno score o non è mai stata scansionata
+  blocked_reason: null           # perché non è ancora stata quotata, se noto (es. "manca stima Impact da Sales")
+  waiting_on: null                # chi dovrebbe fornire l'informazione mancante
+
+# strategic_exceptions è APPEND-ONLY, come rice_history — una Strategic
+# Exception può essere invocata in DUE momenti distinti della vita di
+# un'idea, e vanno tracciati entrambi (playbook, "Come gestire le
+# frizioni" — Scenario 2: il PM tiene traccia di ogni Strategic Exception
+# per intercettare pattern, es. lo stesso stakeholder che la invoca ogni
+# settimana):
+#
+# 1. invoked_at_stage: intake — l'idea nasce già come Strategic Exception
+#    (classification: strategic_exception sopra), proposta su un canale
+#    privilegiato, salta il RICE fin dall'inizio.
+# 2. invoked_at_stage: backlog_refinement — l'idea era una classification:
+#    idea normale, CON un suo rice_history reale, ma durante il Backlog
+#    Refinement viene fatta entrare nell'iterazione corrente saltando
+#    davanti a idee con RICE score più alto ancora in backlog. Questo È
+#    un'interruzione dell'agenda via Strategic Exception (playbook,
+#    "Ideas prioritization": "per interrompere l'agenda di sviluppo con
+#    una nuova attività immediata si deve ricorrere sempre alla Strategic
+#    Exception") — anche se l'idea aveva già un RICE regolare.
+#    La skill log-ceremony la rileva confrontando la posizione assegnata
+#    col RICE score, e chiede esplicitamente se è un'eccezione (bypass su
+#    autorizzazione di uno stakeholder) o una scelta qualitativa del team
+#    dentro il processo normale (in tal caso NON va qui, resta solo nel
+#    campo `reprioritizations` della cerimonia — vedi
+#    ceremony-decisions.template.yaml).
+#
+# La classification dell'idea NON cambia per un'eccezione invocata in
+# fase 2: l'idea resta "classification: idea", ha comunque un RICE reale,
+# semplicemente questa specifica iterazione l'ha fatta passare avanti.
+strategic_exceptions: []
+# Esempio di singola voce:
+# - date: "2026-01-08"
+#   invoked_at_stage: backlog_refinement   # intake | backlog_refinement
+#   approved_by: "CPO/CTO"                  # chi ha autorizzato il bypass — mai presunto, va confermato esplicitamente
+#   reason: ""                              # perché è stata accolta comunque
+#   ceremony_ref: "product/ceremonies/backlog-refinement/2026-W02"  # null se invocata all'intake
+
+# --- Solo per classification: mandate ---
+#
+# A differenza di strategic_exceptions (che tiene uno storico di eventi
+# distinti), mandate è un blocco che si AGGIORNA — descrive un'unica
+# iniziativa mandataria, non una sequenza di invocazioni. mandated_by e
+# rationale non vanno mai presunti (stesso principio garantista di
+# idea-intake/inbox-triage): vanno chiesti esplicitamente, indipendentemente
+# dal ruolo di chi propone — non c'è un vincolo di ruolo su chi può
+# dichiarare un mandate (a differenza delle Strategic Exception, che
+# richiedono CEO/CPO-CTO), il controllo di eventuali abusi della categoria
+# avviene a posteriori rendendo il pattern visibile in mandates_status
+# (roadmap-snapshot), non bloccando a priori.
+#
+# analysis_start_by e escalation_status sono CALCOLATI dalla skill
+# mandate-watch (fatti derivati, non decisioni) — non vanno mai compilati
+# a mano. Le modifiche a due_date/lead_time_weeks/mandated_by dopo la
+# creazione iniziale passano invece da product/approvals/pending/
+# (type: mandate_update) come un diff RICE.
+mandate:
+  mandated_by: null             # persona/organo che impone l'iniziativa — mai presunto
+  rationale: null                # perché è mandataria (compliance, direttiva strategica, contratto, evento fisso)
+  is_critical: false              # true se leadership la marca "critical" indipendentemente da una data
+  due_date: null                   # scadenza fissa esterna, se esiste (null se non c'è)
+  lead_time_weeks: null            # runway stimato prima della due_date — andrebbe validato con un referente tecnico
+  analysis_start_by: null          # calcolato da mandate-watch: due_date - lead_time_weeks
+  escalation_status: pending_review   # pending_review | on_track | due_soon | overdue — calcolato da mandate-watch
+
+# --- Solo per classification: platform ---
+#
+# Debito tecnico o devops puro (playbook: "flusso di protezione del team
+# per manutenzione ordinaria, gestione del debito tecnico, bug, POC").
+# Chi la propone varia — a volte il team tech in autonomia, a volte
+# mediata dal PM — non c'è un vincolo su questo, ma rationale va sempre
+# chiesto esplicitamente, mai presunto. estimated_effort_weeks alimenta
+# capacity_allocation in roadmap-snapshot (quota di capacità
+# dell'iterazione andata a platform vs. roadmap principale) — va validato
+# dal team tech, come l'Effort del RICE.
+platform:
+  rationale: null                # perché serve (rischio di rottura, manutenibilità, upgrade necessario, ecc.)
+  estimated_effort_weeks: null    # stima settimane — usata per il calcolo della capacità protetta, non per un RICE
 
 # --- Popolato solo al momento della prioritizzazione/push su Jira ---
 jira:
@@ -56,3 +189,9 @@ jira:
 
 links:
   prd_ids: []                   # slug dei PRD collegati in product/prds/
+  nsm_targeted: []               # opzionale: [{product_line, name}] delle NSM che questa idea mira esplicitamente a recuperare
+  # — popolato quando l'idea nasce da un riorientamento di Discovery
+  # confermato via nsm-watch (product/reference/nsm-tracking.yaml,
+  # alert.discovery_focus_confirmed), per poter verificare più avanti se
+  # il focus ha davvero funzionato. Vuoto per la stragrande maggioranza
+  # delle idee — non forzarlo.

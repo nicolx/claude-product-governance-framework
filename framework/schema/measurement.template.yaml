@@ -1,0 +1,81 @@
+# Template per product/prds/{slug}/measurement.yaml (o measurement-1.yaml,
+# measurement-2.yaml se il PRD è spaccato in più documenti — un file di
+# misurazione per ciascun prd-N-*.md, stessa numerazione).
+#
+# Scaffoldato da prd-draft al momento della stesura del PRD, a partire
+# dalla sezione "## Metriche" (nome delle KPI, baseline, target) — non
+# duplica quella sezione, la rende strutturata perché measurement-watch
+# possa leggerla senza fare parsing di Markdown libero.
+#
+# readings è APPEND-ONLY per ciascuna KPI, come rice_history — ogni
+# lettura successiva si aggiunge, non sovrascrive le precedenti: serve a
+# vedere il trend, non solo l'ultimo valore.
+#
+# measurement_status e follow_up_needed sono CALCOLATI da measurement-watch
+# (fatti/valutazioni osservate, non decisioni di priorità) — scrittura
+# diretta, non passano da product/approvals/pending/.
+
+prd_ref: "prd.md"                 # nome del file PRD in questa stessa cartella a cui questa misurazione si riferisce
+idea_id: ""                        # link all'idea di origine — measurement-watch legge lì done_at per calcolare le settimane trascorse
+
+measurement_window_weeks: 6        # quante settimane dopo done_at ci si aspetta di iniziare a vedere impatti — regolabile per iniziativa
+
+# kpis PUÒ restare vuoto — non ogni iniziativa ha una metrica di business
+# attesa. Il caso tipico è una richiesta di mera compliance (spesso
+# classification: mandate con rationale legato a un obbligo normativo):
+# non c'è un'ipotesi "questo migliorerà la metrica X", c'è un obbligo da
+# soddisfare e basta. Se kpis è vuoto, compila not_applicable_reason —
+# non forzare una metrica proxy inventata solo per riempire lo schema
+# (stesso principio garantista di tutto il resto del framework: nel
+# dubbio, o non c'è, si dichiara, non si inventa).
+kpis: []
+not_applicable_reason: null        # perché non c'è una KPI di business, se kpis è vuoto — es. "richiesta di compliance normativa, nessun impatto di business atteso"
+# Esempio di singola KPI (aggiungerne una per ciascuna metrica dichiarata nel PRD, max 3):
+# - name: ""                       # deve corrispondere a una metrica dichiarata nel PRD, sezione Metriche — non ridefinire qui, solo il nome
+#   baseline: null
+#   target: null
+#   unit: ""                        # es. "%", "giorni", "€"
+#   data_source:
+#     mode: manual                   # manual | automated — scelta esplicita del PM, dichiarata nel PRD stesso (sezione Metriche), mai presunta da questa skill
+#     description: ""                 # come si recupera il dato — es. "DataBricks, query conversion funnel" o "report manuale mensile da Sales"
+#     # Se mode: manual, la KPI non entra mai nell'osservazione
+#     # automatica: measurement-watch chiede sempre il valore al PM (comportamento di oggi).
+#     # Se mode: automated, measurement-watch tenta la lettura automatica SOLO se
+#     # l'istanza ha configurato localmente un'integrazione (mai credenziali su
+#     # git — vedi framework/docs/future-work.md, "Integrazione DB/analytics in
+#     # lettura"). Finché quell'integrazione non esiste, si comporta come manual.
+#     # In entrambi i casi il valore letto compare nel riepilogo del run, per
+#     # trasparenza — non è un gate di approvazione.
+#   readings: []
+#   # Esempio di singola lettura (append-only):
+#   # - date: "2026-03-01"
+#   #   value: null
+#   #   source: ""                   # es. "DataBricks", "report manuale"
+#   #   note: ""                      # opzionale: contesto della lettura
+#   measurement_status: pending
+#   # pending           -> non è ancora passato measurement_window_weeks da done_at, troppo presto per giudicare
+#   # check_due         -> la finestra è passata ma non c'è ancora nessuna lettura — è il caso "dovremmo star vedendo impatti, controlliamo"
+#   # on_track          -> readings mostrano un trend verso il target, non ancora raggiunto
+#   # achieved          -> il target è stato raggiunto (o superato, nella direzione attesa)
+#   # at_risk           -> la finestra è passata, i dati non mostrano un movimento significativo verso il target
+#   # invalidated       -> i dati mostrano che l'ipotesi era sbagliata (movimento nella direzione opposta, o nessun effetto plausibile)
+#   # inconclusive      -> dato non disponibile o troppo rumoroso per giudicare
+#   follow_up_needed: false          # segnalato da measurement-watch quando emerge un'ipotesi di iterazione — mai un'idea creata automaticamente, solo un suggerimento
+
+# closure è l'atto di ACCETTAZIONE che chiude l'intero cantiere di
+# misurazione di questa iniziativa — distinto dal measurement_status di
+# ogni singola KPI. Si applica sia quando ci sono KPI da chiudere (si
+# sono mosse o non si sono mosse come sperato, comunque smettiamo di
+# seguirle) sia quando kpis è vuoto (es. compliance: nessuna metrica da
+# guardare, ma serve comunque un atto esplicito che dichiari "questa
+# iniziativa è chiusa", non un silenzio che measurement-watch continua a
+# segnalare all'infinito). Va sempre su decisione esplicita del PM in
+# conversazione con measurement-watch — mai chiusa in automatico, nemmeno
+# quando kpis è vuoto. Una volta closed: true, measurement-watch non
+# segnala più questa iniziativa nei run successivi.
+closure:
+  closed: false
+  closed_at: null
+  closed_by: null                   # chi ha accettato la chiusura — mai presunto, chiesto esplicitamente
+  outcome: null                      # achieved | not_achieved_accepted | not_applicable | inconclusive_accepted
+  note: null                         # perché si chiude comunque — "si è mossa o non si è mossa come sperato", nelle parole del PM

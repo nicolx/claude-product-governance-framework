@@ -1,6 +1,6 @@
 ---
 name: pending-approval
-description: Elenca, spiega e applica (o rifiuta) le proposte in product/approvals/pending/ — l'unico punto in cui un diff di RICE, uno snapshot di roadmap o una comunicazione in uscita passano da proposti ad effettivi. Usala per rivedere la coda.
+description: Elenca, spiega e applica (o rifiuta) le proposte in product/approvals/pending/ — l'unico punto in cui un diff di RICE, uno snapshot di roadmap, una Strategic Exception rilevata in Backlog Refinement, un aggiornamento a un'iniziativa mandataria, o una comunicazione in uscita passano da proposti ad effettivi. Usala per rivedere la coda.
 ---
 
 # pending-approval
@@ -31,6 +31,22 @@ Quando l'utente approva una voce specifica (per nome file o descrizione):
      comunicazione (email, ecc.) a meno che l'istanza abbia
      un'integrazione dedicata configurata — se non c'è, prepara il testo
      finale pronto per l'invio manuale da parte dell'utente.
+   - `strategic_exception_flag`: appendi la voce a `strategic_exceptions`
+     nell'idea (mai sovrascrivere voci precedenti — stesso principio
+     append-only di `rice_history`). **In più**, appendi una riga
+     sintetica a `product/reference/friction-log.yaml` (chi, quando,
+     quale idea, `scenario: recurring_strategic_exception`) — è il modo
+     in cui il framework rende visibile un pattern (la stessa persona che
+     bypassa la priorità ogni settimana) senza dover ricostruire la
+     storia idea per idea.
+   - `mandate_update`: aggiorna i campi del blocco `mandate` sull'idea
+     con i nuovi valori dal payload (`due_date`, `lead_time_weeks`,
+     `mandated_by`, `rationale`, `is_critical` — solo quelli presenti nel
+     payload, non toccare gli altri). **Non toccare mai
+     `analysis_start_by`/`escalation_status`** — sono calcolati da
+     `mandate-watch`, non da questa approvazione; se il cambio di
+     `due_date`/`lead_time_weeks` li rende stale, segnala all'utente di
+     rilanciare `mandate-watch` dopo l'approvazione, non ricalcolarli qui.
 3. Imposta `decision: approved`, `decided_by` (chiedi conferma di chi sta
    approvando se non ovvio dal contesto), `decided_at`.
 4. Sposta il file da `product/approvals/pending/` a

@@ -9,6 +9,26 @@
 # product/approvals/pending/ (tipo roadmap_snapshot) — mai scritto
 # direttamente dalla skill roadmap-snapshot.
 
+# nsm_alerts va per primo nel documento deliberatamente: è il segnale più
+# strategico che il framework osserva (playbook, "Salute delle NSM e
+# Product Discovery") — più a monte delle singole iniziative. Elenca
+# TUTTE le NSM con alert.status diverso da "none" in
+# product/reference/nsm-tracking.yaml, non solo quelle rilevate questa
+# settimana — finché un allarme resta "active" e non "resolved", deve
+# comparire in ogni snapshot, per lo stesso motivo per cui un'iniziativa
+# mandataria a rischio non sparisce finché non è risolta. Popolato
+# leggendo trend_status/alert calcolati da nsm-watch (non ricalcolato
+# qui).
+nsm_alerts:
+  - product_line: ""
+    name: ""
+    trend_status: ""                   # degrading | improving | stable | unknown
+    alert_status: ""                    # active | resolved
+    discovery_focus_confirmed: false
+    latest_reading: null
+    baseline: null
+    target: null
+
 week: "2026-W02"
 generated_at: "2026-01-08"
 iteration_goal: ""
@@ -24,3 +44,73 @@ initiatives:
     completion_pct: null
 
 retro_notes: ""                     # mini-retrospettiva dell'iterazione precedente (facoltativa)
+
+# capacity_allocation mostra quanta capacità dell'iterazione è andata a
+# classification: platform (debito tecnico/devops) rispetto alla roadmap
+# principale — playbook, "flusso di protezione del team". total_capacity_weeks
+# è una stima del team tech (chiesta esplicitamente da roadmap-snapshot,
+# mai presunta); platform_weeks è la somma di platform.estimated_effort_weeks
+# delle iniziative classification: platform presenti in initiatives questa
+# settimana; roadmap_weeks è la somma di rice_history[-1].effort_weeks
+# delle iniziative classification: idea in initiatives. La serie storica
+# di questo blocco, snapshot dopo snapshot, è ciò che permette di vedere
+# se il debito tecnico si accumula silenziosamente perché non gli si dà
+# mai spazio, o se sta assorbendo più capacità di quanto sostenibile.
+capacity_allocation:
+  total_capacity_weeks: null
+  platform_weeks: null
+  platform_pct: null                 # calcolato: platform_weeks / total_capacity_weeks
+  roadmap_weeks: null
+  note: ""                            # contesto libero, es. "settimana pesante per un incidente in produzione"
+
+# mandates_status elenca TUTTE le idee classification: mandate ancora
+# aperte (status diverso da done/aborted) — non solo quelle già in
+# initiatives sopra. È il punto in cui un'iniziativa mandataria diventa
+# visibile in un MBR/MTR anche PRIMA di essere entrata in lavorazione:
+# se aspettassimo che sia in initiatives per vederla, il rischio di
+# scoprire la scadenza troppo tardi resterebbe intatto. Popolato da
+# roadmap-snapshot leggendo escalation_status calcolato da mandate-watch
+# su ciascuna idea (non ricalcolato qui).
+mandates_status:
+  - idea_id: ""
+    mandated_by: ""
+    due_date: null
+    analysis_start_by: null
+    escalation_status: ""             # pending_review | on_track | due_soon | overdue
+    current_status: ""                 # status corrente dell'idea (bucket, in_analysis, ecc.)
+
+# unscored_ideas elenca le idee classification: idea ancora con
+# rice_history vuoto — stesso principio di mandates_status: renderle
+# visibili anche se non sono ancora in initiatives, perché è esattamente
+# lì che si perdono (nessuno le nota finché non è troppo tardi). Popolato
+# leggendo rice_status calcolato da rice-watch su ciascuna idea (non
+# ricalcolato qui).
+unscored_ideas:
+  - idea_id: ""
+    title: ""
+    days_unscored: null                # calcolato al momento dello snapshot, non un campo persistito sull'idea
+    status: ""                          # fresh | aging | stale | blocked_on:{waiting_on}
+    blocked_reason: null
+    waiting_on: null
+
+# measurements_status elenca le KPI delle iniziative già rilasciate
+# (idea status: done) che meritano attenzione — non solo check_due/
+# at_risk/invalidated, ma la serie storica di questa sezione nel tempo
+# (uno snapshot per settimana) È il tracciamento delle metriche su Git
+# richiesto per prendere decisioni informate su dove veicolare gli
+# investimenti futuri: non serve aspettare un livello derivato/DB per
+# iniziare ad accumularlo. Popolato leggendo measurement_status
+# calcolato da measurement-watch su ciascun product/prds/*/measurement.yaml
+# (non ricalcolato qui). Le iniziative con closure.closed: true non
+# compaiono più qui — incluso il caso "senza KPI" (kpis vuoto) una volta
+# accettata la chiusura: finché non è chiusa, compare comunque una riga
+# con kpi_name: null per segnalare che manca ancora l'atto di
+# accettazione, anche se non c'è nulla da misurare.
+measurements_status:
+  - idea_id: ""
+    prd_ref: ""
+    kpi_name: null                       # null se l'iniziativa non ha KPI di business (vedi not_applicable_reason su measurement.yaml)
+    weeks_since_done: null
+    measurement_status: ""              # check_due | on_track | achieved | at_risk | invalidated | inconclusive | pending_closure (kpis vuoto, non ancora chiusa)
+    latest_reading: null
+    target: null

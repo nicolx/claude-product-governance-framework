@@ -1,0 +1,56 @@
+# Template per product/reference/nsm-tracking.yaml
+#
+# Tiene traccia nel tempo delle North Star Metric (e altri KPI chiave)
+# dichiarate per ciascuna Product Line in product-lines.yaml — non le
+# ridefinisce (nsm: [] lì resta la fonte dei nomi), qui vive solo
+# baseline/target/storico delle letture, perché nsm-watch possa
+# calcolare un trend senza fare parsing di prosa libera.
+#
+# Diverso da measurement.yaml: measurement.yaml traccia l'ipotesi di
+# impatto di UNA iniziativa specifica dopo il rilascio. Questo file
+# traccia la salute aggregata di una Product Line nel tempo,
+# indipendentemente da quale iniziativa la sta muovendo — per questo
+# esiste una volta per istanza (non uno per PRD) e non si chiude mai:
+# una NSM non "finisce di essere osservata".
+#
+# Convenzione già in uso in product-lines.yaml: il prefisso nel nome
+# della NSM indica la direzione attesa — "+" vogliamo che salga, "-"
+# vogliamo che scenda. nsm-watch la usa per giudicare se un movimento è
+# un miglioramento o un peggioramento — non presumere mai "più alto è
+# meglio" per una NSM che non segue questa convenzione: chiedi.
+#
+# Non creato durante init-governance-project (i valori di baseline/target
+# spesso richiedono un giro su DataBricks/analytics che non è pratico
+# fare a metà di un'intervista di setup) — lo scaffolda nsm-watch al
+# primo run, chiedendo baseline/target/unit per ciascuna NSM dichiarata
+# in product-lines.yaml.
+
+metrics:
+  - product_line: ""                  # deve corrispondere a un name in product-lines.yaml
+    name: ""                           # deve corrispondere a un valore in nsm: della stessa product line, prefisso incluso
+    baseline: null
+    target: null
+    unit: ""
+    readings: []
+    # Esempio di singola lettura (append-only, come rice_history):
+    # - date: "2026-03-01"
+    #   value: null
+    #   source: ""                     # es. "DataBricks", "report manuale"
+    #   note: ""
+    trend_status: unknown               # unknown (meno di 2 letture) | improving | stable | degrading — calcolato da nsm-watch
+    last_checked: null                   # data dell'ultima volta che nsm-watch l'ha rivista, anche senza una nuova lettura
+
+    # alert è il meccanismo che riporta il focus della Product Discovery
+    # su questa NSM quando degrada, invece che sul backlog RICE-ranked —
+    # playbook, sezione "Salute delle NSM e Product Discovery". status e
+    # triggered_at sono calcolati da nsm-watch (fatto osservato dal
+    # trend). discovery_focus_confirmed è invece una decisione del PM,
+    # mai presunta: nsm-watch segnala con forza, non decide da sola che
+    # la Discovery vada riorientata.
+    alert:
+      status: none                      # none | active | resolved
+      triggered_at: null
+      discovery_focus_confirmed: false    # true solo se il PM conferma esplicitamente il riorientamento della Discovery
+      discovery_focus_note: null           # cosa si sta facendo — es. link a idee generate, cerimonia di riferimento
+      resolved_at: null
+      resolved_note: null                   # perché si chiude — tornata a improving/stable, o spiegazione accettata di un calo temporaneo

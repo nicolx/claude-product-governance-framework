@@ -136,9 +136,12 @@ misurazione e feedback.
 > dell'iterazione. Le sezioni relative all'implementazione tecnica
 > (Product Design, Development, Rollout) sono di competenza del CTO/tech
 > lead di ogni istanza e vanno integrate localmente. La sezione
-> Measurement resta essenziale finché un'istanza non ha un datalake
-> strutturato — potenziarla è un obiettivo di maturità, non un requisito
-> di partenza.
+> Measurement non richiede un datalake strutturato per iniziare: il
+> tracciamento delle KPI (baseline, target, letture nel tempo) vive in
+> Git accanto al PRD fin da subito, con le letture riportate dal PM a
+> mano — vedi skill `measurement-watch`. Un datalake resta comunque
+> l'obiettivo di maturità per automatizzare la raccolta delle letture,
+> non un prerequisito per cominciare a tracciare.
 
 Questo processo è progettato per governare **decisioni**, non solo
 attività. Ogni iniziativa è valutata in termini di rischio cognitivo e
@@ -164,7 +167,15 @@ Tre macro fasi di lavoro per ogni prodotto:
   logica why/what; definizione UI/UX e specifiche; go-to-market strategy.
 - **Implementazione della soluzione** (ricorrente): backlog di breve
   termine secondo Agile; almeno due flussi continui — roadmap principale e
-  protezione del team per manutenzione/debito tecnico/bug.
+  protezione del team per manutenzione/debito tecnico/bug. Il debito
+  tecnico e le attività devops pure si catalogano come
+  `classification: platform`: bypassano il RICE (la priorità è giudizio
+  del team tech dentro la capacità protetta, non valore di business), ma
+  non sono invisibili — entrano comunque in roadmap quando rilevanti, e
+  la quota di capacità che assorbono è tracciata esplicitamente
+  (`capacity_allocation` in ogni snapshot settimanale) perché il
+  bilanciamento tra le due cose sia una scelta consapevole, non un
+  effetto collaterale.
 
 ## Le fasi ricorrenti
 
@@ -343,6 +354,19 @@ Essere in priorità 1 non significa che il team si fionda immediatamente
 sull'attività: per interrompere l'agenda con un'attività immediata serve
 sempre la Strategic Exception.
 
+**Cosa succede a un'idea che non riesce ad avere un RICE.** Non tutte le
+idee arrivano con abbastanza informazione per essere quotate subito —
+spesso manca un dato da uno stakeholder (un numero, una conferma, una
+priorità di business che solo lui conosce). Questo è normale e non va
+forzato: **meglio un'idea che resta senza RICE in attesa di
+un'informazione reale, che un RICE inventato per far procedere qualcosa**
+(lo stesso principio del "nel dubbio, chiedi" applicato all'intake vale
+qui). Il rischio non è avere idee in attesa — è **perderle di vista**: se
+nessuno controlla periodicamente cosa è rimasto senza quotazione,
+un'idea può restare ferma per mesi senza che nessuno se ne accorga. Per
+questo il controllo va fatto ad ogni Backlog Refinement, non solo quando
+qualcuno se ne ricorda.
+
 *Principi Agile da incarnare in questa fase:*
 - *Committenti e sviluppatori devono lavorare insieme quotidianamente per
   tutta la durata del progetto.*
@@ -357,6 +381,140 @@ sempre la Strategic Exception.
 - [ ] Lo stakeholder proponente ha confermato Reach e Impact?
 - [ ] L'idea è stata confrontata con le prime posizioni del backlog per coerenza del ranking?
 - [ ] Se il RICE score è basso: è stata comunicata la motivazione allo stakeholder?
+- [ ] Le idee ancora senza RICE sono state riviste all'ultimo Backlog Refinement, indipendentemente da quanto sembrino vecchie o marginali?
+- [ ] Per le idee senza RICE da più di qualche settimana: è chiaro cosa manca e a chi è stato chiesto?
+
+## Iniziative Mandatarie
+
+*"Work expands so as to fill the time available for its completion." —
+C. Northcote Parkinson*
+
+Non tutte le iniziative nascono da un'idea che compete per priorità.
+Alcune sono **imposte dall'alto** (una direttiva di leadership o board),
+**marcate "critical"** indipendentemente da qualunque numero, o vincolate
+a una **scadenza esterna fissa** che il framework non controlla
+(compliance normativa, un contratto firmato con una data, un evento a
+calendario). Chiamiamo queste iniziative **Iniziative Mandatarie**
+(`mandate`).
+
+Una Iniziativa Mandataria **non compete sul RICE** — non ha senso
+calcolare Reach/Impact/Confidence/Effort per decidere se "vale la pena":
+non è una domanda che il framework è chiamato a rispondere in questo
+caso, la priorità è già stata data da chi ha il mandato per farlo. Ma
+questo non significa che salti l'analisi: un'iniziativa mandataria
+attraversa comunque Preliminary Analysis, Complete Analysis, PRD — deve
+comunque essere capita, scoperta nelle sue implicazioni tecniche,
+dimensionata. Salta solo la domanda "conviene farla ora rispetto al
+resto?". La domanda a cui risponde invece è diversa e più urgente:
+**"abbiamo abbastanza tempo prima della scadenza per farla bene?"**
+
+Questa è la parte che il citazione di Parkinson coglie: senza un
+meccanismo che forzi l'attenzione ad anticiparsi, il lavoro (o la sua
+mancanza) si espande fino a riempire tutto il tempo disponibile — e la
+scadenza si scopre quando è troppo tardi per rispettarla con qualità. Per
+questo ogni Iniziativa Mandataria con una scadenza nota richiede una
+stima di **lead time**: quante settimane servono, prima della scadenza,
+per completare analisi, PRD e sviluppo. Questa stima **va fatta con un
+referente tecnico**, con lo stesso spirito con cui l'Effort del RICE
+viene validato ad alto livello nella prioritizzazione — non è un numero
+che il PM inventa da solo.
+
+**Chi può dichiarare un'iniziativa come mandataria?** Non c'è un vincolo
+di ruolo esplicito, a differenza della Strategic Exception (che richiede
+un'approvazione CEO/CPO-CTO): chiunque può proporla. Ma proprio per
+questo, **chi la impone e perché** vanno sempre dichiarati esplicitamente
+e mai presunti — non basta il tono o il ruolo del mittente per giustificare
+il bypass del RICE. Il controllo non è a priori (nessun blocco), ma a
+posteriori: ogni Iniziativa Mandataria resta visibile nei report di
+roadmap con la sua scadenza e il suo stato, per chiunque — così un abuso
+sistematico della categoria (usarla per bypassare il RICE senza un vero
+mandato) diventa visibile con la stessa logica con cui il framework
+intercetta le Strategic Exception ricorrenti.
+
+**Verifica ad ogni Backlog Refinement.** Ogni ciclo di Backlog
+Refinement è anche il momento in cui si controlla lo stato di avanzamento
+di ogni Iniziativa Mandataria aperta rispetto alla sua scadenza: siamo in
+tempo per iniziare l'analisi, siamo a ridosso, o è già tardi? Questo
+controllo non è occasionale — deve accadere ogni settimana,
+automaticamente, non solo quando qualcuno se ne ricorda. Un'iniziativa
+mandataria senza una scadenza nota (il caso "critical ma senza data") non
+è esente da questo controllo: resta in stato di verifica finché qualcuno
+non la chiarisce, comparendo ogni settimana finché non viene risolta.
+
+*Principi Agile da incarnare in questa fase:*
+- *La nostra massima priorità è soddisfare il cliente rilasciando
+  software di valore, fin da subito ed in maniera continua.*
+- *A intervalli regolari il team riflette su come diventare più
+  efficace, poi regola il proprio comportamento di conseguenza.*
+
+**Checklist operativa**
+- [ ] Chi impone l'iniziativa (`mandated_by`) e perché (`rationale`) sono stati dichiarati esplicitamente, non presunti?
+- [ ] Se esiste una scadenza esterna: è stata registrata come data precisa, non come "presto" o "appena possibile"?
+- [ ] È stata fatta una stima di lead time con un referente tecnico?
+- [ ] L'iniziativa è stata controllata all'ultimo Backlog Refinement, indipendentemente da quanto sembri lontana la scadenza?
+- [ ] Se la scadenza è a rischio: è stato segnalato esplicitamente al PM, non lasciato in un file che nessuno rilegge?
+- [ ] L'iniziativa mandataria compare nei report di roadmap anche se non è ancora entrata in lavorazione?
+
+## Salute delle NSM e Product Discovery
+
+*"Success breeds complacency. Complacency breeds failure. Only the
+paranoid survive." — Andy Grove*
+
+Ogni PM è responsabile del successo di una North Star Metric (sezione
+"Il lavoro del Product Manager"), e il prodotto è "promotore della
+Product Discovery per identificare iniziative ad alto impatto sulle
+NSM, indipendentemente dagli altri stakeholder". Questo principio esiste
+già nel playbook — quello che manca, se non viene reso esplicito, è
+**cosa succede quando la salute di una NSM peggiora davvero**.
+
+**Il funzionamento ordinario è corretto così com'è.** Con molte
+richieste (interne, di stakeholder, idee di team) è normale e sano che
+la priorità segua il RICE score: è il meccanismo che tiene onesta la
+prioritizzazione, discusso in "Ideas prioritization". La Discovery
+continua a lavorare sullo sfondo, sempre attiva, senza bisogno di
+interrompere nulla.
+
+**Ma un deterioramento di una NSM chiave è un segnale di categoria
+diversa.** Non è un'altra richiesta da mettere in coda e valutare col
+RICE come le altre — è un'indicazione che la Product Line nel suo
+complesso sta peggiorando, e nessuna quantità di idee ad alto RICE score
+prese dal backlog compensa una NSM che va nella direzione sbagliata: se
+il fondamentale peggiora, l'intero portfolio di iniziative rischia di
+star ottimizzando le cose sbagliate. Per questo, quando succede, **il
+focus della Product Discovery deve tornare esplicitamente sulla NSM in
+difficoltà** — generare e prioritizzare iniziative (strategiche o
+tattiche) mirate a recuperarla, anche rispetto a idee con RICE più alto
+già in backlog.
+
+Questo non è un override automatico del RICE, ed è coerente con lo
+spirito del framework: **un segnale forte, non una decisione presa al
+posto del PM.** La skill `nsm-watch` osserva le NSM (e altri KPI chiave)
+di ogni Product Line nel tempo, calcola quando una sta degradando, e lo
+porta all'attenzione del PM con la massima evidenza — in apertura di
+ogni Backlog Refinement, prima di qualunque altra cosa. Sta al PM (col
+team) decidere se e come riorientare la Discovery, tenendo traccia
+esplicita di quella decisione.
+
+**Distinzione rispetto alla Measurement** (sezione dedicata): la
+Measurement verifica se l'ipotesi di **una singola iniziativa** ha reso
+quanto sperato, dopo il rilascio. Questa sezione riguarda la salute
+**aggregata** di una Product Line — indipendente da quale iniziativa
+specifica la stia muovendo, osservata con continuità, non solo dopo un
+rilascio.
+
+*Principi Agile da incarnare in questa fase:*
+- *A intervalli regolari il team riflette su come diventare più efficace,
+  poi regola il proprio comportamento di conseguenza.*
+- *Il prodotto è promotore della Product Discovery indipendentemente
+  dagli altri stakeholder, auto-sottoponendosi agli stessi criteri di
+  validazione.*
+
+**Checklist operativa**
+- [ ] Le NSM di ogni Product Line hanno baseline e target dichiarati, non solo un nome?
+- [ ] Sono state riviste all'ultimo Backlog Refinement, in apertura, prima di ogni altra watch?
+- [ ] Per le NSM in degrado: il riorientamento della Discovery è stato discusso esplicitamente, non ignorato perché "il backlog RICE è già pieno"?
+- [ ] Le idee nate da un riorientamento di Discovery sono collegate alla NSM che intendono recuperare?
+- [ ] Un allarme risolto è stato chiuso esplicitamente, con la motivazione, non lasciato a scomparire da solo?
 
 ## Product Backlog Refinement
 
@@ -368,6 +526,17 @@ pianifica le attività in cima alle priorità e che potrebbero avere spazio
 nell'agenda del team nei prossimi giorni/settimane. Si usa la metafora
 delle "iterazioni settimanali" per dare un'idea delle possibili date di
 rilascio in termini di periodizzazione, non di giorno esatto.
+
+**La riunione si apre guardando indietro, non avanti.** Prima di
+discutere cosa entra in agenda, si controlla lo stato di ciò che è già
+stato rilasciato e di ciò che ha una scadenza in avvicinamento: quali
+iniziative stanno mostrando gli impatti attesi sulle metriche e quali
+no (sezione "Measurement"), quali iniziative mandatarie richiedono
+attenzione per la loro scadenza (sezione "Iniziative Mandatarie"), quali
+idee restano senza RICE da troppo tempo (sezione "Ideas prioritization").
+Solo dopo si passa a decidere le priorità del prossimo periodo — è più
+facile prioritizzare bene quando si parte da un quadro aggiornato di cosa
+sta già funzionando, invece di scoprirlo a posteriori.
 
 > **Nota su Scrum vs Kanban.** Un approccio più Kanban (una cosa dopo
 > l'altra, ben ordinate per priorità) è spesso preferibile a un
@@ -595,6 +764,7 @@ pattern trascrizione + decisioni strutturate.
 - [ ] L'agenda tiene conto del flusso di manutenzione ordinaria/debito tecnico?
 - [ ] Le date di rilascio stimate sono coerenti con quanto discusso?
 - [ ] Gli stakeholder chiave sono stati aggiornati sulle aspettative di delivery?
+- [ ] La capacità dedicata a platform (debito tecnico/devops) questa iterazione è stata dichiarata esplicitamente, non lasciata implicita?
 
 ## Product Design, development and rollout
 
@@ -650,6 +820,40 @@ Si presentano i risultati, si celebrano i successi con i dati. Quando va
 storto, si celebra di aver imparato. Nessuna sfera di cristallo: solo la
 ricerca di un circolo virtuoso.
 
+**Il rischio non è misurare male — è dimenticarsi di misurare.** Un'idea
+consegnata "Done" (codice in produzione, playbook "Product Design,
+development and rollout") non risponde da sola alla domanda se ha
+funzionato: qualcuno deve tornare a controllare le sue KPI, e "qualcuno
+tornerà a controllare" senza un meccanismo esplicito diventa in pratica
+"nessuno lo farà mai". Per questo il controllo va integrato nel ciclo
+ricorrente, non lasciato alla buona volontà: **ad ogni Backlog
+Refinement, prima ancora di guardare cosa entra in agenda, si controllano
+le iniziative già rilasciate** — quali stanno mostrando l'impatto atteso,
+quali sono ancora troppo giovani per giudicarle, quali non lo stanno
+mostrando e meritano un follow-up o una chiusura consapevole. Questo
+tracciamento, accumulato settimana dopo settimana in Git accanto ai PRD,
+è ciò che nel tempo permette di vedere pattern e decidere con più
+sicurezza dove veicolare gli investimenti futuri — non solo "abbiamo
+consegnato tanto", ma "quello che abbiamo consegnato ha reso".
+
+**Non tutte le iniziative hanno una metrica di business.** Una richiesta
+di mera compliance normativa (spesso un'Iniziativa Mandataria — vedi
+sezione dedicata) non nasce con l'ipotesi "questo migliorerà la metrica
+X": nasce da un obbligo. Forzare una metrica proxy solo per riempire la
+sezione Metriche del PRD produce dati inutili nel tempo — meglio
+dichiarare esplicitamente che non c'è nulla da misurare.
+
+Questo però non significa che il cantiere resti aperto per sempre senza
+nessuno che se ne occupi. Serve comunque un **atto esplicito di
+chiusura/accettazione**: qualcuno, ad un certo punto, deve dire "questa
+iniziativa è chiusa" — che ci sia una KPI che si è mossa (o non si è
+mossa) come sperato, o che non ci sia proprio nulla da misurare (il caso
+compliance). La chiusura non è un'inferenza automatica basata sui dati:
+è una decisione del PM, tracciata con data e motivazione, che smette di
+far riapparire quell'iniziativa negli alert successivi. Senza questo
+atto esplicito, un'iniziativa senza KPI rischia di restare per sempre
+un'eccezione che nessuno chiude formalmente.
+
 *Principi Agile da incarnare in questa fase:*
 - *A intervalli regolari il team riflette su come diventare più efficace,
   poi regola il proprio comportamento di conseguenza.*
@@ -662,6 +866,10 @@ ricerca di un circolo virtuoso.
 - [ ] Se il target non è stato raggiunto: è stato avviato un processo di analisi causa-effetto?
 - [ ] Il debito tecnico generato è stato annotato?
 - [ ] Le nuove idee emerse dalla misurazione sono state aggiunte al bucket?
+- [ ] Le iniziative rilasciate da tempo sufficiente sono state riviste all'ultimo Backlog Refinement, in apertura, non come ripensamento a fine riunione?
+- [ ] Per le iniziative il cui impatto non convince: è stata presa una decisione esplicita (follow-up o chiusura), invece di lasciarle in un limbo?
+- [ ] Per le iniziative senza una metrica di business (es. compliance): è dichiarato esplicitamente il perché, invece di una metrica proxy inventata?
+- [ ] Ogni iniziativa rilasciata ha, prima o poi, un atto esplicito di chiusura/accettazione — non resta aperta indefinitamente senza che nessuno se ne occupi?
 
 ---
 
@@ -767,6 +975,33 @@ per la propria Product Line.
 **Strategic Exception** — Meccanismo che consente a una richiesta di
 bypassare il normale processo di prioritizzazione, su approvazione di un
 livello dirigenziale definito dall'istanza. Deve essere rara e motivata.
+
+**Iniziativa Mandataria (mandate)** — Iniziativa che bypassa il RICE
+perché imposta dall'alto, marcata "critical" da leadership, o vincolata a
+una scadenza esterna fissa — non l'analisi, che resta necessaria. A
+differenza della Strategic Exception, non richiede un'approvazione di
+ruolo specifico, ma richiede sempre di dichiarare esplicitamente chi la
+impone e perché, e una stima di lead time verificata ad ogni Backlog
+Refinement. Vedi sezione "Iniziative Mandatarie".
+
+**Platform** — Debito tecnico o attività devops pura. Bypassa il RICE
+perché la priorità è giudizio del team tech dentro una capacità protetta,
+non valore di business né autorità esterna — a differenza sia delle idee
+normali (RICE) sia delle Iniziative Mandatarie (autorità esterna). Non è
+lavoro invisibile: entra in roadmap come qualunque altra iniziativa
+quando rilevante, e la capacità che assorbe è tracciata esplicitamente
+(`capacity_allocation` in ogni snapshot settimanale) per rendere
+consapevole il bilanciamento con la roadmap principale.
+
+**Allarme NSM (NSM Alert)** — Segnale generato quando una North Star
+Metric (o altro KPI chiave di Product Line) mostra un trend di
+peggioramento, osservato nel tempo indipendentemente da quale iniziativa
+specifica la stia muovendo. A differenza del `measurement_status` di una
+singola iniziativa, un allarme NSM dovrebbe riportare il focus della
+Product Discovery sulla metrica in difficoltà, anche rispetto a idee con
+RICE più alto in backlog — non un override automatico, ma un segnale
+con la massima evidenza che richiede una decisione esplicita del PM. Vedi
+sezione "Salute delle NSM e Product Discovery".
 
 **Ideas Bucket** — Il repository dove vengono raccolte tutte le idee,
 richieste e segnalazioni prima di essere valutate. Non è una coda di

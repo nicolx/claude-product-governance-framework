@@ -1,0 +1,80 @@
+---
+name: mandate-watch
+description: Scansiona tutte le idee classification "mandate" (iniziative top-down, "critical" da leadership, o con scadenza esterna fissa) e calcola/aggiorna il loro escalation_status in base al lead time necessario prima della due_date. Usala periodicamente e sempre come parte del Backlog Refinement (log-ceremony la richiama).
+---
+
+# mandate-watch
+
+Le iniziative `classification: mandate` (playbook, sezione "Iniziative
+Mandatarie") non passano dal RICE, ma devono comunque entrare in analisi
+**con anticipo sufficiente** rispetto a una eventuale scadenza esterna.
+Questa skill è il meccanismo che garantisce che non vengano dimenticate
+finché non è troppo tardi: calcola per ciascun mandate aperto se è ancora
+in tempo, a rischio, o già in ritardo — e lo rende visibile, senza mai
+agire da sola sulla priorità.
+
+## Quando usarla
+
+- **Standalone**, in qualunque momento: "controlla lo stato dei mandate",
+  "siamo a rischio su qualche scadenza mandataria?".
+- **Richiamata da `log-ceremony`** durante il Backlog Refinement — è così
+  che il controllo avviene ad ogni ciclo settimanale, non solo quando
+  qualcuno se ne ricorda.
+
+## Passi
+
+1. **Elenca tutte le idee** in `product/ideas/*/idea.yaml` con
+   `classification: mandate` e `status` diverso da `done` o `aborted`.
+   Se non ce ne sono, dillo esplicitamente e fermati — non è un errore,
+   è uno stato normale.
+
+2. **Per ciascuna, calcola `escalation_status`**:
+   - Se `due_date` o `lead_time_weeks` sono `null`: `escalation_status:
+     pending_review`. Questo è lo stato di default per i mandate
+     "critical" senza scadenza fissa (`is_critical: true`, `due_date:
+     null`) — **non è un errore da correggere subito**, ma va comunque
+     rimenzionato esplicitamente ad ogni run finché qualcuno non lo
+     risolve (aggiungendo una data, o confermando che non ne serve una).
+     Non silenziarlo dopo la prima segnalazione.
+   - Se entrambi sono noti: calcola `analysis_start_by = due_date -
+     lead_time_weeks` (in settimane). Poi:
+     - `overdue` — `analysis_start_by` è già passata E lo `status`
+       dell'idea non ha ancora raggiunto almeno `in_analysis`.
+     - `due_soon` — mancano 2 settimane o meno ad `analysis_start_by` (o
+       è già passata ma l'idea è già almeno `in_analysis` — la scadenza
+       resta da sorvegliare, ma l'analisi è partita).
+     - `on_track` — mancano più di 2 settimane ad `analysis_start_by`.
+
+3. **Scrivi `analysis_start_by` e `escalation_status` direttamente** su
+   ciascun `idea.yaml` — sono fatti calcolati da una formula, non
+   decisioni di prodotto, quindi **non passano da
+   `product/approvals/pending/`** (stesso principio già usato per
+   `jira.status`/`jira.last_polled_at` nella skill `jira-sync`). Non
+   toccare mai `due_date`, `lead_time_weeks`, `mandated_by`, `rationale`,
+   `is_critical` — quelli si modificano solo via proposta
+   `mandate_update` (skill che gestisce il caso, tipicamente
+   `idea-intake`/`inbox-triage` alla creazione, o una richiesta esplicita
+   dell'utente per un aggiornamento).
+
+4. **Presenta un riepilogo ordinato per urgenza** (`overdue` prima,
+   poi `due_soon`, poi `pending_review`, poi `on_track` solo se
+   rilevante): per ciascun mandate a rischio, mostra `idea_id`,
+   `mandated_by`, `due_date`, `analysis_start_by`, lo `status` corrente
+   dell'idea. **Solo segnalazione — nessuna azione automatica**: non
+   proporre né inviare comunicazioni di escalation da questa skill, la
+   decisione su come/se sollecitare resta interamente del PM.
+
+5. Se chiamata da `log-ceremony`, restituisci il riepilogo perché venga
+   incluso nel log della cerimonia — non scrivere tu stessa nel file
+   `decisions.yaml` della cerimonia, è compito di `log-ceremony`.
+
+## Cosa NON fare
+
+- Non decidere autonomamente di anticipare o modificare la roadmap in
+  base a un mandate a rischio — questa skill segnala, non prioritizza.
+- Non proporre comunicazioni di escalation (email, Slack) — per questo
+  framework è deliberatamente fuori scope: la segnalazione forte in
+  conversazione/log è sufficiente, l'escalation a stakeholder esterni
+  resta una scelta del PM.
+- Non silenziare un mandate `pending_review` solo perché è già stato
+  segnalato in un run precedente.

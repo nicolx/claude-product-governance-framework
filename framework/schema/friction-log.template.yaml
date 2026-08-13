@@ -6,6 +6,11 @@
 # product/ceremonies/friction-resolution/{data}-{slug}/ — qui resta solo
 # la riga sintetica con link, per poter individuare pattern (es. la stessa
 # persona che invoca Strategic Exception ogni settimana) con un solo file.
+#
+# Popolato a mano, ma anche automaticamente da pending-approval quando
+# approva una proposta di tipo strategic_exception_flag (Strategic
+# Exception rilevata da log-ceremony durante il Backlog Refinement — vedi
+# idea.template.yaml, strategic_exceptions).
 
 entries: []
 # Esempio di voce:
@@ -14,4 +19,5 @@ entries: []
 #   scenario: ""                    # es. "bypass_process" | "recurring_strategic_exception" | "priority_pushback" | "top_down_pressure"
 #   summary: ""
 #   outcome: ""
+#   idea_id: null                   # idea collegata, se applicabile (es. per recurring_strategic_exception)
 #   ceremony_ref: null              # link a product/ceremonies/... se c'è una registrazione/trascrizione completa

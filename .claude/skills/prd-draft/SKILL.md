@@ -1,6 +1,6 @@
 ---
 name: prd-draft
-description: Redige un PRD "A3-sized" a partire da un'idea già prioritizzata, con visibilità sui submodule applicativi in apps/ quando presenti. Applica il vincolo dimensionale e il criterio di split del playbook — non duplica mai il RICE.
+description: Redige un PRD "A3-sized" a partire da un'idea già prioritizzata, con visibilità sui submodule applicativi in apps/ quando presenti, e scaffolda measurement.yaml per le KPI dichiarate. Applica il vincolo dimensionale e il criterio di split del playbook — non duplica mai il RICE.
 ---
 
 # prd-draft
@@ -38,35 +38,75 @@ normalmente senza bloccarti.
    voce.
 
 3. Redigi seguendo `framework/schema/prd.template.md`: Why (poche righe),
-   What (elenco puntato), Who (solo se rilevante — ometti se ovvio), 1-3
-   Metriche con baseline e target, How ad alto livello (informato dalla
+   What (elenco puntato), Who (solo se rilevante — ometti se ovvio),
+   Metriche con baseline e target **se l'iniziativa ne ha** (vedi passo 4
+   per il caso in cui non ne ha), How ad alto livello (informato dalla
    lettura di `apps/` quando disponibile), Rischi e dipendenze aperte.
 
-4. **Applica il vincolo dimensionale attivamente, non solo a
+4. **Scaffolda `measurement.yaml`** (o `measurement-N.yaml` se questo è
+   uno dei più PRD della cartella — stessa numerazione del file
+   `prd-N-*.md` corrispondente) a partire da
+   `framework/schema/measurement.template.yaml`.
+   - **Caso normale**: una voce in `kpis` per ciascuna metrica scritta
+     nella sezione Metriche del PRD (stesso `name`, `baseline`, `target`,
+     `unit`). Non è una duplicazione: la sezione Metriche del PRD resta
+     la fonte narrativa (perché quella metrica, il ragionamento),
+     `measurement.yaml` è solo la sua rappresentazione strutturata
+     perché `measurement-watch` possa leggerla senza fare parsing di
+     Markdown libero. Chiedi (non presumere) `measurement_window_weeks`
+     se l'utente/referente tecnico ha un'aspettativa diversa dal default
+     nel template.
+   - **Per ciascuna KPI, chiedi esplicitamente `data_source`**: "come
+     pensi di recuperare questo dato — lo controlli tu (manuale), o
+     l'istanza ha un'integrazione che può leggerlo in autonomia
+     (automatizzata)?" Non presumere mai la risposta, e non default a
+     "automated" solo perché sembra la scelta più moderna — è una
+     decisione del PM, va scritta nella sezione Metriche del PRD stesso
+     (non solo in `measurement.yaml`) prima di procedere. Se risponde
+     "automatizzata" ma l'istanza non ha ancora un'integrazione
+     configurata (il caso comune oggi — vedi
+     `framework/docs/future-work.md`), scrivi comunque `mode: automated`
+     come intento dichiarato: `measurement-watch` si comporterà come
+     manuale finché quell'integrazione non esiste davvero, senza
+     bloccare la stesura del PRD per questo.
+   - **Caso senza KPI di business** (tipico per iniziative di mera
+     compliance, spesso `classification: mandate`): se durante la
+     stesura emerge che non c'è un'ipotesi "questo migliorerà la metrica
+     X" — solo un obbligo da soddisfare — **non forzare una metrica
+     proxy per riempire la sezione**. Scrivi nella sezione Metriche del
+     PRD stesso qualcosa come "N/A — nessuna metrica di business attesa,
+     iniziativa di compliance" (motivandolo in una riga), e lascia
+     `kpis: []` in `measurement.yaml` compilando `not_applicable_reason`
+     con lo stesso motivo. Resta comunque un'iniziativa da chiudere
+     esplicitamente più avanti (skill `measurement-watch`, blocco
+     `closure`) — non sparisce dal framework solo perché non ha KPI.
+
+5. **Applica il vincolo dimensionale attivamente, non solo a
    consuntivo**: se durante la stesura ti accorgi che il contenuto
    necessario eccede ~2 facciate A4, **fermati e proponi lo split** lungo
    le cuciture del problema (rischio tecnico, owner, o stakeholder
    distinti) — non comprimere la prosa per farcelo stare. Motiva
    esplicitamente il criterio di split scelto.
 
-5. Se generi più PRD per la stessa idea, crea più file nella stessa
+6. Se generi più PRD per la stessa idea, crea più file nella stessa
    cartella `product/prds/{slug}/` (es. `prd-1-{sub-slug}.md`,
-   `prd-2-{sub-slug}.md`), e compila `reading_sequence` e
+   `prd-2-{sub-slug}.md`), con il rispettivo `measurement-1.yaml`/
+   `measurement-2.yaml`, e compila `reading_sequence` e
    `release_sequence` in ciascun frontmatter **dichiarandole
    separatamente** — non assumere che l'ordine di lettura coincida con
    l'ordine di rilascio.
 
-6. **Non ripetere il RICE**: nel PRD va solo `idea_id` che linka
+7. **Non ripetere il RICE**: nel PRD va solo `idea_id` che linka
    all'idea. Se durante la stesura emerge che il RICE andrebbe rivisto
    (ROI diverso da quanto stimato), non modificarlo qui — segnalalo
    all'utente e proponi di lanciare `rice-update`.
 
-7. **Non ridescrivere framework generali** (Business Model Canvas, GTM,
+8. **Non ridescrivere framework generali** (Business Model Canvas, GTM,
    glossario di dominio) — cita solo la scelta specifica fatta per questo
    caso, con link al documento canonico se l'istanza ne ha uno in
    `product/reference/`.
 
-8. Aggiorna `idea.yaml`: aggiungi lo/gli slug del PRD a `links.prd_ids` e
+9. Aggiorna `idea.yaml`: aggiungi lo/gli slug del PRD a `links.prd_ids` e
    valuta se `status` va portato a `in_prd` — questo è un aggiornamento di
    metadato dell'idea, non un diff di RICE: se l'istanza tratta anche
    questo come modifica soggetta ad approvazione, passa da
