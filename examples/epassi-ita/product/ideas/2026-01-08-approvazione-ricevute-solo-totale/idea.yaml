@@ -21,6 +21,13 @@ status: done
 
 created_at: "2026-01-08"
 
+clarification:
+  needed: false
+  questions: []
+  draft_message: null
+  sent_at: null
+  resolved_at: null
+
 rice_history:
   - date: "2026-01-09"
     reach_percent: 15
@@ -40,9 +47,9 @@ rice_history:
     approved_by: "Franco (referente tecnico)"
     ceremony_ref: null
 
-strategic_exception:
-  approved_by: null
-  reason: null
+strategic_exceptions: []
+# Questa idea non ha mai saltato la coda: è entrata in iterazione seguendo
+# il suo RICE score regolare (Episodio 6), nessuna Strategic Exception.
 
 jira:
   card_id: null

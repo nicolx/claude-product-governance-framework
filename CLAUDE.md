@@ -32,7 +32,7 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `apps/` | Istanza | Solo `init-governance-project` (aggiunta submodule) |
 | `product/inbox/` | Istanza, NON tracciata da git | `inbox-triage` la svuota spostando ogni elemento altrove; nessuna approvazione richiesta per lo spostamento in sé |
 | `product/ideas/`, `product/prds/` (creazione) | Istanza | `idea-intake`, `inbox-triage`, `prd-draft` — creazione diretta, non passa da approvazione (non è ancora una decisione di priorità) |
-| `product/ideas/*/rice_history`, `product/roadmap/`, comunicazioni in uscita | Istanza | Solo tramite `product/approvals/pending/` — vedi regola sotto |
+| `product/ideas/*/rice_history`, `product/ideas/*/strategic_exceptions`, `product/roadmap/`, comunicazioni in uscita | Istanza | Solo tramite `product/approvals/pending/` — vedi regola sotto |
 | `.governance/config.yaml` | Istanza | Solo `init-governance-project`, in scrittura successiva solo su richiesta esplicita dell'utente |
 
 Non spostare mai contenuto da `framework/` verso cartelle di istanza per
@@ -50,6 +50,12 @@ Nessuna skill scrive mai direttamente in `product/ideas/`, `product/prds/`,
 - Ogni diff di RICE proposto da nuova evidenza
 - Ogni snapshot di roadmap generato da una cerimonia
 - Ogni comunicazione in uscita (mail settimanale, roadmap trimestrale)
+- Ogni Strategic Exception rilevata durante il Backlog Refinement quando
+  un'iniziativa salta la coda rispetto al suo RICE score (vedi
+  `log-ceremony` e `idea.template.yaml`, `strategic_exceptions`) — quelle
+  invocate già all'intake seguono invece `idea-intake`/`inbox-triage` e
+  non passano da qui, perché non c'è ancora un `target_file` esistente da
+  modificare (l'idea nasce già così)
 
 L'automazione propone (scrive in `pending/` con il diff/contenuto
 proposto), un umano approva esplicitamente (la voce si sposta in

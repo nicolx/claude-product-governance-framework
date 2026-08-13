@@ -13,14 +13,18 @@
 #                 comunque in decided/ con decision: rejected (per audit)
 
 id: "2026-01-08-slug-descrittivo"
-type: rice_diff                     # rice_diff | roadmap_snapshot | outbound_comm
+type: rice_diff                     # rice_diff | roadmap_snapshot | outbound_comm | strategic_exception_flag
 proposed_at: "2026-01-08"
-proposed_by: ""                     # nome della skill che ha generato la proposta (es. rice-update)
+proposed_by: ""                     # nome della skill che ha generato la proposta (es. rice-update, log-ceremony)
 
 # Cosa verrebbe applicato se approvato. Forma libera in base a 'type':
 # - rice_diff: la nuova voce da appendere a rice_history di un'idea
 # - roadmap_snapshot: il contenuto completo del nuovo snapshot
 # - outbound_comm: oggetto + corpo della comunicazione, e a chi
+# - strategic_exception_flag: la nuova voce da appendere a
+#   strategic_exceptions di un'idea (es. invoked_at_stage:
+#   backlog_refinement, rilevata da log-ceremony durante il Backlog
+#   Refinement — vedi framework/schema/idea.template.yaml)
 payload: {}
 
 target_file: null                   # es. "product/ideas/2026-01-08-slug/idea.yaml" — null per outbound_comm

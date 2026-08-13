@@ -50,6 +50,39 @@ ricorrente del team.
    completamento dell'iterazione precedente, impedimenti riscontrati) se
    presente nella trascrizione.
 
-7. Mostra un riepilogo delle decisioni estratte all'utente prima di
+7. **Per `backlog-refinement`, rileva le reprioritizzazioni.** Per ogni
+   iniziativa che entra nell'iterazione corrente, confronta la sua
+   posizione con il RICE score attuale delle idee ancora in backlog
+   (leggi `rice_history` più recente di ciascuna idea prioritizzata non
+   ancora in iterazione). Se un'iniziativa entra pur avendoci idee con
+   score più alto ancora in attesa, **non limitarti a registrarlo come
+   una decisione qualunque**: chiedi esplicitamente al PM —
+
+   > "Questa iniziativa entra davanti a idee con RICE più alto ancora in
+   > backlog. È una Strategic Exception (uno stakeholder ha chiesto di
+   > bypassare la priorità) o una scelta qualitativa del team dentro il
+   > processo normale?"
+
+   Registra la risposta in `reprioritizations` (vedi
+   `ceremony-decisions.template.yaml`), con `reason_type` distinto:
+   - **`qualitative_team_call`** — resta solo qui, nessun'altra
+     scrittura. È normale governance del backlog, non un'eccezione.
+   - **`strategic_exception`** — in più, prepara una proposta
+     `type: strategic_exception_flag` in `product/approvals/pending/`
+     (payload: nuova voce per `strategic_exceptions` dell'idea, con
+     `invoked_at_stage: backlog_refinement`, `ceremony_ref` verso questa
+     cartella). **Non scrivere direttamente su `idea.yaml`** — stessa
+     regola delle altre skill: proponi, non applicare. Non presumere mai
+     `approved_by`: chiedilo esplicitamente, anche se il richiedente ha
+     un ruolo senior.
+
+   Questa distinzione è il modo in cui il framework intercetta il
+   pattern descritto dal playbook ("Come gestire le frizioni" — Scenario
+   2): se la stessa persona invoca Strategic Exception ogni settimana,
+   deve emergere dai dati, non restare un'impressione.
+
+8. Mostra un riepilogo delle decisioni estratte all'utente prima di
    considerare il log completo — è più facile correggere un
    fraintendimento ora che scoprirlo settimane dopo in una revisione.
+   Se sono state rilevate reprioritizzazioni, includile esplicitamente
+   nel riepilogo, distinguendo le due categorie.

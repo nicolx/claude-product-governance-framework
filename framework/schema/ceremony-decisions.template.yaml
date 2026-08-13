@@ -31,3 +31,21 @@ decisions:
       approval_id: null             # id della voce in product/approvals/pending/ (o decided/) generata da questa decisione
 
 retro_notes: ""                    # es. % completamento iterazione precedente, impedimenti — solo per backlog-refinement
+
+# --- Solo per ceremony_type: backlog-refinement ---
+#
+# Ogni volta che un'iniziativa entra nell'iterazione corrente saltando
+# davanti a idee con RICE score più alto ancora in backlog, la skill
+# log-ceremony chiede esplicitamente: è una Strategic Exception (bypass
+# su autorizzazione di uno stakeholder) o una scelta qualitativa fatta
+# dal team dentro il processo normale? La distinzione conta: solo la
+# prima va tracciata su strategic_exceptions dell'idea e nel friction-log
+# per intercettare pattern (playbook, "Come gestire le frizioni" —
+# Scenario 2); la seconda resta normale governance del backlog.
+reprioritizations: []
+# Esempio di singola voce:
+# - idea_id: "2026-01-08-slug-esistente"
+#   expected_rank_note: "era 8° per RICE score nel backlog, entra ora al 2° posto dell'iterazione"
+#   reason_type: strategic_exception    # strategic_exception | qualitative_team_call
+#   reason: ""                          # perché, in entrambi i casi
+#   strategic_exception_approved_by: null   # solo se reason_type: strategic_exception — "CEO" | "CPO/CTO" | null finché non confermato

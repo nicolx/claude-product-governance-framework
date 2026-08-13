@@ -152,10 +152,12 @@ a un'idea/PRD già esistente (passo 4).
      mai lasciato solo nel testo del ticket.
 
    - **Strategic Exception** — crea comunque la cartella idea (per
-     traccia), `classification: strategic_exception`, ma lascia
-     `strategic_exception.approved_by`/`reason` da confermare
-     esplicitamente — non presumere l'approvazione solo perché il
-     mittente ha un ruolo senior.
+     traccia), `classification: strategic_exception`, e aggiungi una voce
+     a `strategic_exceptions` con `invoked_at_stage: intake` —
+     `approved_by`/`reason` restano da confermare esplicitamente, non
+     presumere l'approvazione solo perché il mittente ha un ruolo senior.
+     (Questo è distinto dal caso in cui un'idea normale salta la coda più
+     avanti, in Backlog Refinement — vedi skill `log-ceremony`.)
 
    - **Troppo ambiguo per classificare (dubbio di livello 2)** — **non
      forzare una classificazione indovinando**. Crea comunque

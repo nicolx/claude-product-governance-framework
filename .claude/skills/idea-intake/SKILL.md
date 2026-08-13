@@ -68,9 +68,10 @@ presente nel materiale di origine.
    - **Strategic Exception** — se il proponente è a un livello che nel
      `product/reference/` (o dichiarato dall'utente) qualifica per bypass
      del RICE. Crea comunque la cartella idea (serve comunque traccia),
-     ma imposta `classification: strategic_exception` e lascia
-     `strategic_exception.approved_by`/`reason` da confermare con
-     l'utente — **non assumere l'approvazione**, chiedila esplicitamente.
+     ma imposta `classification: strategic_exception` e aggiungi una voce
+     a `strategic_exceptions` con `invoked_at_stage: intake` —
+     `approved_by`/`reason` restano da confermare con l'utente, **non
+     assumere l'approvazione**, chiedila esplicitamente.
    - **Idea normale** — il caso di default.
 
 4. **Determina titolo, proponente, Product Line** (per la singola unità
