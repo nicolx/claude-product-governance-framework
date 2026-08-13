@@ -49,7 +49,7 @@ Ci sono **due livelli di dubbio**, e vanno trattati diversamente:
 2. **Dubbio che solo chi ha mandato il materiale originale può risolvere**
    (dati mancanti che il PM stesso non conosce: un numero, un dettaglio
    del problema, chi sia davvero il beneficiario coinvolto). Questo è il
-   caso che diventa `status: needs_clarification` (vedi passo 4 sotto) —
+   caso che diventa `status: needs_clarification` (vedi passo 5 sotto) —
    con domande specifiche pronte per essere rispedite al mittente.
 
 In entrambi i casi, la regola è la stessa: **non scrivere un campo con un
@@ -59,7 +59,7 @@ lascialo esplicitamente vuoto/null con una nota, non riempirlo a caso.
 
 Non vale solo per la classificazione: vale anche per numeri, nomi,
 percentuali, product line, e per l'ipotesi che un elemento sia collegato
-a un'idea/PRD già esistente (passo 3).
+a un'idea/PRD già esistente (passo 4).
 
 ## Passi
 
@@ -72,18 +72,43 @@ a un'idea/PRD già esistente (passo 3).
    metadati di eventuali immagini/allegati) prima di decidere qualunque
    cosa.
 
-3. **Prima di classificare come "nuova idea", cerca se esiste già
-   qualcosa di collegato**: leggi titoli/contesto di
+3. **Decomponi ogni elemento se mescola più richieste indipendenti.**
+   Una singola mail o trascrizione può contenere più idee distinte,
+   ciascuna con la propria priorità futura — ogni idea ha il proprio
+   RICE, quindi non vanno bundlate solo perché arrivate insieme.
+   **Criterio pratico** (stesso di `idea-intake`): se a due parti del
+   contenuto assegneresti un RICE score indipendente e scollegato, sono
+   due unità separate, non una. Da qui in poi, i passi 4-5 (verifica
+   collegamenti + classificazione) vanno ripetuti **per ciascuna unità
+   risultante**, indipendentemente — un singolo elemento può produrre in
+   output una combinazione qualsiasi di nuova idea / aggiornamento /
+   bug / needs_clarification, non solo "più idee nuove". Se il contenuto
+   è coeso (un solo problema descritto da più angolazioni), resta
+   un'unica unità.
+
+   **Regola per il materiale grezzo condiviso**: quando un elemento si
+   decompone in più unità, il materiale grezzo va copiato per intero
+   (mai spezzettato in estratti parziali) in ciascuna delle destinazioni
+   che le unità genereranno — chi apre una cartella deve poter leggere
+   il contesto completo senza risalire alle altre. Aggiungi in cima a
+   ogni copia una riga di nota che indichi le altre destinazioni
+   generate dalla stessa fonte. L'elemento lascia `product/inbox/` solo
+   dopo che tutte le unità generate sono state scritte nella loro
+   destinazione finale — se un'unica email genera 3 record, esce
+   dall'inbox solo quando tutti e 3 esistono, non dopo il primo.
+
+4. **Per ciascuna unità, prima di classificarla come "nuova idea", cerca
+   se esiste già qualcosa di collegato**: leggi titoli/contesto di
    `product/ideas/*/idea.yaml` e frontmatter di `product/prds/*/prd.md`
    (Why/What, non serve leggere tutto il corpo per uno screening
    iniziale). Se il contenuto sembra riferirsi chiaramente a un'idea o
-   PRD già esistente, tratta l'elemento come **aggiornamento**, non come
+   PRD già esistente, tratta l'unità come **aggiornamento**, non come
    nuova idea. Se il collegamento è plausibile ma non certo, è un dubbio
    di **livello 1** (vedi sopra): chiedi conferma al PM nella
    conversazione, subito, invece di decidere da solo — un falso
    collegamento è peggio di una domanda in più.
 
-4. **Classifica** ogni elemento in uno di questi esiti. Prima di scegliere
+5. **Classifica** ogni unità in uno di questi esiti. Prima di scegliere
    idea/bug/strategic_exception/aggiornamento (cioè prima di scartare
    `needs_clarification`), verifica di poter rispondere, **solo dal
    materiale a disposizione o da una domanda di livello 1 già fatta al
@@ -98,9 +123,9 @@ a un'idea/PRD già esistente (passo 3).
 
    - **Nuova idea** — segui gli stessi passi della skill `idea-intake`
      per struttura della cartella, naming dello slug e classificazione
-     idea/bug/strategic_exception. Il materiale grezzo si **sposta**
-     (non copia) da `product/inbox/` a
-     `product/ideas/{data}-{slug}/source/`.
+     idea/bug/strategic_exception. Materiale grezzo: vedi la regola sul
+     condiviso al passo 3 se questa unità è una tra più generate dallo
+     stesso elemento.
 
    - **Aggiornamento di un'idea esistente** — sposta il materiale in
      `product/ideas/{slug-esistente}/source/` (nome file che non collida
@@ -153,15 +178,18 @@ a un'idea/PRD già esistente (passo 3).
      un'integrazione disponibile (es. email) chiedi esplicitamente
      conferma prima di usarla.
 
-5. **Chiudi il run con un riepilogo**, non solo con le scritture fatte:
-   quanti elementi processati, quanti nuove idee / aggiornamenti / bug /
-   strategic exception / needs_clarification, e — se qualcosa non è
-   stato processato per un problema tecnico (file illeggibile, formato
-   non gestito) — dillo esplicitamente e lascialo in `product/inbox/`
-   piuttosto che farlo sparire silenziosamente.
+6. **Chiudi il run con un riepilogo**, non solo con le scritture fatte:
+   quanti elementi processati, in quante unità si sono decomposti, quante
+   nuove idee / aggiornamenti / bug / strategic exception /
+   needs_clarification ne sono derivate — **raggruppa nel riepilogo le
+   unità nate dallo stesso elemento**, non elencarle come se fossero
+   scollegate — e se qualcosa non è stato processato per un problema
+   tecnico (file illeggibile, formato non gestito) dillo esplicitamente e
+   lascialo in `product/inbox/` piuttosto che farlo sparire
+   silenziosamente.
 
-6. **Verifica che `product/inbox/` sia vuota** (a parte `.gitkeep` e gli
-   eventuali elementi non processabili segnalati al passo 5) prima di
+7. **Verifica che `product/inbox/` sia vuota** (a parte `.gitkeep` e gli
+   eventuali elementi non processabili segnalati al passo 6) prima di
    considerare il run concluso.
 
 ## Cosa NON fare

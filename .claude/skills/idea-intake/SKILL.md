@@ -39,7 +39,19 @@ presente nel materiale di origine.
 1. **Leggi il materiale grezzo** fornito dall'utente (allegato, testo
    incollato, o riferimento a un file).
 
-2. **Classifica** prima di tutto secondo il playbook:
+2. **Decomponi prima di classificare, se il materiale mescola più
+   richieste indipendenti.** Una singola mail o trascrizione può
+   contenere più idee distinte, ciascuna con la propria priorità futura.
+   **Criterio pratico**: se a due parti del contenuto assegneresti un
+   RICE score indipendente e scollegato (Reach/Impact/Confidence/Effort
+   diversi, senza che l'uno dipenda dall'altro), sono due idee, non una
+   — non forzarle in un'unica cartella solo perché sono arrivate insieme.
+   Da qui in poi, ripeti i passi 3-7 **per ciascuna unità risultante**,
+   in modo completamente indipendente (classificazione, slug, RICE
+   futuro separati). Se invece il materiale è coeso (un solo problema
+   descritto da più angolazioni), resta un'unica idea.
+
+3. **Classifica** ogni unità risultante secondo il playbook:
    - **Bug** — se descrive un output diverso da quanto atteso per errore
      di codice o interpretazione errata del requisito. **Crea comunque la
      cartella idea** (passi 4-6 sotto), con `classification: bug` — serve
@@ -61,34 +73,41 @@ presente nel materiale di origine.
      l'utente — **non assumere l'approvazione**, chiedila esplicitamente.
    - **Idea normale** — il caso di default.
 
-3. **Determina titolo, proponente, Product Line.** Per convenzione, se il
-   materiale è un'email, usa l'oggetto come titolo. Se la Product Line non
-   è ovvia, chiedi — non indovinare tra le opzioni in
+4. **Determina titolo, proponente, Product Line** (per la singola unità
+   che stai processando). Per convenzione, se il materiale è un'email,
+   usa l'oggetto come titolo — se l'email è stata decomposta in più
+   unità, aggiungi un breve suffisso che distingua i titoli tra loro. Se
+   la Product Line non è ovvia, chiedi — non indovinare tra le opzioni in
    `product/reference/product-lines.yaml`.
 
-4. **Genera lo slug e crea la cartella**
+5. **Genera lo slug e crea la cartella**
    `product/ideas/{YYYY-MM-DD}-{slug-descrittivo}/` (data odierna o data
    del materiale di origine, a scelta più sensata per il caso). Lo slug è
    un topic-slug leggibile (es. `ricevute-scontrino-solo-totale`), non un
-   ID opaco.
+   ID opaco. Una cartella per unità, anche se più unità condividono la
+   stessa origine.
 
-5. **Salva il materiale grezzo** in `source/` dentro la cartella (es.
+6. **Salva il materiale grezzo** in `source/` dentro la cartella (es.
    `source/email-originale.md`, `source/trascrizione.md`) — non
-   parafrasarlo via, l'originale deve restare consultabile.
+   parafrasarlo via, l'originale deve restare consultabile. **Se
+   un'unica fonte ha generato più unità (idee/bug/ecc.), copia il
+   materiale grezzo per intero in ognuna delle cartelle risultanti** —
+   non spezzettarlo in estratti parziali: chi apre una cartella deve
+   poter leggere il contesto completo senza dover risalire alle altre.
+   In questo caso, aggiungi in cima al file copiato una riga tipo `<!--
+   Questa fonte ha generato anche: {altri slug} -->` così chi la legge sa
+   che esistono record collegati dalla stessa origine.
 
-6. **Scrivi `idea.yaml`** a partire da
+7. **Scrivi `idea.yaml`** a partire da
    `framework/schema/idea.template.yaml`, compilando i campi noti. **Non
    compilare `rice_history`** in questo passo — quello è compito della
    skill `rice-update`, con la sua propria approvazione. Lascialo vuoto
    (`[]`).
 
-7. **Non serve passare da `product/approvals/pending/` per la creazione
+8. **Non serve passare da `product/approvals/pending/` per la creazione
    di una nuova idea** (a differenza degli aggiornamenti a idee/roadmap
    già esistenti): l'intake è la prima cattura, non ancora una decisione
    di priorità. Comunicalo comunque chiaramente all'utente e mostragli il
-   contenuto creato prima di considerare il passo concluso.
-
-8. Se dal materiale emergono **più idee distinte** (es. una trascrizione
-   di riunione che tocca temi diversi), crea più cartelle separate invece
-   di forzarle in una sola — ognuna deve restare giudicabile
-   singolarmente in fase di prioritizzazione.
+   contenuto creato — **se sono state create più unità dalla stessa
+   fonte, elencale tutte insieme nel riepilogo finale**, non una alla
+   volta senza collegarle — prima di considerare il passo concluso.
