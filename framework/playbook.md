@@ -455,6 +455,67 @@ non la chiarisce, comparendo ogni settimana finché non viene risolta.
 - [ ] Se la scadenza è a rischio: è stato segnalato esplicitamente al PM, non lasciato in un file che nessuno rilegge?
 - [ ] L'iniziativa mandataria compare nei report di roadmap anche se non è ancora entrata in lavorazione?
 
+## Salute delle NSM e Product Discovery
+
+*"Success breeds complacency. Complacency breeds failure. Only the
+paranoid survive." — Andy Grove*
+
+Ogni PM è responsabile del successo di una North Star Metric (sezione
+"Il lavoro del Product Manager"), e il prodotto è "promotore della
+Product Discovery per identificare iniziative ad alto impatto sulle
+NSM, indipendentemente dagli altri stakeholder". Questo principio esiste
+già nel playbook — quello che manca, se non viene reso esplicito, è
+**cosa succede quando la salute di una NSM peggiora davvero**.
+
+**Il funzionamento ordinario è corretto così com'è.** Con molte
+richieste (interne, di stakeholder, idee di team) è normale e sano che
+la priorità segua il RICE score: è il meccanismo che tiene onesta la
+prioritizzazione, discusso in "Ideas prioritization". La Discovery
+continua a lavorare sullo sfondo, sempre attiva, senza bisogno di
+interrompere nulla.
+
+**Ma un deterioramento di una NSM chiave è un segnale di categoria
+diversa.** Non è un'altra richiesta da mettere in coda e valutare col
+RICE come le altre — è un'indicazione che la Product Line nel suo
+complesso sta peggiorando, e nessuna quantità di idee ad alto RICE score
+prese dal backlog compensa una NSM che va nella direzione sbagliata: se
+il fondamentale peggiora, l'intero portfolio di iniziative rischia di
+star ottimizzando le cose sbagliate. Per questo, quando succede, **il
+focus della Product Discovery deve tornare esplicitamente sulla NSM in
+difficoltà** — generare e prioritizzare iniziative (strategiche o
+tattiche) mirate a recuperarla, anche rispetto a idee con RICE più alto
+già in backlog.
+
+Questo non è un override automatico del RICE, ed è coerente con lo
+spirito del framework: **un segnale forte, non una decisione presa al
+posto del PM.** La skill `nsm-watch` osserva le NSM (e altri KPI chiave)
+di ogni Product Line nel tempo, calcola quando una sta degradando, e lo
+porta all'attenzione del PM con la massima evidenza — in apertura di
+ogni Backlog Refinement, prima di qualunque altra cosa. Sta al PM (col
+team) decidere se e come riorientare la Discovery, tenendo traccia
+esplicita di quella decisione.
+
+**Distinzione rispetto alla Measurement** (sezione dedicata): la
+Measurement verifica se l'ipotesi di **una singola iniziativa** ha reso
+quanto sperato, dopo il rilascio. Questa sezione riguarda la salute
+**aggregata** di una Product Line — indipendente da quale iniziativa
+specifica la stia muovendo, osservata con continuità, non solo dopo un
+rilascio.
+
+*Principi Agile da incarnare in questa fase:*
+- *A intervalli regolari il team riflette su come diventare più efficace,
+  poi regola il proprio comportamento di conseguenza.*
+- *Il prodotto è promotore della Product Discovery indipendentemente
+  dagli altri stakeholder, auto-sottoponendosi agli stessi criteri di
+  validazione.*
+
+**Checklist operativa**
+- [ ] Le NSM di ogni Product Line hanno baseline e target dichiarati, non solo un nome?
+- [ ] Sono state riviste all'ultimo Backlog Refinement, in apertura, prima di ogni altra watch?
+- [ ] Per le NSM in degrado: il riorientamento della Discovery è stato discusso esplicitamente, non ignorato perché "il backlog RICE è già pieno"?
+- [ ] Le idee nate da un riorientamento di Discovery sono collegate alla NSM che intendono recuperare?
+- [ ] Un allarme risolto è stato chiuso esplicitamente, con la motivazione, non lasciato a scomparire da solo?
+
 ## Product Backlog Refinement
 
 *"Plans are useless, but planning is indispensable." — Dwight D.
@@ -931,6 +992,16 @@ lavoro invisibile: entra in roadmap come qualunque altra iniziativa
 quando rilevante, e la capacità che assorbe è tracciata esplicitamente
 (`capacity_allocation` in ogni snapshot settimanale) per rendere
 consapevole il bilanciamento con la roadmap principale.
+
+**Allarme NSM (NSM Alert)** — Segnale generato quando una North Star
+Metric (o altro KPI chiave di Product Line) mostra un trend di
+peggioramento, osservato nel tempo indipendentemente da quale iniziativa
+specifica la stia muovendo. A differenza del `measurement_status` di una
+singola iniziativa, un allarme NSM dovrebbe riportare il focus della
+Product Discovery sulla metrica in difficoltà, anche rispetto a idee con
+RICE più alto in backlog — non un override automatico, ma un segnale
+con la massima evidenza che richiede una decisione esplicita del PM. Vedi
+sezione "Salute delle NSM e Product Discovery".
 
 **Ideas Bucket** — Il repository dove vengono raccolte tutte le idee,
 richieste e segnalazioni prima di essere valutate. Non è una coda di

@@ -1,6 +1,6 @@
 ---
 name: roadmap-snapshot
-description: Genera la proposta di snapshot settimanale della roadmap a partire dalle cerimonie loggate e dallo stato Jira, inclusi capacità protetta per il debito tecnico (platform), iniziative mandatarie a rischio, idee senza RICE e stato delle misurazioni — scrivendola in product/approvals/pending/, mai direttamente in product/roadmap/snapshots/.
+description: Genera la proposta di snapshot settimanale della roadmap a partire dalle cerimonie loggate e dallo stato Jira, inclusi allarmi sulle NSM in degrado, capacità protetta per il debito tecnico (platform), iniziative mandatarie a rischio, idee senza RICE e stato delle misurazioni — scrivendola in product/approvals/pending/, mai direttamente in product/roadmap/snapshots/.
 ---
 
 # roadmap-snapshot
@@ -25,7 +25,7 @@ creato/aggiornato.
 2. Raccogli input da:
    - `product/ceremonies/backlog-refinement/{settimana}/decisions.yaml`
      e `product/ceremonies/roadmap-iteration-planning/{settimana}/decisions.yaml`,
-     se presenti — inclusi i riepiloghi di `measurement-watch`,
+     se presenti — inclusi i riepiloghi di `nsm-watch`, `measurement-watch`,
      `mandate-watch`, `rice-watch` se `log-ceremony` li ha loggati lì.
    - Stato Jira delle iniziative già collegate (vedi skill `jira-sync` —
      se lo stato non è stato aggiornato di recente, suggerisci di
@@ -34,13 +34,19 @@ creato/aggiornato.
    - `product/ideas/*/idea.yaml` con `status` in `in_roadmap` o
      `in_jira`, per popolare la lista `initiatives`.
    - Se i riepiloghi delle cerimonie non coprono già lo stato più
-     recente, richiama direttamente `mandate-watch`, `rice-watch` e
-     `measurement-watch` prima di comporre lo snapshot — le sezioni sotto
-     non vanno mai lasciate vuote solo perché la cerimonia non le ha
-     toccate quella settimana.
+     recente, richiama direttamente `nsm-watch`, `mandate-watch`,
+     `rice-watch` e `measurement-watch` prima di comporre lo snapshot —
+     le sezioni sotto non vanno mai lasciate vuote solo perché la
+     cerimonia non le ha toccate quella settimana.
 
 3. Componi il contenuto secondo
    `framework/schema/roadmap-snapshot.template.yaml`:
+   - `nsm_alerts` **per primo**: tutte le NSM con `alert.status` diverso
+     da `none` in `product/reference/nsm-tracking.yaml` (non solo quelle
+     rilevate questa settimana — un allarme resta finché non è
+     `resolved`), leggendo `trend_status`/`alert` già calcolati da
+     `nsm-watch`. È il segnale più strategico dello snapshot, va in cima
+     al documento, non in coda dopo tutto il resto.
    - `iteration_goal`, `ceremony_refs` (link alle cartelle cerimonia
      usate come fonte), `initiatives` (idea_id, prd_id, jira_card_id,
      status, completion_pct), `retro_notes` se disponibili dal Backlog

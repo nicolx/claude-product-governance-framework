@@ -65,6 +65,11 @@ che serve da lì e chiedi solo quello che manca.
    upstream/main` se disponibile, altrimenti `HEAD`).
 2. `product/reference/product-lines.yaml` (da template).
 3. `product/reference/friction-log.yaml` (da template, vuoto).
+   Non creare qui `product/reference/nsm-tracking.yaml`: baseline e
+   target delle NSM spesso richiedono un giro su DataBricks/analytics
+   che non è pratico fare a metà di questa intervista — lo scaffolda la
+   skill `nsm-watch` al suo primo run, quando il PM ha il tempo di
+   recuperare i valori con calma.
 4. Scaffold vuoto: `product/ideas/`, `product/prds/`,
    `product/roadmap/snapshots/`, `product/ceremonies/`,
    `product/approvals/pending/`, `product/approvals/decided/`,

@@ -112,7 +112,10 @@ presente nel materiale di origine.
    usa l'oggetto come titolo — se l'email è stata decomposta in più
    unità, aggiungi un breve suffisso che distingua i titoli tra loro. Se
    la Product Line non è ovvia, chiedi — non indovinare tra le opzioni in
-   `product/reference/product-lines.yaml`.
+   `product/reference/product-lines.yaml`. Se questa idea nasce da un
+   riorientamento di Discovery confermato dalla skill `nsm-watch` (una
+   NSM in degrado), chiedi se va collegata in `links.nsm_targeted` — non
+   presumerlo solo perché il contesto della conversazione lo suggerisce.
 
 5. **Genera lo slug e crea la cartella**
    `product/ideas/{YYYY-MM-DD}-{slug-descrittivo}/` (data odierna o data

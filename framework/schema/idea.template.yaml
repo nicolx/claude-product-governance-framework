@@ -189,3 +189,9 @@ jira:
 
 links:
   prd_ids: []                   # slug dei PRD collegati in product/prds/
+  nsm_targeted: []               # opzionale: [{product_line, name}] delle NSM che questa idea mira esplicitamente a recuperare
+  # — popolato quando l'idea nasce da un riorientamento di Discovery
+  # confermato via nsm-watch (product/reference/nsm-tracking.yaml,
+  # alert.discovery_focus_confirmed), per poter verificare più avanti se
+  # il focus ha davvero funzionato. Vuoto per la stragrande maggioranza
+  # delle idee — non forzarlo.

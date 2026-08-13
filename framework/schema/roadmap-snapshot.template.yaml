@@ -9,6 +9,26 @@
 # product/approvals/pending/ (tipo roadmap_snapshot) — mai scritto
 # direttamente dalla skill roadmap-snapshot.
 
+# nsm_alerts va per primo nel documento deliberatamente: è il segnale più
+# strategico che il framework osserva (playbook, "Salute delle NSM e
+# Product Discovery") — più a monte delle singole iniziative. Elenca
+# TUTTE le NSM con alert.status diverso da "none" in
+# product/reference/nsm-tracking.yaml, non solo quelle rilevate questa
+# settimana — finché un allarme resta "active" e non "resolved", deve
+# comparire in ogni snapshot, per lo stesso motivo per cui un'iniziativa
+# mandataria a rischio non sparisce finché non è risolta. Popolato
+# leggendo trend_status/alert calcolati da nsm-watch (non ricalcolato
+# qui).
+nsm_alerts:
+  - product_line: ""
+    name: ""
+    trend_status: ""                   # degrading | improving | stable | unknown
+    alert_status: ""                    # active | resolved
+    discovery_focus_confirmed: false
+    latest_reading: null
+    baseline: null
+    target: null
+
 week: "2026-W02"
 generated_at: "2026-01-08"
 iteration_goal: ""
