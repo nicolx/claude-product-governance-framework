@@ -63,12 +63,16 @@ unscored_ideas:
 # investimenti futuri: non serve aspettare un livello derivato/DB per
 # iniziare ad accumularlo. Popolato leggendo measurement_status
 # calcolato da measurement-watch su ciascun product/prds/*/measurement.yaml
-# (non ricalcolato qui). Le KPI concluded non compaiono più qui.
+# (non ricalcolato qui). Le iniziative con closure.closed: true non
+# compaiono più qui — incluso il caso "senza KPI" (kpis vuoto) una volta
+# accettata la chiusura: finché non è chiusa, compare comunque una riga
+# con kpi_name: null per segnalare che manca ancora l'atto di
+# accettazione, anche se non c'è nulla da misurare.
 measurements_status:
   - idea_id: ""
     prd_ref: ""
-    kpi_name: ""
+    kpi_name: null                       # null se l'iniziativa non ha KPI di business (vedi not_applicable_reason su measurement.yaml)
     weeks_since_done: null
-    measurement_status: ""              # check_due | on_track | achieved | at_risk | invalidated | inconclusive
+    measurement_status: ""              # check_due | on_track | achieved | at_risk | invalidated | inconclusive | pending_closure (kpis vuoto, non ancora chiusa)
     latest_reading: null
     target: null

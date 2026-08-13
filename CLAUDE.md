@@ -36,7 +36,7 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `product/ideas/*/mandate.analysis_start_by`, `product/ideas/*/mandate.escalation_status` | Istanza | Solo `mandate-watch` — fatti calcolati, non decisioni, scrittura diretta senza approvazione (stesso principio di `jira.status`) |
 | `product/ideas/*/rice_status` | Istanza | Solo `rice-watch` — `flagged_since` è un fatto osservato; `blocked_reason`/`waiting_on` sono cattura di contesto (chiesti al PM, mai presunti), non decisioni di priorità: nessuna delle due passa da approvazione |
 | `product/prds/*/measurement*.yaml` (creazione) | Istanza | Solo `prd-draft`, contestualmente alla creazione del PRD — non passa da approvazione (stessa logica della creazione di idee/PRD) |
-| `product/prds/*/measurement*.yaml` (readings, measurement_status, follow_up_needed) | Istanza | Solo `measurement-watch` — letture riportate dal PM (fatti osservati, non decisioni) e valutazioni calcolate dai dati; `concluded` solo su decisione esplicita del PM in conversazione. Nessuna delle due passa da approvazione |
+| `product/prds/*/measurement*.yaml` (readings, measurement_status, follow_up_needed, closure) | Istanza | Solo `measurement-watch` — letture riportate dal PM e `closure` sono cattura di decisioni/fatti già espressi in conversazione (mai presunti, mai chiusi di iniziativa propria), `measurement_status` è calcolato dai dati. Nessuno di questi passa da approvazione |
 | `.governance/config.yaml` | Istanza | Solo `init-governance-project`, in scrittura successiva solo su richiesta esplicita dell'utente |
 
 Non spostare mai contenuto da `framework/` verso cartelle di istanza per

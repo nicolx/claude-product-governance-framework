@@ -39,7 +39,16 @@ created_at: "2026-01-08"
 ## Metriche
 
 <!-- 1-3 KPI massimo, con baseline e target. Il ragionamento su come si è
-     arrivati a scegliere la metrica resta nell'idea di origine, non qui. -->
+     arrivati a scegliere la metrica resta nell'idea di origine, non qui.
+
+     Se l'iniziativa non ha un'ipotesi di impatto su una metrica di
+     business (tipico per iniziative di mera compliance normativa), non
+     forzare una metrica proxy: scrivi "N/A — nessuna metrica di business
+     attesa" con una riga sul perché. Va comunque compilato
+     measurement.yaml con kpis vuoto e not_applicable_reason (skill
+     prd-draft) — l'iniziativa resta da chiudere esplicitamente più
+     avanti (skill measurement-watch), non sparisce dal tracciamento
+     solo perché non ha KPI. -->
 
 ## How
 

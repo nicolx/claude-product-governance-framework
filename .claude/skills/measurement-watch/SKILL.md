@@ -1,6 +1,6 @@
 ---
 name: measurement-watch
-description: Scansiona le iniziative già rilasciate (idea status "done") e verifica se le loro KPI stanno mostrando gli impatti attesi, chiedendo al PM le letture correnti quando è passata la finestra di misurazione. Segnala quali meritano un follow-up e quali possono essere chiuse. Usala periodicamente e sempre all'apertura del Backlog Refinement.
+description: Scansiona le iniziative già rilasciate (idea status "done") e verifica se le loro KPI stanno mostrando gli impatti attesi, chiedendo al PM le letture correnti quando è passata la finestra di misurazione. Gestisce anche iniziative senza KPI di business (es. compliance) e l'atto di chiusura/accettazione che chiude il cantiere di misurazione. Usala periodicamente e sempre all'apertura del Backlog Refinement.
 ---
 
 # measurement-watch
@@ -12,12 +12,16 @@ funzionato?" (playbook, "Product Design, development and rollout" /
 domanda "ha funzionato?" resti senza risposta perché nessuno se n'è più
 occupato: se un'iniziativa è in produzione da settimane, qualcuno deve
 controllare le KPI dichiarate nel suo PRD e decidere se c'è un impatto,
-serve ancora tempo, o l'ipotesi non ha retto.
+serve ancora tempo, o l'ipotesi non ha retto — o, se l'iniziativa non ha
+mai avuto una KPI di business (tipico delle richieste di mera
+compliance), qualcuno deve comunque accettare esplicitamente di chiudere
+il cantiere, invece di lasciarlo in un limbo indefinito.
 
 ## Quando usarla
 
 - **Standalone**, in qualunque momento: "quali iniziative dovrebbero
-  già mostrare impatti?", "controlliamo lo stato delle misurazioni".
+  già mostrare impatti?", "controlliamo lo stato delle misurazioni",
+  "possiamo chiudere il cantiere di misurazione di X?".
 - **Richiamata da `log-ceremony`**, e idealmente **in apertura** del
   Backlog Refinement (playbook, sezione "Product Backlog Refinement"):
   prima di guardare cosa entra in agenda, si guarda cosa è già stato
@@ -29,12 +33,25 @@ serve ancora tempo, o l'ipotesi non ha retto.
 1. **Elenca le iniziative rilevanti**: idee con `status: done` e
    `done_at` valorizzato, che hanno almeno un PRD collegato (`links.prd_ids`
    non vuoto) con un `measurement.yaml` (o `measurement-N.yaml`) nella
-   sua cartella. Se `status: done` ma `done_at` è `null`, chiedi al PM la
-   data (**mai presumere "oggi"**) e scrivila su `idea.yaml` prima di
-   procedere con quella iniziativa — è un fatto mancante, non una
-   decisione, scrittura diretta.
+   sua cartella, **e `closure.closed` ancora `false`** (le iniziative già
+   chiuse non vanno riconsiderate — vedi passo 5). Se `status: done` ma
+   `done_at` è `null`, chiedi al PM la data (**mai presumere "oggi"**) e
+   scrivila su `idea.yaml` prima di procedere — è un fatto mancante, non
+   una decisione, scrittura diretta.
 
-2. **Per ciascuna KPI in ciascun `measurement.yaml`**, calcola le
+2. **Se `kpis` è vuoto**, non trattarlo come un errore da correggere a
+   tutti i costi: è il caso legittimo di un'iniziativa senza metrica di
+   business attesa (tipico per `classification: mandate` con
+   `rationale` di compliance normativa — vedi playbook, "Iniziative
+   Mandatarie"). Se anche `not_applicable_reason` è vuoto, chiedi al PM
+   se è corretto che non ci sia una KPI, e se sì fallo scrivere (mai
+   presumere tu il motivo). Poi passa direttamente al passo 5 (l'atto di
+   chiusura) per questa iniziativa — non ha senso continuare a
+   segnalarla ad ogni run se non c'è nulla da misurare, ma resta comunque
+   necessario un atto esplicito di accettazione prima di considerarla
+   chiusa.
+
+3. **Per ciascuna KPI in `kpis`** (quando non è vuoto), calcola le
    settimane trascorse da `done_at` e confrontale con
    `measurement_window_weeks`:
    - Se non ancora passata: `measurement_status: pending`, non serve
@@ -56,32 +73,43 @@ serve ancora tempo, o l'ipotesi non ha retto.
      c'è una lettura più fresca prima di dare per buono un giudizio
      stantio.
 
-3. **Scrivi `measurement_status` direttamente** su `measurement.yaml` —
-   è una valutazione calcolata dai dati, non una decisione di priorità,
-   **non passa da `product/approvals/pending/`** (stesso principio di
-   `escalation_status` in `mandate-watch`).
+4. **Scrivi `measurement_status` direttamente** su ciascuna KPI — è una
+   valutazione calcolata dai dati, non una decisione di priorità, **non
+   passa da `product/approvals/pending/`** (stesso principio di
+   `escalation_status` in `mandate-watch`). Per le KPI `at_risk` o
+   `invalidated`, chiedi esplicitamente al PM se serve un follow-up: "I
+   dati suggeriscono che l'ipotesi non sta reggendo — vuoi che prepari
+   una nuova idea per iterare (via `idea-intake`), o consideriamo chiusa
+   questa iniziativa così com'è?" Se conferma che serve un follow-up,
+   imposta `follow_up_needed: true` e **suggerisci** `idea-intake` sul
+   follow-up — **non creare tu stessa la nuova idea**.
 
-4. **Per le KPI `at_risk` o `invalidated`, chiedi esplicitamente al PM**
-   se serve un follow-up: "I dati suggeriscono che l'ipotesi non sta
-   reggendo — vuoi che prepari una nuova idea per iterare (via
-   `idea-intake`), o consideriamo chiusa questa iniziativa così com'è?"
-   Se il PM conferma che serve un follow-up, imposta
-   `follow_up_needed: true` e **suggerisci** di lanciare `idea-intake`
-   sul follow-up — **non creare tu stessa la nuova idea**, è una
-   decisione del PM, non un'inferenza automatica.
+5. **L'atto di chiusura (`closure`).** Distinto dallo stato delle
+   singole KPI: è la decisione che chiude l'intero cantiere di
+   misurazione per questa iniziativa, "si è mossa o non si è mossa come
+   sperato, comunque smettiamo di seguirla" — nelle parole dell'utente.
+   Proponilo esplicitamente al PM quando ha senso (KPI tutte
+   `achieved`/`at_risk`/`invalidated` da un po', oppure kpis vuoto per il
+   caso compliance del passo 2), **ma non chiuderlo mai di tua
+   iniziativa**. Se il PM conferma, scrivi:
+   - `closed: true`, `closed_at` (oggi), `closed_by` (chi lo conferma —
+     chiesto, mai presunto)
+   - `outcome`: `achieved` | `not_achieved_accepted` | `not_applicable`
+     (per il caso senza KPI) | `inconclusive_accepted`
+   - `note`: il perché in una riga, nelle parole del PM
 
-5. **Per le KPI che il PM decide esplicitamente di non seguire più**
-   (raggiunto l'obiettivo e non serve più monitorare, oppure il
-   contrario — si accetta che non ha funzionato e si chiude) — solo su
-   indicazione esplicita, mai di iniziativa propria — scrivi
-   `measurement_status: concluded`. Da quel momento questa KPI non
-   compare più negli alert dei run successivi.
+   Anche questa è cattura di una decisione già presa in conversazione,
+   non passa da `product/approvals/pending/`. Da questo momento,
+   `measurement-watch` non segnala più questa iniziativa nei run
+   successivi (passo 1).
 
 6. **Presenta un riepilogo ordinato per urgenza** (`check_due` e
-   `at_risk`/`invalidated` prima, poi `on_track`, `achieved`/`concluded`
-   solo se richiesti esplicitamente): per ciascuna, `idea_id`, nome
-   della KPI, settimane da `done_at`, ultimo valore noto vs.
-   baseline/target. **Solo segnalazione** — nessuna comunicazione o
+   `at_risk`/`invalidated` prima, poi le iniziative senza KPI ancora da
+   accettare, poi `on_track`; le iniziative appena chiuse in questo run
+   vanno menzionate una volta, non ripetute): per ciascuna, `idea_id`,
+   nome della KPI (o "nessuna KPI" per il caso compliance), settimane da
+   `done_at`, ultimo valore noto vs. baseline/target. **Solo
+   segnalazione** per ciò che resta aperto — nessuna comunicazione o
    escalation automatica, stesso principio di `mandate-watch`.
 
 7. Se chiamata da `log-ceremony`, restituisci il riepilogo perché venga
@@ -92,10 +120,15 @@ serve ancora tempo, o l'ipotesi non ha retto.
 
 - Non inventare un valore di lettura per completare uno schema — se il
   PM non lo sa, resta `check_due`, non forzare un numero.
+- Non inventare una KPI proxy per un'iniziativa che non ne ha (es.
+  compliance) solo per non lasciare `kpis` vuoto — `not_applicable_reason`
+  è la risposta corretta, non una metrica di comodo.
 - Non decidere autonomamente che un'iniziativa è `achieved`/`invalidated`
   senza dati reali a supporto — un giudizio senza readings è
   `inconclusive`, non un esito positivo o negativo per default.
 - Non creare una nuova idea di follow-up di tua iniziativa — proponilo,
   la creazione resta un passo esplicito del PM tramite `idea-intake`.
-- Non impostare `concluded` senza una decisione esplicita del PM in
-  questa conversazione.
+- Non impostare `closure.closed: true` senza una decisione esplicita del
+  PM in questa conversazione — nemmeno per le iniziative senza KPI:
+  "non c'è nulla da misurare" non equivale a "possiamo chiuderla senza
+  chiedere".

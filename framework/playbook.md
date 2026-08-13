@@ -766,6 +766,24 @@ tracciamento, accumulato settimana dopo settimana in Git accanto ai PRD,
 sicurezza dove veicolare gli investimenti futuri — non solo "abbiamo
 consegnato tanto", ma "quello che abbiamo consegnato ha reso".
 
+**Non tutte le iniziative hanno una metrica di business.** Una richiesta
+di mera compliance normativa (spesso un'Iniziativa Mandataria — vedi
+sezione dedicata) non nasce con l'ipotesi "questo migliorerà la metrica
+X": nasce da un obbligo. Forzare una metrica proxy solo per riempire la
+sezione Metriche del PRD produce dati inutili nel tempo — meglio
+dichiarare esplicitamente che non c'è nulla da misurare.
+
+Questo però non significa che il cantiere resti aperto per sempre senza
+nessuno che se ne occupi. Serve comunque un **atto esplicito di
+chiusura/accettazione**: qualcuno, ad un certo punto, deve dire "questa
+iniziativa è chiusa" — che ci sia una KPI che si è mossa (o non si è
+mossa) come sperato, o che non ci sia proprio nulla da misurare (il caso
+compliance). La chiusura non è un'inferenza automatica basata sui dati:
+è una decisione del PM, tracciata con data e motivazione, che smette di
+far riapparire quell'iniziativa negli alert successivi. Senza questo
+atto esplicito, un'iniziativa senza KPI rischia di restare per sempre
+un'eccezione che nessuno chiude formalmente.
+
 *Principi Agile da incarnare in questa fase:*
 - *A intervalli regolari il team riflette su come diventare più efficace,
   poi regola il proprio comportamento di conseguenza.*
@@ -780,6 +798,8 @@ consegnato tanto", ma "quello che abbiamo consegnato ha reso".
 - [ ] Le nuove idee emerse dalla misurazione sono state aggiunte al bucket?
 - [ ] Le iniziative rilasciate da tempo sufficiente sono state riviste all'ultimo Backlog Refinement, in apertura, non come ripensamento a fine riunione?
 - [ ] Per le iniziative il cui impatto non convince: è stata presa una decisione esplicita (follow-up o chiusura), invece di lasciarle in un limbo?
+- [ ] Per le iniziative senza una metrica di business (es. compliance): è dichiarato esplicitamente il perché, invece di una metrica proxy inventata?
+- [ ] Ogni iniziativa rilasciata ha, prima o poi, un atto esplicito di chiusura/accettazione — non resta aperta indefinitamente senza che nessuno se ne occupi?
 
 ---
 
