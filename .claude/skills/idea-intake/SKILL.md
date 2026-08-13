@@ -1,6 +1,6 @@
 ---
 name: idea-intake
-description: Trasforma materiale grezzo (email, trascrizione, segnalazione) in una nuova idea strutturata in product/ideas/, classificandola come idea/bug/strategic exception/mandate secondo il playbook. Usala quando l'utente allega o incolla materiale nuovo da valutare.
+description: Trasforma materiale grezzo (email, trascrizione, segnalazione) in una nuova idea strutturata in product/ideas/, classificandola come idea/bug/strategic exception/mandate/platform secondo il playbook. Usala quando l'utente allega o incolla materiale nuovo da valutare.
 ---
 
 # idea-intake
@@ -89,6 +89,22 @@ presente nel materiale di origine.
      con una nota, non bloccare la creazione). Non compilare mai
      `analysis_start_by`/`escalation_status` — sono calcolati dalla
      skill `mandate-watch`, non a mano.
+   - **Platform (debito tecnico/devops puro)** — non è un bug (non
+     produce un output sbagliato) né un'idea di business: è manutenzione,
+     upgrade, gestione del debito tecnico o attività devops che il team
+     tech giudica necessaria (playbook, "flusso di protezione del team").
+     Può arrivare sia dal team tech direttamente sia mediata dal PM —
+     nessun vincolo su chi la propone. Imposta `classification: platform`
+     e compila il blocco `platform`: `rationale` sempre chiesto
+     esplicitamente (perché serve — rischio, manutenibilità, ecc.), non
+     dedotto dal fatto che "viene dal team tech quindi ovviamente serve".
+     Se emerge una stima di sforzo, chiedi `estimated_effort_weeks`
+     (segnala che andrebbe validata dal team tech se chi la propone non
+     lo è già) — serve al calcolo della capacità protetta in
+     `roadmap-snapshot`, non a un RICE (che questa classification non ha
+     mai). Come `mandate`, **non salta l'analisi**: le iniziative
+     importanti seguono comunque `in_analysis`/`in_prd`; quelle piccole
+     possono saltare direttamente a `in_jira`, a giudizio del team tech.
    - **Idea normale** — il caso di default.
 
 4. **Determina titolo, proponente, Product Line** (per la singola unità

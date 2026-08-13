@@ -50,13 +50,19 @@ ricorrente del team.
    completamento dell'iterazione precedente, impedimenti riscontrati) se
    presente nella trascrizione.
 
-7. **Per `backlog-refinement`, rileva le reprioritizzazioni.** Per ogni
-   iniziativa che entra nell'iterazione corrente, confronta la sua
-   posizione con il RICE score attuale delle idee ancora in backlog
-   (leggi `rice_history` più recente di ciascuna idea prioritizzata non
-   ancora in iterazione). Se un'iniziativa entra pur avendoci idee con
-   score più alto ancora in attesa, **non limitarti a registrarlo come
-   una decisione qualunque**: chiedi esplicitamente al PM —
+7. **Per `backlog-refinement`, rileva le reprioritizzazioni.** Si
+   applica **solo alle iniziative `classification: idea`** — bug,
+   strategic exception, mandate e platform non sono mai state
+   RICE-ranked per disegno, quindi il loro ingresso in iterazione non è
+   una reprioritizzazione da segnalare, è il loro percorso normale (non
+   chiedere nulla per queste). Per ogni iniziativa `classification: idea`
+   che entra nell'iterazione corrente, confronta la sua posizione con il
+   RICE score attuale delle altre idee `classification: idea` ancora in
+   backlog (leggi `rice_history` più recente di ciascuna idea
+   prioritizzata non ancora in iterazione). Se un'iniziativa entra pur
+   avendoci idee con score più alto ancora in attesa, **non limitarti a
+   registrarlo come una decisione qualunque**: chiedi esplicitamente al
+   PM —
 
    > "Questa iniziativa entra davanti a idee con RICE più alto ancora in
    > backlog. È una Strategic Exception (uno stakeholder ha chiesto di

@@ -1,6 +1,6 @@
 ---
 name: inbox-triage
-description: Svuota product/inbox/ classificando ogni elemento grezzo che il PM ci ha buttato dentro (email, thread, trascrizioni, allegati, immagini) — idea nuova, aggiornamento di un'idea/PRD esistente, bug, strategic exception, mandate/iniziativa mandataria, o materiale troppo ambiguo da richiedere un chiarimento al mittente. È il punto d'ingresso raccomandato per il materiale grezzo non ancora ordinato.
+description: Svuota product/inbox/ classificando ogni elemento grezzo che il PM ci ha buttato dentro (email, thread, trascrizioni, allegati, immagini) — idea nuova, aggiornamento di un'idea/PRD esistente, bug, strategic exception, mandate/iniziativa mandataria, platform/debito tecnico, o materiale troppo ambiguo da richiedere un chiarimento al mittente. È il punto d'ingresso raccomandato per il materiale grezzo non ancora ordinato.
 ---
 
 # inbox-triage
@@ -109,7 +109,7 @@ a un'idea/PRD già esistente (passo 4).
    collegamento è peggio di una domanda in più.
 
 5. **Classifica** ogni unità in uno di questi esiti. Prima di scegliere
-   idea/bug/strategic_exception/mandate/aggiornamento (cioè prima di
+   idea/bug/strategic_exception/mandate/platform/aggiornamento (cioè prima di
    scartare `needs_clarification`), verifica di poter rispondere, **solo dal
    materiale a disposizione o da una domanda di livello 1 già fatta al
    PM**, a queste domande minime:
@@ -123,9 +123,9 @@ a un'idea/PRD già esistente (passo 4).
 
    - **Nuova idea** — segui gli stessi passi della skill `idea-intake`
      per struttura della cartella, naming dello slug e classificazione
-     idea/bug/strategic_exception. Materiale grezzo: vedi la regola sul
-     condiviso al passo 3 se questa unità è una tra più generate dallo
-     stesso elemento.
+     idea/bug/strategic_exception/mandate/platform. Materiale grezzo:
+     vedi la regola sul condiviso al passo 3 se questa unità è una tra
+     più generate dallo stesso elemento.
 
    - **Aggiornamento di un'idea esistente** — sposta il materiale in
      `product/ideas/{slug-esistente}/source/` (nome file che non collida
@@ -171,6 +171,14 @@ a un'idea/PRD già esistente (passo 4).
      nota, non bloccare). Mai compilare `analysis_start_by`/
      `escalation_status` — li calcola `mandate-watch`.
 
+   - **Platform (debito tecnico/devops puro)** — stessa regola di
+     `idea-intake`: non è un bug né un'idea di business, è manutenzione o
+     debito tecnico che il team tech giudica necessario. `classification:
+     platform` — salta solo il RICE, non necessariamente l'analisi (le
+     iniziative importanti sì, quelle piccole possono saltare
+     direttamente a `in_jira`). `rationale` sempre chiesto
+     esplicitamente, mai presunto solo perché arriva dal team tech.
+
    - **Troppo ambiguo per classificare (dubbio di livello 2)** — **non
      forzare una classificazione indovinando**. Crea comunque
      `product/ideas/{data}-{slug-provvisorio}/` con:
@@ -195,7 +203,7 @@ a un'idea/PRD già esistente (passo 4).
 6. **Chiudi il run con un riepilogo**, non solo con le scritture fatte:
    quanti elementi processati, in quante unità si sono decomposti, quante
    nuove idee / aggiornamenti / bug / strategic exception / mandate /
-   needs_clarification ne sono derivate — **raggruppa nel riepilogo le
+   platform / needs_clarification ne sono derivate — **raggruppa nel riepilogo le
    unità nate dallo stesso elemento**, non elencarle come se fossero
    scollegate — e se qualcosa non è stato processato per un problema
    tecnico (file illeggibile, formato non gestito) dillo esplicitamente e

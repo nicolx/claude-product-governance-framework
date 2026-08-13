@@ -3,11 +3,14 @@
 # Un'idea nasce da materiale grezzo (email, trascrizione, segnalazione) e
 # viene classificata secondo il playbook (sezione "Alimentazione del bucket
 # delle idee"): idea normale, bug (bypassa il RICE, va su Jira), Strategic
-# Exception (bypassa il RICE, richiede approvazione CEO/CPO-CTO), o
+# Exception (bypassa il RICE, richiede approvazione CEO/CPO-CTO),
 # Iniziativa Mandataria/mandate (bypassa SOLO il RICE — non l'analisi —
 # perché imposta dall'alto, marcata "critical" da leadership, o vincolata
 # a una scadenza esterna fissa; vedi playbook, sezione "Iniziative
-# Mandatarie", e il blocco `mandate` più sotto).
+# Mandatarie", e il blocco `mandate` più sotto), o platform (debito
+# tecnico/devops puro — bypassa il RICE perché la priorità è giudizio del
+# team tech dentro una capacità protetta, non valore di business né
+# autorità esterna; vedi il blocco `platform` più sotto).
 #
 # rice_history è APPEND-ONLY: ogni revisione del RICE (nuova evidenza,
 # discussione) aggiunge una voce nuova, non sovrascrive le precedenti —
@@ -22,8 +25,8 @@ source:
   type: email                        # email | meeting_transcript | slack | other
   ref: ""                            # citazione/pointer al materiale in source/ (es. "source/email-2026-01-08.eml")
 
-product_line: ""                     # deve corrispondere a un name in product/reference/product-lines.yaml — può restare "" se status è needs_clarification
-classification: idea                 # idea | bug | strategic_exception | mandate — può restare provvisoria se status è needs_clarification
+product_line: ""                     # deve corrispondere a un name in product/reference/product-lines.yaml — può restare "" se status è needs_clarification, o restare vuoto per classification: platform se non è legata a una Product Line specifica
+classification: idea                 # idea | bug | strategic_exception | mandate | platform — può restare provvisoria se status è needs_clarification
 
 status: bucket
 # needs_clarification -> bucket -> prioritized -> in_backlog_refinement -> in_analysis -> in_prd -> in_roadmap -> in_jira -> done | aborted
@@ -38,6 +41,14 @@ status: bucket
 # in_backlog_refinement -> in_analysis -> in_prd -> in_roadmap -> in_jira
 # -> done. L'ingresso in analisi è forzato dalla scadenza (vedi blocco
 # `mandate` e skill mandate-watch), non dal ranking RICE.
+#
+# classification: platform salta SOLO prioritized, come mandate — segue
+# lo stesso percorso per il resto, inclusa l'eventuale Complete Analysis/
+# PRD per le iniziative di dimensione importante (le più piccole possono
+# saltare direttamente a in_jira, a giudizio del team tech). Entra
+# comunque in product/roadmap/snapshots/ come qualunque altra iniziativa
+# quando entra in iterazione — non è lavoro invisibile, solo non
+# RICE-ranked.
 
 done_at: null
 # Data in cui status è passato a "done" (Definition of Done: codice in
@@ -154,6 +165,20 @@ mandate:
   lead_time_weeks: null            # runway stimato prima della due_date — andrebbe validato con un referente tecnico
   analysis_start_by: null          # calcolato da mandate-watch: due_date - lead_time_weeks
   escalation_status: pending_review   # pending_review | on_track | due_soon | overdue — calcolato da mandate-watch
+
+# --- Solo per classification: platform ---
+#
+# Debito tecnico o devops puro (playbook: "flusso di protezione del team
+# per manutenzione ordinaria, gestione del debito tecnico, bug, POC").
+# Chi la propone varia — a volte il team tech in autonomia, a volte
+# mediata dal PM — non c'è un vincolo su questo, ma rationale va sempre
+# chiesto esplicitamente, mai presunto. estimated_effort_weeks alimenta
+# capacity_allocation in roadmap-snapshot (quota di capacità
+# dell'iterazione andata a platform vs. roadmap principale) — va validato
+# dal team tech, come l'Effort del RICE.
+platform:
+  rationale: null                # perché serve (rischio di rottura, manutenibilità, upgrade necessario, ecc.)
+  estimated_effort_weeks: null    # stima settimane — usata per il calcolo della capacità protetta, non per un RICE
 
 # --- Popolato solo al momento della prioritizzazione/push su Jira ---
 jira:

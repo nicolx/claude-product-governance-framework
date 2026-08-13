@@ -167,7 +167,15 @@ Tre macro fasi di lavoro per ogni prodotto:
   logica why/what; definizione UI/UX e specifiche; go-to-market strategy.
 - **Implementazione della soluzione** (ricorrente): backlog di breve
   termine secondo Agile; almeno due flussi continui — roadmap principale e
-  protezione del team per manutenzione/debito tecnico/bug.
+  protezione del team per manutenzione/debito tecnico/bug. Il debito
+  tecnico e le attività devops pure si catalogano come
+  `classification: platform`: bypassano il RICE (la priorità è giudizio
+  del team tech dentro la capacità protetta, non valore di business), ma
+  non sono invisibili — entrano comunque in roadmap quando rilevanti, e
+  la quota di capacità che assorbono è tracciata esplicitamente
+  (`capacity_allocation` in ogni snapshot settimanale) perché il
+  bilanciamento tra le due cose sia una scelta consapevole, non un
+  effetto collaterale.
 
 ## Le fasi ricorrenti
 
@@ -695,6 +703,7 @@ pattern trascrizione + decisioni strutturate.
 - [ ] L'agenda tiene conto del flusso di manutenzione ordinaria/debito tecnico?
 - [ ] Le date di rilascio stimate sono coerenti con quanto discusso?
 - [ ] Gli stakeholder chiave sono stati aggiornati sulle aspettative di delivery?
+- [ ] La capacità dedicata a platform (debito tecnico/devops) questa iterazione è stata dichiarata esplicitamente, non lasciata implicita?
 
 ## Product Design, development and rollout
 
@@ -913,6 +922,15 @@ differenza della Strategic Exception, non richiede un'approvazione di
 ruolo specifico, ma richiede sempre di dichiarare esplicitamente chi la
 impone e perché, e una stima di lead time verificata ad ogni Backlog
 Refinement. Vedi sezione "Iniziative Mandatarie".
+
+**Platform** — Debito tecnico o attività devops pura. Bypassa il RICE
+perché la priorità è giudizio del team tech dentro una capacità protetta,
+non valore di business né autorità esterna — a differenza sia delle idee
+normali (RICE) sia delle Iniziative Mandatarie (autorità esterna). Non è
+lavoro invisibile: entra in roadmap come qualunque altra iniziativa
+quando rilevante, e la capacità che assorbe è tracciata esplicitamente
+(`capacity_allocation` in ogni snapshot settimanale) per rendere
+consapevole il bilanciamento con la roadmap principale.
 
 **Ideas Bucket** — Il repository dove vengono raccolte tutte le idee,
 richieste e segnalazioni prima di essere valutate. Non è una coda di
