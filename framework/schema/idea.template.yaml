@@ -23,6 +23,11 @@ classification: idea                 # idea | bug | strategic_exception — può
 
 status: bucket
 # needs_clarification -> bucket -> prioritized -> in_backlog_refinement -> in_analysis -> in_prd -> in_roadmap -> in_jira -> done | aborted
+#
+# classification: bug e strategic_exception saltano quasi tutta la catena:
+# tipicamente bucket -> in_jira -> done direttamente (bug) o, per strategic
+# exception, bucket -> in_jira -> done non appena approvata — non passano
+# né da prioritized (niente RICE) né dal Backlog Refinement per priorità.
 
 created_at: "2026-01-08"
 

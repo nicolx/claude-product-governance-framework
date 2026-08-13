@@ -22,11 +22,18 @@ indirizza a `init-governance-project`.
 
 2. **Classifica** prima di tutto secondo il playbook:
    - **Bug** — se descrive un output diverso da quanto atteso per errore
-     di codice o interpretazione errata del requisito. Non creare
-     un'idea: segnala all'utente che va aperto direttamente nel tracker
-     di esecuzione (Jira) con impatto stimato, e chiedi se vuole che tu
-     prepari il testo del ticket. Non forzare la creazione di
-     `product/ideas/` per un bug.
+     di codice o interpretazione errata del requisito. **Crea comunque la
+     cartella idea** (passi 4-6 sotto), con `classification: bug` — serve
+     per non perdere il materiale grezzo e per avere un record archiviato
+     e diffabile. La differenza rispetto a un'idea normale: **non passa
+     mai dal RICE** (`rice_history` resta `[]` per sempre, non solo in
+     questo passo) e non entra nel Backlog Refinement per priorità —
+     segnala esplicitamente all'utente che va aperto anche nel tracker di
+     esecuzione (Jira) con impatto stimato, e chiedi se vuole che tu
+     prepari il testo del ticket. Una volta creato il ticket, popola
+     comunque `jira.card_id`/`jira.url` sull'idea (vedi skill
+     `jira-sync`), così il record locale resta collegato a dove il lavoro
+     viene davvero tracciato.
    - **Strategic Exception** — se il proponente è a un livello che nel
      `product/reference/` (o dichiarato dall'utente) qualifica per bypass
      del RICE. Crea comunque la cartella idea (serve comunque traccia),

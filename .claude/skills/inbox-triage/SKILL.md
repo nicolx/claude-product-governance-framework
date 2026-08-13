@@ -56,15 +56,20 @@ questo processo.
      stesso principio del RICE: proponi, non decidere.
 
    - **Aggiornamento/integrazione di un PRD esistente** — sposta il
-     materiale in `product/prds/{slug}/source/`. **Non riscrivere il PRD
-     da solo** — l'authoring del PRD resta un atto deliberato (skill
-     `prd-draft`). Segnala che è arrivato nuovo materiale rilevante e in
-     cosa potrebbe impattare (Why/What/Metriche/Rischi).
+     materiale in `product/prds/{slug}/source/` (nome file che non
+     collida con quelli già presenti). **Non riscrivere il PRD da solo**
+     — l'authoring del PRD resta un atto deliberato (skill `prd-draft`).
+     Segnala che è arrivato nuovo materiale rilevante e in cosa potrebbe
+     impattare (Why/What/Metriche/Rischi).
 
-   - **Bug** — stessa regola di `idea-intake`: non creare un'idea,
-     prepara il testo del ticket per il tracker di esecuzione e chiedi
-     conferma prima di aprirlo (se è disponibile un'integrazione) o
-     consegna il testo pronto all'utente.
+   - **Bug** — stessa regola di `idea-intake`: **crea comunque la cartella
+     idea** (`classification: bug`, `rice_history` che resta `[]` per
+     sempre — un bug non passa mai dal RICE) per non perdere il materiale
+     e avere un record archiviato. In più, prepara il testo del ticket
+     per il tracker di esecuzione e chiedi conferma prima di aprirlo (se
+     è disponibile un'integrazione) o consegna il testo pronto
+     all'utente. Il materiale grezzo si sposta comunque in `source/` —
+     mai lasciato solo nel testo del ticket.
 
    - **Strategic Exception** — crea comunque la cartella idea (per
      traccia), `classification: strategic_exception`, ma lascia
