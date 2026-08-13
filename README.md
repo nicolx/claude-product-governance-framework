@@ -159,3 +159,12 @@ garantire da solo.
   stakeholder) — quelli vivono solo nei fork.
 - Le uniche eccezioni sono i contenuti sotto `examples/`, che sono
   dichiaratamente un caso di studio, non dati operativi.
+
+## Note per lavoro futuro
+
+Spunti su cose esplicitamente fuori scope adesso (es. il livello
+web/DB derivato per la fruizione delle roadmap), catturati mano a mano
+per non perderli, in
+[`framework/docs/future-work.md`](framework/docs/future-work.md). Non
+sono un roadmap impegnativo — solo il posto dove non si perdono nel
+frattempo.
