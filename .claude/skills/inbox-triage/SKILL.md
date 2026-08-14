@@ -40,11 +40,11 @@ Ci sono **due livelli di dubbio**, e vanno trattati diversamente:
 1. **Dubbio che il PM davanti a te può risolvere subito, in conversazione**
    (es. "questa email sembra riferirsi alla Product Line A o B, quale
    delle due?", "questo materiale è un aggiornamento dell'idea
-   `2026-01-08-xyz` o è scollegato?", "il proponente è lo stesso Filiberto
-   di Operations o un omonimo?"). **Fai la domanda subito, nella
-   conversazione corrente**, prima di scrivere qualunque file — non
-   serve creare un record `needs_clarification` per questo, il PM ha
-   l'informazione a portata di mano.
+   `2026-01-08-xyz` o è scollegato?", "il proponente è lo stesso Mario
+   Rossi di Operations dell'idea già registrata, o un omonimo?"). **Fai la
+   domanda subito, nella conversazione corrente**, prima di scrivere
+   qualunque file — non serve creare un record `needs_clarification` per
+   questo, il PM ha l'informazione a portata di mano.
 
 2. **Dubbio che solo chi ha mandato il materiale originale può risolvere**
    (dati mancanti che il PM stesso non conosce: un numero, un dettaglio
