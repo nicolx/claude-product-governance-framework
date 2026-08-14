@@ -228,6 +228,50 @@ funziona sommariamente il modello di business: solo una chiara
 comprensione del business aiuta a mantenere il focus sulle cose che
 spostano (principio 80/20).
 
+## Contesto aziendale (`context/`)
+
+Il paragrafo precedente dice che "ogni membro dell'organizzazione di
+prodotto e tecnologia dovrebbe avere chiaro come funziona sommariamente
+il modello di business": questa sezione descrive dove vive quella
+comprensione dentro un'istanza, non solo nella testa del PM.
+
+Un'istanza mantiene una cartella `context/` alla **radice del
+repository** (non sotto `product/`, perché non tutto quello che ci va è
+materiale di prodotto — bilanci pubblici, org chart, materiale
+legale/societario ci stanno altrettanto bene), popolata con qualunque
+materiale che aiuti a razionalizzare il contesto aziendale: export
+Confluence, slide, PDF, bilanci, documenti strategici. Le skill che
+generano idee e PRD (`idea-intake`, `prd-draft`) leggono `context/`
+insieme al codice in `apps/` — il differenziale del framework non è solo
+"conosce la codebase", è anche "conosce il business".
+
+**Nessuna copia del materiale grezzo persiste nel repository, né
+tracciata né ignorata da git.** Un file gitignorato esiste solo nel clone
+di chi l'ha processato: un collega che clona l'istanza vede la sintesi ma
+non può verificarla, e se aggiunge il proprio materiale grezzo il
+contesto diverge silenziosamente tra le macchine del team — esattamente
+il problema che si voleva evitare tenendo un originale "per sicurezza".
+La skill `context-intake` legge il materiale grezzo droppato in
+`context/`, lo trascrive in file Markdown tracciati per argomento,
+**citando sempre la fonte** (link Confluence/Drive/URL se esiste,
+altrimenti nome del documento, chi l'ha fornito, e la data), poi elimina
+l'originale. La verificabilità viene dal puntare alla fonte di sistema
+condivisa, non da una copia locale.
+
+**È un documento vivo, non un archivio statico.** Quando materiale già in
+lavorazione da un'altra skill (un PRD, un elemento smistato da
+`inbox-triage`) rivela un'informazione che cambia la comprensione del
+business — una riorganizzazione, un nuovo dato di mercato, un pivot
+dichiarato — quella skill non scrive da sola in `context/`: segnala il
+candidato e richiama `context-intake`, che **propone l'aggiornamento e lo
+scrive solo dopo conferma esplicita del PM** nella stessa conversazione.
+A differenza delle poche scritture dirette che il framework ammette senza
+passare da `product/approvals/pending/` (`mandate-watch`, `rice-watch`,
+`nsm-watch`), qui non si tratta di un fatto mai presunto ma di
+un'interpretazione di materiale grezzo — per questo la conferma in
+conversazione è sempre richiesta, anche se non serve la coda `pending/`
+completa (non è una decisione di priorità).
+
 ## Alimentazione del bucket delle idee
 
 *"The best way to have a good idea is to have a lot of ideas." — Linus
@@ -1002,6 +1046,14 @@ Product Discovery sulla metrica in difficoltà, anche rispetto a idee con
 RICE più alto in backlog — non un override automatico, ma un segnale
 con la massima evidenza che richiede una decisione esplicita del PM. Vedi
 sezione "Salute delle NSM e Product Discovery".
+
+**`context/`** — Cartella alla radice dell'istanza (non sotto `product/`)
+che raccoglie la comprensione del business/azienda (modello di business,
+finanza, organizzazione, mercato) come file Markdown tracciati, citando
+sempre la fonte del materiale grezzo da cui derivano. Alimentata e fatta
+evolvere dalla skill `context-intake`. Nessun file grezzo (PDF, slide,
+docx) vi persiste: solo la trascrizione. Vedi sezione "Contesto aziendale
+(`context/`)".
 
 **Ideas Bucket** — Il repository dove vengono raccolte tutte le idee,
 richieste e segnalazioni prima di essere valutate. Non è una coda di

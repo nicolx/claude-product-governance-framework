@@ -200,7 +200,14 @@ a un'idea/PRD già esistente (passo 4).
      un'integrazione disponibile (es. email) chiedi esplicitamente
      conferma prima di usarla.
 
-6. **Chiudi il run con un riepilogo**, non solo con le scritture fatte:
+6. **Se un elemento rivela contesto aziendale rilevante (non di
+   prodotto)** — un dato finanziario, una riorganizzazione, un cambio di
+   strategia dichiarato — **non scriverlo tu in `context/`**: segnalalo
+   nel riepilogo finale e proponi di richiamare `context-intake` su
+   quell'elemento. Vale indipendentemente dalla classificazione scelta
+   sopra (può capitare anche per un elemento che diventa una nuova idea).
+
+7. **Chiudi il run con un riepilogo**, non solo con le scritture fatte:
    quanti elementi processati, in quante unità si sono decomposti, quante
    nuove idee / aggiornamenti / bug / strategic exception / mandate /
    platform / needs_clarification ne sono derivate — **raggruppa nel riepilogo le
@@ -210,8 +217,8 @@ a un'idea/PRD già esistente (passo 4).
    lascialo in `product/inbox/` piuttosto che farlo sparire
    silenziosamente.
 
-7. **Verifica che `product/inbox/` sia vuota** (a parte `.gitkeep` e gli
-   eventuali elementi non processabili segnalati al passo 6) prima di
+8. **Verifica che `product/inbox/` sia vuota** (a parte `.gitkeep` e gli
+   eventuali elementi non processabili segnalati al passo 7) prima di
    considerare il run concluso.
 
 ## Cosa NON fare

@@ -30,6 +30,7 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 |---|---|---|
 | `bootstrap.sh`, `.githooks/`, `framework/`, `.claude/skills/`, `.gitignore` | Framework (upstream) | Solo PR sul canonico, mai un'istanza |
 | `apps/` | Istanza | Solo `init-governance-project` (aggiunta submodule) |
+| `context/` | Istanza, **tracciata da git** (a differenza di `product/inbox/`) | Solo `context-intake`, sempre con conferma esplicita del PM prima di scrivere — è interpretazione di materiale grezzo, non un fatto mai presunto come `jira.status`/`rice_status`. Nessuna approvazione via `pending/` (non è una decisione di priorità). Nessun file grezzo (PDF, slide, docx) vi persiste, né tracciato né gitignorato — vedi playbook, sezione "Contesto aziendale" |
 | `product/inbox/` | Istanza, NON tracciata da git | `inbox-triage` la svuota spostando ogni elemento altrove; nessuna approvazione richiesta per lo spostamento in sé |
 | `product/ideas/`, `product/prds/` (creazione) | Istanza | `idea-intake`, `inbox-triage`, `prd-draft` — creazione diretta, non passa da approvazione (non è ancora una decisione di priorità) |
 | `product/ideas/*/rice_history`, `product/ideas/*/strategic_exceptions`, `product/ideas/*/mandate` (dopo la creazione), `product/roadmap/`, comunicazioni in uscita | Istanza | Solo tramite `product/approvals/pending/` — vedi regola sotto |

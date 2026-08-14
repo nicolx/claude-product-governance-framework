@@ -51,6 +51,14 @@ per raccogliere:
 6. **Eventuali altre configurazioni rilevanti** — canale Slack/Teams per
    comunicazioni, link a strumenti di analytics (es. DataBricks), altro
    che l'utente ritenga utile avere a portata di mano nel config.
+7. **Materiale di contesto aziendale già disponibile** — chiedi se il PM
+   ha materiale (bilanci pubblici, slide, export Confluence, documenti
+   strategici) utile a capire il business/l'azienda, non solo il
+   prodotto. Se sì, non serve trascriverlo a mano ora: crea `context/`
+   (vedi sotto) e invita il PM a droppare i file lì; a fine intervista
+   richiama la skill `context-intake` per processarli. Se non ha ancora
+   materiale pronto, va bene: `context/` resta popolabile in qualunque
+   momento successivo, non è un blocco per l'inizializzazione.
 
 Non forzare un ordine rigido se l'utente fornisce più informazioni insieme
 (es. incolla una trascrizione di un meeting di kickoff): estrai tutto ciò
@@ -77,6 +85,13 @@ che serve da lì e chiedi solo quello che manca.
    cartelle vuote). `product/inbox/` è già coperta dal `.gitignore` di
    root (contenuto non tracciato — vedi skill `inbox-triage`): non
    toglierla dal `.gitignore` per questa istanza.
+5. `context/` alla **radice del repository** (non sotto `product/`, vedi
+   playbook sezione "Contesto aziendale") — con `.gitkeep` se resta
+   vuota. A differenza di `product/inbox/`, **non va aggiunta al
+   `.gitignore`**: il contenuto che ci finisce (via `context-intake`) è
+   già la trascrizione tracciabile, non il materiale grezzo. Se il PM ha
+   fornito materiale al passo 7 dell'intervista, droppalo qui e richiama
+   `context-intake` prima di chiudere l'inizializzazione.
 
 ## Dopo l'inizializzazione
 
@@ -84,7 +99,8 @@ che serve da lì e chiedi solo quello che manca.
   progetto>`.
 - Riepiloga all'utente cosa è stato creato e cosa resta da fare (es.
   submodule non ancora collegati, denominatori Reach non ancora
-  formalizzati).
+  formalizzati, materiale di contesto aziendale non ancora fornito se
+  `context/` è rimasta vuota).
 - Ricorda che da questo momento in poi nessuna scrittura in `product/`
   deve avvenire senza passare da `product/approvals/pending/` — vedi
   `CLAUDE.md` e `framework/playbook.md`.

@@ -59,6 +59,8 @@ inizializzata) e scaffolda `apps/` e `product/`.
 ├── .governance/config.yaml                  ← config/marker di QUESTA istanza
 ├── apps/                                    ← submodule dei repository applicativi
 │   └── <nome-repo>/
+├── context/                                 ← comprensione del business di QUESTA istanza, tracciata da git
+│   └── *.md                                 (modello di business, finanza, org, mercato — vedi sotto)
 └── product/                                 ← artefatti di Product Management di QUESTA istanza
     ├── inbox/                   ← raccoglitore universale, NON tracciato da git (.gitignore)
     │                              qualsiasi cosa arrivi a casaccio (email, thread, trascrizioni,
@@ -111,6 +113,26 @@ nomi che dicono cosa contengono.
 `product/approvals/pending/`. L'automazione propone, un umano approva.
 Vedi `CLAUDE.md` e il playbook per il dettaglio.
 
+## Contesto aziendale: `context/`
+
+A differenza di `product/inbox/`, `context/` sta **alla radice del
+repository** (non è materiale di prodotto — bilanci pubblici, org chart,
+documenti societari ci stanno) ed è **tracciata da git**: contiene la
+comprensione del business/azienda che `idea-intake` e `prd-draft` leggono
+insieme al codice in `apps/`.
+
+Il PM droppa lì qualunque materiale grezzo (Confluence, PDF, slide,
+docx), poi la skill **`context-intake`** lo trascrive in file Markdown
+per argomento, **citando sempre la fonte** (link se esiste, altrimenti
+documento + chi l'ha fornito + data), e cancella l'originale — nessuna
+copia raw persiste nel repo, né tracciata né gitignorata: un file locale
+esisterebbe solo nel clone di chi l'ha processato, e farebbe divergere
+silenziosamente il contesto tra le macchine del team. `context/` è un
+documento vivo: quando materiale in lavorazione altrove (un PRD, un
+elemento smistato da `inbox-triage`) rivela informazioni rilevanti,
+quella skill propone l'aggiornamento a `context-intake`, che lo scrive
+solo dopo conferma esplicita del PM.
+
 ## Il metodo
 
 Il playbook genericizzato è in
@@ -152,11 +174,11 @@ garantire da solo.
 
 ## Cosa NON fare in questo repo (canonico)
 
-- Non creare cartelle `apps/` o `product/` qui: sono solo il risultato
-  dell'inizializzazione di un'istanza (un fork), non appartengono al
-  framework.
+- Non creare cartelle `apps/`, `product/` o `context/` qui: sono solo il
+  risultato dell'inizializzazione di un'istanza (un fork), non
+  appartengono al framework.
 - Non aggiungere dati specifici di un progetto reale (idee, PRD, roadmap,
-  stakeholder) — quelli vivono solo nei fork.
+  stakeholder, contesto aziendale) — quelli vivono solo nei fork.
 - Le uniche eccezioni sono i contenuti sotto `examples/`, che sono
   dichiaratamente un caso di studio, non dati operativi.
 
