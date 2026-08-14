@@ -28,7 +28,7 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 
 | Cartella | Proprietà | Chi scrive |
 |---|---|---|
-| `bootstrap.sh`, `.githooks/`, `framework/`, `.claude/skills/`, `.gitignore` | Framework (upstream) | Solo PR sul canonico, mai un'istanza |
+| `bootstrap.sh`, `.githooks/`, `framework/`, `.claude/skills/`, `.claude/settings.json`, `.claude/hooks/`, `.gitignore` | Framework (upstream) | Solo PR sul canonico, mai un'istanza |
 | `apps/` | Istanza | Solo `init-governance-project` (aggiunta submodule) |
 | `context/` | Istanza, **tracciata da git** (a differenza di `product/inbox/`) | Solo `context-intake`, sempre con conferma esplicita del PM prima di scrivere — è interpretazione di materiale grezzo, non un fatto mai presunto come `jira.status`/`rice_status`. Nessuna approvazione via `pending/` (non è una decisione di priorità). Nessun file grezzo (PDF, slide, docx) vi persiste, né tracciato né gitignorato — vedi playbook, sezione "Contesto aziendale" |
 | `product/inbox/` | Istanza, NON tracciata da git | `inbox-triage` la svuota spostando ogni elemento altrove; nessuna approvazione richiesta per lo spostamento in sé |
