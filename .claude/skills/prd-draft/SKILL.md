@@ -16,7 +16,7 @@ quindi presente in `product/ideas/{slug}/idea.yaml`, non solo in
 `approvals/pending/`). Se non ce l'ha, segnalalo e proponi di passare
 prima da `rice-update`.
 
-## Il differenziale di questo framework: leggere la codebase reale
+## Il differenziale di questo framework: leggere la codebase reale (e il contesto aziendale)
 
 Se l'istanza ha repository applicativi collegati in `apps/` (submodule),
 **leggili prima di scrivere l'How** — non limitarti a chiedere all'utente
@@ -26,11 +26,22 @@ le implicazioni tecniche vanno considerate fin dall'authoring, non
 scoperte dopo. Se `apps/` è vuota o non pertinente al tema del PRD, procedi
 normalmente senza bloccarti.
 
+Allo stesso modo, se `context/` (radice del repository, vedi playbook
+sezione "Contesto aziendale") ha file rilevanti per il Why/Who di questa
+idea — modello di business, dati di mercato, organizzazione — leggili
+prima di scrivere, invece di chiedere all'utente cose che sono già
+documentate. Se durante la lettura di `source/` o del codice emerge
+un'informazione di contesto aziendale (non di prodotto) che sembra nuova
+o in contrasto con `context/`, **non aggiornarlo da solo**: segnala il
+candidato e richiama `context-intake`, che propone la modifica e la
+scrive solo dopo conferma esplicita del PM.
+
 ## Passi
 
 1. Leggi `product/ideas/{slug}/idea.yaml` (Why implicito dal contesto
    dell'idea, ultima voce di `rice_history` per capire cosa è stato
-   valutato) e tutto il materiale in `source/`.
+   valutato), tutto il materiale in `source/`, e i file di `context/`
+   pertinenti al tema del PRD.
 
 2. Se esiste già una Preliminary/Complete Analysis registrata (es. in
    `product/ceremonies/` o note fornite dall'utente), usala come base per
