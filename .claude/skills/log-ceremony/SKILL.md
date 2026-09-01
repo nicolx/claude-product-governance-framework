@@ -22,6 +22,13 @@ ricorrente del team.
 
 ## Passi
 
+0. **Sincronizza da `origin` prima di leggere lo stato**: esegui
+   `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
+   "Sincronizzazione dell'istanza (`origin`)"). Le reprioritizzazioni e
+   le watch che seguono confrontano lo stato di molte idee: devono
+   partire dai dati aggiornati del team. Se l'helper segnala un
+   disallineamento non-fast-forward, fermati e riferiscilo all'utente.
+
 1. Determina `ceremony_type` (es. `backlog-refinement`,
    `roadmap-iteration-planning`, `measurement-retro`, o altro se
    l'utente lo specifica) e il periodo (settimana ISO per cerimonie
@@ -135,3 +142,12 @@ ricorrente del team.
     non come nota a margine — e **apri sempre il riepilogo con gli
     allarmi di `nsm-watch`**, se ce ne sono: è il segnale più strategico
     della cerimonia, per playbook.
+
+13. **Sincronizza il repo**: esegui
+    `bash .claude/hooks/governance-sync.sh push "log-ceremony: <ceremony_type> <periodo>" product/ceremonies/ product/approvals/pending/`
+    (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Le watch
+    richiamate ai passi 8-11 hanno già sincronizzato le proprie scritture
+    su `idea.yaml`/`nsm-tracking.yaml` con un commit dedicato ciascuna;
+    questo passo cattura i file della cerimonia e le eventuali proposte in
+    `pending/`. Se l'helper segnala un push fallito, riferiscilo nel
+    riepilogo.

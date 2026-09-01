@@ -103,6 +103,13 @@ domanda in più.
    (formato non leggibile, ambiguità irrisolta) — lascialo visibile in
    `context/` con una nota, non farlo sparire silenziosamente.
 
+8. **Sincronizza il repo**: esegui
+   `bash .claude/hooks/governance-sync.sh push "context-intake: <file aggiornati>" context/`
+   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Il commit
+   cattura solo la trascrizione tracciata: il file grezzo è già stato
+   rimosso al passo 6. Se l'helper segnala un push fallito, riferiscilo
+   nel riepilogo.
+
 ## Cosa NON fare
 
 - Non scrivere mai in un file `context/*.md` senza conferma esplicita del

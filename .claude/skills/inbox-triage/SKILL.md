@@ -84,6 +84,14 @@ soli non coprono. In sintesi:
 
 ## Passi
 
+0. **Sincronizza da `origin` prima di leggere lo stato**: esegui
+   `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
+   "Sincronizzazione dell'istanza (`origin`)"). Il dedup del passo 4 —
+   "questa idea esiste già?" — funziona solo se vedi le idee che i
+   colleghi hanno creato. Se l'helper segnala un disallineamento
+   non-fast-forward, **fermati e riferiscilo all'utente** prima di
+   processare l'inbox.
+
 1. **Elenca tutto ciò che c'è in `product/inbox/`.** Non assumere che sia
    un solo elemento: possono esserci più file/oggetti scollegati tra loro
    in un colpo solo (es. tre email diverse buttate lì nello stesso
@@ -241,6 +249,13 @@ soli non coprono. In sintesi:
 8. **Verifica che `product/inbox/` sia vuota** (a parte `.gitkeep` e gli
    eventuali elementi non processabili segnalati al passo 7) prima di
    considerare il run concluso.
+
+9. **Sincronizza il repo**: esegui
+   `bash .claude/hooks/governance-sync.sh push "inbox-triage: processati N elementi" product/`
+   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). `product/inbox/`
+   è gitignorata, quindi il commit cattura solo le destinazioni tracciate
+   in cui gli elementi sono stati smistati. Se l'helper segnala un push
+   fallito, riferiscilo nel riepilogo.
 
 ## Cosa NON fare
 

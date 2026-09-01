@@ -148,3 +148,9 @@ presente nel materiale di origine.
    contenuto creato — **se sono state create più unità dalla stessa
    fonte, elencale tutte insieme nel riepilogo finale**, non una alla
    volta senza collegarle — prima di considerare il passo concluso.
+
+9. **Sincronizza il repo**: come ultimo passo, esegui
+   `bash .claude/hooks/governance-sync.sh push "idea-intake: <slug>[, +N unità]" product/ideas/`
+   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Se
+   l'helper segnala un push fallito o un disallineamento, riferiscilo nel
+   riepilogo — non ripetere le scritture.

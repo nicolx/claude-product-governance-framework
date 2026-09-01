@@ -123,3 +123,8 @@ scrive solo dopo conferma esplicita del PM.
    questo come modifica soggetta ad approvazione, passa da
    `product/approvals/pending/`; altrimenti applicalo direttamente e
    segnalalo chiaramente nel riepilogo finale.
+
+10. **Sincronizza il repo**: esegui
+    `bash .claude/hooks/governance-sync.sh push "prd-draft: PRD <slug>" product/prds/ product/ideas/`
+    (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Se l'helper
+    segnala un push fallito, riferiscilo nel riepilogo finale.

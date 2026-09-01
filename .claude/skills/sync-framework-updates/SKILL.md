@@ -36,6 +36,14 @@ segnalalo invece di procedere.
    dovrebbero essere rari per costruzione (l'upstream non scrive lì), se
    capitano vanno trattati con particolare attenzione.
 
+   Dopo un merge pulito, **pusha su `origin`** (non `governance-sync.sh`
+   qui — questo è l'unico punto del framework in cui il push porta
+   commit da `upstream`, non stato dati dell'istanza): `git push origin`.
+   Se fallisce (non fast-forward, un collega ha pushato nel frattempo),
+   segnalalo esplicitamente invece di forzare — stesso principio
+   "solo fast-forward" della sincronizzazione dati (playbook,
+   "Sincronizzazione dell'istanza (`origin`)").
+
 5. **Spiega cosa è cambiato in linguaggio PM, non solo il diff grezzo.**
    Esempi del tipo di traduzione richiesta:
    - "il playbook ha aggiornato le soglie di Confidence" → spiega la

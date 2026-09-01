@@ -23,6 +23,12 @@ silenzio.
 
 ## Passi
 
+0. **Sincronizza da `origin`**: esegui
+   `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
+   "Sincronizzazione dell'istanza (`origin`)") prima di scansionare — non
+   vuoi segnalare come "senza RICE" un'idea che un collega ha già
+   quotato in locale e non hai ancora ricevuto.
+
 1. **Elenca tutte le idee** in `product/ideas/*/idea.yaml` con
    `classification: idea` (bug, strategic_exception e mandate non
    passano mai dal RICE per disegno — non sono "in ritardo", sono
@@ -70,6 +76,12 @@ silenzio.
 6. Se chiamata da `log-ceremony`, restituisci il riepilogo perché venga
    incluso nel log della cerimonia — non scrivere tu stessa nel file
    `decisions.yaml` della cerimonia, è compito di `log-ceremony`.
+
+7. **Sincronizza il repo**: se i passi 3-4 hanno scritto almeno un
+   `idea.yaml`, esegui
+   `bash .claude/hooks/governance-sync.sh push "rice-watch: aggiornati rice_status" product/ideas/`
+   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)") — anche se
+   richiamata da `log-ceremony`.
 
 ## Cosa NON fare
 
