@@ -77,6 +77,18 @@ clarification:
   resolved_at: null             # quando arriva la risposta e l'idea può essere riclassificata
 
 # --- Solo per classification: idea (bug e strategic_exception saltano il RICE) ---
+#
+# La "E" del RICE è ENTANGLEMENT (footprint del cambiamento), NON Effort
+# inteso come settimane-sviluppatore. Vedi playbook, "Ideas
+# prioritization": con l'implementazione AI-assistita il tempo di codifica
+# si è scollegato dal costo reale di un cambiamento; quello che resta e
+# domina è quanto l'iniziativa è intrecciata col sistema (quanti
+# componenti/sistemi/team tocca, superficie di regressione, complessità di
+# review e rollout). Scala 1-10, valore alto = più intrecciata = più a
+# rischio = deprioritizzata (è a denominatore).
+# La stima di tempo-calendario per la pianificazione NON vive qui: vedi
+# il blocco `delivery` più sotto (contabilità di capacità d'iterazione) e
+# `mandate.lead_time_weeks` (runway prima di una scadenza).
 rice_history: []
 # Esempio di singola voce (aggiungerne una nuova ad ogni revisione, mai modificare le precedenti):
 # - date: "2026-01-08"
@@ -86,11 +98,15 @@ rice_history: []
 #   confidence_score: 10       # 1-10
 #   confidence_evidence_tier: quantitative_multi_source
 #   # opinion (1-3) | anecdotal (3-6) | quantitative_single_source (6-8) | quantitative_multi_source (>8)
-#   effort_weeks: 1
-#   score: null                 # calcolato: reach_percent * impact_points * confidence_score / effort_weeks
+#   entanglement_score: 4      # 1-10, footprint del cambiamento nel sistema (blast radius) — MAI settimane
+#   entanglement_basis: code_inspection
+#   # code_inspection (rice-update ha ispezionato apps/) | structured_estimate (stima con referente tecnico, apps/ non disponibile o sistema non montato — evidenza più debole)
+#   entanglement_note: ""      # cosa tocca: sistemi, componenti, interfacce/consumer, + eventuali costi esterni hard (legale, licenze, UAT estesa)
+#   score: null                 # calcolato: reach_percent * impact_points * confidence_score / entanglement_score
 #   rationale: ""               # perché questi valori — riferimento alla discussione/evidenza
 #   approved_by: ""             # referente tecnico e/o stakeholder che ha validato la stima
 #   ceremony_ref: null          # opzionale: link a product/ceremonies/... se la revisione è nata lì
+#   effort_weeks: null          # DEPRECATO — vecchia semantica "settimane-sviluppatore". Presente solo nelle voci storiche precedenti a questo schema; non compilarlo per voci nuove.
 
 # rice_status esiste per rispondere a una domanda diversa da rice_history:
 # non "qual è il RICE", ma "perché questa idea non ce l'ha ancora". Un'idea
@@ -186,10 +202,24 @@ mandate:
 # chiesto esplicitamente, mai presunto. estimated_effort_weeks alimenta
 # capacity_allocation in roadmap-snapshot (quota di capacità
 # dell'iterazione andata a platform vs. roadmap principale) — va validato
-# dal team tech, come l'Effort del RICE.
+# dal team tech (è una stima di tempo-calendario, non l'Entanglement del
+# RICE: quello per le platform non esiste, saltano il RICE).
 platform:
   rationale: null                # perché serve (rischio di rottura, manutenibilità, upgrade necessario, ecc.)
   estimated_effort_weeks: null    # stima settimane — usata per il calcolo della capacità protetta, non per un RICE
+
+# --- Solo per classification: idea — stima di delivery per la contabilità
+# di capacità d'iterazione (capacity_allocation.roadmap_weeks in
+# roadmap-snapshot, in parallelo a platform.estimated_effort_weeks per le
+# iniziative platform). NON è un input del RICE — la E del RICE è
+# Entanglement (footprint), non tempo. Questo è tempo-calendario, riempito
+# in Iteration Planning dal team tech quando l'iniziativa viene
+# dimensionata davvero (valutazione 80/20). Resta null prima di allora:
+# roadmap-snapshot lo tratta come "non ancora dimensionata" e lo segnala,
+# non lo presume. Scrittura diretta come un fatto di pianificazione, non
+# passa da product/approvals/pending/. ---
+delivery:
+  estimated_effort_weeks: null    # settimane stimate dal team tech in Iteration Planning — solo capacità, non RICE
 
 # --- Popolato solo al momento della prioritizzazione/push su Jira ---
 jira:

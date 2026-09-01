@@ -51,16 +51,21 @@ retro_notes: ""                     # mini-retrospettiva dell'iterazione precede
 # è una stima del team tech (chiesta esplicitamente da roadmap-snapshot,
 # mai presunta); platform_weeks è la somma di platform.estimated_effort_weeks
 # delle iniziative classification: platform presenti in initiatives questa
-# settimana; roadmap_weeks è la somma di rice_history[-1].effort_weeks
-# delle iniziative classification: idea in initiatives. La serie storica
-# di questo blocco, snapshot dopo snapshot, è ciò che permette di vedere
-# se il debito tecnico si accumula silenziosamente perché non gli si dà
-# mai spazio, o se sta assorbendo più capacità di quanto sostenibile.
+# settimana; roadmap_weeks è la somma di delivery.estimated_effort_weeks
+# delle iniziative classification: idea in initiatives (NON la
+# entanglement_score del RICE — quella è un footprint 1-10, non settimane).
+# Le idee in iterazione ancora senza delivery.estimated_effort_weeks (non
+# passate da Iteration Planning) vanno elencate come "non dimensionate" in
+# note, non stimate d'ufficio. La serie storica di questo blocco, snapshot
+# dopo snapshot, è ciò che permette di vedere se il debito tecnico si
+# accumula silenziosamente perché non gli si dà mai spazio, o se sta
+# assorbendo più capacità di quanto sostenibile.
 capacity_allocation:
   total_capacity_weeks: null
   platform_weeks: null
   platform_pct: null                 # calcolato: platform_weeks / total_capacity_weeks
   roadmap_weeks: null
+  undimensioned_ideas: []            # idea_id delle iniziative idea in iterazione senza delivery.estimated_effort_weeks
   note: ""                            # contesto libero, es. "settimana pesante per un incidente in produzione"
 
 # mandates_status elenca TUTTE le idee classification: mandate ancora

@@ -39,11 +39,32 @@ umana esplicita (skill `pending-approval`) la voce viene appesa a
      playbook (opinione 1-3, aneddotico 3-6, quantitativo singola fonte
      6-8, quantitativo multi-fonte >8). Chiedi esplicitamente che tipo di
      evidenza c'è dietro la stima — non dedurlo dal tono del messaggio.
-   - **Effort**: settimane stimate. Se disponibile, chiedi conferma a un
-     referente tecnico prima di considerarla definitiva.
+   - **Entanglement** (footprint del cambiamento, 1-10 — **non**
+     settimane): vedi playbook, "Ideas prioritization", per la scala
+     completa. Quanto l'iniziativa è intrecciata col sistema: componenti,
+     sistemi e team toccati, superficie di regressione, complessità di
+     review/rollout, più eventuali costi esterni hard (legale, licenze,
+     UAT estesa).
+     - **Se i repository sono montati in `apps/`**: ispezionali per
+       collocare l'ordine di grandezza — quali moduli/sistemi tocca
+       l'iniziativa, che interfacce e consumer sono coinvolti, quanto è
+       accoppiato ciò che cambia. È una passata leggera, non una Complete
+       Analysis. Registra `entanglement_basis: code_inspection` e
+       riassumi in `entanglement_note` cosa hai visto (sistemi,
+       interfacce, consumer). Se l'iniziativa è un primo scoring di un
+       intake storico bulk (playbook, "Intake storico e roadmap
+       pre-esistente"), salta l'ispezione e metti un valore grezzo con
+       `entanglement_basis: structured_estimate` e una nota.
+     - **Se `apps/` non è collegato, o l'iniziativa tocca sistemi non
+       montati**: stima con un referente tecnico, registra
+       `entanglement_basis: structured_estimate` e segnala nel `rationale`
+       che l'evidenza sul footprint è più debole.
+     - In entrambi i casi è una **prima passata**: la Preliminary/Complete
+       Analysis può cambiare il quadro, e quella revisione entra come
+       nuova voce in `rice_history` (append-only).
 
 3. Calcola `score = reach_percent * impact_points * confidence_score /
-   effort_weeks`.
+   entanglement_score`.
 
 4. Scrivi `rationale` che spiega perché questi valori (riferimento alla
    discussione/evidenza, non solo i numeri nudi) e `approved_by` con chi

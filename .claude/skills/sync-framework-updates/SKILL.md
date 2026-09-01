@@ -47,6 +47,17 @@ segnalalo invece di procedere.
      campo, e proponi (senza applicarlo da solo) un piano di migrazione
      minimo. Non modificare in massa i file di istanza senza che
      l'utente lo chieda esplicitamente.
+   - "un campo esistente ha cambiato significato" (es. la "E" del RICE è
+     passata da `effort_weeks`/settimane a `entanglement_score`/footprint
+     1-10) → **caso di migrazione dati**: le voci `rice_history` esistenti
+     hanno la vecchia semantica e i loro `score` sono calcolati sulla
+     vecchia formula. Spiega che restano valide come storico ma non sono
+     più confrontabili 1:1 con le voci nuove, e proponi (senza applicarlo)
+     di ricalcolare l'Entanglement — via `rice-update`, con la sua coda di
+     approvazione — per le idee ancora attive in backlog, lasciando
+     intatte quelle già chiuse. Segnala anche i campi nuovi che le idee
+     attive dovranno avere popolati (es. `delivery.estimated_effort_weeks`
+     in Iteration Planning per le iniziative in iterazione).
 
 6. Chiudi con un riepilogo breve: cosa è cambiato, cosa richiede
    attenzione da parte dell'utente, cosa non richiede nulla.

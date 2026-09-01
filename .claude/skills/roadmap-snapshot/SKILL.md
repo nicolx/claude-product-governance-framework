@@ -54,12 +54,17 @@ creato/aggiornato.
    - `capacity_allocation`: somma `platform.estimated_effort_weeks`
      delle iniziative `classification: platform` presenti in
      `initiatives` questa settimana (→ `platform_weeks`) e
-     `rice_history[-1].effort_weeks` delle iniziative `classification:
-     idea` (→ `roadmap_weeks`). **Chiedi sempre** `total_capacity_weeks`
-     al team tech (non presumerlo, non dedurlo da `platform_weeks +
-     roadmap_weeks` — la capacità reale del team può essere diversa dal
-     lavoro effettivamente pianificato). Calcola `platform_pct` solo se
-     `total_capacity_weeks` è noto.
+     `delivery.estimated_effort_weeks` delle iniziative `classification:
+     idea` (→ `roadmap_weeks`). **NON** usare la `entanglement_score` del
+     RICE per `roadmap_weeks`: è un footprint 1-10, non settimane. Le
+     iniziative `idea` senza `delivery.estimated_effort_weeks` (non ancora
+     passate da Iteration Planning) vanno in
+     `capacity_allocation.undimensioned_ideas` (lista di `idea_id`), non
+     stimate d'ufficio né ignorate silenziosamente. **Chiedi sempre**
+     `total_capacity_weeks` al team tech (non presumerlo, non dedurlo da
+     `platform_weeks + roadmap_weeks` — la capacità reale del team può
+     essere diversa dal lavoro effettivamente pianificato). Calcola
+     `platform_pct` solo se `total_capacity_weeks` è noto.
    - `mandates_status`: **tutte** le idee `classification: mandate` con
      `status` diverso da `done`/`aborted` (non solo quelle già in
      `initiatives`), leggendo `escalation_status`/`analysis_start_by`

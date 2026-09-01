@@ -42,13 +42,19 @@ rice_history:
     impact_points: 5
     confidence_score: 10
     confidence_evidence_tier: quantitative_multi_source
-    effort_weeks: 1
-    score: 750   # 15 * 5 * 10 / 1
+    entanglement_score: 2
+    entanglement_basis: structured_estimate
+    entanglement_note: >-
+      Un solo componente in un solo sistema (il motore di approvazione
+      ricevute): si esclude una regola-filtro. Nessun consumer esterno,
+      superficie di regressione limitata al motore stesso. apps/ non
+      collegato in questo esempio, stima con Franco.
+    score: 375   # 15 * 5 * 10 / 2
     rationale: >-
       Stima condivisa in meeting con Filiberto (proponente) e Franco
       (referente tecnico): 4 FTE/anno risparmiati stimati (~100k EBITDA),
-      dato quantitativo con evidenze chiare, effort minimo (rimozione di
-      una regola filtro nel motore esistente).
+      dato quantitativo con evidenze chiare, footprint minimo (rimozione
+      di una regola filtro nel motore esistente, cambiamento localizzato).
     approved_by: "Franco (referente tecnico)"
     ceremony_ref: null
 
