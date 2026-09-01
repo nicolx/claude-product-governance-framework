@@ -88,11 +88,14 @@ inizializzata) e scaffolda `apps/` e `product/`.
 mail, un thread, la trascrizione di un workshop, immagini) senza doverla
 pre-classificare. La skill **`inbox-triage`** la analizza e decide, per
 ciascun elemento: nuova idea, aggiornamento di un'idea/PRD già
-esistente, bug, Strategic Exception, o — se è troppo ambiguo — un'idea
-con `status: needs_clarification` e una bozza di domanda pronta da
-rispedire a chi l'ha mandato. Alla fine del run, `product/inbox/` resta
-vuota: tutto quello che deve sopravvivere è già stato spostato in una
-cartella tracciata.
+esistente, bug, Strategic Exception, scarto al triage (`status: declined`
+— non è roba da fare), o — se è troppo ambiguo — un'idea con
+`status: needs_clarification`. In ogni caso, quando c'è un richiedente
+esterno, prepara una **bozza di risposta** (presa in carico, eccezione in
+attesa di conferma, scarto motivato, o domande di chiarimento) da rivedere
+e inviare a mano. Alla fine del run, `product/inbox/` resta vuota: tutto
+quello che deve sopravvivere è già stato spostato in una cartella
+tracciata.
 
 `product/inbox/` è una comodità, **non un passaggio obbligato**: un PM
 può sempre creare/modificare file sotto `product/ideas/` o

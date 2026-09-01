@@ -17,6 +17,13 @@ file in `product/approvals/pending/`, per ciascuno un riepilogo leggibile
 quando. Ordina per data, più vecchi prima — una coda che si accumula è un
 segnale da far notare esplicitamente all'utente, non da nascondere.
 
+Per le voci con un `target_file` che punta a un'idea (`rice_diff`,
+`strategic_exception_flag`, `mandate_update`, `mandate_reclassification`),
+aggiungi al riepilogo il **`summary`** dell'idea e, se ha un
+`deadline.due_date`, la scadenza col suo `escalation_status` — così si
+decide con lo stesso contesto della lista ordinata del backlog, non solo
+guardando i numeri del diff.
+
 ## Approvazione
 
 Quando l'utente approva una voce specifica (per nome file o descrizione):

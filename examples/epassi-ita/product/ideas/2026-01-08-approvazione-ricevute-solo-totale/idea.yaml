@@ -5,7 +5,9 @@
 
 id: "2026-01-08-approvazione-ricevute-solo-totale"
 title: "Idea per il motore di approvazione ricevute"
+summary: "Escludere una regola-filtro nel motore di approvazione ricevute per ridurre i falsi rifiuti sul caso 'ricevute non riconosciute', risparmiando lavoro di backoffice."
 proposer: "Filiberto (Head of Operations)"
+notes: "Quick win a footprint basso; Filiberto ci tiene. Impatto ~1/3 dell'incremento EBITDA atteso."
 
 source:
   type: email

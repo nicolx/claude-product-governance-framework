@@ -342,16 +342,28 @@ un'idea sia immediatamente azionabile.
 
 Le idee devono essere inserite in modo che sia facile capire:
 
-- Da chi arrivano e di cosa si tratta, con un titolo
+- Da chi arrivano e di cosa si tratta, con un titolo e una **`summary`**
+  di una riga in linguaggio piano — cosa c'è da fare, comprensibile
+  senza aprire il materiale di origine (il titolo è spesso solo l'oggetto
+  di una mail, che non basta a orientarsi nella lista ordinata)
 - Una descrizione che spieghi il contesto e permetta di risalire alle
   informazioni essenziali (citazioni email, documenti già disponibili)
 - Una categoria (Product Line, tipo di richiesta) per semplificare i
   filtri
 
 > *Pattern pratico consigliato: usa l'oggetto della mail/segnalazione come
-> titolo dell'idea, e il contenuto (con allegati) come dettaglio in
-> `source/`. Rende più semplice risalire alla fonte e non perde
-> informazione.*
+> titolo dell'idea, il contenuto (con allegati) come dettaglio in
+> `source/`, e scrivi a mano la `summary` leggibile. Rende più semplice
+> risalire alla fonte e non perde informazione.*
+
+**Non tutto quello che arriva è un'idea.** Una parte del materiale
+(richieste di supporto tecnico, temi fuori dal perimetro del team, cose
+già coperte altrove) va **scartata al triage** — `status: declined`, con
+`decline_reason` in una riga. Non si scarta in silenzio: si crea comunque
+il record (archivio/audit, distinto da `aborted` che è "avviata poi
+interrotta"), e si prepara una bozza di risposta al richiedente (vedi
+sezione successiva). L'automazione propone lo scarto, il PM conferma — è
+un giudizio, non un fatto.
 
 Due input che sembrano idee ma scavalcano le fasi successive:
 
@@ -384,11 +396,69 @@ Strategic Exception si verifica ogni settimana, non è più un'eccezione.
 > `examples/epassi-ita/`.)*
 
 **Checklist operativa**
-- [ ] L'idea è stata registrata con titolo, proponente, descrizione del contesto?
+- [ ] L'idea è stata registrata con titolo, `summary` leggibile, proponente, descrizione del contesto?
 - [ ] Se è un bug: è già stato aperto un ticket con impatto stimato nel tracker di esecuzione?
-- [ ] Se è una Strategic Exception: è stata approvata al livello richiesto?
+- [ ] Se è una Strategic Exception: è stata approvata al livello richiesto (o è chiaro che è ancora in attesa di conferma)?
+- [ ] Se non è un'idea: è stata scartata come `declined` con `decline_reason`, non cancellata né lasciata in inbox?
 - [ ] L'idea è stata categorizzata per Product Line?
+- [ ] È stata preparata (e mostrata al PM) una bozza di risposta al richiedente, quando c'è un richiedente esterno?
 - [ ] Se arriva via canale informale (chat, voce): è stata trasferita nell'archivio prima di qualsiasi altra azione?
+
+## Chiudere il loop col richiedente
+
+*"The single biggest problem in communication is the illusion that it has
+taken place." — George Bernard Shaw*
+
+Il framework è bravo a catturare, classificare e prioritizzare — ma
+un'email arrivata da uno stakeholder, se non riceve risposta, lascia il
+richiedente al buio: non sa se è stata vista, se serve altro, quando
+succederà qualcosa. La delusione (e la frizione) nasce lì, non dal RICE
+score.
+
+Per questo **ogni intake con un richiedente esterno identificabile
+produce una bozza di risposta** — scritta dall'automazione, rivista e
+inviata *a mano* dal PM (mai invio automatico), salvata sull'idea in
+`requester_reply`. Non passa da `product/approvals/pending/`: è una
+cortesia 1:1 con l'idea, non una decisione. Se l'idea nasce dal PM stesso
+o da un brainstorm interno, non c'è nessuno da avvisare e la bozza si
+salta.
+
+Il contenuto dipende da come è stata classificata:
+
+- **Idea normale** — la bozza copre tre cose: (a) presa in carico; (b)
+  **serve una riunione di approfondimento col richiedente per fare un
+  RICE serio?** Spesso sì — un dato che solo lui ha, un problema da
+  inquadrare meglio. Se sì, va segnato in modo strutturato
+  (`rice_status.deep_dive`) perché `rice-watch` continui a ricordarlo
+  finché il meeting non avviene; (c) **una prima ipotesi onesta di
+  quando** potrebbe essere prioritizzata, letta dal backlog ordinato
+  attuale ("con N idee davanti a RICE più alto e nessuna quotazione
+  ancora, realisticamente non prima di…") — una forbice, mai una data,
+  mai una promessa.
+- **Strategic Exception invocata all'intake** — "accolta su canale
+  privilegiato, **in attesa di conferma** dall'autorità richiesta"
+  (CEO/CPO-CTO): non si dice "approvata" finché non lo è. Si esplicita
+  l'impegno del PM a restituire feedback sull'esito (è un dovere del
+  metodo, non un favore).
+- **Scarto (`declined`)** — si spiega con rispetto perché il team di
+  prodotto non è il posto giusto per quella richiesta, e — se sensato —
+  si indirizza altrove. Meglio un "no" chiaro e motivato subito che un
+  silenzio che il richiedente interpreta come "ci stanno lavorando".
+- **`needs_clarification`** — la bozza pone le domande precise che
+  servono a sbloccare la classificazione (è già `clarification.draft_message`).
+
+*Principi Agile da incarnare in questa fase:*
+- *Una conversazione faccia a faccia (o almeno una risposta) è il modo
+  più efficiente per comunicare.*
+- *Accogliamo i cambiamenti nei requisiti: chi ci scrive va tenuto nel
+  ciclo, non lasciato fuori.*
+
+**Checklist operativa**
+- [ ] Ogni idea con un richiedente esterno ha una `requester_reply.draft` pronta?
+- [ ] Nessuna bozza è stata inviata in automatico — tutte mostrate al PM per revisione?
+- [ ] Per le idee normali: la bozza dice se serve un meeting di approfondimento, e in tal caso `rice_status.deep_dive` è compilato?
+- [ ] Per le idee normali: la prima ipotesi di timing è una forbice onesta, non una data né una promessa?
+- [ ] Per le Strategic Exception: la bozza dice "in attesa di conferma", non "approvata", finché non lo è?
 
 ## Intake storico e roadmap pre-esistente
 
@@ -569,6 +639,25 @@ un'idea può restare ferma per mesi senza che nessuno se ne accorga. Per
 questo il controllo va fatto ad ogni Backlog Refinement, non solo quando
 qualcuno se ne ricorda.
 
+Un sotto-caso merita attenzione a sé: le idee che non hanno un RICE non
+perché manca un dato che arriverà, ma perché **serve una riunione di
+approfondimento col richiedente** per inquadrare il problema. Aspettare
+non le sblocca — le sblocca solo il PM che fissa quel meeting. Vanno
+marcate esplicitamente (`rice_status.deep_dive`) all'intake o quando
+`rice-watch` le rileva, e `rice-watch` le tiene in cima ai suoi
+promemoria — con un'escalation se il meeting è riconosciuto necessario da
+settimane e non è ancora nemmeno in calendario.
+
+**La lista ordinata del backlog non è solo una colonna di numeri.**
+Quando si guarda il backlog per decidere (skill `backlog-list`), accanto
+allo score vanno sempre mostrati: la `summary` (cosa c'è da fare, in
+chiaro), l'eventuale scadenza (`deadline`), e le note utili a capire se e
+quando prioritizzare (`notes`, `rice_status`). Un ranking RICE letto
+senza questo contesto porta a decisioni meccaniche — e le iniziative
+fuori RICE (mandate, platform, strategic exception) non vanno mescolate
+nello stesso elenco ordinato: non hanno una "posizione", si leggono per
+scadenza e stato.
+
 *Principi Agile da incarnare in questa fase:*
 - *Committenti e sviluppatori devono lavorare insieme quotidianamente per
   tutta la durata del progetto.*
@@ -586,6 +675,8 @@ qualcuno se ne ricorda.
 - [ ] Se il RICE score è basso: è stata comunicata la motivazione allo stakeholder?
 - [ ] Le idee ancora senza RICE sono state riviste all'ultimo Backlog Refinement, indipendentemente da quanto sembrino vecchie o marginali?
 - [ ] Per le idee senza RICE da più di qualche settimana: è chiaro cosa manca e a chi è stato chiesto?
+- [ ] Per le idee che richiedono un meeting di approfondimento col richiedente: il meeting è stato fissato, o è chiaro perché non ancora?
+- [ ] Quando si guarda il backlog ordinato, si vedono anche summary, scadenza e note — non solo lo score?
 
 ## Scadenze su idee normali (`deadline`)
 
@@ -1211,6 +1302,12 @@ come condivisione del ragionamento. "Se pensi che il punteggio non
 rifletta il vero valore, parliamone: magari ci sono informazioni che non
 ho."
 
+Questo scenario si previene all'intake: se una bozza di risposta
+(`requester_reply`) fosse partita quando l'idea è arrivata — con una
+prima ipotesi onesta di timing e, se serviva, la richiesta di un meeting
+di approfondimento — lo stakeholder non arriverebbe a tre mesi di
+silenzio prima di lamentarsi. Vedi "Chiudere il loop col richiedente".
+
 ## Scenario 4: la pressione dal top
 
 *"Il CEO ha detto in riunione che vuole questa feature per fine mese."*
@@ -1325,6 +1422,30 @@ docx) vi persiste: solo la trascrizione. Vedi sezione "Contesto aziendale
 **Ideas Bucket** — Il repository dove vengono raccolte tutte le idee,
 richieste e segnalazioni prima di essere valutate. Non è una coda di
 lavoro: è un archivio non ordinato da cui emergono le priorità.
+
+**Declined (scarto al triage)** — Stato terminale per un elemento
+arrivato all'intake che non è qualcosa su cui il team di prodotto può o
+deve lavorare (richiesta di supporto, fuori perimetro, già coperto). Il
+record si crea comunque, con `decline_reason` e una bozza di risposta al
+richiedente. Distinto da `aborted` (iniziativa avviata e poi interrotta):
+il primo non è mai entrato nel processo, il secondo sì. Vedi
+"Alimentazione del bucket delle idee" e "Chiudere il loop col
+richiedente".
+
+**Requester reply (bozza di risposta al richiedente)** — Ad ogni intake
+con un richiedente esterno identificabile, il framework prepara una bozza
+di risposta (presa in carico / eccezione in attesa di conferma / scarto
+motivato / richiesta di chiarimento), salvata sull'idea in
+`requester_reply` e **mai inviata in automatico**: la rivede e la manda
+il PM. Serve a chiudere il loop con chi ha scritto, che altrimenti resta
+al buio. Vedi "Chiudere il loop col richiedente".
+
+**Deep dive (meeting di approfondimento)** — Riunione col richiedente
+necessaria per inquadrare un'idea abbastanza da farne un RICE serio.
+Marcata in `rice_status.deep_dive`; `rice-watch` la ricorda con
+insistenza — con escalation — finché il meeting non è fissato e
+avvenuto. È il sotto-caso più actionable di "idea senza RICE": non
+aspetta un dato, aspetta che il PM metta il meeting in calendario.
 
 **Product Backlog Refinement** — Cerimonia settimanale in cui PM e tech
 lead allineano le priorità e preparano il backlog per l'iterazione

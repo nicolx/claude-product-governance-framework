@@ -1,6 +1,6 @@
 ---
 name: inbox-triage
-description: Svuota product/inbox/ classificando ogni elemento grezzo che il PM ci ha buttato dentro (email, thread, trascrizioni, allegati, immagini) — idea nuova, aggiornamento di un'idea/PRD esistente, bug, strategic exception, mandate/iniziativa mandataria, platform/debito tecnico, o materiale troppo ambiguo da richiedere un chiarimento al mittente. È il punto d'ingresso raccomandato per il materiale grezzo non ancora ordinato.
+description: Svuota product/inbox/ classificando ogni elemento grezzo che il PM ci ha buttato dentro (email, thread, trascrizioni, allegati, immagini) — idea nuova, aggiornamento di un'idea/PRD esistente, bug, strategic exception, mandate/iniziativa mandataria, platform/debito tecnico, scarto al triage (declined) se non è roba da fare, o materiale troppo ambiguo da richiedere un chiarimento al mittente. Prepara una bozza di risposta al richiedente per ogni elemento con un mittente esterno. È il punto d'ingresso raccomandato per il materiale grezzo non ancora ordinato.
 ---
 
 # inbox-triage
@@ -151,10 +151,24 @@ soli non coprono. In sintesi:
    `needs_clarification` (livello 2, sotto).
 
    - **Nuova idea** — segui gli stessi passi della skill `idea-intake`
-     per struttura della cartella, naming dello slug e classificazione
-     idea/bug/strategic_exception/mandate/platform. Materiale grezzo:
+     per struttura della cartella, naming dello slug, classificazione
+     idea/bug/strategic_exception/mandate/platform, **il campo `summary`**
+     (una riga leggibile su cosa c'è da fare) e **la bozza di risposta al
+     richiedente** (`requester_reply` — vedi `idea-intake` passo 8 e
+     playbook, "Chiudere il loop col richiedente"). Materiale grezzo:
      vedi la regola sul condiviso al passo 3 se questa unità è una tra
      più generate dallo stesso elemento.
+
+   - **Non è un'idea (scarto al triage)** — se l'elemento non è qualcosa
+     su cui il team di prodotto può o deve lavorare (richiesta di
+     supporto, tema fuori perimetro, già coperto altrove, "non è roba da
+     fare"). Non scartarlo in silenzio: crea comunque la cartella
+     (archivio/audit), `status: declined`, `decline_reason` in una riga.
+     **Chiedi conferma esplicita al PM prima di scrivere `declined`** —
+     tu proponi, il PM conferma. Prepara `requester_reply` con
+     `kind: decline` (spiega con rispetto perché il team non può aiutare,
+     indirizza altrove se sensato). Il materiale grezzo va comunque in
+     `source/`.
 
    - **Aggiornamento di un'idea esistente** — sposta il materiale in
      `product/ideas/{slug-esistente}/source/` (nome file che non collida
@@ -195,6 +209,10 @@ soli non coprono. In sintesi:
      Se dietro l'eccezione c'è una scadenza reale, compila anche il
      blocco `deadline` (`due_date`/`note`, mai presunti) — rende la
      motivazione verificabile nel tempo e la mette sotto `deadline-watch`.
+     Prepara `requester_reply` con `kind: strategic_exception_ack`:
+     "accolta su canale privilegiato, **in attesa di conferma** da
+     {autorità}" — mai "approvata" finché non lo è — + impegno a
+     restituire feedback sull'esito.
 
    - **Mandate (iniziativa mandataria)** — stessa regola di
      `idea-intake`: iniziativa imposta dall'alto, "critical" per
@@ -230,6 +248,9 @@ soli non coprono. In sintesi:
      - `clarification.draft_message`: una bozza di messaggio pronta,
        nel tono giusto per essere rispedita a chi ha mandato il
        materiale originale, che ponga quelle domande
+     - `requester_reply.needed: true`, `requester_reply.kind:
+       clarification_request` (il testo è già in
+       `clarification.draft_message` — non duplicarlo)
      Il materiale grezzo si sposta comunque in `source/` — non resta in
      `product/inbox/`, e non va perso.
      **Non inviare mai il messaggio di chiarimento in automatico.**
@@ -247,12 +268,15 @@ soli non coprono. In sintesi:
 7. **Chiudi il run con un riepilogo**, non solo con le scritture fatte:
    quanti elementi processati, in quante unità si sono decomposti, quante
    nuove idee / aggiornamenti / bug / strategic exception / mandate /
-   platform / needs_clarification ne sono derivate — **raggruppa nel riepilogo le
-   unità nate dallo stesso elemento**, non elencarle come se fossero
-   scollegate — e se qualcosa non è stato processato per un problema
-   tecnico (file illeggibile, formato non gestito) dillo esplicitamente e
-   lascialo in `product/inbox/` piuttosto che farlo sparire
-   silenziosamente.
+   platform / needs_clarification / **scartati (declined)** ne sono
+   derivati — **raggruppa nel riepilogo le unità nate dallo stesso
+   elemento**, non elencarle come se fossero scollegate. **Elenca tutte
+   le bozze di `requester_reply` generate** (idea normale, SE, decline,
+   clarification), pronte per la revisione e l'invio manuale del PM — non
+   inviarne nessuna in automatico. Se qualcosa non è stato processato per
+   un problema tecnico (file illeggibile, formato non gestito) dillo
+   esplicitamente e lascialo in `product/inbox/` piuttosto che farlo
+   sparire silenziosamente.
 
 8. **Verifica che `product/inbox/` sia vuota** (a parte `.gitkeep` e gli
    eventuali elementi non processabili segnalati al passo 7) prima di

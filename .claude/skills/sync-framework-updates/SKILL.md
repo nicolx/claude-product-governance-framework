@@ -61,7 +61,12 @@ segnalalo invece di procedere.
      che le idee esistenti in `product/ideas/` potrebbero non avere quel
      campo, e proponi (senza applicarlo da solo) un piano di migrazione
      minimo. Non modificare in massa i file di istanza senza che
-     l'utente lo chieda esplicitamente.
+     l'utente lo chieda esplicitamente. Se i campi nuovi sono opzionali
+     (es. `summary`, `notes`, `requester_reply`, `rice_status.deep_dive`,
+     `status: declined`): le idee vecchie restano valide senza; l'unico
+     con valore a essere backfillato è `summary` (una riga per idea
+     ancora attiva), perché `backlog-list` lo mostra — proponilo come
+     lavoretto incrementale, non un blocco.
    - "un campo esistente ha cambiato significato" (es. la "E" del RICE è
      passata da `effort_weeks`/settimane a `entanglement_score`/footprint
      1-10) → **caso di migrazione dati**: le voci `rice_history` esistenti

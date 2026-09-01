@@ -19,7 +19,15 @@
 
 id: "2026-01-08-slug-descrittivo"   # coincide col nome della cartella
 title: ""                            # per convenzione: oggetto della mail/segnalazione originale
+summary: ""                          # UNA riga in linguaggio piano: cosa c'è da fare, comprensibile senza aprire source/. Il title è spesso solo l'oggetto di una mail — questo è la versione leggibile, mostrata nella lista ordinata del backlog (skill backlog-list). Scritto all'intake.
 proposer: ""                         # [NOME] di chi ha proposto l'idea
+
+# Note libere utili a decidere se/quando prioritizzare, oltre a quanto già
+# strutturato in rice_status/deadline (es. "lo stakeholder ci tiene molto",
+# "dipende dall'iniziativa X", "quick win a basso footprint", "proponente
+# junior, mandato poco chiaro"). Mostrate nella lista ordinata del backlog.
+# Scrittura diretta, non passa da approvazione.
+notes: ""
 
 source:
   type: email                        # email | meeting_transcript | slack | other
@@ -29,7 +37,20 @@ product_line: ""                     # deve corrispondere a un name in product/r
 classification: idea                 # idea | bug | strategic_exception | mandate | platform — può restare provvisoria se status è needs_clarification
 
 status: bucket
-# needs_clarification -> bucket -> prioritized -> in_backlog_refinement -> in_analysis -> in_prd -> in_roadmap -> in_jira -> done | aborted
+# needs_clarification -> bucket -> prioritized -> in_backlog_refinement -> in_analysis -> in_prd -> in_roadmap -> in_jira -> done | aborted | declined
+#
+# declined è uno stato TERMINALE distinto da aborted: l'elemento è stato
+# scartato AL TRIAGE perché non è qualcosa su cui il team può/deve
+# lavorare (non un problema di prodotto, fuori perimetro, richiesta di
+# supporto, ecc.) — non è mai entrato nel processo. aborted invece è
+# un'iniziativa che ERA stata accolta (spesso GO) e poi è stata
+# interrotta. Distinguerli ha valore di audit: "quante richieste
+# scartiamo al triage" vs "quante iniziative interrompiamo dopo averle
+# avviate". Vedi playbook, "Chiudere il loop col richiedente".
+# Il record si crea comunque (archivio), con decline_reason compilato e
+# requester_reply.draft pronta — inbox-triage/idea-intake propongono
+# declined e chiedono conferma al PM prima di scriverlo, non decidono da
+# soli.
 #
 # classification: bug e strategic_exception saltano quasi tutta la catena:
 # tipicamente bucket -> in_jira -> done direttamente (bug) o, per strategic
@@ -60,6 +81,13 @@ done_at: null
 # serve a measurement-watch per calcolare da quanto tempo un'iniziativa
 # è in produzione.
 
+decline_reason: null
+# Solo se status: declined. Perché è stata scartata al triage, in una
+# riga (es. "richiesta di supporto tecnico, non un tema di prodotto",
+# "fuori dal perimetro del team", "già coperto da X"). Compilato da
+# inbox-triage/idea-intake su conferma del PM. La bozza di risposta al
+# richiedente sta in requester_reply.draft.
+
 created_at: "2026-01-08"
 # Per l'intake storico di un backlog pre-esistente (playbook, "Intake
 # storico e roadmap pre-esistente"): usa la data di CREAZIONE ORIGINALE
@@ -75,6 +103,45 @@ clarification:
   draft_message: null           # bozza di messaggio di richiesta chiarimento, pronta per l'invio (mai inviata in automatico)
   sent_at: null
   resolved_at: null             # quando arriva la risposta e l'idea può essere riclassificata
+
+# --- Bozza di risposta al richiedente (chiudere il loop) ---
+#
+# Ogni intake con un richiedente esterno identificabile (un proposer che
+# non è il PM stesso, con un canale raggiungibile) produce una bozza di
+# risposta — mai inviata in automatico, il PM la rivede e la manda lui.
+# Vedi playbook, "Chiudere il loop col richiedente". Scrittura diretta
+# sull'idea (come clarification.draft_message), NON passa da
+# product/approvals/pending/: è una cortesia 1:1 con l'idea, non una
+# decisione applicata a un target file.
+#
+# needed: false quando l'idea nasce dal PM stesso o da un brainstorm
+# interno senza un richiedente esterno da avvisare.
+#
+# kind:
+#   - acknowledgement       -> idea normale: presa in carico + (se serve)
+#     un meeting di approfondimento + prima ipotesi onesta di timing
+#   - clarification_request -> status needs_clarification: la bozza pone
+#     le domande (coincide con clarification.draft_message — non
+#     duplicare, valorizza kind qui e il testo lì)
+#   - decline              -> status declined: spiega perché il team non
+#     può aiutare su questo, con tono rispettoso
+#   - strategic_exception_ack -> classification strategic_exception
+#     invocata all'intake: accolta su canale privilegiato, IN ATTESA DI
+#     CONFERMA dall'autorità richiesta (CEO/CPO-CTO) — non dire "approvata"
+#     finché non lo è — + impegno a restituire feedback sull'esito
+#     (playbook, "Alimentazione del bucket delle idee", punto b)
+#
+# deep_dive_meeting_needed: true se per fare un RICE serio serve una
+# riunione col richiedente (dato mancante che solo lui ha, problema da
+# inquadrare meglio). Se true, rice_status.deep_dive più sotto va
+# compilato di conseguenza — è ciò che rice-watch usa per ricordartelo
+# finché il meeting non avviene.
+requester_reply:
+  needed: false
+  kind: null                    # acknowledgement | clarification_request | decline | strategic_exception_ack
+  draft: null                   # testo pronto per l'invio manuale — mai inviato in automatico
+  deep_dive_meeting_needed: false
+  sent_at: null
 
 # --- Solo per classification: idea (bug e strategic_exception saltano il RICE) ---
 #
@@ -123,6 +190,16 @@ rice_status:
   flagged_since: null           # data della prima volta che rice-watch l'ha rilevata senza RICE — null se ha già uno score o non è mai stata scansionata
   blocked_reason: null           # perché non è ancora stata quotata, se noto (es. "manca stima Impact da Sales")
   waiting_on: null                # chi dovrebbe fornire l'informazione mancante
+  # deep_dive: il sotto-caso in cui lo sblocco non è "aspettare un dato"
+  # ma "organizzare una riunione col richiedente". rice-watch lo tratta
+  # come categoria distinta e continua a ricordarlo finché done_at resta
+  # null — ed escala se requested_at è vecchio e il meeting non è ancora
+  # avvenuto. Tutti fatti/cattura di contesto, scrittura diretta.
+  deep_dive:
+    needed: false               # true se serve un meeting di approfondimento col richiedente per fare un RICE serio
+    requested_at: null          # quando è stato segnalato che serve (di solito = data dell'intake)
+    scheduled_for: null         # data del meeting, quando fissato
+    done_at: null               # quando il meeting è avvenuto — da qui rice-watch smette di ricordarlo (l'idea dovrebbe ottenere un RICE a breve)
 
 # strategic_exceptions è APPEND-ONLY, come rice_history — una Strategic
 # Exception può essere invocata in DUE momenti distinti della vita di
