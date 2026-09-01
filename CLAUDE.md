@@ -86,6 +86,20 @@ vale sia per motivi di qualità (falsi positivi/negativi nell'inferenza)
 sia organizzativi (difendibilità delle decisioni in caso di revisione con
 gli stakeholder) — vedi brief e playbook per il razionale completo.
 
+## Sincronizzazione dell'istanza (`origin`)
+
+Le skill che leggono o scrivono stato tracciato sincronizzano
+automaticamente il remote `origin`: `pull --ff-only` prima di leggere il
+quadro completo, `commit + push` subito dopo aver scritto — tramite
+l'helper `.claude/hooks/governance-sync.sh` (richiamato anche dall'hook
+`SessionStart`). Solo fast-forward, mai un merge automatico, non blocca
+mai, no-op sul canonico. Ogni skill che scrive in `product/`/`context/`
+deve chiudere con `governance-sync.sh push`; quelle elencate nel playbook
+come "read-critical" devono aprire con `governance-sync.sh pull`. Vedi
+playbook, sezione "Sincronizzazione dell'istanza (`origin`)". Da non
+confondere con `sync-framework-updates`, che riguarda `upstream` (il
+metodo), non i dati.
+
 ## Convenzioni di naming
 
 Cartella-per-iniziativa con slug parlante, non ID opachi: chi gestisce il

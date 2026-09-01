@@ -1,5 +1,17 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/governance-sync.sh\" pull",
+            "timeout": 25,
+            "statusMessage": "Sincronizzo l'istanza da origin (pull)…"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [

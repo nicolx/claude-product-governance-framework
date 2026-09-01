@@ -29,6 +29,12 @@ l'attenzione lì, non un'eccezione da gestire in silenzio.
 
 ## Passi
 
+0. **Sincronizza da `origin`**: esegui
+   `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
+   "Sincronizzazione dell'istanza (`origin`)") — è il segnale più
+   strategico del framework, non ha senso giudicarlo su un
+   `nsm-tracking.yaml` locale vecchio.
+
 1. **Se `product/reference/nsm-tracking.yaml` non esiste ancora**,
    scaffoldalo da `framework/schema/nsm-tracking.template.yaml`: una
    voce per ciascuna NSM dichiarata in `product/reference/product-lines.yaml`
@@ -97,6 +103,13 @@ l'attenzione lì, non un'eccezione da gestire in silenzio.
 8. Se chiamata da `log-ceremony`, restituisci il riepilogo perché venga
    incluso nel log della cerimonia — non scrivere tu stessa in
    `decisions.yaml`, è compito di `log-ceremony`.
+
+9. **Sincronizza il repo**: se hai scritto/aggiornato
+   `product/reference/nsm-tracking.yaml`, esegui
+   `bash .claude/hooks/governance-sync.sh push "nsm-watch: aggiornato nsm-tracking" product/reference/nsm-tracking.yaml`
+   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)") — anche se
+   richiamata da `log-ceremony`, e anche prima: è il segnale più
+   strategico, i colleghi devono vederlo appena disponibile.
 
 ## Cosa NON fare
 

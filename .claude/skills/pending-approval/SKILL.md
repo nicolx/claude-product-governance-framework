@@ -21,6 +21,13 @@ segnale da far notare esplicitamente all'utente, non da nascondere.
 
 Quando l'utente approva una voce specifica (per nome file o descrizione):
 
+0. **Sincronizza da `origin`**: esegui
+   `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
+   "Sincronizzazione dell'istanza (`origin`)"). La coda o il `target_file`
+   potrebbero essere cambiati per mano di un collega. Se l'helper segnala
+   un disallineamento non-fast-forward, fermati e riferiscilo all'utente
+   prima di applicare qualunque cosa.
+
 1. Rileggi il file per intero, non fidarti del riepilogo precedente.
 2. Applica `payload` a `target_file` secondo il `type`:
    - `rice_diff`: appendi la voce a `rice_history` nell'idea (mai
@@ -51,16 +58,26 @@ Quando l'utente approva una voce specifica (per nome file o descrizione):
    approvando se non ovvio dal contesto), `decided_at`.
 4. Sposta il file da `product/approvals/pending/` a
    `product/approvals/decided/`.
-5. Conferma all'utente cosa è stato effettivamente scritto/cambiato.
+5. **Sincronizza il repo in un unico commit atomico** — la voce spostata
+   in `decided/` e il `target_file` aggiornato devono viaggiare insieme:
+   `bash .claude/hooks/governance-sync.sh push "pending-approval: approvata <nome-voce>" product/`
+   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)").
+6. Conferma all'utente cosa è stato effettivamente scritto/cambiato; se
+   l'helper ha segnalato un push fallito, dillo.
 
 ## Rifiuto
 
+0. **Sincronizza da `origin`** (stesso passo 0 della sezione Approvazione
+   sopra) prima di procedere.
 1. Imposta `decision: rejected`, `decided_by`, `decided_at`, e chiedi
    (o registra se già fornita) una `notes` col motivo — serve per
    l'audit trail, non lasciarla vuota.
 2. Sposta comunque il file in `product/approvals/decided/` — un rifiuto è
    una decisione tracciata, non va cancellato.
 3. **Non applicare nulla a `target_file`.**
+4. **Sincronizza il repo**: esegui
+   `bash .claude/hooks/governance-sync.sh push "pending-approval: rifiutata <nome-voce>" product/approvals/`
+   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)").
 
 ## Regole generali
 

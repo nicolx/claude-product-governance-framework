@@ -23,6 +23,12 @@ agire da sola sulla priorità.
 
 ## Passi
 
+0. **Sincronizza da `origin`**: esegui
+   `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
+   "Sincronizzazione dell'istanza (`origin`)") prima di leggere le idee —
+   uno scan su dati locali vecchi rischia falsi `overdue`/`due_soon` su
+   mandate che un collega ha già mosso avanti.
+
 1. **Elenca tutte le idee** in `product/ideas/*/idea.yaml` con
    `classification: mandate` e `status` diverso da `done` o `aborted`.
    Se non ce ne sono, dillo esplicitamente e fermati — non è un errore,
@@ -67,6 +73,14 @@ agire da sola sulla priorità.
 5. Se chiamata da `log-ceremony`, restituisci il riepilogo perché venga
    incluso nel log della cerimonia — non scrivere tu stessa nel file
    `decisions.yaml` della cerimonia, è compito di `log-ceremony`.
+
+6. **Sincronizza il repo**: se il passo 3 ha scritto almeno un
+   `idea.yaml`, esegui
+   `bash .claude/hooks/governance-sync.sh push "mandate-watch: aggiornati escalation_status" product/ideas/`
+   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)") — anche se
+   la skill è stata richiamata da `log-ceremony`: le scritture su
+   `idea.yaml` vanno sincronizzate subito, non aspettano il commit finale
+   della cerimonia.
 
 ## Cosa NON fare
 

@@ -81,3 +81,8 @@ umana esplicita (skill `pending-approval`) la voce viene appesa a
    `pending-approval`) — non applicarla da solo, nemmeno se l'utente
    sembra già d'accordo nella stessa conversazione: l'approvazione è un
    passo distinto e tracciato.
+
+7. **Sincronizza il repo**: esegui
+   `bash .claude/hooks/governance-sync.sh push "rice-update: proposta RICE per <slug>" product/approvals/pending/`
+   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Se l'helper
+   segnala un push fallito, riferiscilo all'utente.

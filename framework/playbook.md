@@ -272,6 +272,64 @@ un'interpretazione di materiale grezzo — per questo la conferma in
 conversazione è sempre richiesta, anche se non serve la coda `pending/`
 completa (non è una decisione di priorità).
 
+## Sincronizzazione dell'istanza (`origin`)
+
+Un'istanza è un repository git **condiviso** dal team di prodotto. Il
+repository *è* la fonte di verità: idee, RICE, PRD, cerimonie e coda di
+approvazione vivono lì, non nella testa di chi ha lanciato l'ultima
+skill. Perché questo regga con più persone sulla stessa istanza (o la
+stessa persona da macchine diverse), il clone locale e il remote `origin`
+devono restare allineati — altrimenti si ricreano idee già esistenti, si
+quota un RICE su dati vecchi, si genera uno snapshot di roadmap a cui
+manca metà del quadro.
+
+Questa sincronizzazione è **automatica, demandata alle skill e agli
+hook**, non alla memoria del PM:
+
+- **Pull** (`git pull --ff-only` su `origin`): all'avvio di ogni sessione
+  Claude Code (hook `SessionStart`) e all'inizio delle skill che
+  dipendono dal quadro completo — `inbox-triage`, `roadmap-snapshot`,
+  `pending-approval`, `jira-sync` (pull), e le watch (`nsm-watch`,
+  `mandate-watch`, `rice-watch`, `measurement-watch`).
+- **Commit + push**: come ultimo passo di ogni skill che scrive stato
+  tracciato (`idea-intake`, `inbox-triage`, `rice-update`, `prd-draft`,
+  `log-ceremony`, `roadmap-snapshot`, `pending-approval`,
+  `context-intake`, `jira-sync`, le watch, `init-governance-project`). Il
+  commit è **immediato** dopo la scrittura: è ciò che tiene il working
+  tree pulito e rende sicuri i pull successivi.
+
+Vincoli non negoziabili del meccanismo:
+
+- **Solo fast-forward.** Un pull che non può fast-forward NON viene
+  risolto automaticamente: la skill avvisa che c'è lavoro locale
+  divergente e si ferma. Nessun merge, rebase o stash automatico.
+- **Non blocca mai.** Offline, `origin` irraggiungibile, branch senza
+  upstream: la skill lo segnala e procede con lo stato locale. Il commit
+  resta locale e `check-unpushed.sh` (hook `Stop`) lo ricorda a fine
+  sessione.
+- **Solo `origin`, solo un'istanza.** Gli hook e l'helper fanno no-op se
+  manca `.governance/config.yaml`, o se `origin` è il repo canonico — il
+  canonico non viene mai toccato. Gli aggiornamenti del *metodo* sono
+  un'altra cosa: remote `upstream`, skill `sync-framework-updates`,
+  revisione umana.
+- **Disattivabile per istanza.** `.governance/config.yaml`, blocco
+  `sync:` con `auto_pull` / `auto_push` — default `true` entrambi; una
+  chiave a `false` spegne quel lato (per un'istanza mono-PM o con un
+  setup git particolare).
+
+Implementazione: helper unico `.claude/hooks/governance-sync.sh`
+(`pull` | `push "<messaggio>" [path...]`), richiamato dagli hook e come
+passo esplicito delle skill.
+
+**Cosa fare quando vedi l'avviso "impossibile allineare in fast-forward".**
+Hai commit locali che il team non ha ancora, e `origin` è andato avanti:
+non è un errore, è il segnale che due persone hanno lavorato in
+parallelo. Esegui `git pull --rebase origin` (riscrive i tuoi commit
+locali sopra quelli del team), controlla i conflitti sui file condivisi
+(`product/reference/`, snapshot di roadmap), poi `git push`. Sulle
+`idea.yaml` i conflitti sono quasi sempre banali: la convenzione
+cartella-per-idea e `rice_history` append-only li rende rari e locali.
+
 ## Alimentazione del bucket delle idee
 
 *"The best way to have a good idea is to have a lot of ideas." — Linus

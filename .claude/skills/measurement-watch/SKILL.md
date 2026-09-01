@@ -30,6 +30,11 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
 
 ## Passi
 
+0. **Sincronizza da `origin`**: esegui
+   `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
+   "Sincronizzazione dell'istanza (`origin`)") prima di scansionare le
+   iniziative rilasciate.
+
 1. **Elenca le iniziative rilevanti**: idee con `status: done` e
    `done_at` valorizzato, che hanno almeno un PRD collegato (`links.prd_ids`
    non vuoto) con un `measurement.yaml` (o `measurement-N.yaml`) nella
@@ -126,6 +131,12 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
 7. Se chiamata da `log-ceremony`, restituisci il riepilogo perché venga
    incluso nel log della cerimonia — non scrivere tu stessa in
    `decisions.yaml`, è compito di `log-ceremony`.
+
+8. **Sincronizza il repo**: se i passi 1-5 hanno scritto almeno un
+   `idea.yaml`/`measurement*.yaml`, esegui
+   `bash .claude/hooks/governance-sync.sh push "measurement-watch: aggiornate misurazioni" product/ideas/ product/prds/`
+   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)") — anche se
+   richiamata da `log-ceremony`.
 
 ## Cosa NON fare
 

@@ -97,7 +97,17 @@ che serve da lì e chiedi solo quello che manca.
    esiste) con almeno: nome progetto, data di inizializzazione, PM
    roster, riferimento Jira, elenco submodule collegati, versione/commit
    del framework upstream al momento dell'init (`git rev-parse
-   upstream/main` se disponibile, altrimenti `HEAD`).
+   upstream/main` se disponibile, altrimenti `HEAD`), e un blocco:
+   ```yaml
+   sync:
+     auto_pull: true
+     auto_push: true
+   ```
+   È ciò che attiva la sincronizzazione automatica con `origin` per tutte
+   le skill successive (vedi playbook, "Sincronizzazione dell'istanza
+   (`origin`)") — default `true` su entrambe; menziona all'utente che può
+   spegnerle qui (per un'istanza mono-PM, o un setup git particolare) se
+   non le vuole.
 2. `product/reference/product-lines.yaml` (da template).
 3. `product/reference/friction-log.yaml` (da template, vuoto).
    Non creare qui `product/reference/nsm-tracking.yaml`: baseline e
@@ -124,6 +134,11 @@ che serve da lì e chiedi solo quello che manca.
 
 - Fai un commit dedicato, es. `Initialize governance instance: <nome
   progetto>`.
+- **Sincronizza il repo**: esegui
+  `bash .claude/hooks/governance-sync.sh push "init-governance-project: inizializzazione <nome progetto>" .governance/ product/ context/`
+  (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Da questo
+  momento in poi è quest'helper — richiamato da tutte le altre skill — a
+  tenere allineati `origin` e i cloni del team.
 - Riepiloga all'utente cosa è stato creato e cosa resta da fare (es.
   submodule non ancora collegati, denominatori Reach non ancora
   formalizzati, materiale di contesto aziendale non ancora fornito se

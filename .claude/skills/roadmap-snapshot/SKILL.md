@@ -20,6 +20,13 @@ creato/aggiornato.
 
 ## Passi
 
+0. **Sincronizza da `origin` prima di leggere lo stato**: esegui
+   `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
+   "Sincronizzazione dell'istanza (`origin`)"). Uno snapshot generato su
+   uno stato locale vecchio omette iniziative e proposte che i colleghi
+   hanno già scritto. Se l'helper segnala un disallineamento
+   non-fast-forward, fermati e riferiscilo all'utente.
+
 1. Determina la settimana ISO di riferimento (`YYYY-Www`).
 
 2. Raccogli input da:
@@ -93,3 +100,8 @@ creato/aggiornato.
 
 6. Mostra la proposta e ricorda che resta pending finché non approvata
    esplicitamente.
+
+7. **Sincronizza il repo**: esegui
+   `bash .claude/hooks/governance-sync.sh push "roadmap-snapshot: proposta <YYYY-Www>" product/approvals/pending/`
+   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Se l'helper
+   segnala un push fallito, riferiscilo all'utente.
