@@ -47,6 +47,18 @@ specifico, va aggiunta come nota in `product/reference/`, referenziando la
 regola generica — stessa logica dell'A3 Thinking sui PRD (non duplicare,
 linkare).
 
+**Esclusioni git locali a un'istanza.** Il `.gitignore` di root è di
+proprietà framework (tabella sopra): un'istanza non lo modifica mai. Se
+un'istanza ha bisogno di escludere da git contenuto specifico dentro una
+cartella di sua proprietà — es. uno snapshot locale non versionabile
+sotto `apps/` (vedi `init-governance-project`, caso "repository non
+ancora distribuito via git") — usa un `.gitignore` **annidato** nella
+sottocartella interessata: git lo supporta nativamente e la cartella che
+lo contiene è di proprietà istanza, quindi non serve una PR sul canonico.
+Il pattern tipico è un `apps/<slug>/.gitignore` con `*` + `!.gitignore` +
+`!README.md` (ignora tutto tranne se stesso e la nota che spiega come
+popolare la cartella).
+
 ## Regola non negoziabile: pending approval
 
 Nessuna skill scrive mai direttamente in `product/ideas/`, `product/prds/`,

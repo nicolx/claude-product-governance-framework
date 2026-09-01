@@ -332,6 +332,54 @@ Strategic Exception si verifica ogni settimana, non è più un'eccezione.
 - [ ] L'idea è stata categorizzata per Product Line?
 - [ ] Se arriva via canale informale (chat, voce): è stata trasferita nell'archivio prima di qualsiasi altra azione?
 
+## Intake storico e roadmap pre-esistente
+
+*"You can't cross the sea merely by standing and staring at the water." —
+Rabindranath Tagore*
+
+Il resto di questa sezione assume materiale che arriva alla spicciolata,
+un'email o una segnalazione alla volta. Quando un'istanza nasce su un team
+**già operativo**, l'intake iniziale deve digerire in un colpo solo due
+tipi di materiale che quell'assunzione non copre — ed è la norma, non
+l'eccezione, per ogni nuova istanza.
+
+**1. Backlog storico accumulato** (idee e segnalazioni raccolte per mesi
+in uno strumento esterno — Aha!, Jira, un foglio di calcolo — e mai
+passate dal framework). Trattalo come materiale normale via
+`inbox-triage`, con un solo accorgimento: usa la **data di creazione
+originale** dell'elemento (non la data dell'intake) per `created_at`,
+così `rice-watch`, `mandate-watch` e `measurement-watch` calcolano
+correttamente da quanto tempo qualcosa è fermo o in produzione. Un
+backlog di cento voci datate tutte "oggi" nasconde esattamente le idee
+che sono rimaste indietro.
+
+**2. Iniziative già decise da leadership prima del framework** (una
+roadmap pre-esistente con GO / NO GO / POSTPONED già assegnati). Non
+hanno mai avuto un RICE, ma non è onesto trattarle come idee vergini in
+bucket: **erano già una decisione**, presa da qualcuno con l'autorità per
+prenderla, e il team ci sta già lavorando o ci lavorerà a breve. Come le
+si fa rientrare nel modello di governance senza fingere che la decisione
+pregressa non esista, né bloccare l'intake in attesa di rifare il RICE su
+iniziative già in corso?
+
+| Stato pre-esistente | Come entra nel framework |
+|---|---|
+| **GO** (decisa, in corso o imminente) | `classification: strategic_exception`, voce in `strategic_exceptions` con `invoked_at_stage: intake`. `approved_by`: il PM che conduce l'intake — si assume esplicitamente la responsabilità di portare avanti una decisione presa altrove (è l'unico caso in cui `approved_by` di una strategic exception non è un livello CEO/CPO-CTO; il razionale è la difendibilità, non un nuovo bypass). `reason`: la motivazione originale della decisione. Se in realtà è una direttiva di leadership con una scadenza esterna fissa, `classification: mandate` la descrive meglio — scegli in base alle definizioni di "Iniziative Mandatarie" e "Strategic Exception", non a occhio. |
+| **POSTPONED** (rimandata, non rifiutata) | Idea normale in bucket, `classification: idea`, `rice_history` vuoto. Il RICE è ancora da fare: rientra nel processo standard e verrà quotata quando qualcuno ci lavora, come qualunque altra idea in attesa. |
+| **NO GO** (rifiutata) | `classification: idea`, `status: aborted`. Record storico: non entra in prioritizzazione attiva, ma resta consultabile — se la stessa richiesta torna, c'è traccia del perché fu scartata. |
+
+Questo permette al backlog storico di rientrare nel processo RICE
+standard **non appena qualcuno ci lavora davvero** (analisi, PRD), senza
+un big-bang di scoring a freddo su decine di iniziative e senza perdere
+la memoria di cosa era già stato deciso e da chi.
+
+**Checklist operativa**
+- [ ] Il backlog storico è entrato con `created_at` = data di creazione originale, non data dell'intake?
+- [ ] Le iniziative GO pre-esistenti sono entrate come strategic exception (`invoked_at_stage: intake`) o mandate, con `approved_by`/`mandated_by` e `reason` espliciti, non presunti?
+- [ ] Le iniziative POSTPONED sono in bucket come idee normali, con il RICE dichiarato ancora da fare?
+- [ ] Le iniziative NO GO sono archiviate come `status: aborted`, non cancellate?
+- [ ] Dopo l'intake storico, `rice-watch` e `mandate-watch` sono stati eseguiti una volta per fotografare lo stato di partenza?
+
 ## Ideas prioritization
 
 *"There are no solutions, only trade-offs." — Thomas Sowell*
