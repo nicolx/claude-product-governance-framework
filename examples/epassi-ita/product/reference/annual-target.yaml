@@ -1,0 +1,21 @@
+# Target annuale di Impact di Epassi ITA — esempio di
+# reference/annual-target.yaml popolato per un'istanza reale (vedi
+# docs/playbook-v4.md, sezione "Ideas prioritization": "Target 2026 →
+# 300k incrementali" — un'iniziativa da ~100k vale ~3pt).
+#
+# `value` è l'INCREMENTO atteso sull'anno, non il totale a budget — vedi
+# framework/schema/annual-target.template.yaml.
+
+metric: "EBITDA incrementale atteso nell'anno"
+year: 2026
+value: 300000
+currency: "EUR"
+
+context:
+  total_budget_value: null      # non riportato nelle Cronache — qui conta solo il delta
+  growth_rate_yoy: null
+
+source: "Budget 2026 Epassi ITA (citato nelle Cronache, Episodio 2)"
+owner: "PM di prodotto"
+
+per_product_line: []
