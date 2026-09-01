@@ -46,6 +46,33 @@ per raccogliere:
    `git submodule add <url> apps/<slug>`. Se l'utente non ha ancora repo
    da collegare, salta questo passo e nota in `.governance/config.yaml`
    che va fatto in seguito (non bloccare l'inizializzazione per questo).
+
+   **Organizza `apps/` per dominio funzionale, non per org/repo
+   sorgente.** Se i repository provengono da più organizzazioni o sorgenti
+   (comune dopo un'acquisizione o un rebrand — un'org legacy + una nuova),
+   non ricalcare quell'alberatura: raggruppa per dominio di prodotto
+   (`apps/<dominio>/<repo>/`, es. `apps/employer/`, `apps/merchant/`)
+   a prescindere da dove vive il codice. Un'alberatura per org di
+   provenienza non riflette il dominio e rende più difficile a
+   `idea-intake`/`prd-draft` orientarsi. Chiedi al PM quali domini usare
+   se non è ovvio dai nomi dei repository.
+
+   **Repository non ancora distribuito via git.** Se un sistema
+   applicativo esiste ma il suo codice non è distribuito via git — es.
+   recuperabile solo via CLI proprietaria o export locale (ERP, CRM
+   legacy, un'org Salesforce), personale di chi lo esegue, non pinnato a
+   un commit, non riproducibile con `git submodule update` — non forzare
+   un submodule inesistente. Crea invece `apps/<slug>/` con:
+   - un `.gitignore` annidato (`*` + `!.gitignore` + `!README.md`) che
+     esclude da git lo snapshot locale ma tiene la cartella e la sua nota
+     — vedi `CLAUDE.md`, "Esclusioni git locali a un'istanza";
+   - un `README.md` che spiega come popolare la cartella (comando/CLI,
+     credenziali necessarie) e i limiti: nessuna versione pinnata, ogni
+     collega rigenera lo snapshot in locale;
+   - una nota sotto `apps` in `.governance/config.yaml` che documenta
+     l'eccezione.
+   Sostituire con un vero submodule non appena il codice sarà distribuito
+   via git.
 5. **Jira** (o altro tracker di esecuzione) — project key, URL board. Solo
    configurazione, nessun collegamento realtime va creato qui.
 6. **Eventuali altre configurazioni rilevanti** — canale Slack/Teams per

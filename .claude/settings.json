@@ -8,6 +8,12 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-unpushed.sh\"",
             "timeout": 10,
             "statusMessage": "Verifica modifiche non pushate…"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-inbox.sh\"",
+            "timeout": 10,
+            "statusMessage": "Verifica product/inbox/ non processata…"
           }
         ]
       }

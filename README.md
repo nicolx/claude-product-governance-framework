@@ -57,8 +57,9 @@ inizializzata) e scaffolda `apps/` e `product/`.
 ├── bootstrap.sh, .githooks/, framework/     ← di proprietà upstream (framework)
 ├── .claude/skills/                          ← di proprietà upstream (framework)
 ├── .governance/config.yaml                  ← config/marker di QUESTA istanza
-├── apps/                                    ← submodule dei repository applicativi
-│   └── <nome-repo>/
+├── apps/                                    ← repository applicativi, raggruppati per dominio funzionale
+│   └── <dominio>/<nome-repo>/                (submodule git; o snapshot locale non-git per sistemi
+│                                             legacy non ancora distribuiti via git — vedi init-governance-project)
 ├── context/                                 ← comprensione del business di QUESTA istanza, tracciata da git
 │   └── *.md                                 (modello di business, finanza, org, mercato — vedi sotto)
 └── product/                                 ← artefatti di Product Management di QUESTA istanza

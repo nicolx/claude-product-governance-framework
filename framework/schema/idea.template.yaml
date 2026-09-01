@@ -61,6 +61,11 @@ done_at: null
 # è in produzione.
 
 created_at: "2026-01-08"
+# Per l'intake storico di un backlog pre-esistente (playbook, "Intake
+# storico e roadmap pre-esistente"): usa la data di CREAZIONE ORIGINALE
+# dell'elemento nello strumento di provenienza, non la data dell'intake —
+# rice-watch/mandate-watch/measurement-watch contano il tempo trascorso
+# da qui.
 
 # --- Solo se status: needs_clarification (materiale arrivato in product/inbox/
 # troppo ambiguo per essere classificato senza altre informazioni) ---
@@ -112,7 +117,13 @@ rice_status:
 #
 # 1. invoked_at_stage: intake — l'idea nasce già come Strategic Exception
 #    (classification: strategic_exception sopra), proposta su un canale
-#    privilegiato, salta il RICE fin dall'inizio.
+#    privilegiato, salta il RICE fin dall'inizio. Rientra qui anche
+#    l'intake storico di una roadmap decisa da leadership PRIMA del
+#    framework (iniziativa già GO): in quel caso approved_by è il PM che
+#    conduce l'intake — unico caso in cui non è un livello CEO/CPO-CTO,
+#    si assume la responsabilità di portare avanti una decisione presa
+#    altrove — e reason è la motivazione originale. Vedi playbook,
+#    "Intake storico e roadmap pre-esistente".
 # 2. invoked_at_stage: backlog_refinement — l'idea era una classification:
 #    idea normale, CON un suo rice_history reale, ma durante il Backlog
 #    Refinement viene fatta entrare nell'iterazione corrente saltando

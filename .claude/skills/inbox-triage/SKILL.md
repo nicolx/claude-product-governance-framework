@@ -61,6 +61,27 @@ Non vale solo per la classificazione: vale anche per numeri, nomi,
 percentuali, product line, e per l'ipotesi che un elemento sia collegato
 a un'idea/PRD già esistente (passo 4).
 
+## Caso speciale: intake storico bulk
+
+Se quello che c'è in `product/inbox/` è un **backlog storico** (mesi di
+idee esportate da Aha!/Jira/foglio di calcolo) e/o una **roadmap già
+decisa da leadership** prima che il framework esistesse (iniziative con
+GO/NO GO/POSTPONED già assegnati), applica prima la sezione **"Intake
+storico e roadmap pre-esistente"** del playbook, che i passi qui sotto da
+soli non coprono. In sintesi:
+
+- `created_at` di ogni elemento = **data di creazione originale**, non
+  quella dell'intake — le watch skill contano il tempo trascorso da lì.
+- Iniziativa pre-esistente **GO** → `classification: strategic_exception`,
+  `invoked_at_stage: intake`, `approved_by` = il PM che fa l'intake (unico
+  caso in cui non è un livello CEO/CPO-CTO), `reason` = motivazione
+  originale. Se è una direttiva con scadenza fissa, valuta
+  `classification: mandate`.
+- **POSTPONED** → idea normale in bucket, RICE ancora da fare.
+- **NO GO** → `classification: idea`, `status: aborted` (record storico).
+- Dopo il run, esegui una volta `rice-watch` e `mandate-watch` per
+  fotografare lo stato di partenza.
+
 ## Passi
 
 1. **Elenca tutto ciò che c'è in `product/inbox/`.** Non assumere che sia
