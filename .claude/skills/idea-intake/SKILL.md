@@ -43,7 +43,7 @@ presente nel materiale di origine.
    richieste indipendenti.** Una singola mail o trascrizione può
    contenere più idee distinte, ciascuna con la propria priorità futura.
    **Criterio pratico**: se a due parti del contenuto assegneresti un
-   RICE score indipendente e scollegato (Reach/Impact/Confidence/Effort
+   RICE score indipendente e scollegato (Reach/Impact/Confidence/Entanglement
    diversi, senza che l'uno dipenda dall'altro), sono due idee, non una
    — non forzarle in un'unica cartella solo perché sono arrivate insieme.
    Da qui in poi, ripeti i passi 3-7 **per ciascuna unità risultante**,

@@ -67,8 +67,11 @@ created_at: "2026-01-08"
 
 ## How
 
-<!-- Bullet ad alto livello: cosa serve sapere per stimare l'effort,
-     non la specifica tecnica completa. -->
+<!-- Bullet ad alto livello: cosa serve sapere per capire il footprint del
+     cambiamento (sistemi e componenti toccati, interfacce, blast radius) e
+     stimare la delivery — non la specifica tecnica completa. È la fase in
+     cui l'Entanglement del RICE, stimato all'intake come prima passata, si
+     può raffinare: se cambia, la revisione passa da rice-update. -->
 
 ## Rischi e dipendenze aperte
 

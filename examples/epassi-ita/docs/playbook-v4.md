@@ -233,8 +233,8 @@ RICE è un framework di prioritizzazione molto semplice basato su quattro parame
   - Score 6-8: dato quantitativo verificato da almeno una fonte primaria (DataBricks, contratto, ticket storico)
   - Score >8: dato quantitativo verificato da più fonti indipendenti, o validato con un esperimento
 
-  La maturità dell'analisi (quanto lavoro di scoping è stato fatto) è già rappresentata altrove, in Effort e nelle fasi successive (Preliminary/Complete Analysis) — non va confusa con Confidence.
-- **(E)ffort →** Quanto costerà a noi perché vada a regime in termini di marketing, persone ed eventualmente sviluppi tecnologici? Si può sintetizzare il punteggio come "numero delle settimane necessarie per implementarlo, con le poche info a disposizione".
+  La maturità dell'analisi (quanto lavoro di scoping è stato fatto) si riflette nelle fasi successive (Preliminary/Complete Analysis) e nel progressivo consolidamento dell'evidenza — non va confusa con Confidence.
+- **(E)ntanglement → footprint del cambiamento.** Quanto l'iniziativa è intrecciata col resto del sistema: quanti componenti, sistemi e team tocca, quanto è ampia la superficie di regressione, quanto sono complessi review e rollout. **Non è una stima di tempo-sviluppatore** — con Claude Code il tempo di codifica si è scollegato dal costo reale del cambiamento, e quello che resta (capire le conseguenze, revisionare, coordinare, contenere i side-effect) è ciò che il RICE vuole al denominatore. Un cambiamento che tocca una riga in un componente ha Entanglement basso; uno che tocca 17 cose in 3 sistemi ha Entanglement alto. Scala 1-10: 1-2 un componente/un sistema; 3-5 più componenti in un sistema o un'interfaccia con pochi consumer; 6-8 più sistemi o molti consumer o dato cross bounded-context; 9-10 cambiamento strutturale trasversale. I costi esterni hard non comprimibili (legale, licenze, UAT estesa) alzano comunque il punteggio. Quando i repo sono in `apps/`, `rice-update` ispeziona il codice per la stima; è una prima passata, raffinabile in Complete Analysis. La stima di tempo-calendario per la pianificazione vive altrove (`delivery.estimated_effort_weeks`, in Iteration Planning).
 
 Nessuno di questi parametri richiede una precisione chirurgica nell'esprimere una valutazione, ma avere degli ordini di grandezza (scala 1:10) aiuta a comprendere cosa sia prioritario oggi e cosa no.
 
@@ -250,14 +250,14 @@ Importante: essere in priorità 1 non significa che ora il team si fionda a fare
 - *I processi agili promuovono uno sviluppo sostenibile. Gli sponsor, gli sviluppatori e gli utenti dovrebbero essere in grado di mantenere indefinitamente un ritmo costante.*
 
 > **Cronache di EPASSI ITA — Episodio 2.**
-> Nel primo pomeriggio del giorno successivo, Franco del team di sviluppo è disponibile per prendersi qualche minuto con Filiberto e Gennaro riguardo l'ultima trovata di Filiberto per fare efficienza. Franco ha tante cose da fare, rispettiamo il suo tempo (ma non possiamo fare a meno di lui per proteggere il suo stesso tempo da attività inutili o pericolose...). Gennaro è il facilitatore del meeting. I tre hanno dato un'occhiata alla descrizione su Aha! prima dell'appuntamento ed hanno già alcune idee: a) Filiberto ha verificato che il problema si verifica nel 30% delle ricevute non riconosciute che sono il 30% del totale (una Reach totale del 15%); b) ha stimato che se il problema fosse del tutto risolto, risparmieremmo 4 FTE al backoffice (sono 100k l'anno di EBITDA salvati, circa la metà della crescita attesa dell'EBITDA, che vale 5pt di impatto atteso); c) le sue analisi sono assolutamente quantitative e precise con evidenze chiare, per cui se lo facessimo otterremmo con altissima probabilità l'impatto atteso (confidence 10pt); d) l'Effort è sorprendentemente basso: basta escludere una regola che fa da filtro (1pt). Il meeting si conclude con grande soddisfazione di tutti: questa idea è ora al terzo posto nella lista delle priorità. Filiberto è contento e sboccia, sa che di lì a poco si farà. Il resto del team prende semplicemente un caffè e torna sulla tastiera, ora c'è altro in pentola...
+> Nel primo pomeriggio del giorno successivo, Franco del team di sviluppo è disponibile per prendersi qualche minuto con Filiberto e Gennaro riguardo l'ultima trovata di Filiberto per fare efficienza. Franco ha tante cose da fare, rispettiamo il suo tempo (ma non possiamo fare a meno di lui per proteggere il suo stesso tempo da attività inutili o pericolose...). Gennaro è il facilitatore del meeting. I tre hanno dato un'occhiata alla descrizione su Aha! prima dell'appuntamento ed hanno già alcune idee: a) Filiberto ha verificato che il problema si verifica nel 30% delle ricevute non riconosciute che sono il 30% del totale (una Reach totale del 15%); b) ha stimato che se il problema fosse del tutto risolto, risparmieremmo 4 FTE al backoffice (sono 100k l'anno di EBITDA salvati, circa la metà della crescita attesa dell'EBITDA, che vale 5pt di impatto atteso); c) le sue analisi sono assolutamente quantitative e precise con evidenze chiare, per cui se lo facessimo otterremmo con altissima probabilità l'impatto atteso (confidence 10pt); d) l'Entanglement è sorprendentemente basso: basta escludere una regola che fa da filtro nel motore di approvazione — un solo componente, un solo sistema, nessun consumer esterno (2pt). Il meeting si conclude con grande soddisfazione di tutti: questa idea è ora al terzo posto nella lista delle priorità. Filiberto è contento e sboccia, sa che di lì a poco si farà. Il resto del team prende semplicemente un caffè e torna sulla tastiera, ora c'è altro in pentola...
 
 **✅ Checklist operativa**
 
-- [ ] I quattro parametri RICE sono stati compilati su Aha! (Reach, Impact, Confidence, Effort)?
+- [ ] I quattro parametri RICE sono stati compilati su Aha! (Reach, Impact, Confidence, Entanglement)?
 - [ ] Reach è espresso come percentuale (0-100) sulla popolazione rilevante della Product Line, non come valore assoluto?
 - [ ] Confidence riflette la qualità dell'evidenza a supporto della stima (non la quantità di analisi svolta)?
-- [ ] Il referente tecnico ha validato la stima di Effort ad alto livello?
+- [ ] Il referente tecnico ha validato la stima di Entanglement (footprint del cambiamento) ad alto livello?
 - [ ] Lo stakeholder proponente ha confermato i valori di Reach e Impact?
 - [ ] L'idea è stata confrontata con le prime 5 in backlog per coerenza del ranking?
 - [ ] Se il RICE score è basso: è stata comunicata allo stakeholder la motivazione del posizionamento?
@@ -389,7 +389,7 @@ Confondere le due cose è il modo più rapido per generare aspettative sbagliate
 3. **What** — scope preciso, elenco puntato, non narrativa
 4. **Who** — solo se rilevante; spesso è già ovvio dalla strategia e va omesso
 5. **Metriche** — 1-3 KPI massimo, con baseline e target; il ragionamento su come si è arrivati alla scelta della metrica resta nell'idea di origine, non qui
-6. **How** — bullet ad alto livello: cosa serve sapere per stimare l'effort, non la specifica tecnica completa
+6. **How** — bullet ad alto livello: cosa serve sapere per capire il footprint del cambiamento (sistemi/componenti toccati, blast radius) e stimare la delivery, non la specifica tecnica completa
 7. **Rischi e dipendenze aperte**
 8. **Link al prossimo PRD della sequenza**, se esiste, con dichiarazione esplicita se è dipendenza di rilascio o solo di lettura
 
@@ -602,7 +602,7 @@ Riferimento rapido ai termini tecnici, di processo e di dominio utilizzati nel d
 
 ## Termini di processo
 
-**RICE** — Framework di prioritizzazione basato su quattro parametri: Reach (quante persone impatta), Impact (quanto vale in termini di business), Confidence (quanto siamo sicuri delle nostre stime), Effort (quanto costa implementarlo). Il punteggio finale è R × I × C / E.
+**RICE** — Framework di prioritizzazione basato su quattro parametri: Reach (quante persone impatta), Impact (quanto vale in termini di business), Confidence (quanto siamo sicuri delle nostre stime), Entanglement (footprint del cambiamento nel sistema — quanto è intrecciato col resto, non quanto tempo-sviluppatore costa; sostituisce la vecchia "Effort" resa poco significativa da Claude Code). Il punteggio finale è R × I × C / E.
 
 **NSM — North Star Metric** — Il KPI più importante che ogni PM presidia per la propria Product Line. Rappresenta la misura di successo principale a cui tutte le attività della product line devono contribuire.
 
@@ -638,4 +638,4 @@ Riferimento rapido ai termini tecnici, di processo e di dominio utilizzati nel d
 
 **PDS — Product Designer** — Responsabile dei flussi UI/UX per i prodotti italiani. Lavora trasversalmente su tutte le Product Line. Al momento della stesura del documento, la figura è in fase di selezione (e resta, alla data di questa revisione, non assegnata).
 
-**ITs — Team IT / Sviluppatori** — Il team di tecnologia che implementa le soluzioni. Partecipa attivamente alle cerimonie di analisi e pianificazione, non solo alla fase di sviluppo. La loro voce sul rischio tecnico e sull'effort è fondamentale già nelle fasi di analisi.
+**ITs — Team IT / Sviluppatori** — Il team di tecnologia che implementa le soluzioni. Partecipa attivamente alle cerimonie di analisi e pianificazione, non solo alla fase di sviluppo. La loro voce sul rischio tecnico e sul footprint del cambiamento (l'Entanglement del RICE) è fondamentale già nelle fasi di analisi.

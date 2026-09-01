@@ -424,13 +424,55 @@ RICE è un framework di prioritizzazione basato su quattro parametri:
   - >8: dato quantitativo verificato da più fonti indipendenti, o
     validato con un esperimento
 
-  La maturità dell'analisi (quanto scoping è stato fatto) è già
-  rappresentata in Effort e nelle fasi successive — non va confusa con
-  Confidence.
+  La maturità dell'analisi (quanto scoping è stato fatto) si riflette
+  nelle fasi successive e nel progressivo consolidamento dell'evidenza —
+  non va confusa con Confidence.
 
-- **(E)ffort →** Quanto costerà implementarlo (persone, tempo, eventuali
-  investimenti)? Si può sintetizzare come "numero di settimane necessarie,
-  con le poche info a disposizione".
+- **(E)ntanglement → footprint del cambiamento.** Quanto l'iniziativa è
+  intrecciata col resto del sistema: quanti componenti, sistemi e team
+  tocca, quanto è ampia la superficie di regressione, quanto sono
+  complessi review e rollout. **Non è una stima di tempo-sviluppatore.**
+  Con l'implementazione AI-assistita il tempo di codifica si è scollegato
+  dal costo reale di un cambiamento, e in modo non uniforme: un change
+  meccanico su molti file può essere rapido, un fix sottile su una riga
+  no. Quello che resta — e domina — è il costo di capire le conseguenze,
+  revisionare, coordinare tra team e contenere i side-effect. Un
+  cambiamento che tocca una riga in un componente ha Entanglement basso;
+  uno che tocca 17 cose in 3 sistemi ha Entanglement alto, perché rischia
+  effetti collaterali ovunque. Scala 1-10:
+  - 1-2: un componente, un sistema. Conseguenze evidenti a colpo
+    d'occhio, review rapida.
+  - 3-5: più componenti in un sistema, o un'interfaccia condivisa da
+    pochi consumer noti. Superficie di regressione contenuta e mappabile.
+  - 6-8: più sistemi, o un'interfaccia con molti consumer, o un dato che
+    attraversa più bounded context. Side-effect plausibili in punti non
+    ovvi, serve coordinamento tra team.
+  - 9-10: cambiamento strutturale trasversale (migrazione dati, modello
+    core, la maggior parte dei sistemi). Blast radius difficile da
+    delimitare a priori, rollout a fasi obbligato.
+
+  I **costi esterni hard** che non si comprimono (consulenza legale,
+  licenze, UAT estesa con clienti, spesa infrastrutturale) alzano il
+  punteggio anche quando il footprint di codice è piccolo.
+
+  **Come si stima.** Quando i repository applicativi sono montati in
+  `apps/`, la stima non parte da un'opinione: `rice-update` ispeziona il
+  codice per collocare l'ordine di grandezza (quali sistemi, accoppiamento
+  grossolano, consumer di un'interfaccia) e registra
+  `entanglement_basis: code_inspection`. È una **prima passata** — il
+  blast radius reale lo scopre la Preliminary/Complete Analysis, e la
+  revisione entra come nuova voce in `rice_history`. Senza `apps/`
+  collegato, o per sistemi non montati, si stima con un referente tecnico
+  (`entanglement_basis: structured_estimate`) e si tratta l'evidenza come
+  più debole.
+
+  **Perché non più "Effort" (settimane).** Il tempo-sviluppatore è
+  diventato un segnale rumoroso di ciò che il RICE vuole davvero
+  catturare al denominatore — il costo e il rischio di far atterrare il
+  cambiamento. La stima di tempo-calendario serve ancora, ma per la
+  pianificazione, non per il ranking: vive in `delivery.estimated_effort_weeks`
+  (riempita in Iteration Planning, alimenta `capacity_allocation`) e in
+  `mandate.lead_time_weeks` per le iniziative con scadenza.
 
 Nessuno di questi parametri richiede precisione chirurgica, ma avere
 ordini di grandezza (scala 1:10) aiuta a comprendere cosa sia prioritario.
@@ -466,10 +508,10 @@ qualcuno se ne ricorda.
   e mantenibile indefinitamente.*
 
 **Checklist operativa**
-- [ ] I quattro parametri RICE sono stati compilati (Reach, Impact, Confidence, Effort)?
+- [ ] I quattro parametri RICE sono stati compilati (Reach, Impact, Confidence, Entanglement)?
 - [ ] Reach è espresso come percentuale sulla popolazione rilevante della Product Line?
 - [ ] Confidence riflette la qualità dell'evidenza, non la quantità di analisi svolta?
-- [ ] Il referente tecnico ha validato la stima di Effort ad alto livello?
+- [ ] Entanglement è stato stimato dal footprint reale del cambiamento (ispezione di `apps/` quando disponibile, o stima con un referente tecnico), non da un tempo-sviluppatore?
 - [ ] Lo stakeholder proponente ha confermato Reach e Impact?
 - [ ] L'idea è stata confrontata con le prime posizioni del backlog per coerenza del ranking?
 - [ ] Se il RICE score è basso: è stata comunicata la motivazione allo stakeholder?
@@ -490,7 +532,7 @@ calendario). Chiamiamo queste iniziative **Iniziative Mandatarie**
 (`mandate`).
 
 Una Iniziativa Mandataria **non compete sul RICE** — non ha senso
-calcolare Reach/Impact/Confidence/Effort per decidere se "vale la pena":
+calcolare Reach/Impact/Confidence/Entanglement per decidere se "vale la pena":
 non è una domanda che il framework è chiamato a rispondere in questo
 caso, la priorità è già stata data da chi ha il mandato per farlo. Ma
 questo non significa che salti l'analisi: un'iniziativa mandataria
@@ -507,9 +549,11 @@ scadenza si scopre quando è troppo tardi per rispettarla con qualità. Per
 questo ogni Iniziativa Mandataria con una scadenza nota richiede una
 stima di **lead time**: quante settimane servono, prima della scadenza,
 per completare analisi, PRD e sviluppo. Questa stima **va fatta con un
-referente tecnico**, con lo stesso spirito con cui l'Effort del RICE
-viene validato ad alto livello nella prioritizzazione — non è un numero
-che il PM inventa da solo.
+referente tecnico**, con lo stesso spirito con cui l'Entanglement del
+RICE viene validato con un referente tecnico nella prioritizzazione — non
+è un numero che il PM inventa da solo. (Il lead time è tempo-calendario,
+una domanda diversa da Entanglement: quanta runway c'è prima della
+scadenza, non quanto è intrecciato il cambiamento.)
 
 **Chi può dichiarare un'iniziativa come mandataria?** Non c'è un vincolo
 di ruolo esplicito, a differenza della Strategic Exception (che richiede
@@ -845,6 +889,15 @@ rischio resta una buona cosa: fail fast.
 - *Le architetture, i requisiti e la progettazione migliori emergono da
   team che si auto-organizzano.*
 
+È anche il momento in cui le iniziative `classification: idea` entrate in
+iterazione ricevono una **stima di settimane di delivery**
+(`delivery.estimated_effort_weeks`) dal team tech — tempo-calendario, non
+l'Entanglement del RICE. Non serve prima: al RICE scoring interessa il
+footprint del cambiamento, non la durata; è qui, con la valutazione
+80/20 in mano, che una stima di durata diventa realistica. Alimenta
+`capacity_allocation` in `roadmap-snapshot`, in parallelo a
+`platform.estimated_effort_weeks` per le iniziative platform.
+
 Anche questa cerimonia va registrata in
 `product/ceremonies/roadmap-iteration-planning/{YYYY-Www}/`, con lo stesso
 pattern trascrizione + decisioni strutturate.
@@ -856,6 +909,7 @@ pattern trascrizione + decisioni strutturate.
 - [ ] L'agenda tiene conto del flusso di manutenzione ordinaria/debito tecnico?
 - [ ] Le date di rilascio stimate sono coerenti con quanto discusso?
 - [ ] Gli stakeholder chiave sono stati aggiornati sulle aspettative di delivery?
+- [ ] Le iniziative `idea` in iterazione hanno una stima `delivery.estimated_effort_weeks` per la contabilità di capacità?
 - [ ] La capacità dedicata a platform (debito tecnico/devops) questa iterazione è stata dichiarata esplicitamente, non lasciata implicita?
 
 ## Product Design, development and rollout
@@ -1058,8 +1112,22 @@ l'esempio in `examples/*/docs/` per un caso reale.
 
 **RICE** — Framework di prioritizzazione basato su quattro parametri:
 Reach (quante persone impatta), Impact (quanto vale in termini di
-business), Confidence (quanto si è sicuri delle stime), Effort (quanto
-costa implementarlo). Il punteggio finale è R × I × C / E.
+business), Confidence (quanto si è sicuri delle stime), Entanglement
+(footprint del cambiamento nel sistema — vedi voce dedicata). Il punteggio
+finale è R × I × C / E.
+
+**Entanglement (footprint del cambiamento)** — La "E" del RICE. Stima
+1-10 di quanto un'iniziativa è intrecciata col resto del sistema: quanti
+componenti/sistemi/team tocca, superficie di regressione, complessità di
+review e rollout, più eventuali costi esterni hard (legale, licenze, UAT
+estesa). Valore alto = più intrecciata = più a rischio = deprioritizzata
+(è a denominatore). Sostituisce la vecchia "Effort" (settimane-
+sviluppatore), resa un segnale rumoroso dall'implementazione AI-assistita
+che scollega il tempo di codifica dal costo reale del cambiamento. La
+stima di tempo-calendario per la pianificazione vive altrove
+(`delivery.estimated_effort_weeks`, riempita in Iteration Planning;
+`mandate.lead_time_weeks` per le iniziative con scadenza). Vedi "Ideas
+prioritization".
 
 **NSM — North Star Metric** — Il KPI più importante che ogni PM presidia
 per la propria Product Line.
@@ -1167,5 +1235,5 @@ Product Line.
 
 **Team di tecnologia** — Implementa le soluzioni. Partecipa attivamente
 alle cerimonie di analisi e pianificazione, non solo allo sviluppo. La
-sua voce su rischio tecnico ed effort è fondamentale già nelle fasi di
-analisi.
+sua voce su rischio tecnico e footprint del cambiamento (l'Entanglement
+del RICE) è fondamentale già nelle fasi di analisi.
