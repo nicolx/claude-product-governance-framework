@@ -84,6 +84,23 @@ mandates_status:
     escalation_status: ""             # pending_review | on_track | due_soon | overdue
     current_status: ""                 # status corrente dell'idea (bucket, in_analysis, ecc.)
 
+# deadline_alerts è il fratello di mandates_status per il caso più comune
+# e più facile da perdere: idee classification: idea o strategic_exception
+# (mai mandate, che ha già mandates_status sopra) con un blocco `deadline`
+# valorizzato — una scadenza reale che NON basta da sola a giustificare il
+# bypass del RICE, ma che va sorvegliata mentre si avvicina. Elenca TUTTE
+# quelle con escalation_status due_soon o overdue, non solo quelle già in
+# initiatives — stesso motivo di mandates_status: è prima di entrare in
+# lavorazione che rischiano di passare inosservate. Popolato leggendo
+# escalation_status calcolato da deadline-watch (non ricalcolato qui).
+deadline_alerts:
+  - idea_id: ""
+    classification: ""                 # idea | strategic_exception
+    due_date: null
+    escalation_status: ""              # on_track | due_soon | overdue
+    rice_rank_note: null                # opzionale: posizione approssimativa in backlog, se classification: idea
+    current_status: ""                   # status corrente dell'idea
+
 # unscored_ideas elenca le idee classification: idea ancora con
 # rice_history vuoto — stesso principio di mandates_status: renderle
 # visibili anche se non sono ancora in initiatives, perché è esattamente

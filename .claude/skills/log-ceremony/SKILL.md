@@ -1,6 +1,6 @@
 ---
 name: log-ceremony
-description: Registra una cerimonia collettiva (Backlog Refinement, Roadmap & Iteration Planning, ecc.) a partire dalla sua trascrizione grezza, producendo un record strutturato di decisioni collegato a idee/roadmap impattati. Per il Backlog Refinement rileva anche reprioritizzazioni fuori RICE e richiama nsm-watch, measurement-watch, mandate-watch e rice-watch per segnalare NSM in degrado, impatti mancati, iniziative mandatarie a rischio e idee ancora senza RICE. Usala dopo una riunione di team.
+description: Registra una cerimonia collettiva (Backlog Refinement, Roadmap & Iteration Planning, ecc.) a partire dalla sua trascrizione grezza, producendo un record strutturato di decisioni collegato a idee/roadmap impattati. Per il Backlog Refinement rileva anche reprioritizzazioni fuori RICE e richiama nsm-watch, measurement-watch, mandate-watch, deadline-watch e rice-watch per segnalare NSM in degrado, impatti mancati, iniziative mandatarie e scadenze su idee normali a rischio, e idee ancora senza RICE. Usala dopo una riunione di team.
 ---
 
 # log-ceremony
@@ -125,28 +125,38 @@ ricorrente del team.
     proposte automatiche da questo passo: `mandate-watch` non ne genera,
     e `log-ceremony` non ne aggiunge di proprie.
 
-11. **Richiama anche `rice-watch`.** Stesso principio, ma per le idee
+11. **Richiama anche `deadline-watch`, subito dopo `mandate-watch`.**
+    Stesso tipo di segnale (una scadenza esterna in avvicinamento), ma
+    per idee normali o strategic exception che non sono (ancora)
+    `classification: mandate` — playbook, "Scadenze su idee normali
+    (`deadline`)". Se emergono idee `due_soon` (4 settimane o meno) o
+    `overdue`, includile nel riepilogo (passo 13) con la **stessa forza**
+    con cui `deadline-watch` le ha segnalate — non attenuarle qui: sono
+    un push esplicito al PM, non una nota informativa.
+
+12. **Richiama anche `rice-watch`.** Stesso principio, ma per le idee
     normali senza RICE: senza questo controllo periodico, un'idea in
     attesa di un'informazione da uno stakeholder rischia di restare
     dimenticata nel bucket. Se emergono idee `stale` o `blocked_on`,
-    includile esplicitamente nel riepilogo (passo 12) — anche qui, solo
+    includile esplicitamente nel riepilogo (passo 13) — anche qui, solo
     segnalazione, nessuna azione automatica.
 
-12. Mostra un riepilogo delle decisioni estratte all'utente prima di
+13. Mostra un riepilogo delle decisioni estratte all'utente prima di
     considerare il log completo — è più facile correggere un
     fraintendimento ora che scoprirlo settimane dopo in una revisione.
     Se sono state rilevate reprioritizzazioni, includile esplicitamente
     nel riepilogo, distinguendo le due categorie. Se `nsm-watch`,
-    `measurement-watch`, `mandate-watch` o `rice-watch` hanno segnalato
-    elementi a rischio, includili con la stessa evidenza — non in coda,
-    non come nota a margine — e **apri sempre il riepilogo con gli
-    allarmi di `nsm-watch`**, se ce ne sono: è il segnale più strategico
-    della cerimonia, per playbook.
+    `measurement-watch`, `mandate-watch`, `deadline-watch` o `rice-watch`
+    hanno segnalato elementi a rischio, includili con la stessa evidenza
+    — non in coda, non come nota a margine — e **apri sempre il
+    riepilogo con gli allarmi di `nsm-watch`**, se ce ne sono (è il
+    segnale più strategico della cerimonia, per playbook), seguiti dalle
+    scadenze `overdue`/`due_soon` di `mandate-watch` e `deadline-watch`.
 
-13. **Sincronizza il repo**: esegui
+14. **Sincronizza il repo**: esegui
     `bash .claude/hooks/governance-sync.sh push "log-ceremony: <ceremony_type> <periodo>" product/ceremonies/ product/approvals/pending/`
     (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Le watch
-    richiamate ai passi 8-11 hanno già sincronizzato le proprie scritture
+    richiamate ai passi 8-12 hanno già sincronizzato le proprie scritture
     su `idea.yaml`/`nsm-tracking.yaml` con un commit dedicato ciascuna;
     questo passo cattura i file della cerimonia e le eventuali proposte in
     `pending/`. Se l'helper segnala un push fallito, riferiscilo nel

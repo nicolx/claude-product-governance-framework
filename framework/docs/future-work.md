@@ -24,7 +24,8 @@ direttamente. Non ancora progettato né costruito.
   reminder periodici ai PM quando ci sono processi in sospeso —
   candidati naturali: voci in `product/approvals/pending/` più vecchie
   di qualche giorno, idee `stale`/`blocked_on` da `rice-watch`, mandate
-  `due_soon`/`overdue`/`pending_review` da `mandate-watch`. Oggi questi
+  `due_soon`/`overdue`/`pending_review` da `mandate-watch`, idee
+  `due_soon`/`overdue` da `deadline-watch`. Oggi questi
   controlli esistono solo come skill Claude Code richiamate
   manualmente/durante il Backlog Refinement — un livello applicativo
   potrebbe renderli proattivi invece che "pull" (il PM deve chiedere).

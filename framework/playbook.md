@@ -267,7 +267,7 @@ candidato e richiama `context-intake`, che **propone l'aggiornamento e lo
 scrive solo dopo conferma esplicita del PM** nella stessa conversazione.
 A differenza delle poche scritture dirette che il framework ammette senza
 passare da `product/approvals/pending/` (`mandate-watch`, `rice-watch`,
-`nsm-watch`), qui non si tratta di un fatto mai presunto ma di
+`nsm-watch`, `deadline-watch`), qui non si tratta di un fatto mai presunto ma di
 un'interpretazione di materiale grezzo — per questo la conferma in
 conversazione è sempre richiesta, anche se non serve la coda `pending/`
 completa (non è una decisione di priorità).
@@ -290,7 +290,7 @@ hook**, non alla memoria del PM:
   Claude Code (hook `SessionStart`) e all'inizio delle skill che
   dipendono dal quadro completo — `inbox-triage`, `roadmap-snapshot`,
   `pending-approval`, `jira-sync` (pull), e le watch (`nsm-watch`,
-  `mandate-watch`, `rice-watch`, `measurement-watch`).
+  `mandate-watch`, `deadline-watch`, `rice-watch`, `measurement-watch`).
 - **Commit + push**: come ultimo passo di ogni skill che scrive stato
   tracciato (`idea-intake`, `inbox-triage`, `rice-update`, `prd-draft`,
   `log-ceremony`, `roadmap-snapshot`, `pending-approval`,
@@ -436,7 +436,7 @@ la memoria di cosa era già stato deciso e da chi.
 - [ ] Le iniziative GO pre-esistenti sono entrate come strategic exception (`invoked_at_stage: intake`) o mandate, con `approved_by`/`mandated_by` e `reason` espliciti, non presunti?
 - [ ] Le iniziative POSTPONED sono in bucket come idee normali, con il RICE dichiarato ancora da fare?
 - [ ] Le iniziative NO GO sono archiviate come `status: aborted`, non cancellate?
-- [ ] Dopo l'intake storico, `rice-watch` e `mandate-watch` sono stati eseguiti una volta per fotografare lo stato di partenza?
+- [ ] Dopo l'intake storico, `rice-watch`, `mandate-watch` e `deadline-watch` sono stati eseguiti una volta per fotografare lo stato di partenza?
 
 ## Ideas prioritization
 
@@ -576,6 +576,59 @@ qualcuno se ne ricorda.
 - [ ] Le idee ancora senza RICE sono state riviste all'ultimo Backlog Refinement, indipendentemente da quanto sembrino vecchie o marginali?
 - [ ] Per le idee senza RICE da più di qualche settimana: è chiaro cosa manca e a chi è stato chiesto?
 
+## Scadenze su idee normali (`deadline`)
+
+*"A goal is a dream with a deadline." — Napoleon Hill*
+
+Non tutte le iniziative con una scadenza reale nascono già come
+Iniziativa Mandataria (sezione successiva) o come Strategic Exception.
+Un'idea può competere normalmente sul RICE e **avere comunque un vincolo
+di tempo esterno** — un impegno preso con un cliente, una finestra
+commerciale, una data che qualcuno ha già comunicato all'esterno — senza
+che questo sia (ancora) abbastanza per giustificare il bypass completo
+del RICE previsto per un mandate. È il caso più comune e il più facile
+da perdere: la scadenza non salta all'occhio come un mandate dichiarato,
+e un'idea con RICE score modesto può restare tranquilla in backlog fino
+a quando la finestra si chiude.
+
+Il framework tiene questo caso **distinto e più leggero** di `mandate`:
+un blocco `deadline` (`due_date`, `note`) compilabile su qualunque
+`classification` tranne `mandate` (che ha già il proprio). Impostarlo
+**non salta il RICE e non decide nulla da solo** — è un fatto reso
+visibile, non un'autorizzazione. La skill `deadline-watch` lo sorveglia:
+quando mancano **4 settimane o meno** alla scadenza, fa un push esplicito
+e forte al PM (non una riga tra le altre), chiedendo di scegliere tra tre
+strade — invocare una Strategic Exception, verificare se l'iniziativa
+soddisfa davvero la definizione di Iniziativa Mandataria e farla
+riclassificare, o lasciarla nel processo RICE normale perché la scadenza
+non è poi così rigida. **Nessuna delle tre è automatica**: `deadline-watch`
+segnala con la massima evidenza, la decisione resta del PM, con lo stesso
+principio delle altre watch del framework.
+
+**Riclassificare un'idea a `mandate`.** Se una scadenza dichiarata in
+`deadline` si rivela, alla prova dei fatti, una vera scadenza esterna
+rigida (compliance, contratto, evento fisso — vedi definizione nella
+sezione successiva), l'idea può passare da `classification: idea` (o
+`strategic_exception`) a `classification: mandate`. Non è un'operazione
+automatica: passa da `product/approvals/pending/` come qualunque altra
+decisione di priorità (`type: mandate_reclassification`), perché cambia
+come l'iniziativa compete. Il `rice_history` esistente **non si
+cancella**: resta append-only, come registro storico di cosa sarebbe
+valso nel processo normale — utile se in futuro si discute se la
+riclassificazione era giustificata.
+
+*Principi Agile da incarnare in questa fase:*
+- *A intervalli regolari il team riflette su come diventare più efficace,
+  poi regola il proprio comportamento di conseguenza.*
+- *Meglio fallire presto: una scadenza a rischio va scoperta con
+  settimane di anticipo, non il giorno prima.*
+
+**Checklist operativa**
+- [ ] Le idee con un vincolo di tempo esterno noto hanno `deadline.due_date` compilato, con `note` che spiega perché?
+- [ ] `deadline-watch` è stata eseguita all'ultimo Backlog Refinement?
+- [ ] Le idee `due_soon`/`overdue` hanno ricevuto una decisione esplicita del PM (Strategic Exception, riclassificazione, o conferma che restano nel processo normale) — non un silenzio?
+- [ ] Se un'idea è stata riclassificata a `mandate`: è passata da `product/approvals/pending/`, e il `rice_history` precedente è rimasto intatto?
+
 ## Iniziative Mandatarie
 
 *"Work expands so as to fill the time available for its completion." —
@@ -588,6 +641,17 @@ a una **scadenza esterna fissa** che il framework non controlla
 (compliance normativa, un contratto firmato con una data, un evento a
 calendario). Chiamiamo queste iniziative **Iniziative Mandatarie**
 (`mandate`).
+
+La soglia per il terzo caso è alta: una scadenza deve essere davvero
+**esterna e rigida** perché da sola giustifichi il bypass del RICE. Una
+scadenza più morbida (un obiettivo interno, una finestra desiderabile)
+su un'idea che per il resto compete normalmente non la rende mandataria —
+va nel blocco `deadline` (sezione precedente, "Scadenze su idee
+normali"), sorvegliato da `deadline-watch`. Se col tempo quella scadenza
+si rivela più rigida del previsto, l'idea si può riclassificare a
+`mandate` passando da `product/approvals/pending/`
+(`type: mandate_reclassification`) — mai automaticamente, e senza
+cancellare il `rice_history` già accumulato.
 
 Una Iniziativa Mandataria **non compete sul RICE** — non ha senso
 calcolare Reach/Impact/Confidence/Entanglement per decidere se "vale la pena":
@@ -727,8 +791,10 @@ stato rilasciato e di ciò che ha una scadenza in avvicinamento: quali
 iniziative stanno mostrando gli impatti attesi sulle metriche e quali
 no (sezione "Measurement"), quali iniziative mandatarie richiedono
 attenzione per la loro scadenza (sezione "Iniziative Mandatarie"), quali
-idee restano senza RICE da troppo tempo (sezione "Ideas prioritization").
-Solo dopo si passa a decidere le priorità del prossimo periodo — è più
+idee normali hanno una scadenza dichiarata in avvicinamento (sezione
+"Scadenze su idee normali"), quali idee restano senza RICE da troppo
+tempo (sezione "Ideas prioritization"). Solo dopo si passa a decidere le
+priorità del prossimo periodo — è più
 facile prioritizzare bene quando si parte da un quadro aggiornato di cosa
 sta già funzionando, invece di scoprirlo a posteriori.
 
@@ -1193,6 +1259,9 @@ per la propria Product Line.
 **Strategic Exception** — Meccanismo che consente a una richiesta di
 bypassare il normale processo di prioritizzazione, su approvazione di un
 livello dirigenziale definito dall'istanza. Deve essere rara e motivata.
+Se la motivazione è (anche) una scadenza reale, può portare un blocco
+`deadline` (vedi voce dedicata) per rendere quella motivazione
+verificabile nel tempo, non solo testo libero in `reason`.
 
 **Iniziativa Mandataria (mandate)** — Iniziativa che bypassa il RICE
 perché imposta dall'alto, marcata "critical" da leadership, o vincolata a
@@ -1200,7 +1269,20 @@ una scadenza esterna fissa — non l'analisi, che resta necessaria. A
 differenza della Strategic Exception, non richiede un'approvazione di
 ruolo specifico, ma richiede sempre di dichiarare esplicitamente chi la
 impone e perché, e una stima di lead time verificata ad ogni Backlog
-Refinement. Vedi sezione "Iniziative Mandatarie".
+Refinement. Vedi sezione "Iniziative Mandatarie". Un'idea normale può
+essere riclassificata a mandate a posteriori se una scadenza dichiarata
+in `deadline` si rivela soddisfare davvero questa definizione — passa
+comunque da `product/approvals/pending/` (`type:
+mandate_reclassification`), non è mai automatico.
+
+**Deadline (scadenza su idea normale)** — Blocco opzionale (`due_date`,
+`note`) compilabile su qualunque `classification` tranne `mandate` (che
+ha già il proprio `due_date`): rende visibile che un'idea RICE-ranked o
+una Strategic Exception ha comunque un vincolo di tempo esterno, **senza
+bypassare da solo il RICE**. Sorvegliato dalla skill `deadline-watch`,
+che fa un push esplicito quando mancano 4 settimane o meno alla
+scadenza — segnala, non decide. Vedi sezione "Scadenze su idee normali
+(`deadline`)".
 
 **Platform** — Debito tecnico o attività devops pura. Bypassa il RICE
 perché la priorità è giudizio del team tech dentro una capacità protetta,

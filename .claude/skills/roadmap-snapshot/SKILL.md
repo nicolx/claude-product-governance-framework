@@ -1,6 +1,6 @@
 ---
 name: roadmap-snapshot
-description: Genera la proposta di snapshot settimanale della roadmap a partire dalle cerimonie loggate e dallo stato Jira, inclusi allarmi sulle NSM in degrado, capacità protetta per il debito tecnico (platform), iniziative mandatarie a rischio, idee senza RICE e stato delle misurazioni — scrivendola in product/approvals/pending/, mai direttamente in product/roadmap/snapshots/.
+description: Genera la proposta di snapshot settimanale della roadmap a partire dalle cerimonie loggate e dallo stato Jira, inclusi allarmi sulle NSM in degrado, capacità protetta per il debito tecnico (platform), iniziative mandatarie a rischio, scadenze in avvicinamento su idee normali, idee senza RICE e stato delle misurazioni — scrivendola in product/approvals/pending/, mai direttamente in product/roadmap/snapshots/.
 ---
 
 # roadmap-snapshot
@@ -42,9 +42,9 @@ creato/aggiornato.
      `in_jira`, per popolare la lista `initiatives`.
    - Se i riepiloghi delle cerimonie non coprono già lo stato più
      recente, richiama direttamente `nsm-watch`, `mandate-watch`,
-     `rice-watch` e `measurement-watch` prima di comporre lo snapshot —
-     le sezioni sotto non vanno mai lasciate vuote solo perché la
-     cerimonia non le ha toccate quella settimana.
+     `deadline-watch`, `rice-watch` e `measurement-watch` prima di
+     comporre lo snapshot — le sezioni sotto non vanno mai lasciate vuote
+     solo perché la cerimonia non le ha toccate quella settimana.
 
 3. Componi il contenuto secondo
    `framework/schema/roadmap-snapshot.template.yaml`:
@@ -76,13 +76,19 @@ creato/aggiornato.
      `status` diverso da `done`/`aborted` (non solo quelle già in
      `initiatives`), leggendo `escalation_status`/`analysis_start_by`
      già calcolati da `mandate-watch` — non ricalcolarli qui.
+   - `deadline_alerts`: le idee `classification: idea`/`strategic_exception`
+     (mai `mandate`) con `deadline.escalation_status` a `due_soon` o
+     `overdue`, leggendo il valore già calcolato da `deadline-watch` —
+     non ricalcolarlo qui. Stesso principio di `mandates_status`: vanno
+     rese visibili anche se non ancora in `initiatives`.
    - `unscored_ideas`: idee `classification: idea` con `rice_history`
      vuoto, leggendo `rice_status` già calcolato da `rice-watch`.
    - `measurements_status`: KPI (o assenza di KPI) delle iniziative con
      `status: done` e `closure.closed: false`, leggendo
      `measurement_status` già calcolato da `measurement-watch`.
-   - Se una di queste tre sezioni risulta vuota, verifica che sia
-     davvero perché non c'è nulla da segnalare, non perché la relativa
+   - Se una di queste sezioni (`mandates_status`, `deadline_alerts`,
+     `unscored_ideas`, `measurements_status`) risulta vuota, verifica che
+     sia davvero perché non c'è nulla da segnalare, non perché la relativa
      skill non è mai stata richiamata in questo ciclo.
 
 4. Crea la proposta in

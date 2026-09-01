@@ -89,7 +89,7 @@ domanda in più.
    sia per il caso 2. Dedurre contesto aziendale da un documento è
    un'interpretazione, non un fatto osservato: non rientra tra le poche
    scritture dirette che il framework ammette senza conferma (vedi
-   `mandate-watch`/`rice-watch`/`nsm-watch`, limitate a fatti mai
+   `mandate-watch`/`rice-watch`/`nsm-watch`/`deadline-watch`, limitate a fatti mai
    presunti). Non serve la coda `product/approvals/pending/` (non è una
    decisione di priorità), ma la conferma in conversazione sì, sempre.
 

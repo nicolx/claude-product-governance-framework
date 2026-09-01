@@ -24,8 +24,8 @@ l'attenzione lì, non un'eccezione da gestire in silenzio.
 - **Richiamata da `log-ceremony`**, e **per prima tra tutte le watch**
   in apertura del Backlog Refinement — è il segnale più strategico, va
   visto prima di misurare l'impatto delle singole iniziative
-  (`measurement-watch`) o fare housekeeping operativo (`mandate-watch`,
-  `rice-watch`).
+  (`measurement-watch`) o di controllare le scadenze e l'housekeeping
+  operativo (`mandate-watch`, `deadline-watch`, `rice-watch`).
 
 ## Passi
 

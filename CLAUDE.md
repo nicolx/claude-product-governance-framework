@@ -33,9 +33,11 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `context/` | Istanza, **tracciata da git** (a differenza di `product/inbox/`) | Solo `context-intake`, sempre con conferma esplicita del PM prima di scrivere — è interpretazione di materiale grezzo, non un fatto mai presunto come `jira.status`/`rice_status`. Nessuna approvazione via `pending/` (non è una decisione di priorità). Nessun file grezzo (PDF, slide, docx) vi persiste, né tracciato né gitignorato — vedi playbook, sezione "Contesto aziendale" |
 | `product/inbox/` | Istanza, NON tracciata da git | `inbox-triage` la svuota spostando ogni elemento altrove; nessuna approvazione richiesta per lo spostamento in sé |
 | `product/ideas/`, `product/prds/` (creazione) | Istanza | `idea-intake`, `inbox-triage`, `prd-draft` — creazione diretta, non passa da approvazione (non è ancora una decisione di priorità) |
-| `product/ideas/*/rice_history`, `product/ideas/*/strategic_exceptions`, `product/ideas/*/mandate` (dopo la creazione), `product/roadmap/`, comunicazioni in uscita | Istanza | Solo tramite `product/approvals/pending/` — vedi regola sotto |
+| `product/ideas/*/rice_history`, `product/ideas/*/strategic_exceptions`, `product/ideas/*/mandate` (dopo la creazione), `product/ideas/*/classification` (riclassificazione a `mandate`), `product/roadmap/`, comunicazioni in uscita | Istanza | Solo tramite `product/approvals/pending/` — vedi regola sotto |
 | `product/ideas/*/mandate.analysis_start_by`, `product/ideas/*/mandate.escalation_status` | Istanza | Solo `mandate-watch` — fatti calcolati, non decisioni, scrittura diretta senza approvazione (stesso principio di `jira.status`) |
 | `product/ideas/*/rice_status` | Istanza | Solo `rice-watch` — `flagged_since` è un fatto osservato; `blocked_reason`/`waiting_on` sono cattura di contesto (chiesti al PM, mai presunti), non decisioni di priorità: nessuna delle due passa da approvazione |
+| `product/ideas/*/deadline.due_date`, `product/ideas/*/deadline.note` | Istanza | Qualunque skill che la incontra in conversazione (tipicamente `idea-intake`/`inbox-triage` all'origine) — cattura di un fatto dichiarato dal PM, mai presunto; impostarlo non cambia la priorità, stessa logica di `rice_status`, nessuna approvazione |
+| `product/ideas/*/deadline.escalation_status` | Istanza | Solo `deadline-watch` — fatto calcolato, scrittura diretta senza approvazione (stesso principio di `mandate.escalation_status`) |
 | `product/prds/*/measurement*.yaml` (creazione) | Istanza | Solo `prd-draft`, contestualmente alla creazione del PRD — non passa da approvazione (stessa logica della creazione di idee/PRD) |
 | `product/prds/*/measurement*.yaml` (readings, measurement_status, follow_up_needed, closure) | Istanza | Solo `measurement-watch` — letture riportate dal PM e `closure` sono cattura di decisioni/fatti già espressi in conversazione (mai presunti, mai chiusi di iniziativa propria), `measurement_status` è calcolato dai dati. Nessuno di questi passa da approvazione |
 | `product/reference/nsm-tracking.yaml` | Istanza | Solo `nsm-watch` — creato lazy al primo run (non da `init-governance-project`), scritto direttamente: `readings`/`trend_status`/`alert.status` sono fatti/calcoli osservati, `discovery_focus_confirmed`/`resolved_*` sono cattura di decisioni già espresse dal PM in conversazione. Nessuno di questi passa da approvazione |
@@ -78,6 +80,12 @@ Nessuna skill scrive mai direttamente in `product/ideas/`, `product/prds/`,
   `is_critical` di un'iniziativa mandataria **dopo** la creazione (la
   creazione stessa non passa da qui, stessa logica delle idee normali) —
   vedi `idea.template.yaml`, blocco `mandate`, e skill `mandate-watch`
+- Ogni riclassificazione di un'idea `classification: idea`/
+  `strategic_exception` a `mandate` quando una scadenza dichiarata in
+  `deadline` (tipicamente segnalata da `deadline-watch`) si rivela
+  soddisfare davvero la definizione di Iniziativa Mandataria (`type:
+  mandate_reclassification`) — il `rice_history` esistente non si
+  cancella, resta append-only come storico
 
 L'automazione propone (scrive in `pending/` con il diff/contenuto
 proposto), un umano approva esplicitamente (la voce si sposta in

@@ -54,6 +54,17 @@ Quando l'utente approva una voce specifica (per nome file o descrizione):
      `mandate-watch`, non da questa approvazione; se il cambio di
      `due_date`/`lead_time_weeks` li rende stale, segnala all'utente di
      rilanciare `mandate-watch` dopo l'approvazione, non ricalcolarli qui.
+   - `mandate_reclassification`: cambia `classification` a `mandate` e
+     popola il blocco `mandate` con i valori iniziali del payload
+     (`mandated_by`, `rationale`, `is_critical`, `due_date`,
+     `lead_time_weeks`). **Non toccare `rice_history`** — resta
+     esattamente com'era, append-only, come registro storico di cosa
+     l'idea valeva nel processo RICE normale prima della
+     riclassificazione. Non compilare `analysis_start_by`/
+     `escalation_status`: li calcola `mandate-watch` al run successivo.
+     Se l'idea aveva un blocco `deadline` valorizzato, lascialo intatto
+     (diventa ridondante con `mandate.due_date` ma non va rimosso — è
+     parte della storia di come si è arrivati alla riclassificazione).
 3. Imposta `decision: approved`, `decided_by` (chiedi conferma di chi sta
    approvando se non ovvio dal contesto), `decided_at`.
 4. Sposta il file da `product/approvals/pending/` a
