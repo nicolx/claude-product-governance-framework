@@ -166,6 +166,34 @@ strategic_exceptions: []
 #   reason: ""                              # perché è stata accolta comunque
 #   ceremony_ref: "product/ceremonies/backlog-refinement/2026-W02"  # null se invocata all'intake
 
+# --- Scadenza esterna, per QUALUNQUE classification tranne mandate
+# (idea, strategic_exception, platform — mandate ha già il proprio
+# mandate.due_date, vedi sotto) ---
+#
+# Distinzione dal blocco `mandate`: `mandate.due_date` esiste SOLO
+# quando l'iniziativa già salta il RICE per definizione (imposta
+# dall'alto, "critical", o scadenza esterna rigida — playbook,
+# "Iniziative Mandatarie"). Questo blocco copre il caso più comune e più
+# insidioso: un'idea NORMALE (con RICE reale) — o una strategic_exception
+# già invocata per un'altra ragione — che ha comunque una scadenza vera,
+# non abbastanza da giustificare da sola il bypass del RICE, ma
+# abbastanza da meritare sorveglianza mentre si avvicina. Impostarlo
+# **non salta il RICE e non decide nulla da solo**: è un fatto reso
+# visibile — la decisione (Strategic Exception, riclassificare a
+# `mandate` se soddisfa davvero quella definizione, o lasciare che il
+# RICE segua il suo corso) resta del PM. Vedi playbook, "Ideas
+# prioritization" -> "Scadenze su idee normali", e skill `deadline-watch`.
+#
+# due_date/note vanno sempre chiesti esplicitamente, mai presunti (stesso
+# principio garantista di mandated_by/rationale). Scrittura diretta, non
+# passa da product/approvals/pending/: impostarlo non cambia la priorità,
+# stessa logica di rice_status. escalation_status è invece CALCOLATO
+# dalla skill `deadline-watch`, non va mai compilato a mano.
+deadline:
+  due_date: null                # data precisa, mai "presto"/"appena possibile" — null se non c'è una scadenza reale
+  note: null                     # perché c'è questa scadenza (contratto, impegno con un cliente, evento) — mai presunta
+  escalation_status: null        # on_track | due_soon | overdue — calcolato da deadline-watch; null finché due_date è null
+
 # --- Solo per classification: mandate ---
 #
 # A differenza di strategic_exceptions (che tiene uno storico di eventi
@@ -184,6 +212,15 @@ strategic_exceptions: []
 # a mano. Le modifiche a due_date/lead_time_weeks/mandated_by dopo la
 # creazione iniziale passano invece da product/approvals/pending/
 # (type: mandate_update) come un diff RICE.
+#
+# Riclassificazione a mandate di un'idea già esistente (classification:
+# idea o strategic_exception, tipicamente segnalata da deadline-watch
+# quando il blocco `deadline` sopra si avvicina e soddisfa la
+# definizione di mandate): passa da product/approvals/pending/
+# (type: mandate_reclassification), MAI applicata direttamente — cambia
+# come l'iniziativa compete, va tracciata come le altre decisioni di
+# priorità. rice_history esistente NON si cancella: resta append-only,
+# come registro storico di cosa sarebbe valso nel processo RICE normale.
 mandate:
   mandated_by: null             # persona/organo che impone l'iniziativa — mai presunto
   rationale: null                # perché è mandataria (compliance, direttiva strategica, contratto, evento fisso)

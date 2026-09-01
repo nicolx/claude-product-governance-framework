@@ -162,7 +162,12 @@ soli non coprono. In sintesi:
      da solo: segnala all'utente cosa è arrivato e perché potrebbe
      essere rilevante (es. "questo materiale sembra invalidare la stima
      di Reach fatta il 12/01 — vuoi che lanci rice-update?"). Applica lo
-     stesso principio del RICE: proponi, non decidere.
+     stesso principio del RICE: proponi, non decidere. **Eccezione**: se
+     il materiale rivela una scadenza esterna prima non nota per
+     un'idea `classification: idea`/`strategic_exception`, chiedi conferma
+     al PM e compila il blocco `deadline` (`due_date`/`note`) — è cattura
+     di un fatto dichiarato, non una decisione di priorità, quindi
+     scrittura diretta (vedi playbook, "Scadenze su idee normali").
 
    - **Aggiornamento/integrazione di un PRD esistente** — sposta il
      materiale in `product/prds/{slug}/source/` (nome file che non
@@ -187,6 +192,9 @@ soli non coprono. In sintesi:
      presumere l'approvazione solo perché il mittente ha un ruolo senior.
      (Questo è distinto dal caso in cui un'idea normale salta la coda più
      avanti, in Backlog Refinement — vedi skill `log-ceremony`.)
+     Se dietro l'eccezione c'è una scadenza reale, compila anche il
+     blocco `deadline` (`due_date`/`note`, mai presunti) — rende la
+     motivazione verificabile nel tempo e la mette sotto `deadline-watch`.
 
    - **Mandate (iniziativa mandataria)** — stessa regola di
      `idea-intake`: iniziativa imposta dall'alto, "critical" per

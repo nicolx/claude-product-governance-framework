@@ -32,7 +32,10 @@ agire da sola sulla priorità.
 1. **Elenca tutte le idee** in `product/ideas/*/idea.yaml` con
    `classification: mandate` e `status` diverso da `done` o `aborted`.
    Se non ce ne sono, dillo esplicitamente e fermati — non è un errore,
-   è uno stato normale.
+   è uno stato normale. Le idee `classification: idea`/
+   `strategic_exception` con solo un blocco `deadline` (non ancora
+   riclassificate a `mandate`) **non** rientrano qui: le copre
+   `deadline-watch`.
 
 2. **Per ciascuna, calcola `escalation_status`**:
    - Se `due_date` o `lead_time_weeks` sono `null`: `escalation_status:

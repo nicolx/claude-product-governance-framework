@@ -117,6 +117,16 @@ presente nel materiale di origine.
    NSM in degrado), chiedi se va collegata in `links.nsm_targeted` — non
    presumerlo solo perché il contesto della conversazione lo suggerisce.
 
+   **Scadenza esterna.** Se il materiale menziona una data entro cui
+   qualcosa va fatto (un impegno con un cliente, un evento, una finestra
+   commerciale) e **non** stai classificando l'unità come `mandate` o
+   `bug`, chiedi conferma e compila il blocco `deadline` (`due_date`
+   precisa + `note` sul perché) — vedi playbook, "Scadenze su idee
+   normali (`deadline`)". Non presumerla e non trasformarla in un
+   `mandate` da solo: registrarla rende la scadenza visibile a
+   `deadline-watch`, la decisione se serve un bypass resta successiva e
+   del PM.
+
 5. **Genera lo slug e crea la cartella**
    `product/ideas/{YYYY-MM-DD}-{slug-descrittivo}/` (data odierna o data
    del materiale di origine, a scelta più sensata per il caso). Lo slug è
