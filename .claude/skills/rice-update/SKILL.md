@@ -32,9 +32,19 @@ umana esplicita (skill `pending-approval`) la voce viene appesa a
      denominatore è `null`, segnala che il Reach risultante è
      un'approssimazione (per playbook) e chiedi se procedere comunque.
    - **Impact**: punti 1-10. Se l'utente fornisce un valore economico
-     assoluto, chiedi il target annuale di riferimento della Product Line
-     (o dell'istanza) per convertirlo in punti in modo coerente con le
-     altre idee.
+     assoluto, leggi `product/reference/annual-target.yaml` e converti:
+     `impact_points ≈ round(valore_iniziativa / target * 10)`, dove
+     `target` è l'override della Product Line dell'idea se presente in
+     `per_product_line`, altrimenti `value` a livello di istanza.
+     **`value` è l'incremento atteso nell'anno, non il totale a budget**
+     — se per qualche motivo devi ricavarlo da un totale, calcola il
+     delta e fallo confermare, non usare il totale. **Tappa a 10**: se il
+     valore dell'iniziativa eguaglia o supera l'intero incremento annuo,
+     `impact_points: 10`, la scala non va oltre. Se `value` è `null`
+     (target non ancora dichiarato), segnala che l'Impact risultante è
+     un'approssimazione qualitativa (per playbook, come per il
+     denominatore Reach) e chiedi all'utente il punteggio 1-10 a
+     giudizio, annotandolo nel `rationale`.
    - **Confidence**: 1-10, classificando la fonte secondo le soglie del
      playbook (opinione 1-3, aneddotico 3-6, quantitativo singola fonte
      6-8, quantitativo multi-fonte >8). Chiedi esplicitamente che tipo di

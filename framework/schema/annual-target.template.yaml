@@ -1,0 +1,47 @@
+# Template per product/reference/annual-target.yaml
+#
+# Il valore di riferimento per calibrare l'Impact del RICE (playbook,
+# "Ideas prioritization": "fatto 10pt il valore dell'incremento atteso
+# nell'anno, quanto vale questa attività?"). Popolato durante
+# l'inizializzazione dell'istanza (skill init-governance-project, passo 4
+# dell'intervista). Se non ancora noto all'init resta `null`, e ogni
+# Impact calcolato prima che sia dichiarato è un'approssimazione
+# qualitativa, non calibrata — stesso principio del reach_denominator in
+# product-lines.yaml.
+#
+# REGOLA NON NEGOZIABILE: `value` è l'INCREMENTO atteso nell'anno (il
+# delta rispetto all'anno precedente), MAI il totale a budget. Un PM
+# parla naturalmente in termini di target totale (es. "300k di EBITDA a
+# budget"): la domanda all'intake è scritta apposta per isolare
+# l'incremento (es. "di cui 30k di crescita sull'anno precedente"), e
+# quel 30k è il numero che va qui. Se arriva solo il totale (o totale +
+# crescita %), calcola il delta e fallo CONFERMARE esplicitamente dal PM
+# — non usare mai il totale come se fosse l'incremento.
+#
+# Conversione in punti: impact_points ≈ round(valore_iniziativa / value * 10),
+# con un tetto a 10. Un'iniziativa che da sola vale (o supera) l'intero
+# incremento annuo atteso sta a impact_points: 10 — la scala 1-10 non ha
+# headroom oltre "vale l'intero incremento dell'anno".
+
+metric: ""                    # es. "EBITDA incrementale atteso nell'anno" — sempre l'incremento, mai il totale
+year: null                     # anno di riferimento (il target cambia ogni anno col nuovo Budget/BP)
+value: null                    # SOLO l'incremento/delta atteso — null se non ancora noto, mai presunto
+currency: "EUR"
+
+context:                        # solo contesto/tracciabilità, MAI usato per calibrare Impact
+  total_budget_value: null      # il totale a budget, se il PM l'ha fornito insieme al delta
+  growth_rate_yoy: null         # la % di crescita sull'anno precedente, se nota
+
+source: ""                      # chi ha fornito il dato e quando — mai presunto
+owner: ""                       # chi lo aggiorna (tipicamente a ogni nuovo Budget/BP approvato)
+
+# Override per Product Line (opzionale). Se una Product Line ha un target
+# di incremento proprio, diverso dalla quota implicita del totale
+# istanza, dichiaralo qui esplicitamente — mai presunto pro-quota dal
+# totale. rice-update usa l'override della Product Line dell'idea se
+# presente, altrimenti `value` a livello di istanza.
+per_product_line: []
+# Esempio di singola voce:
+# - name: "Onboarding and integration"   # deve corrispondere a un name in product-lines.yaml
+#   value: null
+#   note: ""

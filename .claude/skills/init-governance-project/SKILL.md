@@ -41,7 +41,23 @@ per raccogliere:
    fonte, owner) — se l'utente non lo sa ancora, lascialo `null` con nota,
    **non inventarlo**: il playbook è esplicito che un Reach non
    formalizzato resta un'approssimazione.
-4. **Repository applicativi da collegare** — per ciascuno: URL git,
+4. **Target annuale di riferimento per l'Impact** — serve per convertire
+   un valore economico assoluto in punti Impact 1-10 (playbook, "Ideas
+   prioritization"). Chiedi **esplicitamente l'incremento atteso**, non
+   il totale a budget: "Qual è il **delta** di [EBITDA, o altra metrica
+   economica che userete] atteso quest'anno rispetto all'anno
+   precedente?" Un PM risponde naturalmente col totale a budget (es.
+   "300k"): incalza per isolare l'incremento (es. "di cui 30k di crescita
+   sull'anno precedente") — **il numero che serve è l'incremento**. Se ti
+   dà solo il totale + una crescita %, calcola il delta e **fallo
+   confermare**, non usarlo di iniziativa. Popola
+   `product/reference/annual-target.yaml` da
+   `framework/schema/annual-target.template.yaml`. Se il PM non lo sa
+   ancora (BP/Budget dell'anno non ancora approvato), lascia `value:
+   null` con nota — **non bloccare l'inizializzazione**, ma segnala che
+   ogni Impact calcolato prima resta un'approssimazione qualitativa, non
+   calibrata (stesso principio del denominatore Reach).
+5. **Repository applicativi da collegare** — per ciascuno: URL git,
    nome/slug con cui va montato sotto `apps/`. Per ognuno esegui:
    `git submodule add <url> apps/<slug>`. Se l'utente non ha ancora repo
    da collegare, salta questo passo e nota in `.governance/config.yaml`
@@ -73,12 +89,12 @@ per raccogliere:
      l'eccezione.
    Sostituire con un vero submodule non appena il codice sarà distribuito
    via git.
-5. **Jira** (o altro tracker di esecuzione) — project key, URL board. Solo
+6. **Jira** (o altro tracker di esecuzione) — project key, URL board. Solo
    configurazione, nessun collegamento realtime va creato qui.
-6. **Eventuali altre configurazioni rilevanti** — canale Slack/Teams per
+7. **Eventuali altre configurazioni rilevanti** — canale Slack/Teams per
    comunicazioni, link a strumenti di analytics (es. DataBricks), altro
    che l'utente ritenga utile avere a portata di mano nel config.
-7. **Materiale di contesto aziendale già disponibile** — chiedi se il PM
+8. **Materiale di contesto aziendale già disponibile** — chiedi se il PM
    ha materiale (bilanci pubblici, slide, export Confluence, documenti
    strategici) utile a capire il business/l'azienda, non solo il
    prodotto. Se sì, non serve trascriverlo a mano ora: crea `context/`
@@ -109,25 +125,29 @@ che serve da lì e chiedi solo quello che manca.
    spegnerle qui (per un'istanza mono-PM, o un setup git particolare) se
    non le vuole.
 2. `product/reference/product-lines.yaml` (da template).
-3. `product/reference/friction-log.yaml` (da template, vuoto).
+3. `product/reference/annual-target.yaml` (da
+   `framework/schema/annual-target.template.yaml`) — con l'incremento
+   raccolto al passo 4 dell'intervista, o `value: null` con nota se non
+   ancora noto.
+4. `product/reference/friction-log.yaml` (da template, vuoto).
    Non creare qui `product/reference/nsm-tracking.yaml`: baseline e
    target delle NSM spesso richiedono un giro su DataBricks/analytics
    che non è pratico fare a metà di questa intervista — lo scaffolda la
    skill `nsm-watch` al suo primo run, quando il PM ha il tempo di
    recuperare i valori con calma.
-4. Scaffold vuoto: `product/ideas/`, `product/prds/`,
+5. Scaffold vuoto: `product/ideas/`, `product/prds/`,
    `product/roadmap/snapshots/`, `product/ceremonies/`,
    `product/approvals/pending/`, `product/approvals/decided/`,
    `product/inbox/` (con `.gitkeep` dove servono, git non traccia
    cartelle vuote). `product/inbox/` è già coperta dal `.gitignore` di
    root (contenuto non tracciato — vedi skill `inbox-triage`): non
    toglierla dal `.gitignore` per questa istanza.
-5. `context/` alla **radice del repository** (non sotto `product/`, vedi
+6. `context/` alla **radice del repository** (non sotto `product/`, vedi
    playbook sezione "Contesto aziendale") — con `.gitkeep` se resta
    vuota. A differenza di `product/inbox/`, **non va aggiunta al
    `.gitignore`**: il contenuto che ci finisce (via `context-intake`) è
    già la trascrizione tracciabile, non il materiale grezzo. Se il PM ha
-   fornito materiale al passo 7 dell'intervista, droppalo qui e richiama
+   fornito materiale al passo 8 dell'intervista, droppalo qui e richiama
    `context-intake` prima di chiudere l'inizializzazione.
 
 ## Dopo l'inizializzazione
@@ -141,8 +161,9 @@ che serve da lì e chiedi solo quello che manca.
   tenere allineati `origin` e i cloni del team.
 - Riepiloga all'utente cosa è stato creato e cosa resta da fare (es.
   submodule non ancora collegati, denominatori Reach non ancora
-  formalizzati, materiale di contesto aziendale non ancora fornito se
-  `context/` è rimasta vuota).
+  formalizzati, **target annuale di Impact non ancora dichiarato**
+  (`product/reference/annual-target.yaml`, `value: null`), materiale di
+  contesto aziendale non ancora fornito se `context/` è rimasta vuota).
 - Ricorda che da questo momento in poi nessuna scrittura in `product/`
   deve avvenire senza passare da `product/approvals/pending/` — vedi
   `CLAUDE.md` e `framework/playbook.md`.

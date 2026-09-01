@@ -49,6 +49,13 @@ segnalalo invece di procedere.
    - "il playbook ha aggiornato le soglie di Confidence" → spiega la
      nuova soglia e se qualche RICE esistente andrebbe rivalutato.
    - "è stata aggiunta la skill X" → spiega cosa fa e quando userla.
+   - "è stato aggiunto un file di riferimento di istanza" (es.
+     `framework/schema/annual-target.template.yaml`, nuovo) → l'istanza
+     non ha ancora il file corrispondente in `product/reference/`.
+     Proponi di crearlo dal template e di raccogliere il dato mancante
+     (nel caso di `annual-target.yaml`: l'incremento annuo atteso, non il
+     totale a budget — vedi il template) — senza bloccare, ma segnalando
+     cosa resta approssimato finché non è dichiarato.
    - "lo schema di `idea.yaml` ha un nuovo campo obbligatorio" →
      **questo è il caso che richiede attenzione**: segnala esplicitamente
      che le idee esistenti in `product/ideas/` potrebbero non avere quel

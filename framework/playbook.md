@@ -467,9 +467,19 @@ RICE è un framework di prioritizzazione basato su quattro parametri:
 - **(I)mpact →** Quali sono gli impatti attesi? Più ricavi, risparmio di
   costo, o — per temi legali/compliance — rischio se non si accoglie?
   Un ottimo modo per esprimerlo: "fatto 10pt il valore dell'incremento
-  atteso nell'anno (es. EBITDA), quanto vale questa attività?" Un target
-  annuale di riferimento va dichiarato per l'istanza (es. in
-  `product/reference/`), così ogni iniziativa si può convertire in punti.
+  atteso nell'anno (es. EBITDA), quanto vale questa attività?" Il target
+  annuale di riferimento va dichiarato per l'istanza in
+  `product/reference/annual-target.yaml` (raccolto nell'intervista di
+  `init-governance-project`, passo 4) — così ogni iniziativa si converte
+  in punti in modo coerente. **Attenzione: è l'incremento atteso — il
+  delta sull'anno precedente — non il totale a budget.** Un PM parla
+  naturalmente in termini di totale (es. "300k a budget"); il numero che
+  serve è solo la crescita di quel totale rispetto all'anno prima (es.
+  30k). Un'iniziativa che da sola vale l'intero incremento annuo sta a
+  Impact 10 — la scala non ha headroom oltre. Finché
+  `annual-target.yaml` ha `value: null`, ogni Impact è
+  un'approssimazione qualitativa e va trattato come tale (stesso
+  principio del denominatore Reach).
 
 - **(C)onfidence →** Misura **la qualità dell'evidenza a supporto delle
   stime di Reach e Impact** — non quanta analisi è stata fatta, non
@@ -569,6 +579,7 @@ qualcuno se ne ricorda.
 - [ ] I quattro parametri RICE sono stati compilati (Reach, Impact, Confidence, Entanglement)?
 - [ ] Reach è espresso come percentuale sulla popolazione rilevante della Product Line?
 - [ ] Confidence riflette la qualità dell'evidenza, non la quantità di analisi svolta?
+- [ ] Se l'Impact nasce da un valore economico: è stato rapportato all'`annual-target.yaml` (l'incremento atteso, non il totale a budget), e tappato a 10 se lo eguaglia o supera?
 - [ ] Entanglement è stato stimato dal footprint reale del cambiamento (ispezione di `apps/` quando disponibile, o stima con un referente tecnico), non da un tempo-sviluppatore?
 - [ ] Lo stakeholder proponente ha confermato Reach e Impact?
 - [ ] L'idea è stata confrontata con le prime posizioni del backlog per coerenza del ranking?

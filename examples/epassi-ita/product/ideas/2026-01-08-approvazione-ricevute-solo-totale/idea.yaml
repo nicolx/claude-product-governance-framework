@@ -39,7 +39,7 @@ rice_history:
     reach_absolute_note: >-
       30% delle ricevute non riconosciute (che sono il 30% del totale) —
       Reach totale stimato 15%.
-    impact_points: 5
+    impact_points: 3
     confidence_score: 10
     confidence_evidence_tier: quantitative_multi_source
     entanglement_score: 2
@@ -49,12 +49,14 @@ rice_history:
       ricevute): si esclude una regola-filtro. Nessun consumer esterno,
       superficie di regressione limitata al motore stesso. apps/ non
       collegato in questo esempio, stima con Franco.
-    score: 375   # 15 * 5 * 10 / 2
+    score: 225   # 15 * 3 * 10 / 2
     rationale: >-
       Stima condivisa in meeting con Filiberto (proponente) e Franco
-      (referente tecnico): 4 FTE/anno risparmiati stimati (~100k EBITDA),
-      dato quantitativo con evidenze chiare, footprint minimo (rimozione
-      di una regola filtro nel motore esistente, cambiamento localizzato).
+      (referente tecnico): 4 FTE/anno risparmiati stimati (~100k EBITDA
+      = ~1/3 dei 300k di incremento atteso 2026, vedi annual-target.yaml
+      -> 3pt), dato quantitativo con evidenze chiare, footprint minimo
+      (rimozione di una regola filtro nel motore esistente, cambiamento
+      localizzato).
     approved_by: "Franco (referente tecnico)"
     ceremony_ref: null
 
