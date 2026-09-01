@@ -1,6 +1,6 @@
 ---
 name: idea-intake
-description: Trasforma materiale grezzo (email, trascrizione, segnalazione) in una nuova idea strutturata in product/ideas/, classificandola come idea/bug/strategic exception/mandate/platform secondo il playbook. Usala quando l'utente allega o incolla materiale nuovo da valutare.
+description: Trasforma materiale grezzo (email, trascrizione, segnalazione) in una nuova idea strutturata in product/ideas/, classificandola come idea/bug/strategic exception/mandate/platform — o scartandola al triage (declined) se non è roba da fare — secondo il playbook. Prepara sempre una bozza di risposta al richiedente. Usala quando l'utente allega o incolla materiale nuovo da valutare.
 ---
 
 # idea-intake
@@ -46,10 +46,10 @@ presente nel materiale di origine.
    RICE score indipendente e scollegato (Reach/Impact/Confidence/Entanglement
    diversi, senza che l'uno dipenda dall'altro), sono due idee, non una
    — non forzarle in un'unica cartella solo perché sono arrivate insieme.
-   Da qui in poi, ripeti i passi 3-7 **per ciascuna unità risultante**,
+   Da qui in poi, ripeti i passi 3-8 **per ciascuna unità risultante**,
    in modo completamente indipendente (classificazione, slug, RICE
-   futuro separati). Se invece il materiale è coeso (un solo problema
-   descritto da più angolazioni), resta un'unica idea.
+   futuro, bozza di risposta separati). Se invece il materiale è coeso
+   (un solo problema descritto da più angolazioni), resta un'unica idea.
 
 3. **Classifica** ogni unità risultante secondo il playbook:
    - **Bug** — se descrive un output diverso da quanto atteso per errore
@@ -71,7 +71,11 @@ presente nel materiale di origine.
      ma imposta `classification: strategic_exception` e aggiungi una voce
      a `strategic_exceptions` con `invoked_at_stage: intake` —
      `approved_by`/`reason` restano da confermare con l'utente, **non
-     assumere l'approvazione**, chiedila esplicitamente.
+     assumere l'approvazione**, chiedila esplicitamente. Prepara al passo
+     8 una bozza di risposta al richiedente (`requester_reply`,
+     `kind: strategic_exception_ack`) che dice "accolta su canale
+     privilegiato, **in attesa di conferma** da {autorità}" — mai
+     "approvata" finché non lo è.
    - **Mandate (iniziativa mandataria)** — se l'iniziativa è imposta
      dall'alto (leadership/board), marcata "critical" indipendentemente
      dai numeri, o vincolata a una scadenza esterna fissa (compliance,
@@ -105,14 +109,35 @@ presente nel materiale di origine.
      mai). Come `mandate`, **non salta l'analisi**: le iniziative
      importanti seguono comunque `in_analysis`/`in_prd`; quelle piccole
      possono saltare direttamente a `in_jira`, a giudizio del team tech.
-   - **Idea normale** — il caso di default.
+   - **Non è un'idea (scarto al triage)** — se il materiale non descrive
+     qualcosa su cui il team di prodotto può o deve lavorare: una
+     richiesta di supporto tecnico, un tema fuori dal perimetro del team,
+     qualcosa già coperto altrove, o semplicemente "non è roba da fare".
+     **Non scartarlo in silenzio.** Crea comunque la cartella idea (per
+     archivio/audit), imposta `status: declined` e compila
+     `decline_reason` in una riga. **Chiedi conferma esplicita al PM
+     prima di scrivere `declined`** — è un giudizio, non un fatto: tu
+     proponi ("questo sembra fuori perimetro perché…, lo segno come
+     scartato?"), il PM conferma. Prepara al passo 8 una bozza di
+     risposta al richiedente (`requester_reply`, `kind: decline`) che
+     spiega con tono rispettoso perché il team non può aiutare su questo,
+     e — se sensato — indirizza altrove.
 
-4. **Determina titolo, proponente, Product Line** (per la singola unità
-   che stai processando). Per convenzione, se il materiale è un'email,
-   usa l'oggetto come titolo — se l'email è stata decomposta in più
-   unità, aggiungi un breve suffisso che distingua i titoli tra loro. Se
-   la Product Line non è ovvia, chiedi — non indovinare tra le opzioni in
-   `product/reference/product-lines.yaml`. Se questa idea nasce da un
+   - **Idea normale** — il caso di default. Prepara al passo 8 una bozza
+     di risposta al richiedente (`requester_reply`, `kind:
+     acknowledgement`).
+
+4. **Determina titolo, `summary`, proponente, Product Line** (per la
+   singola unità che stai processando). Per convenzione, se il materiale
+   è un'email, usa l'oggetto come titolo — se l'email è stata decomposta
+   in più unità, aggiungi un breve suffisso che distingua i titoli tra
+   loro. **`summary`**: una riga in linguaggio piano che dica *cosa c'è
+   da fare*, comprensibile senza aprire `source/` — il titolo-oggetto
+   spesso non basta. È il campo mostrato nella lista ordinata del backlog
+   (`backlog-list`). Se non riesci a scriverla con quello che hai, è un
+   segnale che il materiale è troppo vago: valuta `needs_clarification`.
+   Se la Product Line non è ovvia, chiedi — non indovinare tra le opzioni
+   in `product/reference/product-lines.yaml`. Se questa idea nasce da un
    riorientamento di Discovery confermato dalla skill `nsm-watch` (una
    NSM in degrado), chiedi se va collegata in `links.nsm_targeted` — non
    presumerlo solo perché il contesto della conversazione lo suggerisce.
@@ -151,16 +176,46 @@ presente nel materiale di origine.
    skill `rice-update`, con la sua propria approvazione. Lascialo vuoto
    (`[]`).
 
-8. **Non serve passare da `product/approvals/pending/` per la creazione
+8. **Bozza di risposta al richiedente (chiudere il loop).** Vedi
+   playbook, "Chiudere il loop col richiedente". Compila `requester_reply`
+   **solo se c'è un richiedente esterno identificabile e raggiungibile**
+   (`proposer` non è il PM stesso, non è un'idea nata da un brainstorm
+   interno) — altrimenti `requester_reply.needed: false` e salta. Il
+   `kind` dipende dalla classificazione:
+   - **`acknowledgement`** (idea normale): la bozza copre tre cose —
+     (a) presa in carico; (b) **serve un meeting di approfondimento col
+     richiedente per fare un RICE serio?** (dato che solo lui ha,
+     problema da inquadrare meglio): se sì, `deep_dive_meeting_needed:
+     true` e compila `rice_status.deep_dive` (`needed: true`,
+     `requested_at:` oggi) — è così che `rice-watch` te lo ricorda finché
+     non avviene; (c) **prima ipotesi onesta di quando potrebbe essere
+     prioritizzata**: leggi il backlog ordinato (come fa `backlog-list`)
+     e dai una forbice realistica ("con ~N idee davanti a RICE più alto e
+     nessuna quotazione ancora, non prima di [trimestre/periodo]") — mai
+     una data precisa, mai una promessa.
+   - **`clarification_request`** (`status: needs_clarification`): la bozza
+     coincide con `clarification.draft_message` — non duplicare il testo,
+     valorizza solo `requester_reply.kind` qui.
+   - **`decline`** (`status: declined`): spiega con rispetto perché il
+     team non può aiutare, indirizza altrove se sensato.
+   - **`strategic_exception_ack`**: accolta su canale privilegiato, **in
+     attesa di conferma** da {autorità} — non "approvata" — + impegno a
+     restituire feedback sull'esito.
+   **Non inviare mai la bozza in automatico.** Mostrala all'utente nel
+   riepilogo; se c'è un'integrazione (email) chiedi conferma esplicita
+   per ogni singolo invio.
+
+9. **Non serve passare da `product/approvals/pending/` per la creazione
    di una nuova idea** (a differenza degli aggiornamenti a idee/roadmap
    già esistenti): l'intake è la prima cattura, non ancora una decisione
    di priorità. Comunicalo comunque chiaramente all'utente e mostragli il
    contenuto creato — **se sono state create più unità dalla stessa
    fonte, elencale tutte insieme nel riepilogo finale**, non una alla
    volta senza collegarle — prima di considerare il passo concluso.
+   Includi nel riepilogo le bozze di `requester_reply` generate.
 
-9. **Sincronizza il repo**: come ultimo passo, esegui
-   `bash .claude/hooks/governance-sync.sh push "idea-intake: <slug>[, +N unità]" product/ideas/`
-   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Se
-   l'helper segnala un push fallito o un disallineamento, riferiscilo nel
-   riepilogo — non ripetere le scritture.
+10. **Sincronizza il repo**: come ultimo passo, esegui
+    `bash .claude/hooks/governance-sync.sh push "idea-intake: <slug>[, +N unità]" product/ideas/`
+    (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Se
+    l'helper segnala un push fallito o un disallineamento, riferiscilo nel
+    riepilogo — non ripetere le scritture.

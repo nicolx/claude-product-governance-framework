@@ -137,8 +137,10 @@ ricorrente del team.
 12. **Richiama anche `rice-watch`.** Stesso principio, ma per le idee
     normali senza RICE: senza questo controllo periodico, un'idea in
     attesa di un'informazione da uno stakeholder rischia di restare
-    dimenticata nel bucket. Se emergono idee `stale` o `blocked_on`,
-    includile esplicitamente nel riepilogo (passo 13) — anche qui, solo
+    dimenticata nel bucket. Se emergono idee `stale`, `blocked_on` o
+    **`needs_deep_dive`** (aspettano un meeting col richiedente che il PM
+    deve organizzare — la categoria più actionable), includile
+    esplicitamente nel riepilogo (passo 13) — anche qui, solo
     segnalazione, nessuna azione automatica.
 
 13. Mostra un riepilogo delle decisioni estratte all'utente prima di

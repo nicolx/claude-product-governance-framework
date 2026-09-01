@@ -82,7 +82,10 @@ creato/aggiornato.
      non ricalcolarlo qui. Stesso principio di `mandates_status`: vanno
      rese visibili anche se non ancora in `initiatives`.
    - `unscored_ideas`: idee `classification: idea` con `rice_history`
-     vuoto, leggendo `rice_status` già calcolato da `rice-watch`.
+     vuoto, leggendo `rice_status` già calcolato da `rice-watch` —
+     incluso il `summary` dell'idea e, per quelle con
+     `rice_status.deep_dive.needed`, lo stato `needs_deep_dive:{richiedente}`
+     con da quanto il meeting è in sospeso.
    - `measurements_status`: KPI (o assenza di KPI) delle iniziative con
      `status: done` e `closure.closed: false`, leggendo
      `measurement_status` già calcolato da `measurement-watch`.

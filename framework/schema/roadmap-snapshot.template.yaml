@@ -110,10 +110,12 @@ deadline_alerts:
 unscored_ideas:
   - idea_id: ""
     title: ""
+    summary: ""                          # da idea.summary — cosa c'è da fare, in chiaro
     days_unscored: null                # calcolato al momento dello snapshot, non un campo persistito sull'idea
-    status: ""                          # fresh | aging | stale | blocked_on:{waiting_on}
+    status: ""                          # fresh | aging | stale | blocked_on:{waiting_on} | needs_deep_dive:{richiedente}
     blocked_reason: null
     waiting_on: null
+    deep_dive_pending_since: null        # se status needs_deep_dive: da quando il meeting è riconosciuto necessario e non ancora avvenuto
 
 # measurements_status elenca le KPI delle iniziative già rilasciate
 # (idea status: done) che meritano attenzione — non solo check_due/
