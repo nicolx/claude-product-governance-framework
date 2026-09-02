@@ -20,6 +20,17 @@ creato/aggiornato.
 
 ## Passi
 
+> **Dry-run.** Se la skill è stata invocata in modalità simulazione
+> (argomento `dry-run`, o `dry_run: true` in `.governance/config.yaml`),
+> applica il contratto della sezione "Modalità dry-run (simulazione)" del
+> playbook: esegui letture e analisi normalmente, **non** creare la
+> proposta in `product/approvals/pending/`, **non** invocare
+> `governance-sync.sh push`, mostra come testo lo snapshot completo (YAML)
+> che avresti scritto, e chiudi con `🔍 DRY-RUN — nessun file scritto,
+> nessun commit, nessun push.` **Propaga il dry-run** a `nsm-watch`,
+> `mandate-watch`, `deadline-watch`, `rice-watch`, `measurement-watch` se
+> le richiami.
+
 0. **Sincronizza da `origin` prima di leggere lo stato**: esegui
    `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
    "Sincronizzazione dell'istanza (`origin`)"). Uno snapshot generato su

@@ -22,6 +22,19 @@ ricorrente del team.
 
 ## Passi
 
+> **Dry-run.** Se la skill è stata invocata in modalità simulazione
+> (argomento `dry-run`, o `dry_run: true` in `.governance/config.yaml`),
+> applica il contratto della sezione "Modalità dry-run (simulazione)" del
+> playbook: esegui letture e analisi normalmente, **non** scrivere su
+> `product/`/`context/`/`.governance/` (nessuna cartella cerimonia, nessun
+> `decisions.yaml`, nessuna proposta in `pending/`), **non** invocare
+> `governance-sync.sh push`, mostra come testo l'output completo che
+> avresti prodotto, e chiudi con `🔍 DRY-RUN — nessun file scritto,
+> nessun commit, nessun push.` **Propaga il dry-run** a ogni skill che
+> richiami (`nsm-watch`, `measurement-watch`, `mandate-watch`,
+> `deadline-watch`, `rice-watch`, e le proposte verso `rice-update`/
+> `roadmap-snapshot`).
+
 0. **Sincronizza da `origin` prima di leggere lo stato**: esegui
    `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
    "Sincronizzazione dell'istanza (`origin`)"). Le reprioritizzazioni e

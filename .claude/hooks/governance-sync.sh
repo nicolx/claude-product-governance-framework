@@ -58,6 +58,18 @@ toggle_off() {
   grep -Eq "^[[:space:]]+$1:[[:space:]]*false([[:space:]]*#.*)?$" "$CONFIG" 2>/dev/null
 }
 
+# Modalità dry-run (simulazione): rete di sicurezza per cui il `push`
+# non scrive mai verso origin. Attiva se la env GOVERNANCE_DRY_RUN è
+# valorizzata (diversa da 0/false/no), o se .governance/config.yaml ha
+# una chiave top-level `dry_run: true`. Vedi playbook, "Modalità dry-run".
+dry_run_active() {
+  case "${GOVERNANCE_DRY_RUN:-}" in
+    ""|0|false|no|NO|False) : ;;
+    *) return 0 ;;
+  esac
+  grep -Eq "^[[:space:]]*dry_run:[[:space:]]*true([[:space:]]*#.*)?$" "$CONFIG" 2>/dev/null
+}
+
 has_upstream() {
   git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1
 }
@@ -95,6 +107,14 @@ case "$MODE" in
       exit 0
     fi
     shift || true
+    if dry_run_active; then
+      echo ""
+      echo "🔍 governance-sync: DRY-RUN attivo — nessun commit, nessun push."
+      echo "    Avrei committato:  ${*:-product/ context/ .governance/config.yaml}"
+      echo "    Messaggio:         ${MSG}"
+      echo ""
+      exit 0
+    fi
     if [ "$#" -gt 0 ]; then
       git add -- "$@" 2>/dev/null || true
     else

@@ -84,6 +84,15 @@ soli non coprono. In sintesi:
 
 ## Passi
 
+> **Dry-run.** Se la skill è stata invocata in modalità simulazione
+> (argomento `dry-run`, o `dry_run: true` in `.governance/config.yaml`),
+> applica il contratto della sezione "Modalità dry-run (simulazione)" del
+> playbook: esegui letture e analisi normalmente, **non** scrivere su
+> `product/`/`context/`/`.governance/` (nemmeno spostando file da
+> `product/inbox/`), **non** invocare `governance-sync.sh push`, mostra
+> come testo l'output completo che avresti prodotto, e chiudi con
+> `🔍 DRY-RUN — nessun file scritto, nessun commit, nessun push.`
+
 0. **Sincronizza da `origin` prima di leggere lo stato**: esegui
    `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
    "Sincronizzazione dell'istanza (`origin`)"). Il dedup del passo 4 —
