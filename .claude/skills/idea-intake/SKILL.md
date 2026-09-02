@@ -70,10 +70,13 @@ presente nel materiale di origine.
      questo passo) e non entra nel Backlog Refinement per priorità —
      segnala esplicitamente all'utente che va aperto anche nel tracker di
      esecuzione (Jira) con impatto stimato, e chiedi se vuole che tu
-     prepari il testo del ticket. Una volta creato il ticket, popola
-     comunque `jira.card_id`/`jira.url` sull'idea (vedi skill
-     `jira-sync`), così il record locale resta collegato a dove il lavoro
-     viene davvero tracciato.
+     prepari il testo del ticket. **Prima di aprirne uno nuovo**, se il
+     connettore Jira permette la ricerca (`jira.integration`), cerca un
+     ticket già esistente per lo stesso bug e proponi di linkare quello —
+     stesso dedup del passo 3 di `jira-sync` Push. Una volta creato (o
+     linkato) il ticket, popola `jira.card_id`/`jira.url` sull'idea (vedi
+     skill `jira-sync`), così il record locale resta collegato a dove il
+     lavoro viene davvero tracciato.
    - **Strategic Exception** — se il proponente è a un livello che nel
      `product/reference/` (o dichiarato dall'utente) qualifica per bypass
      del RICE. Crea comunque la cartella idea (serve comunque traccia),

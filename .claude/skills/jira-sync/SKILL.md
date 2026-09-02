@@ -1,6 +1,6 @@
 ---
 name: jira-sync
-description: Push - crea/collega il ticket Jira per un'idea o PRD già prioritizzato e persiste l'ID; Pull - fa polling occasionale dello stato/commenti dei ticket già collegati. Nessun sync realtime, Jira resta l'unica fonte di verità per l'esecuzione.
+description: Push - cerca un ticket già esistente (dedup JQL), poi crea/collega quello per un'idea o PRD prioritizzato e persiste l'ID; Pull - polling occasionale di stato/commenti dei ticket collegati; Riconciliazione - scova idee mai passate dal RICE il cui lavoro è già partito in Jira. Nessun sync realtime, Jira resta l'unica fonte di verità per l'esecuzione. Connettore consigliato: Atlassian Remote MCP Server ufficiale.
 ---
 
 # jira-sync
@@ -16,7 +16,32 @@ l'esecuzione, non duplicato. Nessun sync in tempo reale."
 > su `product/ideas/`, **non** invocare `governance-sync.sh push`; mostra
 > come testo il ticket che avresti creato / gli aggiornamenti di stato che
 > avresti scritto, e chiudi con `🔍 DRY-RUN — nessun file scritto, nessun
-> ticket creato, nessun commit.`
+> ticket creato, nessun commit.` La ricerca JQL in lettura (dedup,
+> riconciliazione) si può eseguire anche in dry-run — non muta nulla.
+
+## Il connettore
+
+Come questa istanza parla con Jira è dichiarato in
+`.governance/config.yaml`, blocco `jira.integration`:
+
+- **`atlassian-mcp`** (consigliato) — l'Atlassian Remote MCP Server
+  ufficiale (OAuth 2.1). Setup una-tantum:
+  `claude mcp add --transport http atlassian https://mcp.atlassian.com/v2/mcp`
+  poi `/mcp` per il login. I tool compaiono col prefisso
+  `mcp__atlassian__` — tipicamente `searchJiraIssuesUsingJql`,
+  `createJiraIssue`, `editJiraIssue`, `transitionJiraIssue`,
+  `addCommentToJiraIssue`, `getJiraIssue`, `getVisibleJiraProjects`,
+  `getAccessibleAtlassianResources` (verifica i nomi esatti con
+  `/mcp` — Atlassian li evolve). Molti tool vogliono il `cloud_id` da
+  `jira.cloud_id`.
+- **`cli:<nome>`** — una CLI Jira presente nell'ambiente. Fallback.
+- **`manuale`** — nessun accesso programmatico: prepara sempre i testi
+  pronti (ticket, JQL da lanciare a mano) e chiedi all'utente di
+  agire lui, poi di riportare gli ID/risultati.
+
+Se `jira.integration` è vuoto o assente, comportati come `manuale` e
+segnala che conviene configurare il connettore (rende possibili dedup e
+riconciliazione automatici — vedi sotto).
 
 ## Modalità Push (idea/PRD → Jira)
 
@@ -35,17 +60,30 @@ Planning).
    integrale del PRD dentro Jira, linkalo). Se l'idea ha un `short_ref`,
    mettilo in testa al titolo del ticket (es. `[PG-042] …`) — è il
    cross-reference tra la governance e l'esecuzione.
-3. Crea il ticket via integrazione Jira disponibile nell'ambiente (MCP
-   tool o CLI, secondo cosa è configurato in questa istanza). Se non è
-   disponibile alcuna integrazione, prepara comunque il testo pronto da
-   incollare e chiedi all'utente di crearlo lui, poi chiedigli l'ID per
-   completare il passo 4.
-4. Scrivi `jira.card_id`, `jira.url`, `jira.last_polled_at` (= ora) in
+3. **Dedup contro Jira — prima di creare.** Il passo 0 verifica solo che
+   *l'idea locale* non sia già linkata; non basta. Se il connettore
+   permette la ricerca, lancia una JQL sul progetto configurato con le
+   parole chiave di titolo/`summary`
+   (`project = {jira.project_key} AND text ~ "<parole chiave>"`,
+   eventualmente allargando a `summary ~` / `description ~`). Se emergono
+   candidati plausibili, **presentali al PM** (chiave, titolo, status) e
+   chiedi: è uno di questi, o è davvero nuovo?
+   - Se il PM riconosce un match → **linka quello**: salta la creazione,
+     vai al passo 5 col suo `card_id`/`url`. Se il ticket risulta già
+     avanti nel workflow, segnalalo: è lavoro partito prima che l'idea
+     passasse dalla governance.
+   - Se è nuovo, o il connettore è `manuale` (consegna al PM la JQL da
+     lanciare) → procedi al passo 4.
+4. Crea il ticket via il connettore dichiarato (`jira.integration` — vedi
+   sezione "Il connettore"; con `atlassian-mcp` è `createJiraIssue`). Se
+   il connettore è `manuale`, prepara il testo pronto da incollare e
+   chiedi all'utente di crearlo lui, poi chiedigli l'ID.
+5. Scrivi `jira.card_id`, `jira.url`, `jira.last_polled_at` (= ora) in
    `product/ideas/{slug}/idea.yaml`. Questo campo NON passa dalla coda di
    approvazione (è un fatto — il ticket esiste o non esiste — non una
    proposta soggetta a revisione), ma segnalalo chiaramente all'utente.
-5. Aggiorna `status` dell'idea a `in_jira`.
-6. **Sincronizza il repo**: esegui
+6. Aggiorna `status` dell'idea a `in_jira`.
+7. **Sincronizza il repo**: esegui
    `bash .claude/hooks/governance-sync.sh push "jira-sync: push <slug> -> <card_id>" product/ideas/{slug}`
    (vedi playbook, "Sincronizzazione dell'istanza (`origin`)").
 
@@ -76,3 +114,48 @@ locale, tipicamente prima di generare uno `roadmap-snapshot`.
    `bash .claude/hooks/governance-sync.sh push "jira-sync: pull stato N idee" product/ideas/`
    (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Se l'helper
    segnala un push fallito, riferiscilo nel riepilogo.
+
+## Modalità Riconciliazione (idee ↔ ticket già in Jira)
+
+Il dedup del passo 3 di Push agisce **una idea alla volta, al momento del
+push**. Non copre il caso più insidioso: un'idea che qualcuno ha portato
+avanti direttamente in Jira — magari mesi fa, magari prima ancora che
+l'istanza esistesse — **senza mai passare dal RICE**. Il suo `idea.yaml`
+locale resta con `rice_history: []` e `jira.card_id: null`, mentre il
+ticket corrispondente è "In corso" o "Completata". È esattamente la falla
+che il gate RICE dovrebbe chiudere, e senza questo controllo resta
+silenziosa.
+
+Da usare **periodicamente** (richiamata da `backlog-refinement` nella
+sweep di apertura, se `jira.integration` permette la ricerca) o
+**standalone** ("controlliamo se c'è lavoro Jira fuori governance").
+Richiede un connettore con ricerca — con `manuale` non è praticabile in
+automatico, segnalalo e fermati.
+
+0. **Sincronizza da `origin`** (`governance-sync.sh pull`).
+1. **Elenca le idee candidate**: `classification: idea` (i bug/mandate/
+   strategic exception saltano il RICE per disegno — non sono una falla),
+   `rice_history` vuoto, `jira.card_id: null`, `status` non `declined`/
+   `aborted`.
+2. **Per ciascuna, cerca su Jira** un ticket plausibile: JQL sulle parole
+   chiave di titolo/`summary` nel progetto `jira.project_key`. Batch le
+   ricerche, non una conversazione per idea.
+3. **Segnala i match plausibili con status Jira "attivo"** (Ready for
+   dev / In corso / In review / Deploy / Completata — adatta ai nomi
+   colonna del progetto): per ciascuno, `short_ref`/`idea_id` locale +
+   `summary`, chiave e status del ticket Jira. Ordina mettendo per primi
+   i ticket più avanti nel workflow — sono i più costosi da aver perso.
+   **Solo segnalazione**: non linkare né cambiare stato di iniziativa
+   propria.
+4. **Per ogni match che il PM conferma**, allinea il record locale:
+   scrivi `jira.card_id`/`jira.url`/`jira.status`/`jira.last_polled_at`,
+   porta `status` al valore coerente col ticket (`in_jira`, o `done` con
+   `done_at` se il ticket è chiuso/in produzione — chiedi conferma, non
+   presumere la Definition of Done). Scrittura diretta, non passa da
+   `pending/` (stessa logica di Push/Pull). Se emerge che serve comunque
+   un RICE retroattivo per capire se l'iniziativa valeva la pena,
+   **suggerisci `rice-update`** — non forzarlo.
+5. **Sincronizza il repo**: se hai scritto almeno un `idea.yaml`, esegui
+   `bash .claude/hooks/governance-sync.sh push "jira-sync: riconciliazione N idee" product/ideas/`.
+   Se richiamata da `backlog-refinement`, restituisci comunque il
+   riepilogo perché venga incluso nel `decisions.yaml` della cerimonia.

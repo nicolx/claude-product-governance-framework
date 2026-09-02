@@ -205,8 +205,11 @@ soli non coprono. In sintesi:
      e avere un record archiviato. In più, prepara il testo del ticket
      per il tracker di esecuzione e chiedi conferma prima di aprirlo (se
      è disponibile un'integrazione) o consegna il testo pronto
-     all'utente. Il materiale grezzo si sposta comunque in `source/` —
-     mai lasciato solo nel testo del ticket.
+     all'utente. Se il connettore Jira permette la ricerca, prima cerca
+     un ticket già esistente per lo stesso bug e proponi di linkare
+     quello (dedup — vedi `jira-sync` Push). Il materiale grezzo si
+     sposta comunque in `source/` — mai lasciato solo nel testo del
+     ticket.
 
    - **Strategic Exception** — crea comunque la cartella idea (per
      traccia), `classification: strategic_exception`, e aggiungi una voce

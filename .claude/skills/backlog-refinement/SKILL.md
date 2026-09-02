@@ -47,6 +47,11 @@ descritti sotto.
       ≤4 settimane: push forte, non una riga tra le altre.
    5. `rice-watch` — idee `classification: idea` ancora senza RICE:
       `stale`, `blocked_on`, `needs_deep_dive`.
+   6. `jira-sync` **modalità Riconciliazione** — solo se
+      `.governance/config.yaml` ha un `jira.integration` con capacità di
+      ricerca: idee mai passate dal RICE il cui lavoro è già partito in
+      Jira (falla di governance). Saltala senza rumore se Jira non è
+      configurato così.
 
    Ogni watch **solo segnala** — nessuna azione automatica. I riepiloghi
    vanno passati a `log-ceremony` perché li includa nel `decisions.yaml`

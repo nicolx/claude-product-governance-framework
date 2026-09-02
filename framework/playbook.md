@@ -1248,6 +1248,37 @@ di prodotto. Quando un'attività è matura, passa dalla roadmap di prodotto
 al backlog effettivo del team tech (tipicamente prioritizzato secondo
 Kanban).
 
+### Il tracker di esecuzione (Jira): collegamento, non duplicazione
+
+Jira (o l'equivalente) è la **fonte di verità per l'esecuzione**: stato
+delle card, transizioni, blocchi. Il repo di governance non lo duplica e
+non ci fa sync in tempo reale — tiene solo un puntatore (`jira.card_id`)
+sull'idea e ne fa polling periodico. La skill `jira-sync` gestisce il
+collegamento in tre modi: Push (idea prioritizzata → nuovo ticket), Pull
+(stato dei ticket collegati → repo), Riconciliazione.
+
+La regola "non duplicare" vale **nei due sensi**. Non solo "non copiare
+Jira nel repo": anche **non aprire su Jira un ticket per qualcosa che è
+già tracciato lì**. Prima di creare, `jira-sync` cerca un ticket
+esistente sulle parole chiave dell'idea e, se lo trova, lo linka invece
+di duplicarlo.
+
+Il caso più costoso è quello silenzioso: un'iniziativa portata avanti
+direttamente in Jira — a volte prima ancora che l'istanza esistesse —
+**senza mai passare dal RICE**. È la falla che il gate di
+prioritizzazione dovrebbe chiudere. La modalità **Riconciliazione** di
+`jira-sync` la rende visibile: periodicamente (in apertura del Backlog
+Refinement, se il connettore permette la ricerca) confronta le idee
+ancora senza RICE con i ticket "attivi" del progetto e segnala i match —
+lavoro in esecuzione fuori dalla governance, da riallineare
+esplicitamente.
+
+Il connettore consigliato è l'**Atlassian Remote MCP Server ufficiale**
+(OAuth 2.1, nessun token da gestire); una CLI o l'operatività manuale
+sono fallback. Come l'istanza si connette è dichiarato in
+`.governance/config.yaml`, blocco `jira` (vedi
+`framework/schema/governance-config.template.yaml`).
+
 ### Daily Standup
 
 Il team si riunisce ogni giorno per un massimo di 15 minuti, con
