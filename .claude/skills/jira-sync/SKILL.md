@@ -87,6 +87,12 @@ Planning).
    `bash .claude/hooks/governance-sync.sh push "jira-sync: push <slug> -> <card_id>" product/ideas/{slug}`
    (vedi playbook, "Sincronizzazione dell'istanza (`origin`)").
 
+> **Vedi anche.** Quando l'iniziativa collegata ha prodotto UI visibile
+> ed è "done", la skill `demo-capture` genera screenshot dimostrativi dal
+> codice reale e prepara una bozza di nota per la card — che il PM allega
+> a mano (`jira-sync` e `demo-capture` non pubblicano commenti/allegati
+> in automatico).
+
 ## Modalità Pull (Jira → stato locale)
 
 Da usare periodicamente (non in tempo reale) per aggiornare lo stato

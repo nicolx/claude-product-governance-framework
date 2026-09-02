@@ -295,7 +295,7 @@ hook**, non alla memoria del PM:
   tracciato (`idea-intake`, `inbox-triage`, `rice-update`, `prd-draft`,
   `backlog-refinement`, `iteration-planning`, `log-ceremony`,
   `roadmap-snapshot`, `pending-approval`, `context-intake`, `jira-sync`,
-  le watch, `init-governance-project`). Il
+  `demo-capture`, le watch, `init-governance-project`). Il
   commit è **immediato** dopo la scrittura: è ciò che tiene il working
   tree pulito e rende sicuri i pull successivi.
 
@@ -1326,6 +1326,60 @@ un blocco tecnico impatta la roadmap.
   esaltano l'agilità.*
 - *Le architetture, i requisiti e la progettazione migliori emergono da
   team che si auto-organizzano.*
+
+### Evidenza visiva di delivery (`demo-capture`)
+
+Una card è "Done" quando il codice è in produzione — ma una card che ha
+prodotto un cambiamento **visibile** (una nuova schermata, un flusso
+rivisto, un componente ridisegnato) chiude meglio il loop con gli
+stakeholder se alla richiesta di partenza si può riagganciare *cosa si
+vede adesso*, non solo "fatto, è in produzione". Descrivere a parole un
+cambiamento di interfaccia in una mail di avanzamento è debole; un'immagine
+no.
+
+`demo-capture` genera quell'evidenza partendo dal **codice reale**, non da
+un mockup: fa il rendering dell'applicazione — la stessa che va (o è
+andata) in produzione — su uno stato di dati controllato, e cattura gli
+screenshot dei flussi che l'iniziativa ha toccato.
+
+**Cosa è fedele e cosa no.** Fedele è il *rendering del codice*: se si
+cattura dal commit/tag di release con un build di produzione, l'HTML/CSS/JS
+è quello che vede l'utente. Non è fedele — ed è dichiarato su ogni
+immagine e nel `manifest.yaml` — il *dato* (sintetico, mai dati reali di
+clienti), le *zone con servizi terzi* (auth, pagamenti, mappe: stubbate in
+modalità demo) e l'*ambiente di rendering* (font, versione del browser:
+fissati, non quelli di un utente reale). L'evidenza dice "ecco la
+funzionalità", non "ecco il tuo account".
+
+**Due modalità.** `deployed` — si punta a un deployment reale del codice
+(staging, o la preview environment per-PR): massima fedeltà, pipeline e
+infrastruttura identiche. `local` — si porta su l'app in locale con un
+build di produzione e dati di seed: il ripiego quando non c'è un ambiente
+pre-esistente, con i caveat sopra tutti a carico della disciplina di
+configurazione.
+
+**Nessuna azione in uscita.** `demo-capture` produce solo artefatti
+locali: gli screenshot e una bozza di nota per la card. Non allega niente
+al tracker di esecuzione, non condivide niente — il momento in cui
+l'evidenza esce verso gli stakeholder è sempre un atto manuale del PM
+(stessa logica di `requester_reply` — "Chiudere il loop col richiedente").
+Gli screenshot sono artefatti binari e non entrano in Git
+(`product/demos/captures/*/screenshots/` è escluso); resta tracciato solo
+un `manifest.yaml` per cattura — cosa è stato catturato, da quale commit,
+quando — come record di audit, allo stesso titolo di `jira.card_id`.
+
+**Il contratto per-app.** Come si porta su un'applicazione in modalità
+demo, quali dati seminare, quali flussi catturare: tutto vive in
+`product/demos/recipes/<app-slug>.yaml` (vedi
+`framework/schema/demo-recipe.template.yaml`), un file per applicazione
+collegata in `apps/`, scaffoldato da `demo-capture` al primo uso e
+completato dal team. **Nessun segreto vi è scritto** — credenziali ed
+endpoint sensibili restano in variabili d'ambiente o in un file locale
+escluso da Git, mai nel repo tracciato (stesso vincolo dell'integrazione
+analytics — `framework/docs/future-work.md`).
+
+*Principio Agile da incarnare in questa fase:*
+- *Il software funzionante è il miglior metro di misura del progresso.*
 
 ## Measurement
 

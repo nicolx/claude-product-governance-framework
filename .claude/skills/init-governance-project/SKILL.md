@@ -158,10 +158,14 @@ che serve da lì e chiedi solo quello che manca.
 5. Scaffold vuoto: `product/ideas/`, `product/prds/`,
    `product/roadmap/snapshots/`, `product/ceremonies/`,
    `product/approvals/pending/`, `product/approvals/decided/`,
+   `product/demos/recipes/`, `product/demos/captures/`,
    `product/inbox/` (con `.gitkeep` dove servono, git non traccia
    cartelle vuote). `product/inbox/` è già coperta dal `.gitignore` di
    root (contenuto non tracciato — vedi skill `inbox-triage`): non
-   toglierla dal `.gitignore` per questa istanza.
+   toglierla dal `.gitignore` per questa istanza. `product/demos/` è
+   tracciata (recipe e manifest); solo
+   `product/demos/captures/*/screenshots/` è escluso dal `.gitignore` di
+   root (artefatti binari — vedi skill `demo-capture`).
 6. `context/` alla **radice del repository** (non sotto `product/`, vedi
    playbook sezione "Contesto aziendale") — con `.gitkeep` se resta
    vuota. A differenza di `product/inbox/`, **non va aggiunta al

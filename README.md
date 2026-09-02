@@ -78,6 +78,11 @@ inizializzata) e scaffolda `apps/` e `product/`.
     │   └── decisions.yaml      (esito strutturato, link a cosa ha impattato)
     ├── roadmap/snapshots/{YYYY-Www}.yaml
     ├── approvals/{pending,decided}/
+    ├── demos/                    ← evidenza visiva di delivery (skill demo-capture)
+    │   ├── recipes/{app-slug}.yaml        (come portare su ogni app in modalità demo — tracciato, NIENTE segreti)
+    │   └── captures/{idea-slug}/
+    │       ├── manifest.yaml              (record di audit: cosa/quale commit/quando — tracciato)
+    │       └── screenshots/               (PNG dimostrativi — NON tracciati, .gitignore)
     └── reference/
         ├── product-lines.yaml
         └── friction-log.yaml

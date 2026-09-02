@@ -1,0 +1,147 @@
+# Template per product/demos/recipes/<app-slug>.yaml
+#
+# Un file per applicazione collegata in apps/. Dichiara COME si porta
+# quell'app in modalità demo e QUALI flussi catturare, così che
+# `demo-capture` possa generare screenshot dimostrativi dal codice reale
+# (non da un mockup) da allegare a mano alla card del tracker di
+# esecuzione.
+#
+# Scaffoldato da `demo-capture` al primo uso, completato dal PM / dal team
+# tech. Proprietà istanza, tracciato da git — è un contratto tecnico
+# per-app, non una decisione di priorità: scrittura diretta, nessuna
+# approvazione via product/approvals/pending/.
+#
+# ┌─────────────────────────────────────────────────────────────────────┐
+# │ NESSUN SEGRETO QUI DENTRO.                                           │
+# │ Credenziali, token, URL con credenziali embedded, connection string │
+# │ di database: SOLO in variabili d'ambiente o in un file locale       │
+# │ escluso da git — MAI in questo file (che è tracciato e condiviso    │
+# │ con tutto il team). Referenzia i nomi delle env var, non i valori.  │
+# │ Stesso vincolo dell'integrazione analytics — vedi                   │
+# │ framework/docs/future-work.md.                                      │
+# └─────────────────────────────────────────────────────────────────────┘
+
+app_slug: ""                       # deve corrispondere a una voce apps[].slug in .governance/config.yaml
+platform: web                      # web | web-responsive (per gli screenshot "mobile" si usa un viewport ridotto, non un emulatore nativo)
+
+capture:
+  # COME si guida il browser.
+  driver: ""                       # "claude-in-chrome" (skill omonima + mcp__claude-in-chrome__*, guida il Chrome reale — adatto a mode: deployed)
+                                   # "playwright-mcp" (server MCP Playwright headless — pinnabile, adatto a mode: local)
+                                   # "manuale" (nessun driver: demo-capture prepara la lista di flussi/URL, il PM cattura a mano e riporta i file)
+
+  # COSA renderizzare.
+  mode: deployed                   # "deployed" (fedeltà massima: si punta a un deployment reale del codice) | "local" (ripiego: build di produzione in locale)
+
+  # Ambiente di rendering — va FISSATO per rendere le catture riproducibili.
+  browser: ""                      # es. "chromium-125" — versione del browser usata dal driver
+  device_scale_factor: 2           # per screenshot nitidi su display HiDPI
+  fonts: []                        # web font che DEVONO caricarsi prima dello scatto (nomi famiglia). Se non si caricano, l'immagine mostra un fallback — segnalarlo.
+  color_scheme: light              # light | dark — se l'app supporta entrambi, fare un giro per ciascuno che serve
+  wait_after_load_ms: 500          # attesa di default per il settle di animazioni/caricamenti prima dello scatto (override per-flow in flows[].steps)
+
+  # Footer di provenienza iniettato nel DOM prima dello scatto (se il
+  # driver lo permette). Serve a non far passare l'immagine per uno stato
+  # di produzione reale con dati reali.
+  provenance_footer:
+    enabled: true
+    text: "{app_slug} · {commit_short} · {idea_ref} · dati dimostrativi · {date}"
+
+# --- Solo per mode: deployed ---
+deployed:
+  base_url: ""                     # URL del deployment reale (staging, o pattern della preview per-PR). NIENTE credenziali nell'URL.
+  ref_note: ""                     # come si sa quale commit serve quell'ambiente (es. "staging = ultimo tag release", "preview = HEAD della PR")
+  auth:
+    method: ""                     # "none" | "form" | "cookie" | "basic" | "header"
+    # Per form login: selettori del form + NOMI delle env var con le credenziali (mai i valori).
+    login_url: ""
+    username_selector: ""
+    password_selector: ""
+    submit_selector: ""
+    username_env: ""               # es. "DEMO_STAGING_USER"
+    password_env: ""               # es. "DEMO_STAGING_PASS"
+    # Per cookie/header: nome dell'env var che contiene il valore.
+    token_env: ""
+
+# --- Solo per mode: local ---
+local:
+  # Comandi shell per portare su l'app. DEVONO usare un build di
+  # PRODUZIONE, non un dev server (un dev server rende con CSS non
+  # purgato, warning di sviluppo, asset URL diversi — non fedele).
+  bring_up: []                     # es. ["docker compose -f docker-compose.demo.yml up -d --build"]
+  base_url: "http://localhost:3000"
+  ready_check:
+    url: "http://localhost:3000/health"
+    expect_status: 200
+    timeout_s: 120
+  # Semina dati SINTETICI. Mai puntare a un DB con dati di clienti reali.
+  seed: []                         # es. ["docker compose -f docker-compose.demo.yml exec app npm run seed:demo"]
+  db_note: ""                      # come è isolato il DB demo (container effimero, schema dedicato) — deve essere ovvio che non è produzione
+  teardown: []                     # es. ["docker compose -f docker-compose.demo.yml down -v"]
+
+# --- I flussi da catturare ---
+#
+# Ogni flow è una sequenza di passi che porta a uno o più screenshot.
+# `idea_refs` collega il flow alle iniziative che quella schermata
+# riguarda: demo-capture, invocata su un'idea, cattura i flow che la
+# citano (il PM può comunque restringere o allargare la selezione).
+flows: []
+# Esempio di singola voce:
+# - name: "riconoscimento-ricevuta-in-app"
+#   idea_refs: ["PG-042", "2026-01-08-ricevute-non-riconosciute-in-app"]
+#   viewports: ["desktop", "mobile"]   # nomi risolti in capture (desktop=1440x900, mobile=390x844 salvo override)
+#   steps:
+#     - action: navigate
+#       to: "/wallet/receipts"
+#     - action: wait
+#       for: "selector"
+#       selector: "[data-testid='receipt-list']"
+#     - action: click
+#       selector: "[data-testid='receipt-row']:first-child"
+#     - action: wait
+#       ms: 800
+#     - action: screenshot
+#       name: "01-dettaglio-ricevuta"
+#       caption: "Dettaglio ricevuta con stato di riconoscimento"
+#     - action: fill
+#       selector: "#merchant-name"
+#       value: "Bar Centrale"          # valore SINTETICO
+#     - action: click
+#       selector: "[data-testid='confirm-match']"
+#     - action: screenshot
+#       name: "02-ricevuta-riconosciuta"
+#       caption: "Conferma manuale del match"
+
+# --- manifest (scritto da demo-capture in
+#     product/demos/captures/<idea-slug>/manifest.yaml — NON va in questo
+#     file di recipe, è qui solo come riferimento di forma) ---
+#
+# idea_ref: "PG-042"
+# idea_slug: "2026-01-08-ricevute-non-riconosciute-in-app"
+# app_slug: "wallet-web"
+# captured_at: "2026-09-02"
+# mode: deployed
+# code_ref:
+#   sha: "abc1234def5678"
+#   tag: "v2.7.0"
+#   note: "tag di release confermato dal PM"
+# driver: "claude-in-chrome"
+# browser: "chromium-125"
+# screenshots:
+#   - file: "screenshots/01-dettaglio-ricevuta__desktop.png"
+#     flow: "riconoscimento-ricevuta-in-app"
+#     viewport: "desktop"
+#     caption: "Dettaglio ricevuta con stato di riconoscimento"
+#   - file: "screenshots/01-dettaglio-ricevuta__mobile.png"
+#     flow: "riconoscimento-ricevuta-in-app"
+#     viewport: "mobile"
+#     caption: "Dettaglio ricevuta con stato di riconoscimento"
+# fidelity_caveats:
+#   - "Dati sintetici di seed, non dati reali di clienti."
+#   - "Login federato stubbato in modalità demo."
+#   - "Font di sistema: la famiglia brand non era installata sulla macchina di cattura."
+# draft_card_note: |
+#   Evidenza visiva della delivery di PG-042 (ricevute non riconosciute in app).
+#   2 screenshot allegati (desktop + mobile): dettaglio ricevuta e conferma match.
+#   Rendering da wallet-web @ v2.7.0 (abc1234), ambiente staging.
+#   Dati dimostrativi; servizi terzi (login federato) stubbati.
