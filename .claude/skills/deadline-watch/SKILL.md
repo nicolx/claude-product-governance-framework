@@ -1,6 +1,6 @@
 ---
 name: deadline-watch
-description: Scansiona tutte le idee (qualunque classification tranne mandate) con un deadline.due_date dichiarato e fa un push esplicito e forte quando mancano 4 settimane o meno — senza mai decidere da sola se bypassare il RICE. Usala periodicamente e sempre come parte del Backlog Refinement, subito dopo mandate-watch (log-ceremony la richiama).
+description: Scansiona tutte le idee (qualunque classification tranne mandate) con un deadline.due_date dichiarato e fa un push esplicito e forte quando mancano 4 settimane o meno — senza mai decidere da sola se bypassare il RICE. Usala periodicamente e sempre come parte del Backlog Refinement, subito dopo mandate-watch (backlog-refinement la richiama).
 ---
 
 # deadline-watch
@@ -26,7 +26,7 @@ skill esiste per evitare.
 
 - **Standalone**, in qualunque momento: "quali idee hanno una scadenza in
   arrivo?", "rischiamo di perdere qualche finestra?".
-- **Richiamata da `log-ceremony`** durante il Backlog Refinement, subito
+- **Richiamata da `backlog-refinement`** durante il Backlog Refinement, subito
   dopo `mandate-watch` — stesso principio: il controllo deve avvenire ad
   ogni ciclo settimanale, non solo quando qualcuno se ne ricorda.
 
@@ -87,7 +87,7 @@ skill esiste per evitare.
    stessa una Strategic Exception, non riclassificare a `mandate`, non
    toccare il RICE. La decisione resta del PM:
    - se sceglie (a), indirizzalo al meccanismo esistente per una
-     Strategic Exception (`log-ceremony` se nasce in cerimonia, o
+     Strategic Exception (`backlog-refinement` se nasce in cerimonia, o
      conferma diretta con `approved_by`/`reason` se immediata);
    - se sceglie (b), prepara una proposta `type: mandate_reclassification`
      in `product/approvals/pending/` (vedi
@@ -99,7 +99,7 @@ skill esiste per evitare.
 5. **Presenta un riepilogo ordinato per urgenza** (`overdue` prima, poi
    `due_soon`, poi `on_track` solo se richiesto esplicitamente).
 
-6. Se chiamata da `log-ceremony`, restituisci il riepilogo perché venga
+6. Se chiamata da `backlog-refinement`, restituisci il riepilogo perché venga
    incluso nel log della cerimonia — non scrivere tu stessa in
    `decisions.yaml`, è compito di `log-ceremony`.
 
@@ -107,7 +107,7 @@ skill esiste per evitare.
    `idea.yaml`, esegui
    `bash .claude/hooks/governance-sync.sh push "deadline-watch: aggiornati escalation_status" product/ideas/`
    (vedi playbook, "Sincronizzazione dell'istanza (`origin`)") — anche se
-   richiamata da `log-ceremony`.
+   richiamata da `backlog-refinement`.
 
 ## Cosa NON fare
 

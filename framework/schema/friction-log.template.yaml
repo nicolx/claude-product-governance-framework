@@ -9,7 +9,7 @@
 #
 # Popolato a mano, ma anche automaticamente da pending-approval quando
 # approva una proposta di tipo strategic_exception_flag (Strategic
-# Exception rilevata da log-ceremony durante il Backlog Refinement — vedi
+# Exception rilevata da backlog-refinement durante il Backlog Refinement — vedi
 # idea.template.yaml, strategic_exceptions).
 
 entries: []

@@ -1,6 +1,6 @@
 ---
 name: mandate-watch
-description: Scansiona tutte le idee classification "mandate" (iniziative top-down, "critical" da leadership, o con scadenza esterna fissa) e calcola/aggiorna il loro escalation_status in base al lead time necessario prima della due_date. Usala periodicamente e sempre come parte del Backlog Refinement (log-ceremony la richiama).
+description: Scansiona tutte le idee classification "mandate" (iniziative top-down, "critical" da leadership, o con scadenza esterna fissa) e calcola/aggiorna il loro escalation_status in base al lead time necessario prima della due_date. Usala periodicamente e sempre come parte del Backlog Refinement (backlog-refinement la richiama).
 ---
 
 # mandate-watch
@@ -17,7 +17,7 @@ agire da sola sulla priorità.
 
 - **Standalone**, in qualunque momento: "controlla lo stato dei mandate",
   "siamo a rischio su qualche scadenza mandataria?".
-- **Richiamata da `log-ceremony`** durante il Backlog Refinement — è così
+- **Richiamata da `backlog-refinement`** durante il Backlog Refinement — è così
   che il controllo avviene ad ogni ciclo settimanale, non solo quando
   qualcuno se ne ricorda.
 
@@ -82,7 +82,7 @@ agire da sola sulla priorità.
    proporre né inviare comunicazioni di escalation da questa skill, la
    decisione su come/se sollecitare resta interamente del PM.
 
-5. Se chiamata da `log-ceremony`, restituisci il riepilogo perché venga
+5. Se chiamata da `backlog-refinement`, restituisci il riepilogo perché venga
    incluso nel log della cerimonia — non scrivere tu stessa nel file
    `decisions.yaml` della cerimonia, è compito di `log-ceremony`.
 
@@ -90,7 +90,7 @@ agire da sola sulla priorità.
    `idea.yaml`, esegui
    `bash .claude/hooks/governance-sync.sh push "mandate-watch: aggiornati escalation_status" product/ideas/`
    (vedi playbook, "Sincronizzazione dell'istanza (`origin`)") — anche se
-   la skill è stata richiamata da `log-ceremony`: le scritture su
+   la skill è stata richiamata da `backlog-refinement`: le scritture su
    `idea.yaml` vanno sincronizzate subito, non aspettano il commit finale
    della cerimonia.
 

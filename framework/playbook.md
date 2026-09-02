@@ -293,8 +293,9 @@ hook**, non alla memoria del PM:
   `mandate-watch`, `deadline-watch`, `rice-watch`, `measurement-watch`).
 - **Commit + push**: come ultimo passo di ogni skill che scrive stato
   tracciato (`idea-intake`, `inbox-triage`, `rice-update`, `prd-draft`,
-  `log-ceremony`, `roadmap-snapshot`, `pending-approval`,
-  `context-intake`, `jira-sync`, le watch, `init-governance-project`). Il
+  `backlog-refinement`, `iteration-planning`, `log-ceremony`,
+  `roadmap-snapshot`, `pending-approval`, `context-intake`, `jira-sync`,
+  le watch, `init-governance-project`). Il
   commit è **immediato** dopo la scrittura: è ciò che tiene il working
   tree pulito e rende sicuri i pull successivi.
 
@@ -993,12 +994,15 @@ dettagliate (sono oggetto della fase successiva). Va bene anche da remoto.
 - *A intervalli regolari il team riflette su come diventare più efficace,
   poi regola il proprio comportamento di conseguenza.*
 
-Questa cerimonia va registrata in
-`product/ceremonies/backlog-refinement/{YYYY-Www}/` — trascrizione grezza
-in `source/`, esito strutturato in `decisions.yaml` (vedi
-`framework/schema/ceremony-decisions.template.yaml`). Se la discussione
-cambia il RICE di un'idea o produce un nuovo snapshot di roadmap, la
-proposta passa da `product/approvals/pending/` prima di essere applicata.
+Questa cerimonia va registrata con la skill **`backlog-refinement`**, che
+apre la sweep delle watch nell'ordine giusto (`nsm-watch` per prima),
+rileva le reprioritizzazioni fuori-RICE e delega a `log-ceremony` per la
+scrittura in `product/ceremonies/backlog-refinement/{YYYY-Www}/` —
+trascrizione grezza in `source/`, esito strutturato in `decisions.yaml`
+(vedi `framework/schema/ceremony-decisions.template.yaml`), metadati di
+esecuzione in `.run-meta.yaml`. Se la discussione cambia il RICE di
+un'idea o produce un nuovo snapshot di roadmap, la proposta passa da
+`product/approvals/pending/` prima di essere applicata.
 
 **Checklist operativa**
 - [ ] Il contenitore dell'iterazione corrente è stato creato/aggiornato con goal e iniziativa di riferimento?
@@ -1182,9 +1186,12 @@ footprint del cambiamento, non la durata; è qui, con la valutazione
 `capacity_allocation` in `roadmap-snapshot`, in parallelo a
 `platform.estimated_effort_weeks` per le iniziative platform.
 
-Anche questa cerimonia va registrata in
-`product/ceremonies/roadmap-iteration-planning/{YYYY-Www}/`, con lo stesso
-pattern trascrizione + decisioni strutturate.
+Anche questa cerimonia va registrata con una skill dedicata,
+**`iteration-planning`**: raccoglie le stime `delivery.estimated_effort_weeks`
+dal team tech, registra la valutazione 80/20 e la capacità platform
+dichiarata, poi delega a `log-ceremony` per la scrittura in
+`product/ceremonies/roadmap-iteration-planning/{YYYY-Www}/` — stesso
+pattern trascrizione + decisioni strutturate + `.run-meta.yaml`.
 
 **Checklist operativa**
 - [ ] Ogni User Story ha criterio di accettazione chiaro?

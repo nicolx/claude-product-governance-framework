@@ -15,7 +15,7 @@
 id: "2026-01-08-slug-descrittivo"
 type: rice_diff                     # rice_diff | roadmap_snapshot | outbound_comm | strategic_exception_flag | mandate_update | mandate_reclassification
 proposed_at: "2026-01-08"
-proposed_by: ""                     # nome della skill che ha generato la proposta (es. rice-update, log-ceremony)
+proposed_by: ""                     # nome della skill che ha generato la proposta (es. rice-update, roadmap-snapshot, backlog-refinement)
 
 # Cosa verrebbe applicato se approvato. Forma libera in base a 'type':
 # - rice_diff: la nuova voce da appendere a rice_history di un'idea
@@ -23,7 +23,7 @@ proposed_by: ""                     # nome della skill che ha generato la propos
 # - outbound_comm: oggetto + corpo della comunicazione, e a chi
 # - strategic_exception_flag: la nuova voce da appendere a
 #   strategic_exceptions di un'idea (es. invoked_at_stage:
-#   backlog_refinement, rilevata da log-ceremony durante il Backlog
+#   backlog_refinement, rilevata da backlog-refinement durante il Backlog
 #   Refinement — vedi framework/schema/idea.template.yaml)
 # - mandate_update: i nuovi valori per due_date/lead_time_weeks/
 #   mandated_by/rationale/is_critical sul blocco mandate di un'idea —

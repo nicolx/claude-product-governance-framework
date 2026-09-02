@@ -1,0 +1,29 @@
+# Template per product/ceremonies/{tipo}/{periodo}/.run-meta.yaml
+#
+# Metadati di ESECUZIONE di un run di cerimonia — distinti da
+# decisions.yaml (che è l'esito qualitativo, "cosa è stato deciso").
+# Questo file risponde a "da quale stato git è partito questo run, e
+# c'è arrivato in fondo?" — serve a `rollback-ceremony` per annullare
+# un run non riuscito o lanciato per errore senza dry-run.
+#
+# Scritto dalle skill di cerimonia (`backlog-refinement`,
+# `iteration-planning`, `log-ceremony`), MAI a mano. In dry-run non
+# viene scritto: non c'è nulla da annullare.
+#
+# base_sha va catturato PRIMA della prima scrittura del run (prima
+# ancora di creare la cartella cerimonia): è il punto a cui
+# `rollback-ceremony` riporta il repo (`git revert` dei commit da qui
+# a HEAD, forward — mai reset/force-push su storia già pushata).
+
+ceremony_type: backlog-refinement   # backlog-refinement | roadmap-iteration-planning | measurement-retro | strategic-exception-review | other
+period: "2026-W36"                  # settimana ISO, o data per cerimonie non settimanali
+started_at: "2026-09-02T14:30:00Z"  # ora di inizio del run
+started_by: ""                       # PM che ha condotto il run
+base_sha: ""                         # git HEAD immediatamente PRIMA della prima scrittura del run
+
+status: running                      # running | completed | rolled_back
+completed_at: null                   # valorizzato quando il run arriva all'ultimo passo
+
+# --- Popolato SOLO da rollback-ceremony, quando annulla questo run ---
+rolled_back_at: null
+rollback_ref: null                   # SHA del commit di revert (o nota, se il run era ancora tutto locale e non pushato)

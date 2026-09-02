@@ -1,6 +1,6 @@
 ---
 name: rice-watch
-description: Scansiona le idee classification "idea" ancora senza RICE (rice_history vuoto) e segnala da quanto tempo sono ferme e perché, se noto — incluse quelle che aspettano un meeting di approfondimento col richiedente, ricordate con insistenza finché il meeting non avviene. Usala periodicamente e sempre come parte del Backlog Refinement (log-ceremony la richiama).
+description: Scansiona le idee classification "idea" ancora senza RICE (rice_history vuoto) e segnala da quanto tempo sono ferme e perché, se noto — incluse quelle che aspettano un meeting di approfondimento col richiedente, ricordate con insistenza finché il meeting non avviene. Usala periodicamente e sempre come parte del Backlog Refinement (backlog-refinement la richiama).
 ---
 
 # rice-watch
@@ -17,7 +17,7 @@ silenzio.
 
 - **Standalone**, in qualunque momento: "quali idee non hanno ancora un
   RICE?", "siamo in attesa di info da qualcuno per quotare qualcosa?".
-- **Richiamata da `log-ceremony`** durante il Backlog Refinement — stesso
+- **Richiamata da `backlog-refinement`** durante il Backlog Refinement — stesso
   principio di `mandate-watch`: il controllo deve avvenire ad ogni ciclo
   settimanale, non solo quando qualcuno se ne ricorda.
 
@@ -99,7 +99,7 @@ silenzio.
    né proporre comunicazioni. La decisione su come sbloccarle resta del
    PM.
 
-6. Se chiamata da `log-ceremony`, restituisci il riepilogo perché venga
+6. Se chiamata da `backlog-refinement`, restituisci il riepilogo perché venga
    incluso nel log della cerimonia — non scrivere tu stessa nel file
    `decisions.yaml` della cerimonia, è compito di `log-ceremony`.
 
@@ -107,7 +107,7 @@ silenzio.
    `idea.yaml`, esegui
    `bash .claude/hooks/governance-sync.sh push "rice-watch: aggiornati rice_status" product/ideas/`
    (vedi playbook, "Sincronizzazione dell'istanza (`origin`)") — anche se
-   richiamata da `log-ceremony`.
+   richiamata da `backlog-refinement`.
 
 ## Cosa NON fare
 

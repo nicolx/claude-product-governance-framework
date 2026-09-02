@@ -22,7 +22,7 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
 - **Standalone**, in qualunque momento: "quali iniziative dovrebbero
   già mostrare impatti?", "controlliamo lo stato delle misurazioni",
   "possiamo chiudere il cantiere di misurazione di X?".
-- **Richiamata da `log-ceremony`**, e idealmente **in apertura** del
+- **Richiamata da `backlog-refinement`**, e idealmente **in apertura** del
   Backlog Refinement (playbook, sezione "Product Backlog Refinement"):
   prima di guardare cosa entra in agenda, si guarda cosa è già stato
   rilasciato e se sta rendendo — è tracciare le metriche su Git, nel
@@ -137,7 +137,7 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
    segnalazione** per ciò che resta aperto — nessuna comunicazione o
    escalation automatica, stesso principio di `mandate-watch`.
 
-7. Se chiamata da `log-ceremony`, restituisci il riepilogo perché venga
+7. Se chiamata da `backlog-refinement`, restituisci il riepilogo perché venga
    incluso nel log della cerimonia — non scrivere tu stessa in
    `decisions.yaml`, è compito di `log-ceremony`.
 
@@ -145,7 +145,7 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
    `idea.yaml`/`measurement*.yaml`, esegui
    `bash .claude/hooks/governance-sync.sh push "measurement-watch: aggiornate misurazioni" product/ideas/ product/prds/`
    (vedi playbook, "Sincronizzazione dell'istanza (`origin`)") — anche se
-   richiamata da `log-ceremony`.
+   richiamata da `backlog-refinement`.
 
 ## Cosa NON fare
 
