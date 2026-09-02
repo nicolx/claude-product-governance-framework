@@ -36,6 +36,28 @@ direttamente. Non ancora progettato né costruito.
   batch/email automatico, va ridiscussa esplicitamente, non ereditata
   per default.
 
+## Estensioni di `demo-capture`
+
+La skill `demo-capture` (evidenza visiva di delivery — playbook, "Product
+Design, development and rollout") nasce deliberatamente ristretta. Fuori
+scope adesso, da rivedere se emerge la domanda:
+
+- **Emulatore mobile nativo.** v1 fa "mobile" con un viewport responsive
+  del browser. Un emulatore iOS/Android vero (build dell'app, simulatore)
+  è un'altra classe di infrastruttura — per-istanza, per-stack — e non
+  qualcosa che il canonico può fornire in modo agnostico.
+- **Allegato automatico alla card.** Oggi `demo-capture` non compie
+  nessuna azione in uscita: il PM allega screenshot e nota a mano. Un
+  allegato programmatico (via connettore Jira) sarebbe una comunicazione
+  in uscita → andrebbe instradato da `product/approvals/pending/`
+  (`type: outbound_comm`), non aggiunto come scrittura diretta. Decisione
+  deliberata da riprendere esplicitamente, non da ereditare.
+- **Cattura in CI al momento del merge/release.** Rigenerare gli
+  screenshot come step di pipeline sul tag di release invece che su
+  invocazione manuale della skill. Richiede che la recipe sia eseguibile
+  headless senza un umano nel giro — sensato solo dopo che il pattern
+  `recipe` si è stabilizzato su qualche istanza reale.
+
 ## Integrazione DB/analytics in lettura per measurement-watch
 
 Idea dell'utente: dare al sistema, a livello di configurazione, accesso

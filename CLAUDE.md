@@ -46,6 +46,9 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `product/ideas/*/deadline.escalation_status` | Istanza | Solo `deadline-watch` — fatto calcolato, scrittura diretta senza approvazione (stesso principio di `mandate.escalation_status`) |
 | `product/prds/*/measurement*.yaml` (creazione) | Istanza | Solo `prd-draft`, contestualmente alla creazione del PRD — non passa da approvazione (stessa logica della creazione di idee/PRD) |
 | `product/prds/*/measurement*.yaml` (readings, measurement_status, follow_up_needed, closure) | Istanza | Solo `measurement-watch` — letture riportate dal PM e `closure` sono cattura di decisioni/fatti già espressi in conversazione (mai presunti, mai chiusi di iniziativa propria), `measurement_status` è calcolato dai dati. Nessuno di questi passa da approvazione |
+| `product/demos/recipes/*.yaml` | Istanza, **tracciata da git** | `demo-capture` scaffolda al primo uso, PM/team tech completano — contratto tecnico per-app (come portare su l'app in modalità demo, quali flussi catturare), non una decisione di priorità: scrittura diretta, nessuna approvazione. **Mai segreti** dentro (env var per nome, non valori) — stesso vincolo di `framework/docs/future-work.md` |
+| `product/demos/captures/*/manifest.yaml` | Istanza, **tracciata da git** | Solo `demo-capture` — record di audit di cosa è stato catturato, da quale commit, quando: fatto osservato, non decisione (stessa logica di `jira.card_id`), scrittura diretta senza approvazione |
+| `product/demos/captures/*/screenshots/` | Istanza, **NON tracciata da git** (`.gitignore` di root) | Solo `demo-capture` — artefatti binari, mai committati. `demo-capture` non fa **nessuna azione in uscita**: è il PM ad allegarli alla card del tracker di esecuzione / al deck per gli stakeholder, a mano (stessa logica di `requester_reply`) |
 | `product/reference/nsm-tracking.yaml` | Istanza | Solo `nsm-watch` — creato lazy al primo run (non da `init-governance-project`), scritto direttamente: `readings`/`trend_status`/`alert.status` sono fatti/calcoli osservati, `discovery_focus_confirmed`/`resolved_*` sono cattura di decisioni già espresse dal PM in conversazione. Nessuno di questi passa da approvazione |
 | `product/reference/annual-target.yaml` | Istanza | Creato da `init-governance-project` (passo 4 intervista); aggiornato in seguito solo su richiesta esplicita dell'utente (nuovo Budget/BP, override per Product Line). È l'incremento atteso, mai il totale a budget — `rice-update` lo legge per calibrare l'Impact. Non passa da approvazione (è un dato di riferimento condiviso, come il denominatore Reach) |
 | `.governance/config.yaml` | Istanza | Solo `init-governance-project`, in scrittura successiva solo su richiesta esplicita dell'utente |
@@ -105,6 +108,13 @@ Corollario: una voce già in `decided/` con `decision: approved` è una
 decisione umana definitiva. `rollback-ceremony`, quando annulla un run di
 cerimonia, la **esclude** sempre — annullare una decisione approvata è
 un'operazione separata e deliberata, mai un effetto collaterale.
+
+Corollario: `demo-capture` non rientra nella regola perché **non compie
+alcuna azione in uscita** — produce solo artefatti locali (screenshot
+gitignorati + una bozza di nota per la card). Il momento in cui
+l'evidenza esce verso gli stakeholder è sempre un atto manuale del PM
+(stessa logica di `requester_reply`): non c'è comunicazione in uscita da
+far passare da `pending/`.
 
 ## Sincronizzazione dell'istanza (`origin`)
 

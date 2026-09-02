@@ -6,5 +6,11 @@
 product/inbox/*
 !product/inbox/.gitkeep
 
+# product/demos/captures/<idea-slug>/screenshots/ contiene gli screenshot
+# dimostrativi generati da demo-capture: artefatti binari, non vanno in
+# Git. Il manifest.yaml accanto (record di audit: cosa/quale commit/quando)
+# resta invece tracciato.
+product/demos/captures/*/screenshots/
+
 # Artefatti locali comuni
 .DS_Store
