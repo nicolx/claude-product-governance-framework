@@ -49,6 +49,11 @@ in aggiunta, i passi specifici sotto.
    - Le iniziative `classification: platform` usano invece
      `platform.estimated_effort_weeks` (già raccolto all'intake o qui se
      emerge) — non `delivery`.
+   - **Sincronizza subito queste scritture** (stesso principio delle
+     watch): se hai scritto almeno un `idea.yaml`, esegui
+     `bash .claude/hooks/governance-sync.sh push "iteration-planning: stime delivery <periodo>" product/ideas/`
+     prima di procedere — non aspettare il commit finale della cerimonia,
+     che stage solo `product/ceremonies/` e `product/approvals/pending/`.
 
 3. **Valutazione 80/20 (rischio-rendimento)** su ogni user story
    confermata: "se cambiamo questo requisito, anziché N giorni ne
@@ -62,9 +67,9 @@ in aggiunta, i passi specifici sotto.
    Alimenta `capacity_allocation` in `roadmap-snapshot`.
 
 5. Consegna a `log-ceremony` (passi comuni): estrazione decisioni,
-   `decisions.yaml`, riepilogo al PM, chiusura `.run-meta.yaml`, sync.
-   Le stime di delivery scritte al passo 2 vengono catturate nello stesso
-   commit finale della cerimonia.
+   `decisions.yaml` (con gli esiti della valutazione 80/20 e la capacità
+   platform tra le `decisions`), riepilogo al PM, chiusura
+   `.run-meta.yaml`, sincronizzazione finale della cartella cerimonia.
 
 ## Dopo
 

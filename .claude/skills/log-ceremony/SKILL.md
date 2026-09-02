@@ -113,12 +113,11 @@ direttamente, questi passi sono tutto ciò che serve.
    `.run-meta.yaml` `status: completed` e `completed_at` (ora corrente),
    poi esegui
    `bash .claude/hooks/governance-sync.sh push "log-ceremony: <ceremony_type> <periodo>" product/ceremonies/ product/approvals/pending/`
-   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Le watch
-   eventualmente richiamate dalla skill chiamante hanno già sincronizzato
-   le proprie scritture su `idea.yaml`/`nsm-tracking.yaml` con un commit
+   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). La skill
+   chiamante e le watch che ha richiamato hanno già sincronizzato le
+   proprie scritture su `idea.yaml`/`nsm-tracking.yaml` con un commit
    dedicato ciascuna; questo passo cattura i file della cerimonia
-   (inclusi `.run-meta.yaml` e le stime di delivery scritte da
-   `iteration-planning`) e le eventuali proposte in `pending/`. Se
+   (inclusi `.run-meta.yaml`) e le eventuali proposte in `pending/`. Se
    l'helper segnala un push fallito, riferiscilo nel riepilogo —
    `status: completed` resta comunque scritto in locale, il commit è
    già stato fatto.
