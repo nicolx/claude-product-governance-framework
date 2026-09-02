@@ -992,6 +992,17 @@ priorità del prossimo periodo — è più
 facile prioritizzare bene quando si parte da un quadro aggiornato di cosa
 sta già funzionando, invece di scoprirlo a posteriori.
 
+**Poi si svuota la coda di approvazione, e si guarda il backlog
+ordinato.** Un RICE proposto da nuova evidenza non conta finché non è
+approvato (sezione "Ideas prioritization" — l'automazione propone, un
+umano decide); e un ranking che nessuno ha davanti non serve a
+prioritizzare. Quindi, prima di discutere cosa entra in iterazione: si
+cammina la coda `product/approvals/pending/` — i diff di RICE voce per
+voce, approvati o rifiutati dal team — e poi si mette davanti a tutti la
+**lista ordinata del backlog**, con score, scadenze e note di contesto.
+È il materiale su cui si sceglie: la cerimonia registra le decisioni, ma
+prima espone le opzioni.
+
 > **Nota su Scrum vs Kanban.** Un approccio più Kanban (una cosa dopo
 > l'altra, ben ordinate per priorità) è spesso preferibile a un
 > commitment rigido per sprint: un Gantt che promette la feature X nello
@@ -1029,10 +1040,13 @@ dettagliate (sono oggetto della fase successiva). Va bene anche da remoto.
 
 Questa cerimonia va registrata con la skill **`backlog-refinement`**, che
 apre la sweep delle watch nell'ordine giusto (`nsm-watch` per prima),
-rileva le reprioritizzazioni fuori-RICE, assegna gli handle corti
-`short_ref` (`PG-042`) alle idee che ancora non ne hanno — il refinement
-settimanale è il punto di serializzazione a scrittore singolo per cui
-questo non collide — e delega a `log-ceremony` per la
+**cammina la coda di approvazione** (`pending-approval`, i `rice_diff`
+voce per voce con il team), **presenta il backlog ordinato**
+(`backlog-list`) come base della prioritizzazione, rileva le
+reprioritizzazioni fuori-RICE, assegna gli handle corti `short_ref`
+(`PG-042`) alle idee che ancora non ne hanno — il refinement settimanale
+è il punto di serializzazione a scrittore singolo per cui questo non
+collide — e delega a `log-ceremony` per la
 scrittura in `product/ceremonies/backlog-refinement/{YYYY-Www}/` —
 trascrizione grezza in `source/`, esito strutturato in `decisions.yaml`
 (vedi `framework/schema/ceremony-decisions.template.yaml`), metadati di
@@ -1041,6 +1055,8 @@ un'idea o produce un nuovo snapshot di roadmap, la proposta passa da
 `product/approvals/pending/` prima di essere applicata.
 
 **Checklist operativa**
+- [ ] La coda `product/approvals/pending/` è stata camminata: ogni `rice_diff` approvato o rifiutato dal team? Quel che resta in coda è stato segnalato?
+- [ ] Il backlog ordinato (`backlog-list`) è stato mostrato al team prima di decidere cosa entra in iterazione?
 - [ ] Il contenitore dell'iterazione corrente è stato creato/aggiornato con goal e iniziativa di riferimento?
 - [ ] Le feature prioritarie sono state aggiunte all'iterazione?
 - [ ] È stata fatta una mini-retrospettiva sull'iterazione precedente?

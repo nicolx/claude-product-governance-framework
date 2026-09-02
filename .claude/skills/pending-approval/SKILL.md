@@ -115,6 +115,13 @@ Quando l'utente approva una voce specifica (per nome file o descrizione):
   un'istruzione valida se l'utente la dà esplicitamente, ma va comunque
   eseguita voce per voce (log distinto per ciascuna), non con una
   scrittura unica indistinta.
+- Il **Backlog Refinement è il luogo previsto** per rivedere la coda dei
+  `rice_diff` (playbook, "Product Backlog Refinement"): quando
+  `backlog-refinement` cammina la coda con il team e il PM decide voce per
+  voce, quella **è** istruzione esplicita — applicala normalmente. Vale
+  anche l'approvazione in blocco di un batch coerente (primo scoring di un
+  intake storico) se il PM lo indica esplicitamente, sempre eseguita una
+  voce alla volta.
 - Se una proposta in `pending/` è più vecchia di qualche settimana,
   segnalalo: potrebbe essere basata su dati non più attuali (es. un RICE
   diff calcolato prima di un'altra revisione più recente della stessa

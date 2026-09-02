@@ -93,11 +93,12 @@ direttamente, questi passi sono tutto ciò che serve.
 
    La skill di cerimonia che ti ha invocato (`backlog-refinement`,
    `iteration-planning`) ti passa anche il proprio materiale specifico da
-   riversare qui: i riepiloghi delle watch e le `reprioritizations` per
-   il Backlog Refinement (inclusi `retro_notes`), le stime di delivery e
-   la valutazione 80/20 per l'Iteration Planning. Includili nelle
-   `decisions`/campi appositi di `decisions.yaml` — non rieseguire tu
-   quei passi, sono di competenza della skill chiamante.
+   riversare qui: per il Backlog Refinement i riepiloghi delle watch, le
+   `reprioritizations`, `approvals_reviewed` (esito della camminata della
+   coda `pending/`) e `retro_notes`; per l'Iteration Planning le stime di
+   delivery e la valutazione 80/20. Includili nelle `decisions`/campi
+   appositi di `decisions.yaml` — non rieseguire tu quei passi, sono di
+   competenza della skill chiamante.
 
 6. **Mostra un riepilogo delle decisioni estratte all'utente** prima di
    considerare il log completo — è più facile correggere un
