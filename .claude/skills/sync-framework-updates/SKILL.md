@@ -77,7 +77,9 @@ segnalalo invece di procedere.
      approvazione — per le idee ancora attive in backlog, lasciando
      intatte quelle già chiuse. Segnala anche i campi nuovi che le idee
      attive dovranno avere popolati (es. `delivery.estimated_effort_weeks`
-     in Iteration Planning per le iniziative in iterazione).
+     in Iteration Planning per le iniziative in iterazione;
+     `short_ref`, assegnato dal prossimo `backlog-refinement` alle idee
+     ancora senza handle).
 
 6. Chiudi con un riepilogo breve: cosa è cambiato, cosa richiede
    attenzione da parte dell'utente, cosa non richiede nulla.

@@ -13,10 +13,10 @@ rispecificare ogni volta e tiene insieme, in un unico posto, la sequenza
 
 > **Dry-run.** Se l'utente chiede la simulazione (`dry-run`, "simula la
 > cerimonia"), propaga l'argomento a ogni skill che invochi
-> (`log-ceremony` e tutte le watch): nessuna scrittura, nessun commit,
-> chiusura con `🔍 DRY-RUN`. Vedi playbook, "Modalità dry-run
-> (simulazione)". Se il run è già stato fatto per errore senza dry-run:
-> `rollback-ceremony`.
+> (`log-ceremony` e tutte le watch): nessuna scrittura (nemmeno
+> l'assegnazione di `short_ref`), nessun commit, chiusura con
+> `🔍 DRY-RUN`. Vedi playbook, "Modalità dry-run (simulazione)". Se il
+> run è già stato fatto per errore senza dry-run: `rollback-ceremony`.
 
 ## Cosa fa
 
@@ -52,7 +52,21 @@ descritti sotto.
    vanno passati a `log-ceremony` perché li includa nel `decisions.yaml`
    della cerimonia.
 
-3. **Rileva le reprioritizzazioni fuori-RICE.** Solo per iniziative
+3. **Assegna `short_ref` alle idee che ne sono prive.** Per ogni idea in
+   `product/ideas/*/idea.yaml` con `short_ref: null`, assegna il prossimo
+   handle: `{prefisso}-{NNN}` dove `NNN = max(numeri short_ref esistenti
+   in tutte le idee) + 1`, zero-padded a 3 cifre (parti da `001` se non
+   ce n'è nessuno). Prefisso: `short_ref_prefix` da
+   `.governance/config.yaml`, o `PG` se assente. Il Backlog Refinement è
+   il punto di serializzazione a scrittore singolo per cui questo non
+   collide (hai appena fatto `pull` al passo 1). È un fatto di
+   housekeeping — scrittura **diretta** su `idea.yaml`, non passa da
+   `pending/` — e una volta assegnato non cambia più. Sincronizza subito
+   queste scritture (come le watch):
+   `bash .claude/hooks/governance-sync.sh push "backlog-refinement: assegnati short_ref" product/ideas/`.
+   Non toccare le idee che un `short_ref` ce l'hanno già.
+
+4. **Rileva le reprioritizzazioni fuori-RICE.** Solo per iniziative
    `classification: idea` che entrano nell'iterazione corrente davanti a
    idee con RICE score più alto ancora in backlog. Per ciascuna, chiedi
    esplicitamente al PM se è una **Strategic Exception** (bypass
@@ -63,11 +77,11 @@ descritti sotto.
    bypassa la priorità ogni settimana" (playbook, "Come gestire le
    frizioni" — Scenario 2).
 
-4. **`retro_notes`** — % completamento dell'iterazione precedente,
+5. **`retro_notes`** — % completamento dell'iterazione precedente,
    impedimenti riscontrati, informazioni mancate — se presenti nella
    trascrizione.
 
-5. Consegna tutto a `log-ceremony` per i passi comuni: estrazione delle
+6. Consegna tutto a `log-ceremony` per i passi comuni: estrazione delle
    decisioni atomiche, `decisions.yaml` (con `retro_notes` e
    `reprioritizations` valorizzati), riepilogo al PM — aperto **sempre**
    dagli allarmi `nsm-watch` se presenti — chiusura di `.run-meta.yaml`,

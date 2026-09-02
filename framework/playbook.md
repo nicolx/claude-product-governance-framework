@@ -1029,7 +1029,10 @@ dettagliate (sono oggetto della fase successiva). Va bene anche da remoto.
 
 Questa cerimonia va registrata con la skill **`backlog-refinement`**, che
 apre la sweep delle watch nell'ordine giusto (`nsm-watch` per prima),
-rileva le reprioritizzazioni fuori-RICE e delega a `log-ceremony` per la
+rileva le reprioritizzazioni fuori-RICE, assegna gli handle corti
+`short_ref` (`PG-042`) alle idee che ancora non ne hanno — il refinement
+settimanale è il punto di serializzazione a scrittore singolo per cui
+questo non collide — e delega a `log-ceremony` per la
 scrittura in `product/ceremonies/backlog-refinement/{YYYY-Www}/` —
 trascrizione grezza in `source/`, esito strutturato in `decisions.yaml`
 (vedi `framework/schema/ceremony-decisions.template.yaml`), metadati di

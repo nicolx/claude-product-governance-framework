@@ -183,7 +183,9 @@ presente nel materiale di origine.
    `framework/schema/idea.template.yaml`, compilando i campi noti. **Non
    compilare `rice_history`** in questo passo — quello è compito della
    skill `rice-update`, con la sua propria approvazione. Lascialo vuoto
-   (`[]`).
+   (`[]`). Lascia anche `short_ref: null` — lo assegna `backlog-refinement`
+   al primo refinement, non l'intake (serializzazione a scrittore unico
+   per evitare collisioni).
 
 8. **Bozza di risposta al richiedente (chiudere il loop).** Vedi
    playbook, "Chiudere il loop col richiedente". Compila `requester_reply`

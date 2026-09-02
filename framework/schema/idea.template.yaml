@@ -17,7 +17,26 @@
 # serve a rispondere a "perché questa idea è cambiata di priorità?" in
 # un MBR/MTR senza dover ricostruire la storia a memoria.
 
-id: "2026-01-08-slug-descrittivo"   # coincide col nome della cartella
+id: "2026-01-08-slug-descrittivo"   # coincide col nome della cartella — identificatore canonico, non cambia mai
+short_ref: null
+# Handle corto per la conversazione e i cross-reference (Jira, altri PRD):
+# "PG-042" è più maneggevole di "2026-01-08-ricevute-non-riconosciute-in-app"
+# in riunione. NON sostituisce `id` né il nome cartella (che restano
+# l'identificatore canonico e parlante — vedi CLAUDE.md, "Convenzioni di
+# naming"): è un campo in più.
+#
+# Assegnato PIGRAMENTE dalla skill `backlog-refinement` al primo Backlog
+# Refinement che incontra l'idea senza `short_ref` — il refinement
+# settimanale è un punto di serializzazione a scrittore singolo (un
+# facilitatore, `pull` -> assegna -> `push`), quindi niente collisioni
+# anche con più PM che lavorano offline. `next = max(numeri short_ref
+# esistenti) + 1`, zero-padded a 3 cifre; nessun file contatore da mettere
+# in conflitto. Un'idea creata tra due refinement semplicemente non ce
+# l'ha ancora — e non le serve finché il team non la discute.
+# Una volta assegnato NON cambia più (come lo slug). Prefisso: `PG` di
+# default, override per-istanza con la chiave `short_ref_prefix` in
+# `.governance/config.yaml`. Fatto di housekeeping, scrittura diretta,
+# non passa da `product/approvals/pending/` (stessa logica di `rice_status`).
 title: ""                            # per convenzione: oggetto della mail/segnalazione originale
 summary: ""                          # UNA riga in linguaggio piano: cosa c'è da fare, comprensibile senza aprire source/. Il title è spesso solo l'oggetto di una mail — questo è la versione leggibile, mostrata nella lista ordinata del backlog (skill backlog-list). Scritto all'intake.
 proposer: ""                         # [NOME] di chi ha proposto l'idea

@@ -32,7 +32,9 @@ Planning).
    procedere, che esista in `product/prds/`.
 2. Prepara il contenuto del ticket (titolo, descrizione sintetica, link
    al PRD e/o alla cartella idea nel repo — non copiare il contenuto
-   integrale del PRD dentro Jira, linkalo).
+   integrale del PRD dentro Jira, linkalo). Se l'idea ha un `short_ref`,
+   mettilo in testa al titolo del ticket (es. `[PG-042] …`) — è il
+   cross-reference tra la governance e l'esecuzione.
 3. Crea il ticket via integrazione Jira disponibile nell'ambiente (MCP
    tool o CLI, secondo cosa è configurato in questa istanza). Se non è
    disponibile alcuna integrazione, prepara comunque il testo pronto da

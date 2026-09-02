@@ -29,10 +29,11 @@ segnale da far notare esplicitamente all'utente, non da nascondere.
 
 Per le voci con un `target_file` che punta a un'idea (`rice_diff`,
 `strategic_exception_flag`, `mandate_update`, `mandate_reclassification`),
-aggiungi al riepilogo il **`summary`** dell'idea e, se ha un
-`deadline.due_date`, la scadenza col suo `escalation_status` — così si
-decide con lo stesso contesto della lista ordinata del backlog, non solo
-guardando i numeri del diff.
+aggiungi al riepilogo il **`short_ref`** dell'idea se presente (es.
+`PG-042`) e il suo **`summary`**, più — se ha un `deadline.due_date` — la
+scadenza col suo `escalation_status`. Così si decide con lo stesso
+contesto della lista ordinata del backlog, non solo guardando i numeri
+del diff.
 
 ## Approvazione
 
