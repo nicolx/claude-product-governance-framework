@@ -34,6 +34,20 @@ retro_notes: ""                    # es. % completamento iterazione precedente, 
 
 # --- Solo per ceremony_type: backlog-refinement ---
 #
+# La cerimonia cammina la coda product/approvals/pending/ (i rice_diff in
+# particolare) con il team: qui va la traccia di cosa è stato deciso su
+# ciascuna voce. Le approvazioni/rifiuti veri li applica pending-approval
+# (che sposta i file in decided/); questo campo è il riferimento
+# leggibile dalla cerimonia.
+approvals_reviewed: []
+# Esempio di singola voce:
+# - approval_id: "2026-W02-idea-xyz-rice.yaml"
+#   idea_ref: "PG-042"
+#   decision: approved          # approved | rejected | deferred
+#   note: ""                    # motivo se rejected/deferred; per un batch storico: "primo scoring intake bulk del {data}"
+
+# --- Solo per ceremony_type: backlog-refinement ---
+#
 # Ogni volta che un'iniziativa entra nell'iterazione corrente saltando
 # davanti a idee con RICE score più alto ancora in backlog, la skill
 # backlog-refinement chiede esplicitamente: è una Strategic Exception (bypass
