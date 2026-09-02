@@ -214,7 +214,7 @@ soli non coprono. In sintesi:
      `approved_by`/`reason` restano da confermare esplicitamente, non
      presumere l'approvazione solo perché il mittente ha un ruolo senior.
      (Questo è distinto dal caso in cui un'idea normale salta la coda più
-     avanti, in Backlog Refinement — vedi skill `log-ceremony`.)
+     avanti, in Backlog Refinement — vedi skill `backlog-refinement`.)
      Se dietro l'eccezione c'è una scadenza reale, compila anche il
      blocco `deadline` (`due_date`/`note`, mai presunti) — rende la
      motivazione verificabile nel tempo e la mette sotto `deadline-watch`.

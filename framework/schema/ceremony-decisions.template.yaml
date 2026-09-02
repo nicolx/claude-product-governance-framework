@@ -36,7 +36,7 @@ retro_notes: ""                    # es. % completamento iterazione precedente, 
 #
 # Ogni volta che un'iniziativa entra nell'iterazione corrente saltando
 # davanti a idee con RICE score più alto ancora in backlog, la skill
-# log-ceremony chiede esplicitamente: è una Strategic Exception (bypass
+# backlog-refinement chiede esplicitamente: è una Strategic Exception (bypass
 # su autorizzazione di uno stakeholder) o una scelta qualitativa fatta
 # dal team dentro il processo normale? La distinzione conta: solo la
 # prima va tracciata su strategic_exceptions dell'idea e nel friction-log

@@ -33,6 +33,8 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `context/` | Istanza, **tracciata da git** (a differenza di `product/inbox/`) | Solo `context-intake`, sempre con conferma esplicita del PM prima di scrivere — è interpretazione di materiale grezzo, non un fatto mai presunto come `jira.status`/`rice_status`. Nessuna approvazione via `pending/` (non è una decisione di priorità). Nessun file grezzo (PDF, slide, docx) vi persiste, né tracciato né gitignorato — vedi playbook, sezione "Contesto aziendale" |
 | `product/inbox/` | Istanza, NON tracciata da git | `inbox-triage` la svuota spostando ogni elemento altrove; nessuna approvazione richiesta per lo spostamento in sé |
 | `product/ideas/`, `product/prds/` (creazione) | Istanza | `idea-intake`, `inbox-triage`, `prd-draft` — creazione diretta, non passa da approvazione (non è ancora una decisione di priorità) |
+| `product/ceremonies/` (cartella cerimonia, `source/`, `decisions.yaml`, `.run-meta.yaml`) | Istanza | `backlog-refinement`, `iteration-planning`, `log-ceremony` — registrazione diretta di una riunione di team: trascrizione + esito qualitativo + metadati di esecuzione. Non passa da `pending/` (non è una decisione di priorità: gli impatti su RICE/roadmap che ne derivano, sì). `.run-meta.yaml` è metadato di esecuzione scritto dalla skill, mai a mano — lo legge `rollback-ceremony` |
+| `product/ideas/*/delivery.estimated_effort_weeks` | Istanza | Solo `iteration-planning` — stima di tempo-calendario dal team tech per la contabilità di capacità d'iterazione, **non** un input del RICE. Scrittura diretta, nessuna approvazione (stessa logica di `deadline`/`rice_status`) |
 | `product/ideas/*/rice_history`, `product/ideas/*/strategic_exceptions`, `product/ideas/*/mandate` (dopo la creazione), `product/ideas/*/classification` (riclassificazione a `mandate`), `product/roadmap/`, comunicazioni in uscita | Istanza | Solo tramite `product/approvals/pending/` — vedi regola sotto |
 | `product/ideas/*/mandate.analysis_start_by`, `product/ideas/*/mandate.escalation_status` | Istanza | Solo `mandate-watch` — fatti calcolati, non decisioni, scrittura diretta senza approvazione (stesso principio di `jira.status`) |
 | `product/ideas/*/rice_status` (incluso `deep_dive`) | Istanza | `rice-watch` (e `idea-intake`/`inbox-triage` per `deep_dive.needed`/`requested_at` all'origine) — `flagged_since` è un fatto osservato; `blocked_reason`/`waiting_on`/`deep_dive.*` sono cattura di contesto (chiesti al PM, mai presunti), non decisioni di priorità: nessuna passa da approvazione |
@@ -76,7 +78,7 @@ Nessuna skill scrive mai direttamente in `product/ideas/`, `product/prds/`,
 - Ogni comunicazione in uscita (mail settimanale, roadmap trimestrale)
 - Ogni Strategic Exception rilevata durante il Backlog Refinement quando
   un'iniziativa salta la coda rispetto al suo RICE score (vedi
-  `log-ceremony` e `idea.template.yaml`, `strategic_exceptions`) — quelle
+  `backlog-refinement` e `idea.template.yaml`, `strategic_exceptions`) — quelle
   invocate già all'intake seguono invece `idea-intake`/`inbox-triage` e
   non passano da qui, perché non c'è ancora un `target_file` esistente da
   modificare (l'idea nasce già così)

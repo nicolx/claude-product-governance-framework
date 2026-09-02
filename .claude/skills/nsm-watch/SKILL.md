@@ -21,7 +21,7 @@ l'attenzione lì, non un'eccezione da gestire in silenzio.
 
 - **Standalone**, in qualunque momento: "come stanno andando le nostre
   NSM?", "abbiamo una nuova lettura per la NSM X?".
-- **Richiamata da `log-ceremony`**, e **per prima tra tutte le watch**
+- **Richiamata da `backlog-refinement`**, e **per prima tra tutte le watch**
   in apertura del Backlog Refinement — è il segnale più strategico, va
   visto prima di misurare l'impatto delle singole iniziative
   (`measurement-watch`) o di controllare le scadenze e l'housekeeping
@@ -110,7 +110,7 @@ l'attenzione lì, non un'eccezione da gestire in silenzio.
    annegato tra le altre righe. Poi le NSM `improving`/`stable` solo se
    richiesto esplicitamente.
 
-8. Se chiamata da `log-ceremony`, restituisci il riepilogo perché venga
+8. Se chiamata da `backlog-refinement`, restituisci il riepilogo perché venga
    incluso nel log della cerimonia — non scrivere tu stessa in
    `decisions.yaml`, è compito di `log-ceremony`.
 
@@ -118,7 +118,7 @@ l'attenzione lì, non un'eccezione da gestire in silenzio.
    `product/reference/nsm-tracking.yaml`, esegui
    `bash .claude/hooks/governance-sync.sh push "nsm-watch: aggiornato nsm-tracking" product/reference/nsm-tracking.yaml`
    (vedi playbook, "Sincronizzazione dell'istanza (`origin`)") — anche se
-   richiamata da `log-ceremony`, e anche prima: è il segnale più
+   richiamata da `backlog-refinement`, e anche prima: è il segnale più
    strategico, i colleghi devono vederlo appena disponibile.
 
 ## Cosa NON fare

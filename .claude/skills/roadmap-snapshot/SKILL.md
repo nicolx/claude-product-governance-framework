@@ -7,8 +7,9 @@ description: Genera la proposta di snapshot settimanale della roadmap a partire 
 
 Genera la proposta di snapshot settimanale della roadmap, tipicamente
 subito dopo che Backlog Refinement e Roadmap/Iteration Planning sono
-stati loggati con `log-ceremony`. Segue il playbook (sezione "Product
-Backlog Refinement" / "Roadmap update & Iteration planning").
+stati loggati con `backlog-refinement` / `iteration-planning`. Segue il
+playbook (sezione "Product Backlog Refinement" / "Roadmap update &
+Iteration planning").
 
 ## Regola fondamentale
 
@@ -44,7 +45,7 @@ creato/aggiornato.
    - `product/ceremonies/backlog-refinement/{settimana}/decisions.yaml`
      e `product/ceremonies/roadmap-iteration-planning/{settimana}/decisions.yaml`,
      se presenti — inclusi i riepiloghi di `nsm-watch`, `measurement-watch`,
-     `mandate-watch`, `rice-watch` se `log-ceremony` li ha loggati lì.
+     `mandate-watch`, `rice-watch` se `backlog-refinement` li ha loggati lì.
    - Stato Jira delle iniziative già collegate (vedi skill `jira-sync` —
      se lo stato non è stato aggiornato di recente, suggerisci di
      lanciare un pull prima di generare lo snapshot, per non proporre

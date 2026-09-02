@@ -225,7 +225,7 @@ rice_status:
 #    "Ideas prioritization": "per interrompere l'agenda di sviluppo con
 #    una nuova attività immediata si deve ricorrere sempre alla Strategic
 #    Exception") — anche se l'idea aveva già un RICE regolare.
-#    La skill log-ceremony la rileva confrontando la posizione assegnata
+#    La skill backlog-refinement la rileva confrontando la posizione assegnata
 #    col RICE score, e chiede esplicitamente se è un'eccezione (bypass su
 #    autorizzazione di uno stakeholder) o una scelta qualitativa del team
 #    dentro il processo normale (in tal caso NON va qui, resta solo nel
