@@ -330,6 +330,64 @@ locali sopra quelli del team), controlla i conflitti sui file condivisi
 `idea.yaml` i conflitti sono quasi sempre banali: la convenzione
 cartella-per-idea e `rice_history` append-only li rende rari e locali.
 
+## Modalità dry-run (simulazione)
+
+A volte serve **vedere cosa produrrebbe** una skill — tipicamente una
+cerimonia — senza toccare nulla: per provare il flusso di un Backlog
+Refinement prima di condurlo davvero, per addestrare un nuovo PM, o
+semplicemente per rifare la stessa riunione due volte e ritrovarsi con
+gli stessi dati. Questo è il dry-run: la skill legge, analizza e mostra
+l'output completo che *scriverebbe*, ma non persiste nulla di tracciato e
+non fa alcun commit o push. È ripetibile identica finché gli input non
+cambiano.
+
+**Come si attiva:**
+
+- **Per singola invocazione** — l'utente lo chiede esplicitamente
+  ("lancia `backlog-refinement` in dry-run", "simula la cerimonia",
+  argomento `dry-run` alla skill). Vale solo per quel run.
+- **Persistente per istanza** — `.governance/config.yaml`, chiave
+  top-level `dry_run: true`. Finché è `true`, **ogni** skill gira in
+  simulazione. Utile per un'istanza di training/demo; da togliere quando
+  l'istanza diventa operativa.
+
+**Contratto — cosa fa una skill in dry-run:**
+
+1. Esegue tutti i passi di **lettura e analisi** normalmente, incluso
+   `governance-sync.sh pull` (è read-only fast-forward: non sporca nulla
+   di tracciato e tiene la simulazione onesta sullo stato reale del
+   team).
+2. **Non crea né modifica** file sotto `product/`, `context/`,
+   `.governance/` — né con scrittura diretta, né spostando file
+   (`inbox/` → `ideas/`, `pending/` → `decided/`, rinomina di cartelle
+   cerimonia…).
+3. **Non invoca `governance-sync.sh push`**: nessun commit, nessun push.
+   Come rete di sicurezza l'helper stesso fa no-op sul `push` quando il
+   dry-run è attivo (env `GOVERNANCE_DRY_RUN`, o `dry_run: true` in
+   config) — così anche una skill che dimentica il contratto non scrive
+   su `origin`.
+4. **Presenta come testo** l'output completo che avrebbe scritto:
+   contenuto di `decisions.yaml`, proposte per `pending/` (YAML
+   completo), riepiloghi delle watch, diff RICE, bozze di
+   `requester_reply`. Nulla di meno di un run vero — solo non persistito.
+5. Chiude con una riga inequivocabile:
+   `🔍 DRY-RUN — nessun file scritto, nessun commit, nessun push. Rilancia senza "dry-run" per applicare.`
+
+Una skill che ne richiama altre (es. `log-ceremony` con le watch)
+**propaga** il dry-run alle skill richiamate.
+
+**Cosa il dry-run NON è.** Non è un meccanismo di rollback: se hai già
+lanciato una skill *vera* e vuoi annullarla, serve un intervento git
+esplicito (revert dei commit prodotti dalla skill) — non basta
+rilanciare in dry-run. `init-governance-project` e `sync-framework-updates`
+non hanno una modalità dry-run (il primo è bootstrap una-tantum, il
+secondo riguarda il *metodo* su `upstream`, con una sua revisione umana).
+
+**Hook.** `SessionStart` fa solo `pull` (già read-only). `check-unpushed.sh`
+e `check-inbox.sh` (hook `Stop`) restano attivi anche in dry-run e sono
+utili — ti dicono se resta lavoro non pushato da run precedenti o
+`inbox/` non processata — non vanno silenziati.
+
 ## Alimentazione del bucket delle idee
 
 *"The best way to have a good idea is to have a lot of ideas." — Linus

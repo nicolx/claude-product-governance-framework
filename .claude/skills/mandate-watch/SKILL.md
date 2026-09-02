@@ -23,6 +23,15 @@ agire da sola sulla priorità.
 
 ## Passi
 
+> **Dry-run.** Se la skill è stata invocata in modalità simulazione
+> (argomento `dry-run`, o `dry_run: true` in `.governance/config.yaml`),
+> applica il contratto della sezione "Modalità dry-run (simulazione)" del
+> playbook: esegui letture e analisi normalmente, **non** scrivere su
+> `product/` (nemmeno i fatti calcolati come `escalation_status`/
+> `analysis_start_by`), **non** invocare `governance-sync.sh push`, mostra
+> come testo l'output completo che avresti prodotto, e chiudi con
+> `🔍 DRY-RUN — nessun file scritto, nessun commit, nessun push.`
+
 0. **Sincronizza da `origin`**: esegui
    `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
    "Sincronizzazione dell'istanza (`origin`)") prima di leggere le idee —

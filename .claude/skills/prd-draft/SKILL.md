@@ -38,6 +38,15 @@ scrive solo dopo conferma esplicita del PM.
 
 ## Passi
 
+> **Dry-run.** Se la skill è stata invocata in modalità simulazione
+> (argomento `dry-run`, o `dry_run: true` in `.governance/config.yaml`),
+> applica il contratto della sezione "Modalità dry-run (simulazione)" del
+> playbook: esegui letture e analisi normalmente, **non** creare file
+> sotto `product/prds/` (né il PRD né `measurement*.yaml`), **non**
+> invocare `governance-sync.sh push`, mostra come testo il contenuto
+> completo che avresti scritto, e chiudi con `🔍 DRY-RUN — nessun file
+> scritto, nessun commit, nessun push.`
+
 1. Leggi `product/ideas/{slug}/idea.yaml` (Why implicito dal contesto
    dell'idea, ultima voce di `rice_history` per capire cosa è stato
    valutato), tutto il materiale in `source/`, e i file di `context/`

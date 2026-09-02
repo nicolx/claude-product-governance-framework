@@ -9,6 +9,15 @@ Gestisce il collegamento (non la duplicazione) tra le idee/PRD di
 questa istanza e Jira, secondo il brief: "Jira: sistema di verità per
 l'esecuzione, non duplicato. Nessun sync in tempo reale."
 
+> **Dry-run.** Se la skill è stata invocata in modalità simulazione
+> (argomento `dry-run`, o `dry_run: true` in `.governance/config.yaml`),
+> applica il contratto della sezione "Modalità dry-run (simulazione)" del
+> playbook: **non** creare ticket Jira, **non** scrivere `jira.*`/`status`
+> su `product/ideas/`, **non** invocare `governance-sync.sh push`; mostra
+> come testo il ticket che avresti creato / gli aggiornamenti di stato che
+> avresti scritto, e chiudi con `🔍 DRY-RUN — nessun file scritto, nessun
+> ticket creato, nessun commit.`
+
 ## Modalità Push (idea/PRD → Jira)
 
 Da usare quando un'idea è stata prioritizzata ed è pronta a entrare nel

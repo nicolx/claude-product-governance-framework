@@ -36,6 +36,15 @@ presente nel materiale di origine.
 
 ## Passi
 
+> **Dry-run.** Se la skill è stata invocata in modalità simulazione
+> (argomento `dry-run`, o `dry_run: true` in `.governance/config.yaml`),
+> applica il contratto della sezione "Modalità dry-run (simulazione)" del
+> playbook: esegui letture e analisi normalmente, **non** scrivere su
+> `product/`/`context/`/`.governance/` (nemmeno spostando file), **non**
+> invocare `governance-sync.sh push`, mostra come testo l'output completo
+> che avresti prodotto, e chiudi con `🔍 DRY-RUN — nessun file scritto,
+> nessun commit, nessun push.`
+
 1. **Leggi il materiale grezzo** fornito dall'utente (allegato, testo
    incollato, o riferimento a un file).
 

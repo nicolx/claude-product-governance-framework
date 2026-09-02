@@ -112,6 +112,20 @@ playbook, sezione "Sincronizzazione dell'istanza (`origin`)". Da non
 confondere con `sync-framework-updates`, che riguarda `upstream` (il
 metodo), non i dati.
 
+## Modalità dry-run (simulazione)
+
+Ogni skill che scrive stato tracciato supporta un dry-run: eseguita in
+simulazione, legge e analizza, mostra l'output completo che *produrrebbe*,
+ma non scrive nulla sotto `product/`/`context/`/`.governance/` e non fa
+alcun commit o push. Si attiva per singola invocazione (l'utente chiede
+`dry-run`) o per l'intera istanza (`dry_run: true`, chiave top-level in
+`.governance/config.yaml`). Serve a provare o addestrare una cerimonia
+senza sporcare il repo, e a poterla rieseguire identica. Rete di
+sicurezza: `governance-sync.sh push` è un no-op quando il dry-run è
+attivo. Fonte normativa: playbook, sezione "Modalità dry-run
+(simulazione)". Non è un rollback — per annullare un run *vero* serve un
+revert git esplicito dei suoi commit.
+
 ## Convenzioni di naming
 
 Cartella-per-iniziativa con slug parlante, non ID opachi: chi gestisce il

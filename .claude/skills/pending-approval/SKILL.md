@@ -9,6 +9,16 @@ Gestisce la coda unica di "pending approval" del framework — il
 meccanismo per cui **l'automazione propone, un umano decide**, sia per i
 diff di roadmap/RICE sia per le comunicazioni in uscita.
 
+> **Dry-run.** Se la skill è stata invocata in modalità simulazione
+> (argomento `dry-run`, o `dry_run: true` in `.governance/config.yaml`),
+> applica il contratto della sezione "Modalità dry-run (simulazione)" del
+> playbook. L'`Elenco` funziona già in sola lettura. Per
+> `Approvazione`/`Rifiuto`: esegui la lettura e mostra cosa
+> verrebbe applicato a `target_file`, ma **non** modificare `target_file`,
+> **non** spostare la voce in `product/approvals/decided/`, **non**
+> invocare `governance-sync.sh push`; chiudi con `🔍 DRY-RUN — nessun
+> file scritto, nessun commit, nessun push.`
+
 ## Elenco
 
 Se l'utente chiede genericamente cosa c'è da approvare, elenca tutti i

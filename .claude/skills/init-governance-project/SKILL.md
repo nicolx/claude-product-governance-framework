@@ -124,6 +124,11 @@ che serve da lì e chiedi solo quello che manca.
    (`origin`)") — default `true` su entrambe; menziona all'utente che può
    spegnerle qui (per un'istanza mono-PM, o un setup git particolare) se
    non le vuole.
+   Se questa istanza serve solo per training/demo (nessun dato reale da
+   persistere), puoi aggiungere una chiave top-level `dry_run: true`: ogni
+   skill girerà in simulazione finché non la togli (vedi playbook,
+   "Modalità dry-run (simulazione)"). Per un'istanza operativa normale
+   **non** aggiungerla.
 2. `product/reference/product-lines.yaml` (da template).
 3. `product/reference/annual-target.yaml` (da
    `framework/schema/annual-target.template.yaml`) — con l'incremento

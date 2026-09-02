@@ -20,6 +20,15 @@ umana esplicita (skill `pending-approval`) la voce viene appesa a
 
 ## Passi
 
+> **Dry-run.** Se la skill è stata invocata in modalità simulazione
+> (argomento `dry-run`, o `dry_run: true` in `.governance/config.yaml`),
+> applica il contratto della sezione "Modalità dry-run (simulazione)" del
+> playbook: esegui letture e analisi normalmente, **non** creare il file
+> di proposta in `product/approvals/pending/`, **non** invocare
+> `governance-sync.sh push`, mostra come testo la proposta completa
+> (YAML) che avresti scritto, e chiudi con `🔍 DRY-RUN — nessun file
+> scritto, nessun commit, nessun push.`
+
 1. Identifica l'idea (per slug, o aiutando l'utente a trovarla se
    descritta a parole).
 
