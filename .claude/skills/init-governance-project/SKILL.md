@@ -89,8 +89,23 @@ per raccogliere:
      l'eccezione.
    Sostituire con un vero submodule non appena il codice sarà distribuito
    via git.
-6. **Jira** (o altro tracker di esecuzione) — project key, URL board. Solo
-   configurazione, nessun collegamento realtime va creato qui.
+6. **Jira** (o altro tracker di esecuzione) — project key, URL board, e
+   **come l'istanza si connette** (blocco `jira` in
+   `framework/schema/governance-config.template.yaml`). Nessun
+   collegamento realtime va creato qui, ma vale la pena impostare subito
+   l'accesso programmatico, perché serve a `jira-sync` per il dedup e la
+   riconciliazione:
+   - **Path consigliato — Atlassian Remote MCP Server ufficiale** (OAuth
+     2.1, nessun token da gestire):
+     `claude mcp add --transport http atlassian https://mcp.atlassian.com/v2/mcp`
+     poi `/mcp` in sessione per il login in browser. Registra
+     `integration: atlassian-mcp` e il `cloud_id` (lo restituisce il
+     tool `getAccessibleAtlassianResources`).
+   - **Fallback** — una CLI Jira già presente nell'ambiente:
+     `integration: "cli:<nome>"`.
+   - **Nessun accesso programmatico** — `integration: manuale`:
+     `jira-sync` preparerà i testi e il PM agirà a mano. Va bene per
+     partire, si può aggiungere l'MCP in seguito.
 7. **Eventuali altre configurazioni rilevanti** — canale Slack/Teams per
    comunicazioni, link a strumenti di analytics (es. DataBricks), altro
    che l'utente ritenga utile avere a portata di mano nel config.
@@ -110,30 +125,25 @@ che serve da lì e chiedi solo quello che manca.
 ## Cosa scrivere
 
 1. `.governance/config.yaml` (crea la cartella `.governance/` se non
-   esiste) con almeno: nome progetto, data di inizializzazione, PM
-   roster, riferimento Jira, elenco submodule collegati, versione/commit
-   del framework upstream al momento dell'init (`git rev-parse
-   upstream/main` se disponibile, altrimenti `HEAD`), e un blocco:
-   ```yaml
-   sync:
-     auto_pull: true
-     auto_push: true
-   ```
-   È ciò che attiva la sincronizzazione automatica con `origin` per tutte
+   esiste) da `framework/schema/governance-config.template.yaml` —
+   compila i campi noti dall'intervista: `project`, `initialized_at`,
+   `pm_roster`, `framework.upstream_ref` (`git rev-parse upstream/main`
+   se disponibile, altrimenti `HEAD`), il blocco `jira` (passo 6
+   dell'intervista), `apps`.
+   Il blocco `sync` (`auto_pull`/`auto_push`, default `true` entrambi) è
+   ciò che attiva la sincronizzazione automatica con `origin` per tutte
    le skill successive (vedi playbook, "Sincronizzazione dell'istanza
-   (`origin`)") — default `true` su entrambe; menziona all'utente che può
-   spegnerle qui (per un'istanza mono-PM, o un setup git particolare) se
-   non le vuole.
+   (`origin`)") — menziona all'utente che può spegnerle qui (per
+   un'istanza mono-PM, o un setup git particolare) se non le vuole.
    Se questa istanza serve solo per training/demo (nessun dato reale da
-   persistere), puoi aggiungere una chiave top-level `dry_run: true`: ogni
-   skill girerà in simulazione finché non la togli (vedi playbook,
-   "Modalità dry-run (simulazione)"). Per un'istanza operativa normale
-   **non** aggiungerla.
-   Chiave opzionale `short_ref_prefix` (default `PG`): il prefisso degli
-   handle corti delle idee (`PG-042`), assegnati da `backlog-refinement`.
-   Chiedi al PM se preferisce un prefisso legato al progetto (es. la
-   sigla del prodotto); se non gli interessa, lascia il default e non
-   scrivere la chiave.
+   persistere), puoi aggiungere `dry_run: true`: ogni skill girerà in
+   simulazione finché non la togli (vedi playbook, "Modalità dry-run
+   (simulazione)"). Per un'istanza operativa normale **non** aggiungerla.
+   `short_ref_prefix` (default `PG`): il prefisso degli handle corti
+   delle idee (`PG-042`), assegnati da `backlog-refinement`. Chiedi al PM
+   se preferisce un prefisso legato al progetto (es. la sigla del
+   prodotto); se non gli interessa, lascia il default e non scrivere la
+   chiave.
 2. `product/reference/product-lines.yaml` (da template).
 3. `product/reference/annual-target.yaml` (da
    `framework/schema/annual-target.template.yaml`) — con l'incremento

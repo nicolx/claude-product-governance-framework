@@ -1,0 +1,39 @@
+# Template per .governance/config.yaml — il file che marca un fork come
+# istanza operativa del framework (la sua sola presenza attiva hook e
+# sincronizzazione; vedi playbook, "Sincronizzazione dell'istanza").
+#
+# Scritto da `init-governance-project`. In seguito si modifica solo su
+# richiesta esplicita dell'utente. Non è tracciato per esclusione — è
+# proprietà istanza (vedi CLAUDE.md, confini di proprietà).
+
+project: ""                       # nome leggibile dell'istanza
+initialized_at: ""                # data ISO dell'inizializzazione
+pm_roster: []                     # [NOME] dei PM che operano su questa istanza
+
+framework:
+  upstream_ref: ""                # commit di upstream/main al momento dell'init (o HEAD) — lo usa sync-framework-updates
+
+# --- Sincronizzazione dati con origin (vedi playbook) ---
+sync:
+  auto_pull: true                 # default true — una chiave a false spegne quel lato
+  auto_push: true
+
+# --- Opzionali ---
+# dry_run: true                   # istanza di training/demo: OGNI skill gira in simulazione (playbook, "Modalità dry-run"). Non metterla su un'istanza operativa.
+# short_ref_prefix: "PG"          # prefisso degli handle corti delle idee (PG-042), assegnati da backlog-refinement. Default "PG".
+
+# --- Tracker di esecuzione ---
+jira:
+  configured: false               # true quando l'istanza ha davvero un progetto Jira collegato
+  project_key: ""                 # es. "EPITA"
+  board_url: ""                   # URL della board (per i link, non per il polling)
+  cloud_id: ""                    # id del sito Atlassian (da getAccessibleAtlassianResources) — serve ad alcuni tool MCP
+  integration: ""                 # COME l'istanza si connette: "atlassian-mcp" (Remote MCP Server ufficiale, consigliato), "cli:<nome>", "manuale" (nessun accesso programmatico: jira-sync prepara i testi, il PM agisce a mano)
+  note: ""                        # note libere (permessi, quirk del progetto, ecc.)
+
+# --- Repository applicativi collegati come submodule ---
+apps: []
+# Esempio di voce:
+# - slug: "checkout-service"
+#   path: "apps/checkout-service"
+#   note: ""                      # es. "snapshot locale non versionabile — vedi apps/checkout-service/README.md"
