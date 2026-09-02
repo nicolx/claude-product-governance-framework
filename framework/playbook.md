@@ -378,16 +378,49 @@ Una skill che ne richiama altre (es. `log-ceremony` con le watch)
 **propaga** il dry-run alle skill richiamate.
 
 **Cosa il dry-run NON è.** Non è un meccanismo di rollback: se hai già
-lanciato una skill *vera* e vuoi annullarla, serve un intervento git
-esplicito (revert dei commit prodotti dalla skill) — non basta
-rilanciare in dry-run. `init-governance-project` e `sync-framework-updates`
-non hanno una modalità dry-run (il primo è bootstrap una-tantum, il
-secondo riguarda il *metodo* su `upstream`, con una sua revisione umana).
+lanciato una cerimonia *vera* e vuoi annullarla, serve `rollback-ceremony`
+(sezione sotto) — non basta rilanciare in dry-run.
+`init-governance-project` e `sync-framework-updates` non hanno una
+modalità dry-run (il primo è bootstrap una-tantum, il secondo riguarda il
+*metodo* su `upstream`, con una sua revisione umana).
 
 **Hook.** `SessionStart` fa solo `pull` (già read-only). `check-unpushed.sh`
 e `check-inbox.sh` (hook `Stop`) restano attivi anche in dry-run e sono
 utili — ti dicono se resta lavoro non pushato da run precedenti o
 `inbox/` non processata — non vanno silenziati.
+
+## Annullare un run di cerimonia (`rollback-ceremony`)
+
+Se una cerimonia è stata registrata per errore senza dry-run, o si è
+interrotta a metà lasciando i file in uno stato incoerente, la skill
+`rollback-ceremony` riporta il repo allo stato immediatamente precedente
+al run — così lo si può rifare pulito. Si appoggia a `.run-meta.yaml`
+(scritto da `log-ceremony` all'inizio di ogni run), che registra il
+`base_sha`: il commit git da cui il run è partito.
+
+**Si annulla in avanti, non riscrivendo la storia** — coerente con il
+vincolo fast-forward-only del sync su un repo condiviso:
+
+- Commit del run **già pushati su `origin`** → `git revert` (un nuovo
+  commit che li disfa). Mai `git reset` + force-push: romperebbe il
+  clone di chi ha già fatto pull. Il commit di revert è esso stesso
+  parte del registro difendibile ("annullato il run X il {data}").
+- Commit del run **ancora solo locali** → `git reset` è lecito, previa
+  conferma.
+- Un conflitto di revert **non si risolve automaticamente**: la skill fa
+  `--abort`, si ferma e riferisce (stesso principio dell'helper di sync
+  che non fa mai merge automatici).
+
+**Fuori scope: le decisioni già approvate.** Se il run aveva prodotto una
+proposta poi approvata da `pending-approval` (spostata in
+`product/approvals/decided/`, `payload` applicato al `target_file`),
+quella decisione **non** viene annullata da `rollback-ceremony`: è una
+decisione umana tracciata. La skill la rileva, la esclude e la segnala —
+disfarla è un'operazione separata e deliberata.
+
+La trascrizione grezza in `source/` viene per default conservata in una
+cartella `{periodo}-void-{n}` prima dell'annullamento: è costosa da
+ricreare, e resta come traccia del tentativo.
 
 ## Alimentazione del bucket delle idee
 

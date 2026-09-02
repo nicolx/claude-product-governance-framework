@@ -33,7 +33,7 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `context/` | Istanza, **tracciata da git** (a differenza di `product/inbox/`) | Solo `context-intake`, sempre con conferma esplicita del PM prima di scrivere — è interpretazione di materiale grezzo, non un fatto mai presunto come `jira.status`/`rice_status`. Nessuna approvazione via `pending/` (non è una decisione di priorità). Nessun file grezzo (PDF, slide, docx) vi persiste, né tracciato né gitignorato — vedi playbook, sezione "Contesto aziendale" |
 | `product/inbox/` | Istanza, NON tracciata da git | `inbox-triage` la svuota spostando ogni elemento altrove; nessuna approvazione richiesta per lo spostamento in sé |
 | `product/ideas/`, `product/prds/` (creazione) | Istanza | `idea-intake`, `inbox-triage`, `prd-draft` — creazione diretta, non passa da approvazione (non è ancora una decisione di priorità) |
-| `product/ceremonies/` (cartella cerimonia, `source/`, `decisions.yaml`, `.run-meta.yaml`) | Istanza | `backlog-refinement`, `iteration-planning`, `log-ceremony` — registrazione diretta di una riunione di team: trascrizione + esito qualitativo + metadati di esecuzione. Non passa da `pending/` (non è una decisione di priorità: gli impatti su RICE/roadmap che ne derivano, sì). `.run-meta.yaml` è metadato di esecuzione scritto dalla skill, mai a mano — lo legge `rollback-ceremony` |
+| `product/ceremonies/` (cartella cerimonia, `source/`, `decisions.yaml`, `.run-meta.yaml`) | Istanza | `backlog-refinement`, `iteration-planning`, `log-ceremony` — registrazione diretta di una riunione di team: trascrizione + esito qualitativo + metadati di esecuzione. Non passa da `pending/` (non è una decisione di priorità: gli impatti su RICE/roadmap che ne derivano, sì). `.run-meta.yaml` è metadato di esecuzione scritto dalla skill, mai a mano. `rollback-ceremony` può annullare un run (revert forward dei commit + cartella `-void` con la trascrizione), mai una decisione già approvata |
 | `product/ideas/*/delivery.estimated_effort_weeks` | Istanza | Solo `iteration-planning` — stima di tempo-calendario dal team tech per la contabilità di capacità d'iterazione, **non** un input del RICE. Scrittura diretta, nessuna approvazione (stessa logica di `deadline`/`rice_status`) |
 | `product/ideas/*/rice_history`, `product/ideas/*/strategic_exceptions`, `product/ideas/*/mandate` (dopo la creazione), `product/ideas/*/classification` (riclassificazione a `mandate`), `product/roadmap/`, comunicazioni in uscita | Istanza | Solo tramite `product/approvals/pending/` — vedi regola sotto |
 | `product/ideas/*/mandate.analysis_start_by`, `product/ideas/*/mandate.escalation_status` | Istanza | Solo `mandate-watch` — fatti calcolati, non decisioni, scrittura diretta senza approvazione (stesso principio di `jira.status`) |
@@ -100,6 +100,11 @@ vale sia per motivi di qualità (falsi positivi/negativi nell'inferenza)
 sia organizzativi (difendibilità delle decisioni in caso di revisione con
 gli stakeholder) — vedi brief e playbook per il razionale completo.
 
+Corollario: una voce già in `decided/` con `decision: approved` è una
+decisione umana definitiva. `rollback-ceremony`, quando annulla un run di
+cerimonia, la **esclude** sempre — annullare una decisione approvata è
+un'operazione separata e deliberata, mai un effetto collaterale.
+
 ## Sincronizzazione dell'istanza (`origin`)
 
 Le skill che leggono o scrivono stato tracciato sincronizzano
@@ -125,8 +130,10 @@ alcun commit o push. Si attiva per singola invocazione (l'utente chiede
 senza sporcare il repo, e a poterla rieseguire identica. Rete di
 sicurezza: `governance-sync.sh push` è un no-op quando il dry-run è
 attivo. Fonte normativa: playbook, sezione "Modalità dry-run
-(simulazione)". Non è un rollback — per annullare un run *vero* serve un
-revert git esplicito dei suoi commit.
+(simulazione)". Non è un rollback — per annullare un run *vero* c'è
+`rollback-ceremony` (revert forward dei commit del run, mai reset/
+force-push su storia pushata, mai una decisione già approvata). Fonte
+normativa: playbook, "Annullare un run di cerimonia (`rollback-ceremony`)".
 
 ## Convenzioni di naming
 

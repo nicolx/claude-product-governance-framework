@@ -14,7 +14,8 @@ questa cerimonia (stime di delivery, 80/20, capacità platform).
 > l'argomento a `log-ceremony`: nessuna scrittura (né `decisions.yaml`,
 > né `.run-meta.yaml`, né `delivery.estimated_effort_weeks` sulle idee),
 > nessun commit, chiusura con `🔍 DRY-RUN`. Vedi playbook, "Modalità
-> dry-run (simulazione)".
+> dry-run (simulazione)". Run già fatto per errore senza dry-run:
+> `rollback-ceremony`.
 
 ## Cosa fa
 

@@ -142,8 +142,9 @@ solo dopo conferma esplicita del PM.
 Il playbook genericizzato è in
 [`framework/playbook.md`](framework/playbook.md) — RICE, A3 Thinking sui
 PRD, cerimonie, meccanismo di approvazione, modalità dry-run per simulare
-una cerimonia senza scrivere nulla, gestione delle frizioni con gli
-stakeholder. È la fonte normativa che ogni skill deve rispettare.
+una cerimonia senza scrivere nulla (e `rollback-ceremony` per annullarne
+una lanciata per errore), gestione delle frizioni con gli stakeholder.
+È la fonte normativa che ogni skill deve rispettare.
 
 Per un esempio completo e realistico di come tutto questo si applica in un
 caso vero (con tanto di narrativa passo-passo), vedi
