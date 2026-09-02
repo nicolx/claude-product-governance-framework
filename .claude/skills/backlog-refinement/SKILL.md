@@ -15,7 +15,8 @@ rispecificare ogni volta e tiene insieme, in un unico posto, la sequenza
 > cerimonia"), propaga l'argomento a ogni skill che invochi
 > (`log-ceremony` e tutte le watch): nessuna scrittura, nessun commit,
 > chiusura con `🔍 DRY-RUN`. Vedi playbook, "Modalità dry-run
-> (simulazione)".
+> (simulazione)". Se il run è già stato fatto per errore senza dry-run:
+> `rollback-ceremony`.
 
 ## Cosa fa
 
