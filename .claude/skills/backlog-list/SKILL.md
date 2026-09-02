@@ -27,6 +27,10 @@ li mette tutti sulla stessa riga.
    almeno una voce in `rice_history`, **ordinate per lo `score` della
    voce più recente, decrescente**. Per ciascuna mostra, sulla stessa
    riga o in un blocco compatto:
+   - `short_ref` come identificatore in testa alla riga se presente (es.
+     `PG-042`); se `null`, usa lo slug della cartella — non inventarne
+     uno, lo assegna `backlog-refinement`. Vale per **tutte** le sezioni
+     sotto, non solo questa.
    - `score` (dall'ultima voce di `rice_history`)
    - `summary` — se vuoto, segnalalo esplicitamente ("⚠ summary
      mancante") invece di inventarlo o di ripetere il `title`

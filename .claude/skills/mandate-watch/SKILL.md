@@ -76,8 +76,9 @@ agire da sola sulla priorità.
 
 4. **Presenta un riepilogo ordinato per urgenza** (`overdue` prima,
    poi `due_soon`, poi `pending_review`, poi `on_track` solo se
-   rilevante): per ciascun mandate a rischio, mostra `idea_id`,
-   `mandated_by`, `due_date`, `analysis_start_by`, lo `status` corrente
+   rilevante): per ciascun mandate a rischio, mostra `short_ref` se
+   presente, `idea_id`, `mandated_by`, `due_date`, `analysis_start_by`,
+   lo `status` corrente
    dell'idea. **Solo segnalazione — nessuna azione automatica**: non
    proporre né inviare comunicazioni di escalation da questa skill, la
    decisione su come/se sollecitare resta interamente del PM.

@@ -91,7 +91,7 @@ silenzio.
    **`needs_deep_dive`** (specie quelle in ritardo — il meeting è
    riconosciuto necessario ma non ancora in calendario), poi `stale`,
    poi `blocked_on`, poi `aging`, `fresh` solo se rilevante o richiesto.
-   Per ciascuna: `idea_id`, `title`, giorni fermi,
+   Per ciascuna: `short_ref` se presente, `idea_id`, `title`, giorni fermi,
    `blocked_reason`/`waiting_on`, e per le `needs_deep_dive` chi è il
    richiedente da coinvolgere e da quanto il meeting è in sospeso. **Solo
    segnalazione — nessuna azione automatica**: non lanciare tu stessa

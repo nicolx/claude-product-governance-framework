@@ -131,8 +131,9 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
 6. **Presenta un riepilogo ordinato per urgenza** (`check_due` e
    `at_risk`/`invalidated` prima, poi le iniziative senza KPI ancora da
    accettare, poi `on_track`; le iniziative appena chiuse in questo run
-   vanno menzionate una volta, non ripetute): per ciascuna, `idea_id`,
-   nome della KPI (o "nessuna KPI" per il caso compliance), settimane da
+   vanno menzionate una volta, non ripetute): per ciascuna, `short_ref`
+   se presente, `idea_id`, nome della KPI (o "nessuna KPI" per il caso
+   compliance), settimane da
    `done_at`, ultimo valore noto vs. baseline/target. **Solo
    segnalazione** per ciò che resta aperto — nessuna comunicazione o
    escalation automatica, stesso principio di `mandate-watch`.

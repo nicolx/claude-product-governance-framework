@@ -97,7 +97,8 @@ skill esiste per evitare.
      stato.
 
 5. **Presenta un riepilogo ordinato per urgenza** (`overdue` prima, poi
-   `due_soon`, poi `on_track` solo se richiesto esplicitamente).
+   `due_soon`, poi `on_track` solo se richiesto esplicitamente) — per
+   ciascuna idea mostra `short_ref` se presente, oltre a `idea_id`/`title`.
 
 6. Se chiamata da `backlog-refinement`, restituisci il riepilogo perché venga
    incluso nel log della cerimonia — non scrivere tu stessa in

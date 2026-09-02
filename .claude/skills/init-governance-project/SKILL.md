@@ -129,6 +129,11 @@ che serve da lì e chiedi solo quello che manca.
    skill girerà in simulazione finché non la togli (vedi playbook,
    "Modalità dry-run (simulazione)"). Per un'istanza operativa normale
    **non** aggiungerla.
+   Chiave opzionale `short_ref_prefix` (default `PG`): il prefisso degli
+   handle corti delle idee (`PG-042`), assegnati da `backlog-refinement`.
+   Chiedi al PM se preferisce un prefisso legato al progetto (es. la
+   sigla del prodotto); se non gli interessa, lascia il default e non
+   scrivere la chiave.
 2. `product/reference/product-lines.yaml` (da template).
 3. `product/reference/annual-target.yaml` (da
    `framework/schema/annual-target.template.yaml`) — con l'incremento
