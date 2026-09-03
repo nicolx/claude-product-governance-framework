@@ -1,0 +1,114 @@
+# Template per product/roadmap/iterations/{YYYY-Www}.yaml
+#
+# Output PRIMARIO e team-facing del Product Backlog Refinement: "su cosa
+# lavora il team questa settimana", a colpo d'occhio, in quattro bucket.
+# Serie append-only — un file per settimana ISO, mai sovrascritto: la
+# serie storica È il registro di cosa il team ha lavorato settimana per
+# settimana.
+#
+# Diverso da product/roadmap/snapshots/{YYYY-Www}.yaml: quello è il
+# rollup strategico (NSM, mandate, scadenze, misurazioni, capacità) per
+# MBR/MTR; questo è la board operativa del team. Lo snapshot referenzia
+# questo file via iteration_plan_ref e non ne duplica i bucket.
+#
+# Va SEMPRE generato passando prima da product/approvals/pending/
+# (type: iteration_plan) — mai scritto direttamente dalla skill
+# backlog-refinement o iteration-planning. Resta pending finché non
+# approvato esplicitamente (skill pending-approval): non viene
+# auto-applicato nella camminata della cerimonia, quindi è interamente
+# annullabile con rollback-ceremony finché è in pending/ (stesso
+# principio di roadmap_snapshot).
+
+week: "2026-W02"
+generated_at: "2026-01-08"
+based_on: "2026-W01"
+# Settimana ISO del Piano di Iterazione precedente da cui questo parte.
+# null SOLO al primissimo run di un'istanza — in quel caso i bucket si
+# costruiscono dallo stato corrente (vedi backlog-refinement, passo 6).
+
+iteration_goal: ""
+# UNA frase: qual è il focus di questa settimana, quale iniziativa/metrica
+# si cerca di impattare. È il "goal e iniziativa di riferimento" della
+# checklist di playbook per il contenitore dell'iterazione.
+
+ceremony_ref: "ceremonies/backlog-refinement/2026-W02"
+
+refined_by_iteration_planning: false
+# false quando il piano esce dal Backlog Refinement. Messo a true quando
+# la skill iteration-planning, qualche giorno dopo, produce una proposta
+# iteration_plan aggiornata per la stessa settimana (stime di delivery
+# aggiunte, valutazione 80/20 che sposta o toglie voci). generated_at
+# cambia con quella revisione.
+
+# ---------------------------------------------------------------------------
+# LA BOARD — quattro bucket
+# ---------------------------------------------------------------------------
+
+analysis_todo:
+# Idee su cui INIZIARE la Preliminary/Complete Analysis questa settimana.
+# Scelte ESPLICITAMENTE dal ranking RICE mostrato al passo 5 del Backlog
+# Refinement — è la domanda centrale della riunione, non una formalità.
+  - idea_ref: ""                 # short_ref (es. "PG-042"); se l'idea non ce l'ha ancora, lo slug della cartella
+    idea_id: ""                  # slug/id canonico della cartella idea
+    summary: ""                  # da idea.summary — cosa c'è da fare, in chiaro
+    rice_score: null             # dall'ultima voce di rice_history; null se senza RICE (caso riconciliazione Jira)
+    why_now: ""                  # perché entra ORA (es. "1° per RICE, mai avviata" / "richiesto da stakeholder X per la finestra Q3")
+    carried_from: null           # settimana ISO se era già in questo bucket nel piano based_on
+    prd_id: null
+
+analysis_in_progress:
+# Analisi già in corso — tipicamente carry-over dal piano precedente
+# (idea.status: in_analysis).
+  - idea_ref: ""
+    idea_id: ""
+    summary: ""
+    since: ""                    # settimana ISO in cui l'analisi è iniziata
+    carried_from: null
+    prd_id: null
+    weeks_in_bucket: null        # da quante iterazioni è qui — se cresce senza avanzare è un segnale (vedi changes_since_last.slipped)
+    note: ""
+
+in_development:
+# Attività già partite nel tracker di esecuzione (Jira). Carry-over +
+# card nuove emerse nella riconciliazione Jira del passo 2.6.
+  - idea_ref: ""
+    idea_id: ""
+    jira_card_id: ""
+    jira_status: ""              # stato reale letto da jira-sync (NON idea.status top-level)
+    completion_pct: null
+    carried_from: null
+
+urgent_priority:
+# Strategic Exception invocate in questa cerimonia + idee con
+# deadline/mandate a due_soon/overdue che il team decide di forzare in
+# analisi adesso, scavalcando il ranking RICE. Assorbe il vecchio campo
+# "rilevamento reprioritizzazioni fuori-RICE" del Backlog Refinement.
+  - idea_ref: ""
+    idea_id: ""
+    kind: ""                     # deadline | strategic_exception | mandate
+    trigger: ""                  # es. "deadline 2026-09-30 due_soon, non ancora in Jira"
+    decided: ""                  # cosa il team ha deciso di farne (es. "entra in analisi d'urgenza questa settimana")
+    approved_by: null            # SOLO per kind: strategic_exception — chi ha autorizzato il bypass (CEO/CPO-CTO), mai presunto
+    friction_log_ref: null       # se ha generato una riga in product/reference/friction-log.yaml
+
+# ---------------------------------------------------------------------------
+# DIFF vs piano precedente (based_on)
+# ---------------------------------------------------------------------------
+# Ricostruito dalla skill confrontando i bucket di QUESTO piano con quelli
+# del piano based_on. Serve al team per vedere il MOVIMENTO, non solo lo
+# stato: cosa si è completato, cosa è avanzato, cosa è fermo, cosa è stato
+# tolto, cosa è nuovo. Al primissimo run (based_on: null) tutto è "new".
+
+changes_since_last:
+  completed: []
+  #   - { idea_ref: "", was_in: in_development }        # era nel piano precedente, ora idea.status: done
+  advanced: []
+  #   - { idea_ref: "", from: analysis_in_progress, to: in_development }
+  slipped: []
+  #   - { idea_ref: "", bucket: analysis_in_progress, weeks_stuck: 3, note: "" }   # stesso bucket, stesso punto, da >1 iterazione
+  dropped: []
+  #   - { idea_ref: "", reason: "" }                    # era nel piano precedente, tolta deliberatamente questa settimana
+  new: []
+  #   - { idea_ref: "", bucket: analysis_todo }         # non era nel piano precedente
+
+notes: ""

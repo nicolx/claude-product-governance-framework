@@ -354,6 +354,23 @@ platform:
 delivery:
   estimated_effort_weeks: null    # settimane stimate dal team tech in Iteration Planning — solo capacità, non RICE
 
+# --- Puntatore denormalizzato al Piano di Iterazione corrente ---
+#
+# Riflette in quale bucket del Piano di Iterazione APPROVATO più recente
+# (product/roadmap/iterations/{settimana}.yaml) l'idea compare. Serve a
+# backlog-list / iteration-board per non dover fare parsing di tutti i
+# file di iterazione a ogni vista.
+#
+# Scritto SOLO dalla skill pending-approval, all'approvazione di una
+# proposta type: iteration_plan — denormalizzazione di una decisione già
+# approvata, scrittura diretta senza passare (di nuovo) da
+# product/approvals/pending/ (stesso principio di jira.status). Azzerato
+# quando l'idea esce da tutti i bucket di un piano successivo. La fonte di
+# verità resta il file di iterazione, non questo campo.
+iteration:
+  current: null                   # settimana ISO dell'ultimo iteration_plan approvato in cui l'idea compare; null se in nessuno
+  bucket: null                    # analysis_todo | analysis_in_progress | in_development | urgent_priority
+
 # --- Popolato solo al momento della prioritizzazione/push su Jira ---
 jira:
   card_id: null
