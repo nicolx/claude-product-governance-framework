@@ -109,14 +109,19 @@ per raccogliere:
 7. **Connettore analytics / metriche** (blocco `metrics` in
    `framework/schema/governance-config.template.yaml`) — c'è un modo
    programmatico per leggere NSM e KPI dai dati di produzione (un MCP
-   server tipo DataBricks, una CLI)? Se sì: `metrics.configured: true`,
-   `integration` (`mcp:<server>` / `cli:<nome>`), `tool_hint` (il prefisso
-   dei tool MCP, es. `mcp__databricks__`, per la verifica di
-   raggiungibilità), `note` (quali dataset/metriche, owner del dato). Se
-   no: lascia `metrics.configured: false` e non scrivere il resto del
-   blocco — `nsm-watch`/`measurement-watch` chiederanno i valori al PM a
-   mano. Si può aggiungere in seguito. **Nessuna credenziale nel config**
-   (né altrove nel repo tracciato) — solo il *nome* del connettore.
+   server tipo DataBricks, una CLI come la Salesforce CLI `sf`)? Se sì:
+   `metrics.configured: true`, `integration` (`mcp:<server>` /
+   `cli:<nome>`), `probe` (come verificarlo — per un MCP il prefisso dei
+   tool es. `mcp__databricks__`; per una CLI un comando read-only veloce,
+   es. `sf org display --target-org <alias> --json`), `reauth` (il
+   comando per rimetterlo su quando scade — `/mcp`, o `sf org login web
+   --alias <alias>`), `note`. **Chiedi esplicitamente se il connettore
+   scade a ogni sessione** (tipico delle CLI OAuth): se sì, annotalo in
+   `note` — `check-connectors.sh` mostrerà il `reauth` a ogni avvio. Se
+   non c'è un connettore: `metrics.configured: false`, non scrivere il
+   resto del blocco — `nsm-watch`/`measurement-watch` chiederanno i valori
+   al PM. **Nessuna credenziale nel config** (né altrove nel repo
+   tracciato) — solo il *nome* e i *comandi*.
 8. **Eventuali altre configurazioni rilevanti** — canale Slack/Teams per
    comunicazioni, altro che l'utente ritenga utile avere a portata di
    mano nel config.

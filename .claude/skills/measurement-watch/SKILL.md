@@ -46,13 +46,13 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
    .claude/hooks/governance-dump.sh measurements` — i `measurement*.yaml`
    e le `idea.yaml` in un colpo.
    - **Se `.governance/config.yaml` ha `metrics.integration` = `mcp:*` o
-     `cli:*`**, verifica che il connettore risponda (tool con prefisso
-     `metrics.tool_hint`, o una probe). Se **dichiarato ma
-     irraggiungibile**, applica la regola del playbook, "Connettori
-     esterni: dichiarati, verificati a inizio processo, mai un fallback
-     silenzioso" — non degradare in silenzio all'inserimento manuale:
-     segnala, offri `/mcp`, chiedi al PM; se procede, le letture di questo
-     run le dà lui a mano e il gap va nel riepilogo come **rimandato**.
+     `cli:*`**, verifica che il connettore risponda usando `metrics.probe`.
+     Se **dichiarato ma irraggiungibile**, applica la regola del playbook,
+     "Connettori esterni: dichiarati, verificati a inizio processo, mai un
+     fallback silenzioso" — non degradare in silenzio all'inserimento
+     manuale: segnala, proponi `metrics.reauth` (`/mcp`, o `sf org login
+     web --alias …`), chiedi al PM; se procede, le letture di questo run
+     le dà lui a mano e il gap va nel riepilogo come **rimandato**.
      `manuale`/`configured: false` → come sempre, nessuna segnalazione.
 
 1. **Elenca le iniziative rilevanti**: idee con `status: done` e

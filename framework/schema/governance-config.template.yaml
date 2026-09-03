@@ -39,6 +39,8 @@ jira:
   board_url: ""                   # URL della board (per i link, non per il polling)
   cloud_id: ""                    # id del sito Atlassian (da getAccessibleAtlassianResources) — serve ad alcuni tool MCP
   integration: ""                 # COME l'istanza si connette: "atlassian-mcp" (Remote MCP Server ufficiale, consigliato), "cli:<nome>", "manuale" (nessun accesso programmatico: jira-sync prepara i testi, il PM agisce a mano)
+  probe: ""                       # come verificare che sia VIVO: per un MCP, il prefisso dei suoi tool (es. "mcp__atlassian__"); per una CLI, un comando read-only veloce il cui esito lo dice
+  reauth: ""                      # comando/azione per RIMETTERLO SU quando è scaduto — per un MCP di solito "/mcp", per una CLI il comando di login (es. "sf org login web --alias <alias-org>"). MAI credenziali qui, solo il comando.
   note: ""                        # note libere (permessi, quirk del progetto, ecc.)
 
 # --- Connettore analytics / metriche (per leggere NSM e KPI) ---
@@ -52,8 +54,9 @@ jira:
 # esiste ancora — vedi framework/docs/future-work.md.
 metrics:
   configured: false               # true quando l'istanza ha davvero un connettore analytics collegato
-  integration: ""                 # "" | "manuale" | "mcp:<nome-server>" (es. "mcp:databricks") | "cli:<nome>"
-  tool_hint: ""                   # prefisso dei tool MCP per la verifica di raggiungibilità (es. "mcp__databricks__")
+  integration: ""                 # "" | "manuale" | "mcp:<nome-server>" (es. "mcp:databricks") | "cli:<nome>" (es. "cli:sf" per la Salesforce CLI)
+  probe: ""                       # come verificare che sia VIVO: per un MCP, il prefisso dei suoi tool (es. "mcp__databricks__"); per una CLI, un comando read-only veloce (es. "sf org display --target-org <alias-org> --json")
+  reauth: ""                      # comando/azione per RIMETTERLO SU quando è scaduto — MCP: di solito "/mcp"; CLI: il comando di login (es. "sf org login web --alias <alias-org>"). Alcuni connettori (OAuth CLI) scadono a OGNI sessione: check-connectors.sh lo mostra all'avvio. MAI credenziali qui, solo il comando.
   note: ""                        # scope: quali dataset/metriche copre, quirk, owner del dato
 
 # --- Repository applicativi collegati come submodule ---

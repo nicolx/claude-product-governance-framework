@@ -57,10 +57,11 @@ degradare a `manuale` in silenzio e non saltare il passo**.
 Dettagli specifici del connettore Jira (il resto è nella regola del
 playbook):
 
-- **Come rimetterlo su:** `atlassian-mcp` → `/mcp` in sessione per
+- **Come rimetterlo su:** proponi il comando `jira.reauth` dichiarato in
+  config. Per `atlassian-mcp` è tipicamente `/mcp` in sessione per
   ri-loggarsi (OAuth 2.1, login in browser); se è `ENOTFOUND`/timeout è
-  rete o servizio giù, riprovare tra poco. `cli:<nome>` → verificare
-  binario nel PATH e credenziali valide.
+  rete o servizio giù, riprovare tra poco. Per `cli:<nome>` è il comando
+  di login della CLI (verifica anche binario nel PATH).
 - **Cosa resta rimandato** se il PM procede senza: il dedup del push, o
   l'intera Riconciliazione — gap esplicito nel riepilogo / nel
   `decisions.yaml` se in cerimonia, con promemoria di rilanciare

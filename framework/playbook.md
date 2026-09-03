@@ -369,28 +369,34 @@ sistemi esterni:
 
 Ogni blocco ha lo stesso schema di base: `configured` (c'è davvero?),
 `integration` (`atlassian-mcp` / `mcp:<server>` / `cli:<nome>` /
-`manuale`), e note. `metrics` ha in più `tool_hint`, il prefisso dei tool
-MCP che serve a verificarne la presenza.
+`manuale`), `probe` (come verificarlo: per un MCP il prefisso dei suoi
+tool, es. `mcp__databricks__`; per una CLI un comando read-only veloce),
+`reauth` (il comando/azione per rimetterlo su quando scade — `/mcp` per un
+MCP, il comando di login per una CLI), e note.
 
-**Dichiarato non vuol dire attivo.** Un connettore MCP può essere non
-loggato, con la sessione OAuth scaduta, o il servizio può essere
-irraggiungibile (`ENOTFOUND`, timeout). Per questo:
+**Dichiarato non vuol dire attivo.** Un connettore può essere non loggato,
+con la sessione OAuth scaduta, o il servizio irraggiungibile (`ENOTFOUND`,
+timeout). **Alcuni scadono a ogni sessione** — tipicamente le CLI OAuth
+(es. la Salesforce CLI: `sf org login web` va rifatto ogni volta). Per
+questo:
 
 1. **Verifica all'inizio del processo.** Le skill che dipendono da un
-   connettore ne controllano la raggiungibilità *prima* di partire: a
-   inizio cerimonia (`backlog-refinement`, `iteration-planning`
-   verificano `jira` e `metrics`), al passo 0 delle watch di metriche e
-   di `jira-sync` standalone. L'hook `check-connectors.sh` (a inizio
-   sessione) ricorda quali connettori la config dichiara — non può
-   verificare i tool MCP da bash, è un promemoria di controllare `/mcp`.
+   connettore ne controllano la raggiungibilità *prima* di partire (con
+   il `probe` dichiarato): a inizio cerimonia (`backlog-refinement`,
+   `iteration-planning` verificano `jira` e `metrics`), al passo 0 delle
+   watch di metriche e di `jira-sync` standalone. L'hook
+   `check-connectors.sh` (a inizio sessione) ricorda quali connettori la
+   config dichiara e **mostra il comando `reauth`** — non può verificare
+   lo stato da bash, ma ti dà subito cosa rilanciare.
 
 2. **Dichiarato ma irraggiungibile ≠ `manuale`.** Se al momento dell'uso
    il connettore non risponde, **non** degradare in silenzio
    all'inserimento manuale e **non** saltare il passo: è un guasto
    transitorio, non una scelta di setup, e trattarlo come "non
    configurato" nasconde una falla invece di renderla visibile.
-   - Segnala **cosa** non risponde e **come** rimetterlo su (`/mcp` per
-     ri-loggarsi; se è rete/servizio, ritentare tra poco).
+   - Segnala **cosa** non risponde e proponi il comando **`reauth`**
+     dichiarato in config (`/mcp`, o `sf org login web --alias …`, ecc.);
+     se è rete/servizio, ritentare tra poco.
    - Chiedi al PM se riattivare e ritentare, o procedere senza.
    - Se procede senza: la lettura che dipendeva dal connettore la dà il
      PM a mano per questo run, **e** il fatto che la lettura automatica è

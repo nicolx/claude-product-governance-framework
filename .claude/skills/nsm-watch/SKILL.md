@@ -46,14 +46,17 @@ l'attenzione lì, non un'eccezione da gestire in silenzio.
    NSM su un `nsm-tracking.yaml` vecchio); per il quadro completo
    `bash .claude/hooks/governance-dump.sh reference`.
    - **Se `.governance/config.yaml` ha `metrics.integration` = `mcp:*` o
-     `cli:*`** (non `manuale`/vuoto), verifica che il connettore risponda:
-     tool con prefisso `metrics.tool_hint` presenti, o una probe minima.
+     `cli:*`** (non `manuale`/vuoto), verifica che il connettore risponda
+     usando `metrics.probe` (prefisso dei tool MCP presente, o il comando
+     read-only esce pulito).
      - **raggiungibile** → potrai leggere le letture NSM da lì invece di
        chiederle al PM;
      - **dichiarato ma irraggiungibile** → applica la regola del
        playbook, "Connettori esterni: dichiarati, verificati a inizio
        processo, mai un fallback silenzioso": segnala cosa non risponde,
-       offri `/mcp`, chiedi al PM se riattivare e ritentare o procedere.
+       proponi il comando `metrics.reauth` (`/mcp`, o `sf org login web
+       --alias …`, ecc.), chiedi al PM se riattivare e ritentare o
+       procedere.
        Se procede: le letture di questo run le dà il PM a mano **e** nel
        riepilogo il fatto che la lettura automatica è stata saltata va
        registrato come **rimandato**, mai in silenzio;

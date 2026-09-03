@@ -71,14 +71,15 @@ piano passa **sempre** da `product/approvals/pending/`
 
    a. **Verifica i connettori esterni dichiarati** (playbook, "Connettori
       esterni: dichiarati, verificati a inizio processo, mai un fallback
-      silenzioso") — *prima* di entrare nella sweep, così
-      `nsm-watch`/`measurement-watch` inline non scoprono il guasto a
-      metà:
+      silenzioso") — *prima* di entrare nella sweep, con il `probe`
+      dichiarato, così `nsm-watch`/`measurement-watch` inline non scoprono
+      il guasto a metà. L'hook `check-connectors.sh` a inizio sessione ha
+      già mostrato i comandi `reauth`:
       - **`metrics`** (`mcp:*`/`cli:*`): se dichiarato ma irraggiungibile,
-        applica la regola del playbook — segnala, offri `/mcp`, chiedi al
-        PM. Se si procede, le letture NSM/KPI del run le dà il PM a mano e
-        i punti "lettura automatica saltata" vanno nel riepilogo come
-        **rimandati**.
+        applica la regola del playbook — segnala, proponi `metrics.reauth`
+        (es. `sf org login web --alias …`), chiedi al PM. Se si procede,
+        le letture NSM/KPI del run le dà il PM a mano e i punti "lettura
+        automatica saltata" vanno nel riepilogo come **rimandati**.
       - **`jira`** (`atlassian-mcp`/`cli:*`): idem. Se risponde, **lancia
         la riconciliazione Jira come task in background** (`jira-sync`
         modalità Riconciliazione — idee mai passate dal RICE il cui lavoro

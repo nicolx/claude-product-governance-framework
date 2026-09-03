@@ -159,7 +159,8 @@ standalone), e "dichiarato ma irraggiungibile" non è mai un fallback
 silenzioso all'inserimento manuale — vedi playbook, "Connettori esterni:
 dichiarati, verificati a inizio processo, mai un fallback silenzioso".
 L'hook `SessionStart` `check-connectors.sh` ricorda a inizio sessione quali
-connettori la config dichiara. Il *contratto di query* del connettore
+connettori la config dichiara e **mostra il comando `reauth`** (utile per i
+connettori OAuth-CLI che scadono a ogni sessione, es. `sf org login web`). Il *contratto di query* del connettore
 `metrics` (come una richiesta KPI diventa una query e torna un aggregato)
 non esiste ancora — vedi `framework/docs/future-work.md`.
 

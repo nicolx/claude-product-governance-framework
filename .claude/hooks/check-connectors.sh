@@ -53,27 +53,37 @@ is_programmatic() {
 }
 
 DECLARED=""
+REAUTH=""
 
-JIRA_INT="$(nested_value jira integration)"
-if is_programmatic "$JIRA_INT"; then
-  DECLARED="${DECLARED}jira: ${JIRA_INT}; "
-fi
+add_connector() {
+  # add_connector <blocco>
+  local blk="$1" intg re
+  intg="$(nested_value "$blk" integration)"
+  is_programmatic "$intg" || return 0
+  DECLARED="${DECLARED}${blk}: ${intg}; "
+  re="$(nested_value "$blk" reauth)"
+  [ -n "$re" ] && REAUTH="${REAUTH}${blk} → \`${re}\` · "
+}
 
-METRICS_INT="$(nested_value metrics integration)"
-if is_programmatic "$METRICS_INT"; then
-  DECLARED="${DECLARED}metrics: ${METRICS_INT}; "
-fi
+add_connector jira
+add_connector metrics
 
 [ -z "$DECLARED" ] && exit 0
 
 DECLARED="${DECLARED%; }"
 
-MSG="⚙ La config dichiara connettori esterni ($DECLARED). Le skill che li usano (jira-sync, nsm-watch, measurement-watch, cerimonie) li verificano a inizio processo — se /mcp non mostra la connessione attiva, riattivala prima. Dichiarato ma irraggiungibile non è un fallback silenzioso (playbook, sezione Connettori esterni)."
+MSG="⚙ La config dichiara connettori esterni ($DECLARED). Le skill che li usano (jira-sync, nsm-watch, measurement-watch, cerimonie) li verificano a inizio processo; dichiarato ma irraggiungibile non è un fallback silenzioso (playbook, sezione Connettori esterni)."
+if [ -n "$REAUTH" ]; then
+  MSG="${MSG} Se scaduti (alcuni OAuth-CLI scadono a ogni sessione), rimettili su: ${REAUTH%· }"
+else
+  MSG="${MSG} Se /mcp non mostra la connessione attiva, riattivala prima."
+fi
 
-# JSON-escape minimale del messaggio (\ e ") — coerente con gli altri hook,
-# ma qui il messaggio è costruito da valori di config, meglio essere sicuri.
+# JSON-escape minimale (\ e "). Il messaggio è costruito su un'unica riga
+# (separatori " · "), i valori di reauth vengono dal config: nessuna
+# newline attesa, ma \ e " vanno comunque neutralizzati.
 esc_json() {
-  printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+  printf '%s' "$1" | tr '\n' ' ' | sed 's/\\/\\\\/g; s/"/\\"/g'
 }
 
 printf '{"systemMessage": "%s"}\n' "$(esc_json "$MSG")"
