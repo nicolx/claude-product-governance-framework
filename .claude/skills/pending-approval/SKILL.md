@@ -28,12 +28,42 @@ quando. Ordina per data, più vecchi prima — una coda che si accumula è un
 segnale da far notare esplicitamente all'utente, non da nascondere.
 
 Per le voci con un `target_file` che punta a un'idea (`rice_diff`,
-`strategic_exception_flag`, `mandate_update`, `mandate_reclassification`),
-aggiungi al riepilogo il **`short_ref`** dell'idea se presente (es.
-`PG-042`) e il suo **`summary`**, più — se ha un `deadline.due_date` — la
-scadenza col suo `escalation_status`. Così si decide con lo stesso
-contesto della lista ordinata del backlog, non solo guardando i numeri
-del diff.
+`strategic_exception_flag`, `mandate_update`, `mandate_reclassification`)
+non basta lo YAML del diff: si decide con lo stesso contesto della lista
+ordinata del backlog. Quando queste voci sono più d'una, **rendile come
+tabella** con una riga per voce e queste colonne:
+
+- **Identificativo idea** — sempre valorizzato: `short_ref` se assegnato
+  (es. `PG-042`), altrimenti l'`id` dell'idea (lo slug della cartella).
+  Non lasciarlo vuoto e non inventare uno `short_ref` (lo assegna
+  `backlog-refinement`).
+- **`summary`** dell'idea — se vuoto, "⚠ summary mancante", non il
+  `title`.
+- **Tipo** di proposta (`rice_diff`, `strategic_exception_flag`, …).
+- **Score proposto** — per `rice_diff`: lo score del `payload` e, se
+  l'idea ha già una voce in `rice_history`, il delta vs. lo score
+  corrente (es. `480 (+120)`). Per gli altri tipi: "—".
+- **Scadenza** — se l'idea ha `deadline.due_date` (o, per un `mandate`,
+  `mandate.due_date`), mostrala con il suo `escalation_status`
+  (`due_soon`/`overdue` in evidenza). "—" se non c'è.
+- **Bypass** — segnala se l'iniziativa scavalca il RICE e se il bypass è
+  **coperto da un'approvazione o solo dichiarato**:
+  - `Strategic Exception ✋ non approvata` — la voce è un
+    `strategic_exception_flag` ancora in coda, **oppure** l'idea si
+    presenta come `classification: strategic_exception` ma `strategic_exceptions`
+    non ha ancora una voce corrispondente (dichiarata, bypass mai
+    confermato — è un rischio di governance da rendere visibile qui, non
+    da scoprire dopo).
+  - `Strategic Exception ✓` — l'idea ha già almeno una voce approvata in
+    `strategic_exceptions`.
+  - `Mandate` (+ `mandate.escalation_status`) — `classification: mandate`,
+    o la voce è un `mandate_reclassification` in attesa (`Mandate ✋ in
+    riclassificazione`).
+  - "—" per un'idea normale senza bypass.
+
+Le voci senza `target_file` verso un'idea (`roadmap_snapshot`,
+`outbound_comm`) restano un riepilogo in prosa (tipo, cosa cambierebbe,
+chi l'ha proposto, quando) — la tabella non le riguarda.
 
 ## Approvazione
 

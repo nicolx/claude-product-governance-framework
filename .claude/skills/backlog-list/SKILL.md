@@ -54,7 +54,10 @@ li mette tutti sulla stessa riga.
    (`target_file`), lo `score` **proposto** dal `payload`, da quanto è in
    coda, e — se l'idea è già nel ranking del passo 1 — la differenza
    rispetto allo score attuale. Mostra come si inserirebbero nel ranking
-   ("PG-042, proposto 480 → salirebbe al 2° posto"). **Marca la sezione
+   ("PG-042, proposto 480 → salirebbe al 2° posto"). Se l'idea ha una
+   `deadline.due_date` o si presenta come Strategic Exception ancora
+   senza voce approvata in `strategic_exceptions`, segnalalo sulla riga —
+   è contesto che pesa quanto lo score proposto. **Marca la sezione
    in modo inequivocabile come non ufficiale**: sono numeri proposti, non
    approvati — diventano reali solo passando da `pending-approval`. Se la
    coda è vuota, salta la sezione. Se è lunga (intake storico bulk),

@@ -8,6 +8,12 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/governance-sync.sh\" pull",
             "timeout": 25,
             "statusMessage": "Sincronizzo l'istanza da origin (pull)…"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-pending-approvals.sh\"",
+            "timeout": 10,
+            "statusMessage": "Verifica coda di approvazione…"
           }
         ]
       }
@@ -26,6 +32,12 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-inbox.sh\"",
             "timeout": 10,
             "statusMessage": "Verifica product/inbox/ non processata…"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-pending-approvals.sh\"",
+            "timeout": 10,
+            "statusMessage": "Verifica coda di approvazione…"
           }
         ]
       }

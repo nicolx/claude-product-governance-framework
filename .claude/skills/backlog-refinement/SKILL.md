@@ -58,11 +58,20 @@ entra in iterazione.
       ≤4 settimane: push forte, non una riga tra le altre.
    5. `rice-watch` — idee `classification: idea` ancora senza RICE:
       `stale`, `blocked_on`, `needs_deep_dive`.
-   6. `jira-sync` **modalità Riconciliazione** — solo se
-      `.governance/config.yaml` ha un `jira.integration` con capacità di
-      ricerca: idee mai passate dal RICE il cui lavoro è già partito in
-      Jira (falla di governance). Saltala senza rumore se Jira non è
-      configurato così.
+   6. `jira-sync` **modalità Riconciliazione** — idee mai passate dal
+      RICE il cui lavoro è già partito in Jira (falla di governance).
+      Saltala **senza rumore** solo se `jira.integration` non ha capacità
+      di ricerca (`manuale`, vuoto) — è una scelta di setup. Se invece è
+      dichiarato un connettore con ricerca (`atlassian-mcp`) ma **non
+      risponde** al momento del run (tool `mcp__atlassian__*` assenti,
+      `ENOTFOUND`/timeout su `mcp.atlassian.com`), **non saltarla in
+      silenzio**: applica "Connettore dichiarato ma irraggiungibile" di
+      `jira-sync` — segnala il guasto, proponi al PM di riattivare la
+      connessione (`/mcp`) e ritentare il passo. Se sceglie di proseguire,
+      la riconciliazione va registrata come **rimandata** nel riepilogo
+      della cerimonia (debito visibile, da rilanciare `jira-sync`
+      standalone quando il connettore torna su), mai come completata o
+      non applicabile.
 
    Ogni watch **solo segnala** — nessuna azione automatica. I riepiloghi
    vanno passati a `log-ceremony` perché li includa nel `decisions.yaml`
@@ -70,12 +79,17 @@ entra in iterazione.
 
 3. **Svuota la coda di approvazione — prima di guardare il backlog.**
    Elenca `product/approvals/pending/` (usa `pending-approval`, sezione
-   "Elenco"). I `rice_diff` in particolare: finché non sono approvati, i
-   loro score non esistono per `backlog-list`, e la prioritizzazione al
-   passo 6 gira su un ranking incompleto. **Cammina la coda con il PM /
-   il team, voce per voce**: per ciascuna, il PM decide approva / rifiuta
-   / rimanda (con motivo), e tu applichi la decisione via
-   `pending-approval` (Approvazione o Rifiuto). Questo è il luogo previsto
+   "Elenco"): quando ci sono più voci verso un'idea, come **tabella** con
+   le colonne descritte lì — identificativo idea (`short_ref` o `id`),
+   `summary`, tipo, score proposto (col delta vs. quello corrente),
+   scadenza con `escalation_status`, e la colonna **Bypass** che segnala
+   le Strategic Exception *dichiarate ma non ancora approvate* e le
+   iniziative mandatarie. I `rice_diff` in particolare: finché non sono
+   approvati, i loro score non esistono per `backlog-list`, e la
+   prioritizzazione al passo 6 gira su un ranking incompleto. **Cammina la
+   coda con il PM / il team, voce per voce**: per ciascuna, il PM decide
+   approva / rifiuta / rimanda (con motivo), e tu applichi la decisione
+   via `pending-approval` (Approvazione o Rifiuto). Questo è il luogo previsto
    per rivedere i RICE — l'approvazione sollecitata qui **è** istruzione
    esplicita, resa voce per voce.
    - Per un **primo scoring di un intake storico bulk** (decine di
