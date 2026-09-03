@@ -34,12 +34,16 @@ umana esplicita (skill `pending-approval`) la voce viene appesa a
 
 2. Raccogli input per i quattro parametri, chiedendo esplicitamente ciò
    che manca — non inventare numeri:
-   - **Reach**: percentuale (0-100) sulla popolazione della Product Line
-     dell'idea. Usa `reach_denominator` da
-     `product/reference/product-lines.yaml` per convertire un numero
-     assoluto in percentuale se l'utente fornisce solo l'assoluto. Se il
-     denominatore è `null`, segnala che il Reach risultante è
-     un'approssimazione (per playbook) e chiedi se procedere comunque.
+   - **Reach**: punteggio **1-10**. Si ricava così: prendi la quota della
+     popolazione della Product Line dell'idea (usa `reach_denominator` da
+     `product/reference/product-lines.yaml` per convertire un assoluto in
+     percentuale se l'utente fornisce solo l'assoluto), poi
+     `reach_points = max(1, ceil(percentuale / 10))` — arrotondamento per
+     eccesso, minimo 1. Scrivi `reach_points` nella voce; annota la
+     percentuale e l'assoluto in `reach_absolute_note` (es. "≈15% della
+     popolazione → 2"), sono contesto, non entrano nello score. Se il
+     `reach_denominator` è `null`, segnala che la percentuale (e quindi la
+     banda) è un'approssimazione (per playbook) e chiedi se procedere.
    - **Impact**: punti 1-10. Se l'utente fornisce un valore economico
      assoluto, leggi `product/reference/annual-target.yaml` e converti:
      `impact_points ≈ round(valore_iniziativa / target * 10)`, dove
@@ -82,7 +86,7 @@ umana esplicita (skill `pending-approval`) la voce viene appesa a
        Analysis può cambiare il quadro, e quella revisione entra come
        nuova voce in `rice_history` (append-only).
 
-3. Calcola `score = reach_percent * impact_points * confidence_score /
+3. Calcola `score = reach_points * impact_points * confidence_score /
    entanglement_score`.
 
 4. Scrivi `rationale` che spiega perché questi valori (riferimento alla

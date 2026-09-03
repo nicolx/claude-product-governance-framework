@@ -635,13 +635,22 @@ pareri per applicare il RICE.
 
 RICE è un framework di prioritizzazione basato su quattro parametri:
 
-- **(R)each →** Quante persone o utenti avranno un beneficio? **Il valore
-  va sempre espresso come rapporto 0-100 (percentuale) sulla popolazione
-  rilevante per quella Product Line, non come valore assoluto** — solo
-  così i punteggi restano confrontabili tra Product Line diverse nello
-  stesso Backlog Refinement. Il valore assoluto resta utile come nota di
-  contesto nel record dell'idea, ma il campo usato per il punteggio è
-  sempre la percentuale.
+- **(R)each →** Quante persone o utenti avranno un beneficio? Si parte da
+  un **rapporto sulla popolazione rilevante per quella Product Line** (non
+  un valore assoluto) — è ciò che rende i punteggi confrontabili tra
+  Product Line diverse nello stesso Backlog Refinement. Quel rapporto poi
+  si porta sulla stessa **scala 1-10** degli altri tre fattori:
+
+  > `reach_points = max(1, ceil(percentuale / 10))`  → intero 1-10
+
+  Esempi: 3% → 1 · 11% → 2 · 15% → 2 · 50% → 5 · 95% → 10. Arrotondamento
+  **per eccesso**, minimo **1** (un'iniziativa verticale per un cliente
+  solo non viene azzerata da un Reach frazionario). La percentuale e il
+  valore assoluto restano nel record come nota di contesto — sono *come si
+  ricava* il punteggio, non il punteggio. Prima di questo riscalamento
+  Reach era espresso come percentuale 0-100 direttamente nello score: le
+  voci `rice_history` più vecchie vanno migrate (`sync-framework-updates`,
+  meccanicamente).
 
   **Popolazione di riferimento (denominatore).** Il numero usato come
   denominatore per ciascuna Product Line non è lasciato alla stima
@@ -782,7 +791,7 @@ scadenza e stato.
 
 **Checklist operativa**
 - [ ] I quattro parametri RICE sono stati compilati (Reach, Impact, Confidence, Entanglement)?
-- [ ] Reach è espresso come percentuale sulla popolazione rilevante della Product Line?
+- [ ] Reach è espresso 1-10 (`max(1, ceil(` percentuale sulla popolazione rilevante della Product Line `/ 10))`), con la percentuale e l'assoluto annotati come contesto?
 - [ ] Confidence riflette la qualità dell'evidenza, non la quantità di analisi svolta?
 - [ ] Se l'Impact nasce da un valore economico: è stato rapportato all'`annual-target.yaml` (l'incremento atteso, non il totale a budget), e tappato a 10 se lo eguaglia o supera?
 - [ ] Entanglement è stato stimato dal footprint reale del cambiamento (ispezione di `apps/` quando disponibile, o stima con un referente tecnico), non da un tempo-sviluppatore?
@@ -1654,11 +1663,21 @@ di dominio (nomi di ruoli utente, prodotti specifici, unità di misura di
 business) vanno definiti localmente in `product/reference/` — vedi
 l'esempio in `examples/*/docs/` per un caso reale.
 
-**RICE** — Framework di prioritizzazione basato su quattro parametri:
-Reach (quante persone impatta), Impact (quanto vale in termini di
-business), Confidence (quanto si è sicuri delle stime), Entanglement
-(footprint del cambiamento nel sistema — vedi voce dedicata). Il punteggio
-finale è R × I × C / E.
+**RICE** — Framework di prioritizzazione basato su quattro parametri, tutti
+su scala **1-10**: Reach (quante persone impatta — vedi voce dedicata),
+Impact (quanto vale in termini di business), Confidence (quanto si è sicuri
+delle stime), Entanglement (footprint del cambiamento nel sistema — vedi
+voce dedicata). Il punteggio finale è R × I × C / E.
+
+**Reach** — La "R" del RICE. Quota della popolazione della Product Line
+che beneficia dell'iniziativa, portata su scala 1-10:
+`max(1, ceil(percentuale / 10))` — arrotondamento per eccesso, minimo 1.
+La percentuale si ricava dal `reach_denominator` dichiarato per la Product
+Line (`product/reference/product-lines.yaml`), non a occhio; il valore
+assoluto e la percentuale restano come nota di contesto nel record
+dell'idea, non entrano nello score. Fino a settembre 2026 Reach era una
+percentuale 0-100 dentro lo score — le voci `rice_history` più vecchie si
+migrano meccanicamente (`sync-framework-updates`).
 
 **Entanglement (footprint del cambiamento)** — La "E" del RICE. Stima
 1-10 di quanto un'iniziativa è intrecciata col resto del sistema: quanti
