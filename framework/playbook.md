@@ -356,6 +356,58 @@ locali sopra quelli del team), controlla i conflitti sui file condivisi
 `idea.yaml` i conflitti sono quasi sempre banali: la convenzione
 cartella-per-idea e `rice_history` append-only li rende rari e locali.
 
+## Connettori esterni: dichiarati, verificati a inizio processo, mai un fallback silenzioso
+
+Un'istanza può dichiarare in `.governance/config.yaml` dei connettori a
+sistemi esterni:
+
+- **`jira:`** — il tracker di esecuzione, per il dedup e la
+  riconciliazione (`jira-sync`).
+- **`metrics:`** — un connettore analytics/metriche, per leggere le NSM
+  (`nsm-watch`) e le KPI delle iniziative rilasciate (`measurement-watch`)
+  direttamente dai dati di produzione invece di chiederle a mano al PM.
+
+Ogni blocco ha lo stesso schema di base: `configured` (c'è davvero?),
+`integration` (`atlassian-mcp` / `mcp:<server>` / `cli:<nome>` /
+`manuale`), e note. `metrics` ha in più `tool_hint`, il prefisso dei tool
+MCP che serve a verificarne la presenza.
+
+**Dichiarato non vuol dire attivo.** Un connettore MCP può essere non
+loggato, con la sessione OAuth scaduta, o il servizio può essere
+irraggiungibile (`ENOTFOUND`, timeout). Per questo:
+
+1. **Verifica all'inizio del processo.** Le skill che dipendono da un
+   connettore ne controllano la raggiungibilità *prima* di partire: a
+   inizio cerimonia (`backlog-refinement`, `iteration-planning`
+   verificano `jira` e `metrics`), al passo 0 delle watch di metriche e
+   di `jira-sync` standalone. L'hook `check-connectors.sh` (a inizio
+   sessione) ricorda quali connettori la config dichiara — non può
+   verificare i tool MCP da bash, è un promemoria di controllare `/mcp`.
+
+2. **Dichiarato ma irraggiungibile ≠ `manuale`.** Se al momento dell'uso
+   il connettore non risponde, **non** degradare in silenzio
+   all'inserimento manuale e **non** saltare il passo: è un guasto
+   transitorio, non una scelta di setup, e trattarlo come "non
+   configurato" nasconde una falla invece di renderla visibile.
+   - Segnala **cosa** non risponde e **come** rimetterlo su (`/mcp` per
+     ri-loggarsi; se è rete/servizio, ritentare tra poco).
+   - Chiedi al PM se riattivare e ritentare, o procedere senza.
+   - Se procede senza: la lettura che dipendeva dal connettore la dà il
+     PM a mano per questo run, **e** il fatto che la lettura automatica è
+     stata saltata va registrato come **rimandato** nel riepilogo (e nel
+     `decisions.yaml` se in cerimonia), con promemoria di rilanciare la
+     skill quando il connettore torna su. Mai "non applicabile", mai
+     silenzioso.
+
+3. **`manuale` o non dichiarato** → il PM inserisce i valori a mano come
+   sempre, nessuna segnalazione: è la configurazione scelta, non un
+   guasto.
+
+Vale in dry-run come a regime — una query analytics o una ricerca JQL è
+comunque una lettura. La skill `jira-sync` ha i dettagli specifici del
+connettore Jira; questa sezione è la regola generale di cui quello è un
+caso.
+
 ## Modalità dry-run (simulazione)
 
 A volte serve **vedere cosa produrrebbe** una skill — tipicamente una

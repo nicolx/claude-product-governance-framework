@@ -31,6 +31,8 @@ sync:
 #                                 # "governance" e non un prodotto (es. "GOV", "PGOV").
 
 # --- Tracker di esecuzione ---
+# Connettore esterno: vedi playbook, "Connettori esterni: dichiarati,
+# verificati a inizio processo, mai un fallback silenzioso".
 jira:
   configured: false               # true quando l'istanza ha davvero un progetto Jira collegato
   project_key: ""                 # es. "EPITA"
@@ -38,6 +40,21 @@ jira:
   cloud_id: ""                    # id del sito Atlassian (da getAccessibleAtlassianResources) — serve ad alcuni tool MCP
   integration: ""                 # COME l'istanza si connette: "atlassian-mcp" (Remote MCP Server ufficiale, consigliato), "cli:<nome>", "manuale" (nessun accesso programmatico: jira-sync prepara i testi, il PM agisce a mano)
   note: ""                        # note libere (permessi, quirk del progetto, ecc.)
+
+# --- Connettore analytics / metriche (per leggere NSM e KPI) ---
+# Altro connettore esterno, stessa disciplina di `jira` (playbook,
+# "Connettori esterni…"): dichiarato qui, verificato a inizio processo da
+# nsm-watch / measurement-watch / cerimonie; se dichiarato ma
+# irraggiungibile NON si degrada in silenzio all'inserimento manuale.
+# NB: qui c'è solo la DICHIARAZIONE del connettore (c'è / come si chiama /
+# come verificarlo). Il contratto di query vero (come una richiesta KPI
+# diventa una query sullo stack dell'istanza e torna un aggregato) non
+# esiste ancora — vedi framework/docs/future-work.md.
+metrics:
+  configured: false               # true quando l'istanza ha davvero un connettore analytics collegato
+  integration: ""                 # "" | "manuale" | "mcp:<nome-server>" (es. "mcp:databricks") | "cli:<nome>"
+  tool_hint: ""                   # prefisso dei tool MCP per la verifica di raggiungibilità (es. "mcp__databricks__")
+  note: ""                        # scope: quali dataset/metriche copre, quirk, owner del dato
 
 # --- Repository applicativi collegati come submodule ---
 apps: []
