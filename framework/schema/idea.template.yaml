@@ -12,10 +12,12 @@
 # team tech dentro una capacità protetta, non valore di business né
 # autorità esterna; vedi il blocco `platform` più sotto).
 #
-# rice_history è APPEND-ONLY: ogni revisione del RICE (nuova evidenza,
-# discussione) aggiunge una voce nuova, non sovrascrive le precedenti —
-# serve a rispondere a "perché questa idea è cambiata di priorità?" in
-# un MBR/MTR senza dover ricostruire la storia a memoria.
+# rice_history è APPEND-ONLY per i giudizi: ogni revisione del RICE (nuova
+# evidenza, discussione) aggiunge una voce nuova, non sovrascrive le
+# precedenti — serve a rispondere a "perché questa idea è cambiata di
+# priorità?" in un MBR/MTR senza dover ricostruire la storia a memoria.
+# (Una migrazione di formato una-tantum — es. Reach %→1-10 — è l'unica
+# eccezione: riscrive un campo derivato, non un giudizio.)
 
 id: "2026-01-08-slug-descrittivo"   # coincide col nome della cartella — identificatore canonico, non cambia mai
 short_ref: null
@@ -179,11 +181,17 @@ requester_reply:
 # La stima di tempo-calendario per la pianificazione NON vive qui: vedi
 # il blocco `delivery` più sotto (contabilità di capacità d'iterazione) e
 # `mandate.lead_time_weeks` (runway prima di una scadenza).
+# rice_history è APPEND-ONLY per i GIUDIZI: ogni revisione delle stime
+# aggiunge una voce, non modifica le precedenti. Fa eccezione una
+# migrazione di FORMATO una-tantum (es. il riscalamento di Reach da
+# percentuale 0-100 a banda intera 1-10): riscrive il campo derivato
+# delle voci esistenti senza toccare i giudizi — vedi
+# `sync-framework-updates`, che la applica in modo meccanico.
 rice_history: []
 # Esempio di singola voce (aggiungerne una nuova ad ogni revisione, mai modificare le precedenti):
 # - date: "2026-01-08"
-#   reach_percent: 15          # 0-100, normalizzato sulla popolazione della product_line — MAI valore assoluto
-#   reach_absolute_note: ""    # opzionale: es. "30% di un 50% di ricevute non riconosciute"
+#   reach_points: 2            # 1-10 = max(1, ceil(percentuale sulla popolazione della product_line / 10)) — MAI valore assoluto. La percentuale è solo il MODO di ricavarlo, non un campo dello score.
+#   reach_absolute_note: ""    # dove si annota la % sottostante e/o l'assoluto (rende auditabile la banda): es. "≈15% della popolazione (30% ric. non riconosciute × 50%) → 2"
 #   impact_points: 5           # scala 1-10, EBITDA incrementale atteso vs. target annuale della product line
 #   confidence_score: 10       # 1-10
 #   confidence_evidence_tier: quantitative_multi_source
@@ -192,7 +200,8 @@ rice_history: []
 #   entanglement_basis: code_inspection
 #   # code_inspection (rice-update ha ispezionato apps/) | structured_estimate (stima con referente tecnico, apps/ non disponibile o sistema non montato — evidenza più debole)
 #   entanglement_note: ""      # cosa tocca: sistemi, componenti, interfacce/consumer, + eventuali costi esterni hard (legale, licenze, UAT estesa)
-#   score: null                 # calcolato: reach_percent * impact_points * confidence_score / entanglement_score
+#   score: null                 # calcolato: reach_points * impact_points * confidence_score / entanglement_score
+#   reach_percent: null         # DEPRECATO come campo di scoring — presente solo nelle voci precedenti al riscalamento 1-10. Non compilarlo per voci nuove (la % va in reach_absolute_note).
 #   rationale: ""               # perché questi valori — riferimento alla discussione/evidenza
 #   approved_by: ""             # referente tecnico e/o stakeholder che ha validato la stima
 #   ceremony_ref: null          # opzionale: link a product/ceremonies/... se la revisione è nata lì

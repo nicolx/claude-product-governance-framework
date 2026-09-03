@@ -9,6 +9,9 @@
 # normalizzato di ogni RICE su questa product line resta un'approssimazione
 # e va trattato come tale nelle decisioni di priorità. Non calcolarlo "a
 # occhio" ogni volta: va mantenuto qui come dato di riferimento condiviso.
+# Serve a ricavare la PERCENTUALE sulla popolazione; quella percentuale
+# poi alimenta la banda 1-10 di Reach (rice_history.reach_points =
+# max(1, ceil(%/10))), non è il valore finale dello score.
 
 - name: ""
   description: ""

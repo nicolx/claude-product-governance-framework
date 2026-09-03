@@ -17,7 +17,8 @@ schema.
   ricostruita dalle Cronache (Episodi 1-2: la segnalazione di Filiberto
   sul motore di approvazione ricevute), usata per validare che
   `framework/schema/idea.template.yaml` regga un caso narrativo reale,
-  RICE score incluso (15 × 5 × 10 / 1 = 750).
+  RICE score incluso (Reach 2 × Impact 3 × Confidence 10 / Entanglement 2 = 30,
+  con Reach sulla scala 1-10: ≈15% della popolazione → `ceil(15/10)` = 2).
 
 Se un domani Epassi ITA diventa un'istanza reale (fork inizializzato con
 `init-governance-project`), questo esempio resta qui come riferimento
