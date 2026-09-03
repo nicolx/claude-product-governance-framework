@@ -68,15 +68,37 @@ add_connector() {
 add_connector jira
 add_connector metrics
 
+# Connettori custom in `connectors:` — conta le voci (`- name:`) e, se ce
+# ne sono, riporta i loro `reauth:` uno per riga (parsing best-effort).
+CUSTOM_COUNT="$(awk '
+  /^connectors:/ { inlist=1; next }
+  inlist && /^[^[:space:]#]/ { inlist=0 }
+  inlist && /^[[:space:]]*-[[:space:]]*name:/ { n++ }
+  END { print n+0 }
+' "$CONFIG")"
+if [ "${CUSTOM_COUNT:-0}" -gt 0 ]; then
+  DECLARED="${DECLARED}${CUSTOM_COUNT} in \`connectors\`; "
+  CUSTOM_RE="$(awk '
+    /^connectors:/ { inlist=1; next }
+    inlist && /^[^[:space:]#]/ { inlist=0 }
+    inlist && /^[[:space:]]*reauth:[[:space:]]*[^[:space:]#]/ {
+      v=$0; sub(/^[[:space:]]*reauth:[[:space:]]*/, "", v);
+      sub(/[[:space:]]*#.*$/, "", v); gsub(/^["'\''"]|["'\''"]$/, "", v);
+      if (v != "") printf "connectors → `%s` · ", v
+    }
+  ' "$CONFIG")"
+  [ -n "$CUSTOM_RE" ] && REAUTH="${REAUTH}${CUSTOM_RE}"
+fi
+
 [ -z "$DECLARED" ] && exit 0
 
 DECLARED="${DECLARED%; }"
 
-MSG="⚙ La config dichiara connettori esterni ($DECLARED). Le skill che li usano (jira-sync, nsm-watch, measurement-watch, cerimonie) li verificano a inizio processo; dichiarato ma irraggiungibile non è un fallback silenzioso (playbook, sezione Connettori esterni)."
+MSG="⚙ La config dichiara connettori esterni ($DECLARED). Le skill che li usano li verificano a inizio processo; dichiarato ma irraggiungibile non è un fallback silenzioso (playbook, sezione Connettori esterni)."
 if [ -n "$REAUTH" ]; then
-  MSG="${MSG} Se scaduti (alcuni OAuth-CLI scadono a ogni sessione), rimettili su: ${REAUTH%· }"
+  MSG="${MSG} Se scaduti (alcuni login OAuth scadono a ogni sessione), rimettili su: ${REAUTH%· }"
 else
-  MSG="${MSG} Se /mcp non mostra la connessione attiva, riattivala prima."
+  MSG="${MSG} Verifica che siano connessi prima delle skill che li usano."
 fi
 
 # JSON-escape minimale (\ e "). Il messaggio è costruito su un'unica riga

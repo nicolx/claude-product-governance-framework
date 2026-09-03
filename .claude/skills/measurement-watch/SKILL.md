@@ -50,9 +50,9 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
      Se **dichiarato ma irraggiungibile**, applica la regola del playbook,
      "Connettori esterni: dichiarati, verificati a inizio processo, mai un
      fallback silenzioso" — non degradare in silenzio all'inserimento
-     manuale: segnala, proponi `metrics.reauth` (`/mcp`, o `sf org login
-     web --alias …`), chiedi al PM; se procede, le letture di questo run
-     le dà lui a mano e il gap va nel riepilogo come **rimandato**.
+     manuale: segnala, proponi il comando `metrics.reauth` dichiarato in
+     config, chiedi al PM; se procede, le letture di questo run le dà lui
+     a mano e il gap va nel riepilogo come **rimandato**.
      `manuale`/`configured: false` → come sempre, nessuna segnalazione.
 
 1. **Elenca le iniziative rilevanti**: idee con `status: done` e

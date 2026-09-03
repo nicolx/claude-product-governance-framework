@@ -76,10 +76,11 @@ piano passa **sempre** da `product/approvals/pending/`
       il guasto a metà. L'hook `check-connectors.sh` a inizio sessione ha
       già mostrato i comandi `reauth`:
       - **`metrics`** (`mcp:*`/`cli:*`): se dichiarato ma irraggiungibile,
-        applica la regola del playbook — segnala, proponi `metrics.reauth`
-        (es. `sf org login web --alias …`), chiedi al PM. Se si procede,
-        le letture NSM/KPI del run le dà il PM a mano e i punti "lettura
-        automatica saltata" vanno nel riepilogo come **rimandati**.
+        applica la regola del playbook — segnala, proponi il comando
+        `metrics.reauth` dichiarato in config, chiedi al PM. Se si
+        procede, le letture NSM/KPI del run le dà il PM a mano e i punti
+        "lettura automatica saltata" vanno nel riepilogo come
+        **rimandati**.
       - **`jira`** (`atlassian-mcp`/`cli:*`): idem. Se risponde, **lancia
         la riconciliazione Jira come task in background** (`jira-sync`
         modalità Riconciliazione — idee mai passate dal RICE il cui lavoro

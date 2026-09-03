@@ -54,9 +54,8 @@ l'attenzione lì, non un'eccezione da gestire in silenzio.
      - **dichiarato ma irraggiungibile** → applica la regola del
        playbook, "Connettori esterni: dichiarati, verificati a inizio
        processo, mai un fallback silenzioso": segnala cosa non risponde,
-       proponi il comando `metrics.reauth` (`/mcp`, o `sf org login web
-       --alias …`, ecc.), chiedi al PM se riattivare e ritentare o
-       procedere.
+       proponi il comando `metrics.reauth` dichiarato in config, chiedi al
+       PM se riattivare e ritentare o procedere.
        Se procede: le letture di questo run le dà il PM a mano **e** nel
        riepilogo il fatto che la lettura automatica è stata saltata va
        registrato come **rimandato**, mai in silenzio;

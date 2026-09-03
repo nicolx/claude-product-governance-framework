@@ -30,34 +30,54 @@ sync:
 #                                 # qualcosa di più parlante del default, scegli un token che dica
 #                                 # "governance" e non un prodotto (es. "GOV", "PGOV").
 
-# --- Tracker di esecuzione ---
-# Connettore esterno: vedi playbook, "Connettori esterni: dichiarati,
-# verificati a inizio processo, mai un fallback silenzioso".
-jira:
-  configured: false               # true quando l'istanza ha davvero un progetto Jira collegato
-  project_key: ""                 # es. "EPITA"
-  board_url: ""                   # URL della board (per i link, non per il polling)
-  cloud_id: ""                    # id del sito Atlassian (da getAccessibleAtlassianResources) — serve ad alcuni tool MCP
-  integration: ""                 # COME l'istanza si connette: "atlassian-mcp" (Remote MCP Server ufficiale, consigliato), "cli:<nome>", "manuale" (nessun accesso programmatico: jira-sync prepara i testi, il PM agisce a mano)
-  probe: ""                       # come verificare che sia VIVO: per un MCP, il prefisso dei suoi tool (es. "mcp__atlassian__"); per una CLI, un comando read-only veloce il cui esito lo dice
-  reauth: ""                      # comando/azione per RIMETTERLO SU quando è scaduto — per un MCP di solito "/mcp", per una CLI il comando di login (es. "sf org login web --alias <alias-org>"). MAI credenziali qui, solo il comando.
-  note: ""                        # note libere (permessi, quirk del progetto, ecc.)
+# === Connettori a sistemi esterni ===
+# Disciplina comune a TUTTI: vedi playbook, "Connettori esterni:
+# dichiarati, verificati a inizio processo, mai un fallback silenzioso".
+# Campi comuni: configured, integration ("mcp:<server>" | "cli:<nome>" |
+# "manuale" | ""), probe (come verificare che sia vivo — per un MCP il
+# prefisso dei suoi tool, per una CLI/API un comando o una chiamata
+# read-only rapida), reauth (il comando/azione per rimetterlo su quando
+# scade — "/mcp" per un MCP, il comando di login per una CLI). MAI
+# credenziali qui, solo nomi e comandi.
+# NB: il framework non fissa quali connettori esistono — dipende dallo
+# stack dell'istanza (il tracker può essere Jira o Asana o Linear; la
+# fonte metriche un warehouse, un client SQL, un tool SaaS; ci possono
+# essere altri connettori — design, ecc.). I due blocchi sotto sono
+# quelli che le skill del framework di base usano; altri vanno in
+# `connectors` (in fondo).
 
-# --- Connettore analytics / metriche (per leggere NSM e KPI) ---
-# Altro connettore esterno, stessa disciplina di `jira` (playbook,
-# "Connettori esterni…"): dichiarato qui, verificato a inizio processo da
-# nsm-watch / measurement-watch / cerimonie; se dichiarato ma
-# irraggiungibile NON si degrada in silenzio all'inserimento manuale.
-# NB: qui c'è solo la DICHIARAZIONE del connettore (c'è / come si chiama /
-# come verificarlo). Il contratto di query vero (come una richiesta KPI
-# diventa una query sullo stack dell'istanza e torna un aggregato) non
-# esiste ancora — vedi framework/docs/future-work.md.
+# --- Tracker di esecuzione (lo usa jira-sync; tipicamente Jira) ---
+jira:
+  configured: false               # true quando l'istanza ha davvero un tracker collegato
+  project_key: ""                 # chiave/prefisso del progetto nel tracker (es. "EPITA")
+  board_url: ""                   # URL della board (per i link, non per il polling)
+  cloud_id: ""                    # solo Atlassian MCP: id del sito (da getAccessibleAtlassianResources)
+  integration: ""                 # "atlassian-mcp" (Remote MCP ufficiale, consigliato per Jira) | "mcp:<server>" | "cli:<nome>" | "manuale" (jira-sync prepara i testi, il PM agisce a mano)
+  probe: ""                       # come verificarlo (es. per Atlassian MCP: prefisso "mcp__atlassian__")
+  reauth: ""                      # comando per rimetterlo su quando scade (es. "/mcp")
+  note: ""                        # note libere (permessi, quirk, tracker non-Jira, ecc.)
+
+# --- Fonte delle metriche (la usano nsm-watch e measurement-watch per
+# leggere NSM e KPI dai dati di produzione invece di chiederli al PM) ---
+# NB: qui c'è solo la DICHIARAZIONE del connettore. Il contratto di query
+# (come una richiesta KPI diventa una query sullo stack dell'istanza e
+# torna un aggregato) non esiste ancora — vedi framework/docs/future-work.md.
 metrics:
-  configured: false               # true quando l'istanza ha davvero un connettore analytics collegato
-  integration: ""                 # "" | "manuale" | "mcp:<nome-server>" (es. "mcp:databricks") | "cli:<nome>" (es. "cli:sf" per la Salesforce CLI)
-  probe: ""                       # come verificare che sia VIVO: per un MCP, il prefisso dei suoi tool (es. "mcp__databricks__"); per una CLI, un comando read-only veloce (es. "sf org display --target-org <alias-org> --json")
-  reauth: ""                      # comando/azione per RIMETTERLO SU quando è scaduto — MCP: di solito "/mcp"; CLI: il comando di login (es. "sf org login web --alias <alias-org>"). Alcuni connettori (OAuth CLI) scadono a OGNI sessione: check-connectors.sh lo mostra all'avvio. MAI credenziali qui, solo il comando.
-  note: ""                        # scope: quali dataset/metriche copre, quirk, owner del dato
+  configured: false               # true quando l'istanza ha davvero una fonte metriche collegata
+  integration: ""                 # "" | "manuale" | "mcp:<server>" | "cli:<nome>" | "api:<nome>"
+  probe: ""                       # come verificarla (prefisso tool MCP, o un comando/chiamata read-only rapida)
+  reauth: ""                      # comando per rimetterla su quando scade. Alcuni connettori (login OAuth interattivo) scadono a OGNI sessione: check-connectors.sh mostra questo comando all'avvio.
+  note: ""                        # scope: quali metriche/dataset copre, owner del dato, quirk
+
+# --- Altri connettori (design, SQL ad-hoc, ecc.) — stessa disciplina ---
+# Le skill del framework di base non li usano; sono per skill custom o
+# future. check-connectors.sh li segnala a inizio sessione.
+connectors: []
+# - name: ""                      # come lo chiami (es. "figma", "reporting-db")
+#   integration: ""               # "mcp:<server>" | "cli:<nome>" | "api:<nome>"
+#   probe: ""
+#   reauth: ""
+#   note: ""
 
 # --- Repository applicativi collegati come submodule ---
 apps: []

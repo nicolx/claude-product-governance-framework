@@ -358,27 +358,34 @@ cartella-per-idea e `rice_history` append-only li rende rari e locali.
 
 ## Connettori esterni: dichiarati, verificati a inizio processo, mai un fallback silenzioso
 
-Un'istanza può dichiarare in `.governance/config.yaml` dei connettori a
-sistemi esterni:
+Un'istanza gira su uno stack che il framework non conosce a priori. Può
+avere connettori a **qualunque** sistema esterno — un tracker di
+esecuzione (Jira, Asana, Linear…), una fonte di metriche (un warehouse
+analytics, un client SQL, un tool SaaS…), altro ancora (un tool di
+design…). La **disciplina è identica per tutti**; cambia solo quale skill
+lo usa. Si dichiarano in `.governance/config.yaml`:
 
 - **`jira:`** — il tracker di esecuzione, per il dedup e la
-  riconciliazione (`jira-sync`).
-- **`metrics:`** — un connettore analytics/metriche, per leggere le NSM
-  (`nsm-watch`) e le KPI delle iniziative rilasciate (`measurement-watch`)
-  direttamente dai dati di produzione invece di chiederle a mano al PM.
+  riconciliazione (`jira-sync`). Tipicamente Jira, ma il blocco vale per
+  qualunque tracker; solo i dettagli MCP/CLI in `jira-sync` sono
+  Jira-specifici.
+- **`metrics:`** — la fonte da cui `nsm-watch` e `measurement-watch`
+  leggono NSM e KPI dai dati di produzione, invece di chiederli a mano al
+  PM.
+- **`connectors:`** — lista aperta per qualunque altro connettore che una
+  skill custom o futura richieda.
 
-Ogni blocco ha lo stesso schema di base: `configured` (c'è davvero?),
-`integration` (`atlassian-mcp` / `mcp:<server>` / `cli:<nome>` /
-`manuale`), `probe` (come verificarlo: per un MCP il prefisso dei suoi
-tool, es. `mcp__databricks__`; per una CLI un comando read-only veloce),
-`reauth` (il comando/azione per rimetterlo su quando scade — `/mcp` per un
-MCP, il comando di login per una CLI), e note.
+Ogni connettore ha lo stesso schema di base: `configured` (c'è davvero?),
+`integration` (`mcp:<server>` / `cli:<nome>` / `manuale` / vuoto), `probe`
+(come verificare che sia vivo — per un MCP il prefisso dei suoi tool, per
+una CLI/API un comando o una chiamata read-only rapida), `reauth` (il
+comando/azione per rimetterlo su quando scade), e note. **Mai credenziali**
+— solo nomi e comandi.
 
 **Dichiarato non vuol dire attivo.** Un connettore può essere non loggato,
 con la sessione OAuth scaduta, o il servizio irraggiungibile (`ENOTFOUND`,
-timeout). **Alcuni scadono a ogni sessione** — tipicamente le CLI OAuth
-(es. la Salesforce CLI: `sf org login web` va rifatto ogni volta). Per
-questo:
+timeout). **Alcuni scadono a ogni sessione** — tipico dei login OAuth
+interattivi da riga di comando, che vanno rifatti ogni volta. Per questo:
 
 1. **Verifica all'inizio del processo.** Le skill che dipendono da un
    connettore ne controllano la raggiungibilità *prima* di partire (con
@@ -395,8 +402,7 @@ questo:
    transitorio, non una scelta di setup, e trattarlo come "non
    configurato" nasconde una falla invece di renderla visibile.
    - Segnala **cosa** non risponde e proponi il comando **`reauth`**
-     dichiarato in config (`/mcp`, o `sf org login web --alias …`, ecc.);
-     se è rete/servizio, ritentare tra poco.
+     dichiarato in config; se è rete/servizio, ritentare tra poco.
    - Chiedi al PM se riattivare e ritentare, o procedere senza.
    - Se procede senza: la lettura che dipendeva dal connettore la dà il
      PM a mano per questo run, **e** il fatto che la lettura automatica è

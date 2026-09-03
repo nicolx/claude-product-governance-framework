@@ -106,20 +106,21 @@ per raccogliere:
    - **Nessun accesso programmatico** — `integration: manuale`:
      `jira-sync` preparerà i testi e il PM agirà a mano. Va bene per
      partire, si può aggiungere l'MCP in seguito.
-7. **Connettore analytics / metriche** (blocco `metrics` in
+7. **Fonte delle metriche** (blocco `metrics` in
    `framework/schema/governance-config.template.yaml`) — c'è un modo
    programmatico per leggere NSM e KPI dai dati di produzione (un MCP
-   server tipo DataBricks, una CLI come la Salesforce CLI `sf`)? Se sì:
+   server, una CLI, un'API — dipende dallo stack dell'istanza)? Se sì:
    `metrics.configured: true`, `integration` (`mcp:<server>` /
-   `cli:<nome>`), `probe` (come verificarlo — per un MCP il prefisso dei
-   tool es. `mcp__databricks__`; per una CLI un comando read-only veloce,
-   es. `sf org display --target-org <alias> --json`), `reauth` (il
-   comando per rimetterlo su quando scade — `/mcp`, o `sf org login web
-   --alias <alias>`), `note`. **Chiedi esplicitamente se il connettore
-   scade a ogni sessione** (tipico delle CLI OAuth): se sì, annotalo in
-   `note` — `check-connectors.sh` mostrerà il `reauth` a ogni avvio. Se
-   non c'è un connettore: `metrics.configured: false`, non scrivere il
-   resto del blocco — `nsm-watch`/`measurement-watch` chiederanno i valori
+   `cli:<nome>` / `api:<nome>`), `probe` (come verificarlo — per un MCP il
+   prefisso dei suoi tool; per una CLI/API un comando o una chiamata
+   read-only rapida), `reauth` (il comando esatto per rimetterlo su quando
+   scade). **Chiedi esplicitamente se il connettore scade a ogni
+   sessione** (tipico dei login OAuth interattivi): se sì, annotalo in
+   `note` — `check-connectors.sh` mostrerà il `reauth` a ogni avvio.
+   Chiedi anche se l'istanza ha **altri connettori** (design, SQL
+   ad-hoc…): vanno nella lista `connectors` con gli stessi campi. Se non
+   c'è nulla: `metrics.configured: false`, non scrivere il resto del
+   blocco — `nsm-watch`/`measurement-watch` chiederanno i valori
    al PM. **Nessuna credenziale nel config** (né altrove nel repo
    tracciato) — solo il *nome* e i *comandi*.
 8. **Eventuali altre configurazioni rilevanti** — canale Slack/Teams per
@@ -145,8 +146,9 @@ che serve da lì e chiedi solo quello che manca.
    compila i campi noti dall'intervista: `project`, `initialized_at`,
    `pm_roster`, `framework.upstream_ref` (`git rev-parse upstream/main`
    se disponibile, altrimenti `HEAD`), il blocco `jira` (passo 6), il
-   blocco `metrics` (passo 7 — solo se c'è un connettore; altrimenti
-   `configured: false` e stop), `apps`.
+   blocco `metrics` e la lista `connectors` (passo 7 — solo ciò che
+   esiste; se non c'è una fonte metriche, `metrics.configured: false` e
+   stop), `apps`.
    Il blocco `sync` (`auto_pull`/`auto_push`, default `true` entrambi) è
    ciò che attiva la sincronizzazione automatica con `origin` per tutte
    le skill successive (vedi playbook, "Sincronizzazione dell'istanza

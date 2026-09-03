@@ -95,13 +95,14 @@ un'azione in uscita automatica). Fuori scope finché è un caso isolato.
 ## Integrazione DB/analytics in lettura per NSM e measurement-watch
 
 **Dichiarazione + verifica: FATTO** (2026-09-03). `.governance/config.yaml`
-ha un blocco `metrics:` (`configured`/`integration`/`tool_hint`/`note`,
-parallelo a `jira:`); `nsm-watch`, `measurement-watch` e le cerimonie
-**verificano il connettore a inizio processo** e applicano la regola
-"dichiarato ma irraggiungibile ≠ fallback silenzioso" (playbook,
-"Connettori esterni…"); l'hook `check-connectors.sh` lo ricorda a inizio
-sessione. `measurement.yaml` ha già `data_source.mode: manual | automated`
-per KPI.
+ha un blocco `metrics:` (`configured`/`integration`/`probe`/`reauth`/`note`)
+e una lista aperta `connectors:` per qualunque altro sistema — la
+disciplina è agnostica rispetto allo stack (MCP, CLI, API); `nsm-watch`,
+`measurement-watch` e le cerimonie **verificano il connettore a inizio
+processo** e applicano la regola "dichiarato ma irraggiungibile ≠ fallback
+silenzioso" (playbook, "Connettori esterni…"); `check-connectors.sh` lo
+ricorda a inizio sessione mostrando i comandi `reauth`. `measurement.yaml`
+ha già `data_source.mode: manual | automated` per KPI.
 
 **Cosa resta aperto: il contratto di query.** Come una richiesta KPI
 ("conversion funnel della Product Line X, ultimi 30 giorni") diventa una
