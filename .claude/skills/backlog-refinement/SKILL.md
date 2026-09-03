@@ -1,6 +1,6 @@
 ---
 name: backlog-refinement
-description: Conduce e registra il Product Backlog Refinement settimanale — si apre "guardando indietro" (NSM, impatti, scadenze, idee senza RICE), svuota la coda di approvazione RICE, presenta il backlog ordinato come base della prioritizzazione, rileva le reprioritizzazioni fuori-RICE, poi delega a log-ceremony per la registrazione. Punto d'ingresso dedicato: fissa ceremony_type e periodo. Usala per la cerimonia settimanale di team.
+description: Conduce e registra il Product Backlog Refinement settimanale — si apre "guardando indietro" (NSM, impatti, scadenze, idee senza RICE), svuota la coda di approvazione RICE, presenta il backlog ordinato come base della prioritizzazione, compone il Piano di Iterazione della settimana (la board a quattro bucket, output primario, proposto in pending/) rilevando le reprioritizzazioni fuori-RICE, poi delega a log-ceremony per la registrazione. Punto d'ingresso dedicato: fissa ceremony_type e periodo. Usala per la cerimonia settimanale di team.
 ---
 
 # backlog-refinement
@@ -14,13 +14,16 @@ rispecificare ogni volta e tiene insieme, in un unico posto, la sequenza
 > **Dry-run.** Se l'utente chiede la simulazione (`dry-run`, "simula la
 > cerimonia"), propaga l'argomento a ogni skill che invochi
 > (`log-ceremony`, le watch, `pending-approval`): nessuna scrittura
-> (nemmeno l'assegnazione di `short_ref`, nessuna approvazione applicata),
-> nessun commit, chiusura con `🔍 DRY-RUN`. Vedi playbook, "Modalità
-> dry-run (simulazione)". In dry-run, al passo 3 elenca comunque cosa c'è
-> in coda e al passo 5 mostra sia il ranking ufficiale sia quello che
-> risulterebbe approvando le proposte in `pending/` — è la parte più
-> utile della simulazione. Se il run è già stato fatto per errore senza
-> dry-run: `rollback-ceremony`.
+> (nemmeno l'assegnazione di `short_ref`, nessuna approvazione applicata,
+> nessuna proposta `iteration_plan` scritta in `pending/`), nessun commit,
+> chiusura con `🔍 DRY-RUN`. Vedi playbook, "Modalità dry-run
+> (simulazione)". In dry-run, al passo 3 elenca comunque cosa c'è in coda,
+> al passo 5 mostra sia il ranking ufficiale sia quello che risulterebbe
+> approvando le proposte in `pending/`, e al passo 6 mostra comunque per
+> intero la board a quattro bucket del Piano di Iterazione che *avresti*
+> proposto, incluso il diff `changes_since_last` da `based_on` — è la
+> parte più utile della simulazione. Se il run è già stato fatto per
+> errore senza dry-run: `rollback-ceremony`.
 
 ## Cosa fa
 
@@ -38,6 +41,15 @@ nessuno vede — perché gli score sono fermi in `product/approvals/pending/`
 — non serve a prioritizzare. Per questo i passi 3 e 5 svuotano la coda di
 approvazione e presentano la lista ordinata, prima che si discuta cosa
 entra in iterazione.
+
+**L'output primario della cerimonia è il Piano di Iterazione** (passo 6):
+`product/roadmap/iterations/{settimana}.yaml`, la board team-facing a
+quattro bucket costruita come diff dal piano della settimana precedente.
+Senza, la cerimonia registra decisioni e segnalazioni ma non lascia in
+mano al team il documento su cui lavora nei giorni successivi — vedi
+playbook, "Product Backlog Refinement". Come lo snapshot di roadmap, il
+piano passa **sempre** da `product/approvals/pending/`
+(`type: iteration_plan`) e non viene applicato nella camminata.
 
 ## Passi specifici del Backlog Refinement
 
@@ -129,16 +141,73 @@ entra in iterazione.
    `backlog-list` lo evidenzia (sezione "Proposte RICE non ancora
    approvate") — tienilo presente al passo 6.
 
-6. **Rileva le reprioritizzazioni fuori-RICE.** Solo per iniziative
-   `classification: idea` che entrano nell'iterazione corrente davanti a
-   idee con RICE score più alto ancora in backlog (dal ranking del passo
-   5). Per ciascuna, chiedi esplicitamente al PM se è una **Strategic
-   Exception** (bypass autorizzato da uno stakeholder → proposta
-   `strategic_exception_flag` in `pending/`, `approved_by` mai presunto) o
-   una **scelta qualitativa del team** (resta solo nelle
-   `reprioritizations` della cerimonia). È così che il framework
-   intercetta il pattern "stessa persona che bypassa la priorità ogni
-   settimana" (playbook, "Come gestire le frizioni" — Scenario 2).
+6. **Componi il Piano di Iterazione, partendo da quello della settimana
+   precedente.** È l'output primario della cerimonia
+   (`framework/schema/iteration-plan.template.yaml`). Non scrivere mai il
+   file direttamente: si genera una proposta `type: iteration_plan` in
+   `pending/` (passo 6.7).
+
+   1. **Carica il piano precedente.** Cerca il file di iterazione più
+      recente in `product/roadmap/iterations/` con settimana `<` quella
+      corrente → è `based_on`. Se non ne esiste nessuno (primo run
+      dell'istanza): `based_on: null`, e costruisci i bucket dallo stato
+      corrente — idee `status: in_analysis` → `analysis_in_progress`;
+      idee con `jira.card_id` e stato dev attivo → `in_development`.
+   2. **Riconcilia ogni voce del piano precedente con lo stato attuale**
+      e popola `changes_since_last`:
+      - idea ora `status: done` → `completed`, non riportarla nei bucket;
+      - idea avanzata di stato (analisi → dev) → spostala di bucket,
+        `carried_from` = settimana precedente, registrala in `advanced`;
+      - idea ferma allo stesso punto → carry-over nel suo bucket,
+        incrementa `weeks_in_bucket`; se supera una soglia indicativa di
+        **3 iterazioni** senza avanzare, mettila in `slipped` e segnalala
+        esplicitamente al PM (non annegarla nel riepilogo);
+      - idea non più pertinente che il team decide di togliere →
+        `dropped` con `reason`.
+   3. **Presenta al PM la board carried-over** — i quattro bucket più il
+      diff — prima di chiedere le aggiunte.
+   4. **Chiedi le aggiunte, bucket per bucket:**
+      - `analysis_todo`: *dal ranking RICE del passo 5, quali idee
+        `classification: idea` iniziano l'analisi questa settimana?* —
+        **è la domanda centrale della riunione**, non una formalità. Per
+        ciascuna registra `why_now`.
+      - `in_development`: card nuove emerse nella riconciliazione Jira del
+        passo 2.6 e non ancora nel piano.
+      - `urgent_priority`: **questo assorbe il vecchio "rileva le
+        reprioritizzazioni fuori-RICE".** Sono le iniziative
+        `classification: idea` che entrano nell'iterazione **davanti a
+        idee con RICE score più alto** ancora in backlog (dal ranking del
+        passo 5), più le idee con `deadline`/`mandate` a `due_soon`/
+        `overdue` che il team decide di forzare in analisi adesso. Per
+        ciascuna, chiedi esplicitamente al PM se è una **Strategic
+        Exception** (bypass autorizzato da uno stakeholder) o una
+        **scelta qualitativa del team** dentro il processo normale:
+        - se **Strategic Exception**: voce `urgent_priority` con
+          `kind: strategic_exception`, `approved_by` **mai presunto**, e
+          **in più** genera una proposta `strategic_exception_flag` in
+          `pending/` (append a `strategic_exceptions` dell'idea +
+          `pending-approval` aggiunge la riga a
+          `product/reference/friction-log.yaml`) — esattamente come prima
+          dell'introduzione del piano. È così che il framework intercetta
+          il pattern "stessa persona che bypassa la priorità ogni
+          settimana" (playbook, "Come gestire le frizioni" — Scenario 2);
+        - se **scelta qualitativa del team**: la voce resta solo nel
+          piano (`urgent_priority` o `analysis_todo` con `why_now`), e in
+          `decisions.yaml` come `reprioritization` con
+          `reason_type: qualitative_team_call` — nessuna proposta
+          `strategic_exception_flag`.
+   5. **Chiedi il `iteration_goal`** — una frase: focus della settimana /
+      iniziativa o metrica che si cerca di impattare.
+   6. Il PM conferma la board finale.
+   7. **Genera la proposta** `type: iteration_plan` in
+      `product/approvals/pending/{settimana}-iteration-plan.yaml`
+      (`framework/schema/approval.template.yaml`, `payload` = piano
+      completo, `target_file` =
+      `product/roadmap/iterations/{settimana}.yaml`). **Non applicare** —
+      resta pending, si approva separatamente (skill `pending-approval`,
+      come `roadmap_snapshot`).
+   8. Sincronizza `pending/`:
+      `bash .claude/hooks/governance-sync.sh push "backlog-refinement: proposta Piano di Iterazione <settimana>" product/approvals/pending/`.
 
 7. **`retro_notes`** — % completamento dell'iterazione precedente,
    impedimenti riscontrati, informazioni mancate — se presenti nella
@@ -146,14 +215,23 @@ entra in iterazione.
 
 8. Consegna tutto a `log-ceremony` per i passi comuni: estrazione delle
    decisioni atomiche, `decisions.yaml` (con `retro_notes`,
-   `reprioritizations` e `approvals_reviewed` del passo 3 valorizzati),
+   `reprioritizations`, `approvals_reviewed` del passo 3 e
+   `iteration_plan_ref` = path della proposta del passo 6.7 valorizzati),
    riepilogo al PM — aperto **sempre** dagli allarmi `nsm-watch` se
    presenti — chiusura di `.run-meta.yaml`, sincronizzazione.
 
 ## Dopo
 
+- **`pending-approval`** per approvare la proposta di Piano di Iterazione
+  del passo 6 (e le eventuali `strategic_exception_flag` generate): finché
+  resta in `pending/`, `product/roadmap/iterations/{settimana}.yaml` non
+  esiste ancora. La camminata della cerimonia **non** l'ha approvata.
+- **`iteration-board`** per la vista "a colpo d'occhio" del piano (daily
+  standup, mail settimanale, Confluence).
 - Il passo naturale successivo è **`roadmap-snapshot`** — la proposta di
-  snapshot settimanale della roadmap, che legge i riepiloghi delle watch
-  loggati qui.
+  snapshot settimanale della roadmap, che ora **referenzia** il Piano di
+  Iterazione (`iteration_plan_ref`) invece di ricostruire una propria
+  lista di iniziative, e legge i riepiloghi delle watch loggati qui.
 - Qualche giorno dopo: **`iteration-planning`**, quando il team tech
-  fissa l'agenda concreta di delivery.
+  fissa l'agenda concreta di delivery e **conferma/aggiusta** il Piano di
+  Iterazione (stime di delivery, valutazione 80/20).

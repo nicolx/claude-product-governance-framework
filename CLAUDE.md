@@ -36,6 +36,8 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `product/ceremonies/` (cartella cerimonia, `source/`, `decisions.yaml`, `.run-meta.yaml`) | Istanza | `backlog-refinement`, `iteration-planning`, `log-ceremony` — registrazione diretta di una riunione di team: trascrizione + esito qualitativo + metadati di esecuzione. Non passa da `pending/` (non è una decisione di priorità: gli impatti su RICE/roadmap che ne derivano, sì). `.run-meta.yaml` è metadato di esecuzione scritto dalla skill, mai a mano. `rollback-ceremony` può annullare un run (revert forward dei commit + cartella `-void` con la trascrizione), mai una decisione già approvata |
 | `product/ideas/*/delivery.estimated_effort_weeks` | Istanza | Solo `iteration-planning` — stima di tempo-calendario dal team tech per la contabilità di capacità d'iterazione, **non** un input del RICE. Scrittura diretta, nessuna approvazione (stessa logica di `deadline`/`rice_status`) |
 | `product/ideas/*/rice_history`, `product/ideas/*/strategic_exceptions`, `product/ideas/*/mandate` (dopo la creazione), `product/ideas/*/classification` (riclassificazione a `mandate`), `product/roadmap/`, comunicazioni in uscita | Istanza | Solo tramite `product/approvals/pending/` — vedi regola sotto |
+| `product/roadmap/iterations/` | Istanza | Solo tramite `product/approvals/pending/` (`type: iteration_plan`) — output team-facing del Backlog Refinement (proposto da `backlog-refinement`, confermato/aggiustato da `iteration-planning`), applicato solo da `pending-approval` all'approvazione. Parte dal piano della settimana precedente (`based_on`). Serie append-only, un file per settimana ISO, mai sovrascritto (tranne la revisione da Iteration Planning sulla stessa settimana) |
+| `product/ideas/*/iteration` (`current`, `bucket`) | Istanza | Solo `pending-approval` all'approvazione di un `iteration_plan` — puntatore denormalizzato del piano approvato, scrittura diretta senza approvazione a sé (stesso principio di `jira.status`). Azzerato quando l'idea esce da tutti i bucket di un piano successivo |
 | `product/ideas/*/mandate.analysis_start_by`, `product/ideas/*/mandate.escalation_status` | Istanza | Solo `mandate-watch` — fatti calcolati, non decisioni, scrittura diretta senza approvazione (stesso principio di `jira.status`) |
 | `product/ideas/*/rice_status` (incluso `deep_dive`) | Istanza | `rice-watch` (e `idea-intake`/`inbox-triage` per `deep_dive.needed`/`requested_at` all'origine) — `flagged_since` è un fatto osservato; `blocked_reason`/`waiting_on`/`deep_dive.*` sono cattura di contesto (chiesti al PM, mai presunti), non decisioni di priorità: nessuna passa da approvazione |
 | `product/ideas/*/summary`, `product/ideas/*/notes` | Istanza | `idea-intake`/`inbox-triage` all'origine, poi qualunque skill/PM in conversazione — descrizione e note di contesto, non decisioni di priorità, scrittura diretta |
@@ -79,6 +81,11 @@ Nessuna skill scrive mai direttamente in `product/ideas/`, `product/prds/`,
 
 - Ogni diff di RICE proposto da nuova evidenza
 - Ogni snapshot di roadmap generato da una cerimonia
+- Ogni Piano di Iterazione generato da un Backlog Refinement (`type:
+  iteration_plan`), e ogni sua revisione da Iteration Planning — proposto
+  dalla cerimonia, approvato separatamente, mai auto-applicato nella
+  camminata (interamente annullabile con `rollback-ceremony` finché resta
+  in `pending/`)
 - Ogni comunicazione in uscita (mail settimanale, roadmap trimestrale)
 - Ogni Strategic Exception rilevata durante il Backlog Refinement quando
   un'iniziativa salta la coda rispetto al suo RICE score (vedi

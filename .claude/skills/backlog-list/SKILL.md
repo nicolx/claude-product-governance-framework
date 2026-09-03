@@ -43,7 +43,9 @@ li mette tutti sulla stessa riga.
      ma può capitare dopo una revisione)
    - flag: `strategic_exceptions` non vuoto (è già passata avanti almeno
      una volta), `links.prd_ids` non vuoto (ha già un PRD), `status`
-     corrente
+     corrente, e — se `iteration.current` è valorizzato — "in iterazione
+     {settimana} · {iteration.bucket}" (letto dal campo già persistito da
+     `pending-approval`, non ricalcolato)
    Se la voce di `rice_history` più recente ha `entanglement_basis:
    structured_estimate`, segnala che lo score poggia su una stima di
    footprint più debole.
@@ -69,7 +71,9 @@ li mette tutti sulla stessa riga.
    `escalation_status` da `mandate-watch`), `classification:
    platform` (con `estimated_effort_weeks`), e le `strategic_exception`
    con `status` diverso da `done`/`aborted`/`declined`. Queste non hanno
-   uno score — vanno lette per scadenza/stato, non per posizione.
+   uno score — vanno lette per scadenza/stato, non per posizione. Se
+   `iteration.current` è valorizzato, mostralo qui pure ("in iterazione
+   {settimana} · {bucket}").
 
 4. **Idee senza RICE.** Sezione separata: `classification: idea` con
    `rice_history` vuoto **e nessuna proposta `rice_diff` in coda** (se
@@ -93,8 +97,9 @@ li mette tutti sulla stessa riga.
 ## Cosa NON fare
 
 - Non scrivere su nessun file, non fare commit/push — è sola lettura.
-- Non ricalcolare score, `escalation_status`, `rice_status`: leggi i
-  valori già persistiti dalle skill che li possiedono.
+- Non ricalcolare score, `escalation_status`, `rice_status`,
+  `iteration.*`: leggi i valori già persistiti dalle skill che li
+  possiedono.
 - Non inventare un `summary` mancante — segnalalo come gap.
 - Non fondere in un unico elenco le idee RICE-ranked e quelle fuori RICE:
   confrontarle per "posizione" non ha senso, il playbook lo dice

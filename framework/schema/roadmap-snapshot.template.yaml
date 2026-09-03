@@ -31,17 +31,31 @@ nsm_alerts:
 
 week: "2026-W02"
 generated_at: "2026-01-08"
-iteration_goal: ""
 ceremony_refs:                      # cerimonie che hanno contribuito a questo snapshot
   - "ceremonies/backlog-refinement/2026-W02"
   - "ceremonies/roadmap-iteration-planning/2026-W02"
 
+# iteration_plan_ref punta al Piano di Iterazione della settimana
+# (product/roadmap/iterations/{settimana}.yaml) — la board operativa
+# team-facing con i quattro bucket. Lo snapshot NON la duplica: è il
+# rollup strategico per MBR/MTR, il piano è il "cosa fa il team adesso".
+iteration_plan_ref: "roadmap/iterations/2026-W02.yaml"
+
+# iteration_goal e initiatives[] sono DERIVATI/OPZIONALI: la fonte è il
+# Piano di Iterazione referenziato sopra. iteration_goal si copia da lì.
+# initiatives[] serve solo quando un MBR/MTR chiede un elenco piatto delle
+# iniziative in lavorazione: in quel caso roadmap-snapshot lo compone
+# leggendo i quattro bucket del piano (analysis_todo, analysis_in_progress,
+# in_development, urgent_priority) — NON lo ricostruisce da idea.status.
+# Può restare vuoto se lo snapshot di questa settimana non ne ha bisogno.
+iteration_goal: ""
 initiatives:
   - idea_id: ""
     prd_id: null
     jira_card_id: null
     status: ""                      # libero, riflette lo stato reale (es. "in sviluppo", "bloccato", "shipped 70%")
     completion_pct: null
+    iteration_bucket: null          # da quale bucket del Piano di Iterazione proviene questa voce
 
 retro_notes: ""                     # mini-retrospettiva dell'iterazione precedente (facoltativa)
 
@@ -50,10 +64,12 @@ retro_notes: ""                     # mini-retrospettiva dell'iterazione precede
 # principale — playbook, "flusso di protezione del team". total_capacity_weeks
 # è una stima del team tech (chiesta esplicitamente da roadmap-snapshot,
 # mai presunta); platform_weeks è la somma di platform.estimated_effort_weeks
-# delle iniziative classification: platform presenti in initiatives questa
+# delle iniziative classification: platform in lavorazione questa
 # settimana; roadmap_weeks è la somma di delivery.estimated_effort_weeks
-# delle iniziative classification: idea in initiatives (NON la
-# entanglement_score del RICE — quella è un footprint 1-10, non settimane).
+# delle iniziative classification: idea presenti nei bucket analysis_todo /
+# in_development / urgent_priority del Piano di Iterazione referenziato
+# (NON la entanglement_score del RICE — quella è un footprint 1-10, non
+# settimane).
 # Le idee in iterazione ancora senza delivery.estimated_effort_weeks (non
 # passate da Iteration Planning) vanno elencate come "non dimensionate" in
 # note, non stimate d'ufficio. La serie storica di questo blocco, snapshot

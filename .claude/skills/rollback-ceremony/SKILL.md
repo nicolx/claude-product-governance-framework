@@ -84,10 +84,20 @@ o intervento git esplicito dell'utente).
      (se il branch ha upstream). Determina l'insieme "pushati" e
      "solo locali".
    - **ha creato una proposta poi approvata?** — per ogni file aggiunto
-     in `product/approvals/pending/`, controlla se esiste ora un
-     omologo in `product/approvals/decided/` con `decision: approved`.
-     Se sì: quel commit (e la catena fino all'approvazione e al
-     `target_file` aggiornato) è **fuori scope** — vedi sezione sopra.
+     in `product/approvals/pending/` (`rice_diff`,
+     `strategic_exception_flag`, `iteration_plan`, `roadmap_snapshot`,
+     …), controlla se esiste ora un omologo in
+     `product/approvals/decided/` con `decision: approved`. Se sì: quel
+     commit (e la catena fino all'approvazione e ai file aggiornati) è
+     **fuori scope** — vedi sezione sopra. Per un `iteration_plan`
+     approvato, "i file aggiornati" includono
+     `product/roadmap/iterations/{settimana}.yaml` **e** i puntatori
+     `iteration.current`/`iteration.bucket` scritti sulle `idea.yaml`:
+     tutta questa catena resta fuori scope, non solo il file di
+     iterazione.
+     Una proposta `iteration_plan` **ancora in `pending/`** (non
+     approvata — il caso normale subito dopo la cerimonia) fa invece
+     parte dei commit del run e viene revertata come gli altri.
 
 4. **Componi e mostra il piano di rollback**, esplicito, prima di
    toccare qualunque cosa:

@@ -32,10 +32,12 @@ sincronizza — senza mai applicare da sé gli impatti su RICE/roadmap.
 
 I passi qui sotto sono quelli **comuni** a qualunque cerimonia.
 `backlog-refinement` e `iteration-planning` li eseguono tutti,
-intercalando i propri passi specifici — la sweep delle watch e le
-reprioritizzazioni fuori-RICE per il primo, le stime di delivery e la
-valutazione 80/20 per il secondo (descritti nelle rispettive skill, non
-qui: non duplicare, linkare). Per una cerimonia ad-hoc invocata
+intercalando i propri passi specifici — la sweep delle watch e la
+composizione del Piano di Iterazione (che assorbe il rilevamento delle
+reprioritizzazioni fuori-RICE) per il primo, le stime di delivery, la
+valutazione 80/20 e la conferma/revisione del Piano di Iterazione per il
+secondo (descritti nelle rispettive skill, non qui: non duplicare,
+linkare). Per una cerimonia ad-hoc invocata
 direttamente, questi passi sono tutto ciò che serve.
 
 ## Passi comuni
@@ -95,10 +97,12 @@ direttamente, questi passi sono tutto ciò che serve.
    `iteration-planning`) ti passa anche il proprio materiale specifico da
    riversare qui: per il Backlog Refinement i riepiloghi delle watch, le
    `reprioritizations`, `approvals_reviewed` (esito della camminata della
-   coda `pending/`) e `retro_notes`; per l'Iteration Planning le stime di
-   delivery e la valutazione 80/20. Includili nelle `decisions`/campi
-   appositi di `decisions.yaml` — non rieseguire tu quei passi, sono di
-   competenza della skill chiamante.
+   coda `pending/`), `retro_notes` e `iteration_plan_ref` (path della
+   proposta `type: iteration_plan` generata dalla cerimonia); per
+   l'Iteration Planning le stime di delivery, la valutazione 80/20 e
+   l'eventuale `iteration_plan_ref` della proposta rifinita. Includili
+   nelle `decisions`/campi appositi di `decisions.yaml` — non rieseguire
+   tu quei passi, sono di competenza della skill chiamante.
 
 6. **Mostra un riepilogo delle decisioni estratte all'utente** prima di
    considerare il log completo — è più facile correggere un

@@ -76,7 +76,8 @@ inizializzata) e scaffolda `apps/` e `product/`.
     ├── ceremonies/{tipo}/{settimana-o-data}/
     │   ├── source/             (trascrizione grezza della riunione)
     │   └── decisions.yaml      (esito strutturato, link a cosa ha impattato)
-    ├── roadmap/snapshots/{YYYY-Www}.yaml
+    ├── roadmap/iterations/{YYYY-Www}.yaml   ← Piano di Iterazione: board a 4 bucket, output primario del Backlog Refinement (skill iteration-board per la vista)
+    ├── roadmap/snapshots/{YYYY-Www}.yaml     ← rollup strategico per MBR/MTR, referenzia il Piano di Iterazione
     ├── approvals/{pending,decided}/
     ├── demos/                    ← evidenza visiva di delivery (skill demo-capture)
     │   ├── recipes/{app-slug}.yaml        (come portare su ogni app in modalità demo — tracciato, NIENTE segreti)

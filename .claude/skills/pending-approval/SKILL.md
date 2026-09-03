@@ -1,6 +1,6 @@
 ---
 name: pending-approval
-description: Elenca, spiega e applica (o rifiuta) le proposte in product/approvals/pending/ — l'unico punto in cui un diff di RICE, uno snapshot di roadmap, una Strategic Exception rilevata in Backlog Refinement, un aggiornamento a un'iniziativa mandataria, o una comunicazione in uscita passano da proposti ad effettivi. Usala per rivedere la coda.
+description: Elenca, spiega e applica (o rifiuta) le proposte in product/approvals/pending/ — l'unico punto in cui un diff di RICE, uno snapshot di roadmap, un Piano di Iterazione, una Strategic Exception rilevata in Backlog Refinement, un aggiornamento a un'iniziativa mandataria, o una comunicazione in uscita passano da proposti ad effettivi. Usala per rivedere la coda.
 ---
 
 # pending-approval
@@ -62,8 +62,12 @@ tabella** con una riga per voce e queste colonne:
   - "—" per un'idea normale senza bypass.
 
 Le voci senza `target_file` verso un'idea (`roadmap_snapshot`,
-`outbound_comm`) restano un riepilogo in prosa (tipo, cosa cambierebbe,
-chi l'ha proposto, quando) — la tabella non le riguarda.
+`iteration_plan`, `outbound_comm`) restano un riepilogo in prosa (tipo,
+cosa cambierebbe, chi l'ha proposto, quando) — la tabella non le riguarda.
+Per un `iteration_plan`, il riepilogo mostra `iteration_goal`, quante voci
+per bucket, e il diff `changes_since_last` (completate / avanzate /
+slittate / rimosse / nuove) — è la parte che dice se vale la pena
+approvarlo così com'è.
 
 ## Approvazione
 
@@ -82,6 +86,26 @@ Quando l'utente approva una voce specifica (per nome file o descrizione):
      sovrascrivere voci precedenti).
    - `roadmap_snapshot`: crea/sovrascrivi
      `product/roadmap/snapshots/{settimana}.yaml` col contenuto proposto.
+   - `iteration_plan`: scrivi il `payload` in
+     `product/roadmap/iterations/{settimana}.yaml` (`target_file` — crea
+     la cartella `product/roadmap/iterations/` se non esiste). La serie è
+     append-only: un file per settimana ISO, non sovrascrivere un file di
+     una settimana diversa. Se esiste già un file per **questa** settimana
+     (revisione da `iteration-planning`, `refined_by_iteration_planning:
+     true`), sovrascrivilo col nuovo contenuto — è la stessa settimana,
+     non una nuova voce di serie.
+     **In più**, applica il puntatore denormalizzato sulle idee:
+     - per ogni idea presente in un bucket del piano, scrivi
+       `iteration.current` = la settimana del piano e `iteration.bucket` =
+       il nome del bucket, direttamente sul suo `idea.yaml`;
+     - per ogni idea che era in un bucket del piano `based_on` e **non**
+       compare in nessun bucket di questo piano, azzera
+       `iteration.current`/`iteration.bucket` sul suo `idea.yaml`.
+     È denormalizzazione di una decisione approvata (scrittura diretta,
+     stesso principio di `jira.status`) — la fonte di verità resta il file
+     di iterazione. Il file di iterazione e **tutti** i puntatori
+     `iteration.*` toccati viaggiano nello stesso commit atomico (passo 5,
+     come `rice_diff` con la voce in `decided/` + `target_file`).
    - `outbound_comm`: non hai qui il compito di inviare fisicamente la
      comunicazione (email, ecc.) a meno che l'istanza abbia
      un'integrazione dedicata configurata — se non c'è, prepara il testo
