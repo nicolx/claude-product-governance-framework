@@ -23,6 +23,12 @@ source_ref: "source/trascrizione.md"   # pointer al materiale grezzo nella stess
 # ciascuna con riferimento a cosa ha impattato nel repo (nessuna scrittura
 # diretta: se una decisione qui cambia un RICE o produce uno snapshot di
 # roadmap, il cambiamento passa comunque da product/approvals/pending/).
+#
+# Per il Backlog Refinement, qui finiscono anche le azioni prese ai
+# CHECKPOINT della sweep di apertura (playbook, "Diritto di parola dopo
+# ogni passo"): una `decision` per azione — un'idea archiviata, una
+# scadenza pulita, una misurazione chiusa — con impacts.idea_ids
+# valorizzato. Non serve un campo dedicato.
 decisions:
   - summary: ""
     impacts:

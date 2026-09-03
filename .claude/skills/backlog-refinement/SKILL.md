@@ -15,9 +15,13 @@ rispecificare ogni volta e tiene insieme, in un unico posto, la sequenza
 > cerimonia"), propaga l'argomento a ogni skill che invochi
 > (`log-ceremony`, le watch, `pending-approval`): nessuna scrittura
 > (nemmeno l'assegnazione di `short_ref`, nessuna approvazione applicata,
-> nessuna proposta `iteration_plan` scritta in `pending/`), nessun commit,
-> chiusura con `🔍 DRY-RUN`. Vedi playbook, "Modalità dry-run
-> (simulazione)". In dry-run, al passo 3 elenca comunque cosa c'è in coda,
+> nessuna proposta `iteration_plan` scritta in `pending/`, **nessuna
+> azione di checkpoint applicata** — archiviazioni, pulizie di scadenza,
+> `closure` restano mostrate come testo), nessun commit, chiusura con
+> `🔍 DRY-RUN`. Vedi playbook, "Modalità dry-run (simulazione)". In
+> dry-run i checkpoint del passo 2 si eseguono comunque (mostri le
+> tabelle, raccogli i commenti del PM, dici cosa *scriveresti*). Al passo
+> 3 elenca comunque cosa c'è in coda,
 > al passo 5 mostra sia il ranking ufficiale sia quello che risulterebbe
 > approvando le proposte in `pending/`, e al passo 6 mostra comunque per
 > intero la board a quattro bucket del Piano di Iterazione che *avresti*
@@ -88,6 +92,35 @@ piano passa **sempre** da `product/approvals/pending/`
    Ogni watch **solo segnala** — nessuna azione automatica. I riepiloghi
    vanno passati a `log-ceremony` perché li includa nel `decisions.yaml`
    della cerimonia.
+
+   **Checkpoint dopo ogni watch (diritto di parola).** Non eseguire le
+   watch di fila e poi chiedere: dopo *ciascuna*, prima di passare alla
+   successiva —
+   1. mostra la sua tabella con l'**identificatore in prima colonna**
+      (passo di presentazione della watch — vedi playbook, "Ogni elenco
+      prodotto dal sistema è indirizzabile");
+   2. chiedi esplicitamente: *"Prima di procedere — vuoi commentare o
+      agire su una di queste voci? Puoi riferirti a {ID}."* Le azioni
+      tipiche (playbook, "Diritto di parola dopo ogni passo"):
+      archiviare un'idea che non serve più (`status: declined` +
+      `decline_reason`, o `status: aborted` se era in lavorazione — **solo
+      con conferma esplicita del PM**, mai di iniziativa tua); svuotare
+      una `deadline` non più rilevante; chiudere una misurazione
+      (`closure`) o un allarme NSM (`alert.status: resolved`); annotare
+      `notes`; rimandare una revisione di RICE a `rice-update` (che passa
+      da `pending/`). Se non c'è nulla, un "procedi" e si va avanti;
+   3. applica le azioni concordate — scrittura diretta sui campi di
+      housekeeping/stato secondo la tabella dei confini di `CLAUDE.md` —
+      e **sincronizza subito** (come le scritture delle watch:
+      `bash .claude/hooks/governance-sync.sh push "backlog-refinement: checkpoint <watch>" product/ideas/ product/prds/`);
+   4. registra ogni azione/commento del checkpoint perché `log-ceremony`
+      lo metta in `decisions[]` di `decisions.yaml`, con
+      `impacts.idea_ids` valorizzato.
+   Le domande *interne* che alcune watch già pongono (deep-dive di
+   `rice-watch`, discovery focus di `nsm-watch`, escalation di
+   `deadline-watch`) restano dove sono: sono cattura di contesto che serve
+   alla watch. Il checkpoint è il momento uniforme *in più* — "la parola
+   al PM su queste voci".
 
 3. **Svuota la coda di approvazione — prima di guardare il backlog.**
    Elenca `product/approvals/pending/` (usa `pending-approval`, sezione

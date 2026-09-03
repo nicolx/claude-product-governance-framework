@@ -1016,6 +1016,36 @@ priorità del prossimo periodo — è più
 facile prioritizzare bene quando si parte da un quadro aggiornato di cosa
 sta già funzionando, invece di scoprirlo a posteriori.
 
+**Diritto di parola dopo ogni passo.** Ogni passo della sweep di apertura
+— e ogni passo successivo della cerimonia — si chiude con un
+**checkpoint**: la skill mostra la tabella indirizzabile di quel passo
+(sezione "Ogni elenco prodotto dal sistema è indirizzabile") e chiede
+esplicitamente se il PM vuole commentare o agire su una delle voci
+**prima di procedere**. Non si accorpano le interazioni alla fine: quando
+l'oggetto è ancora sullo schermo, ed è chiaro da quale passo arriva, è il
+momento giusto per dire "{ID} non serve più" o "{ID} aggiorna la
+scadenza". Le azioni tipiche del checkpoint — tutte già previste altrove,
+qui solo rese immediate:
+
+- **archiviare** un'idea che non ha più motivo di esistere:
+  `status: declined` + `decline_reason` se non è mai partita, o
+  `status: aborted` se era in lavorazione — sempre su conferma esplicita
+  del PM in conversazione, registrata in `decisions.yaml`, mai decisa
+  dalla sola skill;
+- **pulire una scadenza** non più rilevante: svuotare
+  `deadline.due_date`/`note`;
+- **chiudere una misurazione**: `closure` sul `measurement.yaml` (come
+  `measurement-watch`);
+- **chiudere un allarme NSM** tornato a posto: `alert.status: resolved`
+  (come `nsm-watch`);
+- **annotare** contesto sull'idea: `notes`;
+- **rivedere un RICE**: si rimanda a `rice-update`, che passa da
+  `product/approvals/pending/` come sempre.
+
+Se il PM non ha nulla da dire, un "procedi" e si va avanti. Ogni azione o
+commento del checkpoint diventa una voce in `decisions` del
+`decisions.yaml` della cerimonia, con l'idea impattata referenziata.
+
 **Poi si svuota la coda di approvazione, e si guarda il backlog
 ordinato.** Un RICE proposto da nuova evidenza non conta finché non è
 approvato (sezione "Ideas prioritization" — l'automazione propone, un
@@ -1115,6 +1145,7 @@ e ogni snapshot di roadmap prodotti passano da
 d'occhio" del piano si ottiene con la skill **`iteration-board`**.
 
 **Checklist operativa**
+- [ ] Dopo ogni watch della sweep di apertura c'è stato un checkpoint: tabella con `{ID}` in prima colonna e diritto di parola al PM prima di procedere? Le azioni concordate (archiviazioni, scadenze pulite, misurazioni chiuse) sono in `decisions.yaml`?
 - [ ] La coda `product/approvals/pending/` è stata camminata: ogni `rice_diff` approvato o rifiutato dal team? Quel che resta in coda è stato segnalato?
 - [ ] Il backlog ordinato (`backlog-list`) è stato mostrato al team prima di decidere cosa entra in iterazione?
 - [ ] Il Piano di Iterazione è stato generato **partendo da quello della settimana precedente** (`based_on`)?
