@@ -356,6 +356,70 @@ locali sopra quelli del team), controlla i conflitti sui file condivisi
 `idea.yaml` i conflitti sono quasi sempre banali: la convenzione
 cartella-per-idea e `rice_history` append-only li rende rari e locali.
 
+## Connettori esterni: dichiarati, verificati a inizio processo, mai un fallback silenzioso
+
+Un'istanza gira su uno stack che il framework non conosce a priori. Può
+avere connettori a **qualunque** sistema esterno — un tracker di
+esecuzione (Jira, Asana, Linear…), una fonte di metriche (un warehouse
+analytics, un client SQL, un tool SaaS…), altro ancora (un tool di
+design…). La **disciplina è identica per tutti**; cambia solo quale skill
+lo usa. Si dichiarano in `.governance/config.yaml`:
+
+- **`jira:`** — il tracker di esecuzione, per il dedup e la
+  riconciliazione (`jira-sync`). Tipicamente Jira, ma il blocco vale per
+  qualunque tracker; solo i dettagli MCP/CLI in `jira-sync` sono
+  Jira-specifici.
+- **`metrics:`** — la fonte da cui `nsm-watch` e `measurement-watch`
+  leggono NSM e KPI dai dati di produzione, invece di chiederli a mano al
+  PM.
+- **`connectors:`** — lista aperta per qualunque altro connettore che una
+  skill custom o futura richieda.
+
+Ogni connettore ha lo stesso schema di base: `configured` (c'è davvero?),
+`integration` (`mcp:<server>` / `cli:<nome>` / `manuale` / vuoto), `probe`
+(come verificare che sia vivo — per un MCP il prefisso dei suoi tool, per
+una CLI/API un comando o una chiamata read-only rapida), `reauth` (il
+comando/azione per rimetterlo su quando scade), e note. **Mai credenziali**
+— solo nomi e comandi.
+
+**Dichiarato non vuol dire attivo.** Un connettore può essere non loggato,
+con la sessione OAuth scaduta, o il servizio irraggiungibile (`ENOTFOUND`,
+timeout). **Alcuni scadono a ogni sessione** — tipico dei login OAuth
+interattivi da riga di comando, che vanno rifatti ogni volta. Per questo:
+
+1. **Verifica all'inizio del processo.** Le skill che dipendono da un
+   connettore ne controllano la raggiungibilità *prima* di partire (con
+   il `probe` dichiarato): a inizio cerimonia (`backlog-refinement`,
+   `iteration-planning` verificano `jira` e `metrics`), al passo 0 delle
+   watch di metriche e di `jira-sync` standalone. L'hook
+   `check-connectors.sh` (a inizio sessione) ricorda quali connettori la
+   config dichiara e **mostra il comando `reauth`** — non può verificare
+   lo stato da bash, ma ti dà subito cosa rilanciare.
+
+2. **Dichiarato ma irraggiungibile ≠ `manuale`.** Se al momento dell'uso
+   il connettore non risponde, **non** degradare in silenzio
+   all'inserimento manuale e **non** saltare il passo: è un guasto
+   transitorio, non una scelta di setup, e trattarlo come "non
+   configurato" nasconde una falla invece di renderla visibile.
+   - Segnala **cosa** non risponde e proponi il comando **`reauth`**
+     dichiarato in config; se è rete/servizio, ritentare tra poco.
+   - Chiedi al PM se riattivare e ritentare, o procedere senza.
+   - Se procede senza: la lettura che dipendeva dal connettore la dà il
+     PM a mano per questo run, **e** il fatto che la lettura automatica è
+     stata saltata va registrato come **rimandato** nel riepilogo (e nel
+     `decisions.yaml` se in cerimonia), con promemoria di rilanciare la
+     skill quando il connettore torna su. Mai "non applicabile", mai
+     silenzioso.
+
+3. **`manuale` o non dichiarato** → il PM inserisce i valori a mano come
+   sempre, nessuna segnalazione: è la configurazione scelta, non un
+   guasto.
+
+Vale in dry-run come a regime — una query analytics o una ricerca JQL è
+comunque una lettura. La skill `jira-sync` ha i dettagli specifici del
+connettore Jira; questa sezione è la regola generale di cui quello è un
+caso.
+
 ## Modalità dry-run (simulazione)
 
 A volte serve **vedere cosa produrrebbe** una skill — tipicamente una

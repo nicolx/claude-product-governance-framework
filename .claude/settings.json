@@ -14,6 +14,12 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-pending-approvals.sh\"",
             "timeout": 10,
             "statusMessage": "Verifica coda di approvazione…"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-connectors.sh\"",
+            "timeout": 10,
+            "statusMessage": "Verifica connettori esterni dichiarati…"
           }
         ]
       }

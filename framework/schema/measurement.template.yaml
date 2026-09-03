@@ -40,11 +40,16 @@ not_applicable_reason: null        # perché non c'è una KPI di business, se kp
 #     description: ""                 # come si recupera il dato — es. "DataBricks, query conversion funnel" o "report manuale mensile da Sales"
 #     # Se mode: manual, la KPI non entra mai nell'osservazione
 #     # automatica: measurement-watch chiede sempre il valore al PM (comportamento di oggi).
-#     # Se mode: automated, measurement-watch tenta la lettura automatica SOLO se
-#     # l'istanza ha configurato localmente un'integrazione (mai credenziali su
-#     # git — vedi framework/docs/future-work.md, "Integrazione DB/analytics in
-#     # lettura"). Finché quell'integrazione non esiste, si comporta come manual.
-#     # In entrambi i casi il valore letto compare nel riepilogo del run, per
+#     # Se mode: automated, dipende dal blocco `metrics` in .governance/config.yaml
+#     # (verificato a inizio processo — playbook, "Connettori esterni…"):
+#     #   - metrics.configured: true e connettore raggiungibile -> lettura dal
+#     #     connettore (il contratto di query vero non esiste ancora nel
+#     #     framework di base — vedi framework/docs/future-work.md);
+#     #   - metrics.configured: true ma connettore GIU' -> caso "dichiarato ma
+#     #     irraggiungibile": NON si degrada in silenzio, la lettura resta
+#     #     rimandata;
+#     #   - metrics.configured: false -> si comporta come manual, nessuna segnalazione.
+#     # In ogni caso il valore letto compare nel riepilogo del run, per
 #     # trasparenza — non è un gate di approvazione.
 #   readings: []
 #   # Esempio di singola lettura (append-only):

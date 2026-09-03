@@ -148,6 +148,24 @@ scrittura", solo che la scrittura è una.
 Da non confondere con `sync-framework-updates`, che riguarda `upstream` (il
 metodo), non i dati.
 
+## Connettori esterni
+
+`.governance/config.yaml` può dichiarare connettori a **qualunque** sistema
+esterno — il framework non fissa quali: `jira:` (il tracker, lo usa
+`jira-sync`; Jira o altro), `metrics:` (la fonte di NSM/KPI, la usano le
+watch di metriche), e `connectors:` (lista aperta per il resto). Stessa
+disciplina per tutti: dichiarati da `init-governance-project` (scrittura
+successiva solo su richiesta esplicita), campi comuni
+`integration`/`probe`/`reauth`, **verificati all'inizio dei processi
+chiave** (cerimonie, watch standalone), e "dichiarato ma irraggiungibile"
+non è mai un fallback silenzioso — vedi playbook, "Connettori esterni:
+dichiarati, verificati a inizio processo, mai un fallback silenzioso".
+L'hook `SessionStart` `check-connectors.sh` ricorda a inizio sessione quali
+connettori la config dichiara e **mostra i comandi `reauth`** (utile per i
+connettori il cui login scade a ogni sessione). Il *contratto di query*
+della fonte `metrics` (come una richiesta KPI diventa una query e torna un
+aggregato) non esiste ancora — vedi `framework/docs/future-work.md`.
+
 ## Modalità dry-run (simulazione)
 
 Ogni skill che scrive stato tracciato supporta un dry-run: eseguita in
