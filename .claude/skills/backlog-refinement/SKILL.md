@@ -122,7 +122,15 @@ piano passa **sempre** da `product/approvals/pending/`
    handle: `{prefisso}-{NNN}` dove `NNN = max(numeri short_ref esistenti
    in tutte le idee) + 1`, zero-padded a 3 cifre (parti da `001` se non
    ce n'è nessuno). Prefisso: `short_ref_prefix` da
-   `.governance/config.yaml`, o `PG` se assente. Il Backlog Refinement è
+   `.governance/config.yaml`, o `PG` se assente.
+   - **Guard anti-collisione.** Se il prefisso risolto coincide
+     (case-insensitive) con `jira.project_key` in `.governance/config.yaml`,
+     **fermati e non assegnare**: i due namespace si confonderebbero
+     (`{sigla}-42` idea vs. ticket — vedi playbook, "Ogni elenco prodotto
+     dal sistema è indirizzabile", e `init-governance-project`). Segnala
+     la collisione al PM e chiedi di correggere `short_ref_prefix` in
+     config prima di procedere. Le idee restano senza handle per questo
+     run — non è un errore bloccante per il resto della cerimonia. Il Backlog Refinement è
    il punto di serializzazione a scrittore singolo per cui questo non
    collide (hai appena fatto `pull` al passo 1). È un fatto di
    housekeeping — scrittura **diretta** su `idea.yaml`, non passa da

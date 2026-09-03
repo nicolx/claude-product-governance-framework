@@ -81,5 +81,16 @@ segnalalo invece di procedere.
      `short_ref`, assegnato dal prossimo `backlog-refinement` alle idee
      ancora senza handle).
 
+   - "il framework ora vieta che `short_ref_prefix` coincida con
+     `jira.project_key`" → **controllo di setup**: leggi
+     `.governance/config.yaml`. Se `short_ref_prefix` (o il default `PG`
+     se la chiave manca) è uguale (case-insensitive) a `jira.project_key`,
+     l'istanza ha handle di governance che si confondono con le card del
+     tracker. Segnala che serve un **rinominamento una-tantum** degli
+     `short_ref` già assegnati verso un prefisso proprio: è manuale
+     (`sed`/`grep -rl` su `product/`, aggiornare i titoli dei PRD e le
+     note che citano il vecchio handle; i titoli delle card Jira si
+     aggiornano a mano). Non farlo tu — proponilo e lascia decidere.
+
 6. Chiudi con un riepilogo breve: cosa è cambiato, cosa richiede
    attenzione da parte dell'utente, cosa non richiede nulla.

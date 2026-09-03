@@ -88,7 +88,12 @@ Planning).
    al PRD e/o alla cartella idea nel repo — non copiare il contenuto
    integrale del PRD dentro Jira, linkalo). Se l'idea ha un `short_ref`,
    mettilo in testa al titolo del ticket (es. `[PG-042] …`) — è il
-   cross-reference tra la governance e l'esecuzione.
+   cross-reference tra la governance e l'esecuzione. Funziona **proprio
+   perché** `short_ref_prefix` è un namespace distinto da
+   `jira.project_key`: `[PG-042] Titolo` nel ticket `EPITA-317` è
+   leggibile; `[EPITA-042]` nel ticket `EPITA-317` è solo rumore. Se in
+   `.governance/config.yaml` i due prefissi coincidono, segnalalo (è un
+   errore di setup — vedi `init-governance-project`).
 3. **Dedup contro Jira — prima di creare.** Il passo 0 verifica solo che
    *l'idea locale* non sia già linkata; non basta. Se il connettore
    permette la ricerca, lancia una JQL sul progetto configurato con le

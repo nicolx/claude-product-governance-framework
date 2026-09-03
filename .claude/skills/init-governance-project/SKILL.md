@@ -140,10 +140,17 @@ che serve da lì e chiedi solo quello che manca.
    simulazione finché non la togli (vedi playbook, "Modalità dry-run
    (simulazione)"). Per un'istanza operativa normale **non** aggiungerla.
    `short_ref_prefix` (default `PG`): il prefisso degli handle corti
-   delle idee (`PG-042`), assegnati da `backlog-refinement`. Chiedi al PM
-   se preferisce un prefisso legato al progetto (es. la sigla del
-   prodotto); se non gli interessa, lascia il default e non scrivere la
-   chiave.
+   delle idee di **governance** (`PG-042`), assegnati da
+   `backlog-refinement`. **Non suggerire la sigla del prodotto o del
+   progetto.** Il prefisso deve restare un namespace *distinto* da
+   `jira.project_key` e dagli slug in `apps/`: `PG-042` (idea) e
+   `EPITA-121` (card Jira) non devono potersi confondere in riunione.
+   - Se il PM non ha preferenze: lascia `PG`, non scrivere la chiave.
+   - Se ne vuole uno più parlante: accetta solo un token che dica
+     "governance" (es. `GOV`, `PGOV`), **mai** uguale (case-insensitive)
+     a `jira.project_key`. Se propone la project key o una sigla di
+     prodotto, **rifiuta e spiega perché** (la confusione idea/ticket
+     emersa proprio così su un'istanza reale).
 2. `product/reference/product-lines.yaml` (da template).
 3. `product/reference/annual-target.yaml` (da
    `framework/schema/annual-target.template.yaml`) — con l'incremento

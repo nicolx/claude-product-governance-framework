@@ -20,7 +20,15 @@ sync:
 
 # --- Opzionali ---
 # dry_run: true                   # istanza di training/demo: OGNI skill gira in simulazione (playbook, "Modalità dry-run"). Non metterla su un'istanza operativa.
-# short_ref_prefix: "PG"          # prefisso degli handle corti delle idee (PG-042), assegnati da backlog-refinement. Default "PG".
+#
+# short_ref_prefix: "PG"          # prefisso degli handle corti delle idee di GOVERNANCE (PG-042),
+#                                 # assegnati da backlog-refinement. Default "PG" (Product Governance).
+#                                 # NON riusare jira.project_key né una sigla di prodotto/app: PG-042
+#                                 # (idea di governance) e EPITA-121 (card del tracker di esecuzione)
+#                                 # devono restare visibilmente DUE namespace diversi, o in riunione
+#                                 # non si capisce se "{sigla}-42" è un'idea o un ticket. Se vuoi
+#                                 # qualcosa di più parlante del default, scegli un token che dica
+#                                 # "governance" e non un prodotto (es. "GOV", "PGOV").
 
 # --- Tracker di esecuzione ---
 jira:

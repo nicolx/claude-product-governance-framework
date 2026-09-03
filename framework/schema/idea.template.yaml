@@ -34,9 +34,13 @@ short_ref: null
 # in conflitto. Un'idea creata tra due refinement semplicemente non ce
 # l'ha ancora — e non le serve finché il team non la discute.
 # Una volta assegnato NON cambia più (come lo slug). Prefisso: `PG` di
-# default, override per-istanza con la chiave `short_ref_prefix` in
-# `.governance/config.yaml`. Fatto di housekeeping, scrittura diretta,
-# non passa da `product/approvals/pending/` (stessa logica di `rice_status`).
+# default (Product Governance), override per-istanza con la chiave
+# `short_ref_prefix` in `.governance/config.yaml`. Il prefisso è un
+# namespace di GOVERNANCE, deliberatamente distinto da `jira.project_key`:
+# `PG-042` (idea) e `EPITA-121` (card del tracker) non devono confondersi
+# — `backlog-refinement` si ferma se i due coincidono. Fatto di
+# housekeeping, scrittura diretta, non passa da
+# `product/approvals/pending/` (stessa logica di `rice_status`).
 title: ""                            # per convenzione: oggetto della mail/segnalazione originale
 summary: ""                          # UNA riga in linguaggio piano: cosa c'è da fare, comprensibile senza aprire source/. Il title è spesso solo l'oggetto di una mail — questo è la versione leggibile, mostrata nella lista ordinata del backlog (skill backlog-list). Scritto all'intake.
 proposer: ""                         # [NOME] di chi ha proposto l'idea

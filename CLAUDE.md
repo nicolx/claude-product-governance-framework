@@ -172,6 +172,15 @@ cross-reference (Jira, PRD), non l'identificatore su filesystem. Il nome
 cartella resta lo slug parlante. Vedi `idea.template.yaml`, campo
 `short_ref`, e skill `backlog-refinement` (che lo assegna).
 
+Il **prefisso** dello `short_ref` (`short_ref_prefix` in
+`.governance/config.yaml`, default `PG` = Product Governance) è un
+namespace di **governance**, deliberatamente distinto da
+`jira.project_key`: `PG-042` (un'idea) e `EPITA-121` (una card del tracker
+di esecuzione) non devono potersi confondere in riunione. Non usare mai la
+sigla del prodotto o la project key di Jira come prefisso —
+`init-governance-project` lo rifiuta all'intervista e `backlog-refinement`
+si ferma se i due coincidono.
+
 ## Quando scrivi codice/script in questo repo
 
 Vale comunque la guida globale dell'utente su qualità/coding standard.
