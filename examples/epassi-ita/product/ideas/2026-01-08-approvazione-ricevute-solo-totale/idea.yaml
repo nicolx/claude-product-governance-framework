@@ -37,10 +37,10 @@ clarification:
 
 rice_history:
   - date: "2026-01-09"
-    reach_percent: 15
+    reach_points: 2
     reach_absolute_note: >-
-      30% delle ricevute non riconosciute (che sono il 30% del totale) —
-      Reach totale stimato 15%.
+      ≈15% della popolazione (30% delle ricevute non riconosciute, che
+      sono il 30% del totale) → max(1, ceil(15/10)) = 2.
     impact_points: 3
     confidence_score: 10
     confidence_evidence_tier: quantitative_multi_source
@@ -51,7 +51,7 @@ rice_history:
       ricevute): si esclude una regola-filtro. Nessun consumer esterno,
       superficie di regressione limitata al motore stesso. apps/ non
       collegato in questo esempio, stima con Franco.
-    score: 225   # 15 * 3 * 10 / 2
+    score: 30   # reach_points 2 * impact 3 * confidence 10 / entanglement 2
     rationale: >-
       Stima condivisa in meeting con Filiberto (proponente) e Franco
       (referente tecnico): 4 FTE/anno risparmiati stimati (~100k EBITDA
