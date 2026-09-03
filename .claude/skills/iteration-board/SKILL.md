@@ -51,8 +51,10 @@ non richiama skill di scrittura.
       `kind`, `trigger`, `decided`; per `kind: strategic_exception`
       segnala `approved_by` (o "✋ bypass non ancora confermato" se
       `null`).
-   Apri con `iteration_goal` in testa e la settimana. Usa `idea_ref`
-   (short_ref) come identificatore; se una voce non ce l'ha, lo slug.
+   Apri con `iteration_goal` in testa e la settimana. **Prima colonna:
+   l'identificatore** `idea_ref` (short_ref); se una voce non ce l'ha, lo
+   slug — mai vuoto (playbook, "Ogni elenco prodotto dal sistema è
+   indirizzabile").
 
 3. **Mostra il diff `changes_since_last`** come riga/sezione finale:
    *completate N · avanzate N · slittate N · rimosse N · nuove N*, con

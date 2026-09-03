@@ -131,12 +131,15 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
 6. **Presenta un riepilogo ordinato per urgenza** (`check_due` e
    `at_risk`/`invalidated` prima, poi le iniziative senza KPI ancora da
    accettare, poi `on_track`; le iniziative appena chiuse in questo run
-   vanno menzionate una volta, non ripetute): per ciascuna, `short_ref`
-   se presente, `idea_id`, nome della KPI (o "nessuna KPI" per il caso
-   compliance), settimane da
-   `done_at`, ultimo valore noto vs. baseline/target. **Solo
-   segnalazione** per ciò che resta aperto — nessuna comunicazione o
-   escalation automatica, stesso principio di `mandate-watch`.
+   vanno menzionate una volta, non ripetute). **Prima colonna:
+   l'identificatore** — `short_ref` se assegnato, altrimenti lo slug
+   `idea_id` (mai vuoto — vedi playbook, "Ogni elenco prodotto dal sistema
+   è indirizzabile"), così il PM può riferirsi a una riga con "{ID}";
+   per le righe di KPI, `{prd_id} · {kpi_name}`. Poi nome della KPI (o
+   "nessuna KPI" per il caso compliance), settimane da `done_at`, ultimo
+   valore noto vs. baseline/target. **Solo segnalazione** per ciò che
+   resta aperto — nessuna comunicazione o escalation automatica, stesso
+   principio di `mandate-watch`.
 
 7. Se chiamata da `backlog-refinement`, restituisci il riepilogo perché venga
    incluso nel log della cerimonia — non scrivere tu stessa in

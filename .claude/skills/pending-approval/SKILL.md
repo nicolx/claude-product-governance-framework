@@ -33,10 +33,11 @@ non basta lo YAML del diff: si decide con lo stesso contesto della lista
 ordinata del backlog. Quando queste voci sono più d'una, **rendile come
 tabella** con una riga per voce e queste colonne:
 
-- **Identificativo idea** — sempre valorizzato: `short_ref` se assegnato
-  (es. `PG-042`), altrimenti l'`id` dell'idea (lo slug della cartella).
-  Non lasciarlo vuoto e non inventare uno `short_ref` (lo assegna
-  `backlog-refinement`).
+- **Identificativo idea** — **prima colonna**, sempre valorizzato:
+  `short_ref` se assegnato (es. `PG-042`), altrimenti l'`id` dell'idea (lo
+  slug della cartella). Non lasciarlo vuoto e non inventare uno
+  `short_ref` (lo assegna `backlog-refinement`). Vedi playbook, "Ogni
+  elenco prodotto dal sistema è indirizzabile".
 - **`summary`** dell'idea — se vuoto, "⚠ summary mancante", non il
   `title`.
 - **Tipo** di proposta (`rice_diff`, `strategic_exception_flag`, …).

@@ -228,6 +228,27 @@ funziona sommariamente il modello di business: solo una chiara
 comprensione del business aiuta a mantenere il focus sulle cose che
 spostano (principio 80/20).
 
+### Ogni elenco prodotto dal sistema è indirizzabile
+
+Ogni elenco o tabella che una skill mostra al PM ha, come **prima
+colonna, l'identificatore stabile dell'oggetto** — così il PM può
+riferirsi a una riga con "{ID}" invece di incollare testo copiato dalla
+riga di comando. L'identificatore **non** è opzionale "se presente":
+
+| Oggetto | Identificatore mostrato |
+|---|---|
+| Idea | `short_ref` se assegnato (`PG-042`), altrimenti lo slug `id` della cartella — mai vuoto o "—" |
+| NSM | `{product_line} / {name}` |
+| KPI di misurazione | `{prd_id} · {kpi_name}` |
+| Voce in coda di approvazione | il nome file della proposta in `product/approvals/pending/` |
+| Cerimonia | `{tipo}/{periodo}` |
+
+Se lo `short_ref` di un'idea non è ancora stato assegnato, si mostra lo
+slug: qualcosa di digitabile c'è sempre. Questo vale per tutte le skill di
+vista e per i riepiloghi delle watch (`backlog-list`, `pending-approval`,
+`iteration-board`, `mandate-watch`, `deadline-watch`, `rice-watch`,
+`measurement-watch`, `nsm-watch`).
+
 ## Contesto aziendale (`context/`)
 
 Il paragrafo precedente dice che "ogni membro dell'organizzazione di
