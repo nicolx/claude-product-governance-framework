@@ -183,11 +183,11 @@ Tre macro fasi di lavoro per ogni prodotto:
 |---|---|---|---|
 | Ideas intake | As needed | PM, PMM, Design/Discovery, Users, Leaders | Lista non ordinata di richieste; bug loggati direttamente nel tracker di esecuzione; Strategic Exception approvate |
 | Ideas prioritization | ASAP | PM, IT, Leaders | Lista prioritizzata (RICE) |
-| Product Backlog Refinement | Settimanale | PM, IT | Iterazione/release popolata |
+| Product Backlog Refinement | Settimanale | PM, IT | Piano di Iterazione (4 bucket, diff dalla settimana prima) |
 | Preliminary analysis | ASAP dopo il Refinement | PM, IT, Domain expert | Why chiaro; decisione di procedere o abort |
 | Complete analysis | ASAP dopo la Preliminary | PM, Domain expert, Leaders | What/GTM, metriche, PRD; decisione di procedere (+ROI) |
 | Roadmap update | Settimanale | PM | Report su cosa conta per Prodotto e IT; snapshot roadmap |
-| Iteration planning | Settimanale | PM, Design, IT | User stories, valutazione 80/20, backlog di iterazione |
+| Iteration planning | Settimanale | PM, Design, IT | User stories, valutazione 80/20, Piano di Iterazione confermato/aggiustato |
 | Product Design | ASAP se necessario | Designer | Design pronto per l'implementazione |
 | Development | ASAP | PM, IT | Deliverable testato |
 | Rollout | — | PM, PMM | Esecuzione dei piani GTM |
@@ -289,8 +289,9 @@ hook**, non alla memoria del PM:
 - **Pull** (`git pull --ff-only` su `origin`): all'avvio di ogni sessione
   Claude Code (hook `SessionStart`) e all'inizio delle skill che
   dipendono dal quadro completo — `inbox-triage`, `roadmap-snapshot`,
-  `pending-approval`, `jira-sync` (pull), e le watch (`nsm-watch`,
-  `mandate-watch`, `deadline-watch`, `rice-watch`, `measurement-watch`).
+  `pending-approval`, `backlog-list`, `iteration-board`, `jira-sync`
+  (pull), e le watch (`nsm-watch`, `mandate-watch`, `deadline-watch`,
+  `rice-watch`, `measurement-watch`).
 - **Commit + push**: come ultimo passo di ogni skill che scrive stato
   tracciato (`idea-intake`, `inbox-triage`, `rice-update`, `prd-draft`,
   `backlog-refinement`, `iteration-planning`, `log-ceremony`,
@@ -1031,10 +1032,33 @@ implementato la settimana successiva. **Serve per popolare un backlog di
 cose in cui si crede**, più ampio dello spazio disponibile, che include
 probabilmente attività già in corso.
 
-Dal punto di vista pratico: si crea/aggiorna il contenitore
-dell'iterazione corrente (release), con i tag chiave (goal e iniziativa
-che si cerca di impattare, quando dovrebbe partire il lavoro), poi si
-popola con le feature in priorità.
+**L'output primario della cerimonia è il Piano di Iterazione.** Un
+artefatto team-facing (`product/roadmap/iterations/{settimana}.yaml`) con
+quattro liste — *analisi da avviare*, *analisi in corso*, *in sviluppo*,
+*prioritizzate d'urgenza* — costruito **come diff dal piano della
+settimana precedente**: cosa è stato completato, cosa è slittato (fermo
+allo stesso punto da più iterazioni), cosa è stato tolto, cosa è nuovo. È
+il "contenitore dell'iterazione corrente" con i suoi tag chiave (un
+`iteration_goal` in una frase: quale iniziativa o metrica si cerca di
+impattare), popolato con le feature in priorità — la lista `analisi da
+avviare` si sceglie **esplicitamente dal ranking RICE**, con un `why_now`
+per ciascuna voce. È ciò che il team guarda nei giorni successivi per
+sapere su cosa lavora; senza, la cerimonia registra decisioni e
+segnalazioni ma non lascia in mano nulla di eseguibile. Come ogni diff di
+RICE o snapshot di roadmap, il piano passa **sempre** da
+`product/approvals/pending/` (`type: iteration_plan`) e non viene
+applicato nella camminata della cerimonia. Lo snapshot di roadmap
+(`roadmap/snapshots/`, il rollup strategico per gli MBR/MTR) lo
+**referenzia** senza duplicarlo.
+
+Le iniziative `classification: idea` che entrano nell'iterazione
+**davanti a idee con RICE score più alto** ancora in backlog finiscono
+nella lista *prioritizzate d'urgenza*: per ciascuna il PM dichiara se è
+una Strategic Exception (bypass autorizzato da uno stakeholder — genera
+comunque la voce in `strategic_exceptions` e la riga nel friction-log)
+o una scelta qualitativa del team dentro il processo normale. È così che
+il framework intercetta il pattern "stessa persona che bypassa la
+priorità ogni settimana" (sezione "Come gestire le frizioni", Scenario 2).
 
 Il grosso del lavoro è già stato fatto al RICE scoring. Questa cerimonia
 aggiunge: 1) consapevolezza di come sia andata l'iterazione precedente;
@@ -1055,25 +1079,29 @@ Questa cerimonia va registrata con la skill **`backlog-refinement`**, che
 apre la sweep delle watch nell'ordine giusto (`nsm-watch` per prima),
 **cammina la coda di approvazione** (`pending-approval`, i `rice_diff`
 voce per voce con il team), **presenta il backlog ordinato**
-(`backlog-list`) come base della prioritizzazione, rileva le
-reprioritizzazioni fuori-RICE, assegna gli handle corti `short_ref`
-(`PG-042`) alle idee che ancora non ne hanno — il refinement settimanale
-è il punto di serializzazione a scrittore singolo per cui questo non
-collide — e delega a `log-ceremony` per la
+(`backlog-list`) come base della prioritizzazione, assegna gli handle
+corti `short_ref` (`PG-042`) alle idee che ancora non ne hanno — il
+refinement settimanale è il punto di serializzazione a scrittore singolo
+per cui questo non collide — **compone il Piano di Iterazione**
+partendo da quello della settimana precedente (rilevando lì le
+reprioritizzazioni fuori-RICE), e delega a `log-ceremony` per la
 scrittura in `product/ceremonies/backlog-refinement/{YYYY-Www}/` —
 trascrizione grezza in `source/`, esito strutturato in `decisions.yaml`
 (vedi `framework/schema/ceremony-decisions.template.yaml`), metadati di
-esecuzione in `.run-meta.yaml`. Se la discussione cambia il RICE di
-un'idea o produce un nuovo snapshot di roadmap, la proposta passa da
-`product/approvals/pending/` prima di essere applicata.
+esecuzione in `.run-meta.yaml`. Il Piano di Iterazione, ogni diff di RICE
+e ogni snapshot di roadmap prodotti passano da
+`product/approvals/pending/` prima di essere applicati. La vista "a colpo
+d'occhio" del piano si ottiene con la skill **`iteration-board`**.
 
 **Checklist operativa**
 - [ ] La coda `product/approvals/pending/` è stata camminata: ogni `rice_diff` approvato o rifiutato dal team? Quel che resta in coda è stato segnalato?
 - [ ] Il backlog ordinato (`backlog-list`) è stato mostrato al team prima di decidere cosa entra in iterazione?
-- [ ] Il contenitore dell'iterazione corrente è stato creato/aggiornato con goal e iniziativa di riferimento?
-- [ ] Le feature prioritarie sono state aggiunte all'iterazione?
+- [ ] Il Piano di Iterazione è stato generato **partendo da quello della settimana precedente** (`based_on`)?
+- [ ] Le idee su cui iniziare l'analisi (`analysis_todo`) sono state scelte esplicitamente dal ranking RICE, con un `why_now` per ciascuna?
+- [ ] Il diff vs. settimana precedente (completate / avanzate / slittate / rimosse / nuove) è stato rivisto col team? Le voci slittate da ≥ 3 iterazioni sono state affrontate?
+- [ ] Le voci `prioritizzate d'urgenza` che sono Strategic Exception hanno una proposta `strategic_exception_flag` in coda e una riga nel friction-log?
+- [ ] La proposta `type: iteration_plan` è in `product/approvals/pending/` (non applicata nella camminata)?
 - [ ] È stata fatta una mini-retrospettiva sull'iterazione precedente?
-- [ ] Le feature in backlog sono ancora coerenti col RICE score? Qualcosa è cambiato?
 - [ ] La cerimonia è stata loggata in `product/ceremonies/backlog-refinement/`?
 - [ ] La durata è stata contenuta entro 60 minuti?
 
@@ -1082,11 +1110,11 @@ un'idea o produce un nuovo snapshot di roadmap, la proposta passa da
 *"If you don't know why you are doing something, you shouldn't be doing
 it." — W. Edwards Deming*
 
-Il Backlog Refinement produce un elenco ordinato di feature per
-l'iterazione che parte formalmente qualche giorno dopo. Il cambiamento
-significativo: quello che era in cima all'elenco può ancora cambiare. Il
-team potrebbe a breve iniziare a sviluppare, ma probabilmente mancano
-molte informazioni.
+Il Backlog Refinement produce il bucket `analisi da avviare` del Piano di
+Iterazione della settimana — le idee su cui iniziare l'analisi, che parte
+formalmente qualche giorno dopo. Il cambiamento significativo: quello che
+era in cima all'elenco può ancora cambiare. Il team potrebbe a breve
+iniziare a sviluppare, ma probabilmente mancano molte informazioni.
 
 È il momento di rispondere ai quesiti chiave che guidino la comprensione
 del problema. Finora il Prodotto ha accettato senza troppe domande le
@@ -1252,9 +1280,15 @@ footprint del cambiamento, non la durata; è qui, con la valutazione
 `platform.estimated_effort_weeks` per le iniziative platform.
 
 Anche questa cerimonia va registrata con una skill dedicata,
-**`iteration-planning`**: raccoglie le stime `delivery.estimated_effort_weeks`
-dal team tech, registra la valutazione 80/20 e la capacità platform
-dichiarata, poi delega a `log-ceremony` per la scrittura in
+**`iteration-planning`**: **carica il Piano di Iterazione** prodotto dal
+Backlog Refinement (non ne crea uno nuovo), raccoglie le stime
+`delivery.estimated_effort_weeks` dal team tech per le iniziative nei suoi
+bucket, registra la valutazione 80/20 e la capacità platform dichiarata.
+Se la valutazione 80/20 porta a spostare voci tra bucket o a toglierle,
+la skill produce una **proposta di Piano di Iterazione aggiornata**
+(`refined_by_iteration_planning: true`) che passa da
+`product/approvals/pending/` come quella del Backlog Refinement. Poi
+delega a `log-ceremony` per la scrittura in
 `product/ceremonies/roadmap-iteration-planning/{YYYY-Www}/` — stesso
 pattern trascrizione + decisioni strutturate + `.run-meta.yaml`.
 
@@ -1676,7 +1710,16 @@ aspetta un dato, aspetta che il PM metta il meeting in calendario.
 **Product Backlog Refinement** — Cerimonia settimanale in cui PM e tech
 lead allineano le priorità e preparano il backlog per l'iterazione
 successiva. Non è una pianificazione ferma: è una fotografia aggiornata
-delle intenzioni.
+delle intenzioni. Il suo output primario è il **Piano di Iterazione**.
+
+**Piano di Iterazione** — Artefatto team-facing
+(`product/roadmap/iterations/{settimana}.yaml`), output primario del
+Backlog Refinement: quattro bucket (*analisi da avviare*, *analisi in
+corso*, *in sviluppo*, *prioritizzate d'urgenza*) costruiti come diff dal
+piano della settimana precedente. È la board operativa "cosa fa il team
+adesso"; lo snapshot di roadmap è il rollup strategico che lo referenzia.
+Passa sempre da `product/approvals/pending/`. Vista rapida:
+skill `iteration-board`.
 
 **Why / What / How / When** — I quattro assi dell'analisi di ogni
 feature. Why: il problema reale. What: cosa si costruisce. How: come lo

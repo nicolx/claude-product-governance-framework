@@ -156,7 +156,8 @@ che serve da lì e chiedi solo quello che manca.
    skill `nsm-watch` al suo primo run, quando il PM ha il tempo di
    recuperare i valori con calma.
 5. Scaffold vuoto: `product/ideas/`, `product/prds/`,
-   `product/roadmap/snapshots/`, `product/ceremonies/`,
+   `product/roadmap/snapshots/`, `product/roadmap/iterations/`,
+   `product/ceremonies/`,
    `product/approvals/pending/`, `product/approvals/decided/`,
    `product/demos/recipes/`, `product/demos/captures/`,
    `product/inbox/` (con `.gitkeep` dove servono, git non traccia
