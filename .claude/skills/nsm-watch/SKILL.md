@@ -108,7 +108,10 @@ l'attenzione lì, non un'eccezione da gestire in silenzio.
 7. **Presenta il riepilogo con gli allarmi attivi per primi**, in cima a
    tutto — è il segnale più importante che questa skill produce, non va
    annegato tra le altre righe. Poi le NSM `improving`/`stable` solo se
-   richiesto esplicitamente.
+   richiesto esplicitamente. **Prima colonna: l'identificatore**
+   `{product_line} / {name}` (vedi playbook, "Ogni elenco prodotto dal
+   sistema è indirizzabile"), così il PM può riferirsi a una NSM in modo
+   inequivocabile.
 
 8. Se chiamata da `backlog-refinement`, restituisci il riepilogo perché venga
    incluso nel log della cerimonia — non scrivere tu stessa in

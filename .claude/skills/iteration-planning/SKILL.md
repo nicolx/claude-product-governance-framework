@@ -13,8 +13,8 @@ questa cerimonia (stime di delivery, 80/20, capacità platform).
 > **Dry-run.** Se l'utente chiede la simulazione (`dry-run`), propaga
 > l'argomento a `log-ceremony`: nessuna scrittura (né `decisions.yaml`,
 > né `.run-meta.yaml`, né `delivery.estimated_effort_weeks` sulle idee,
-> né la proposta `iteration_plan` aggiornata in `pending/`), nessun
-> commit, chiusura con `🔍 DRY-RUN`. Vedi playbook, "Modalità dry-run
+> né la proposta `iteration_plan` aggiornata in `pending/`, né azioni di
+> checkpoint applicate), nessun commit, chiusura con `🔍 DRY-RUN`. Vedi playbook, "Modalità dry-run
 > (simulazione)". In dry-run mostra comunque la board del Piano di
 > Iterazione rifinita che *avresti* proposto (stime di delivery inserite,
 > spostamenti tra bucket dalla valutazione 80/20). Run già fatto per
@@ -45,6 +45,9 @@ in aggiunta, i passi specifici sotto.
    né proposta né file (il Backlog Refinement non ha ancora prodotto il
    piano, o è stato saltato), **segnalalo** e procedi sullo stato delle
    idee come prima — ma è un'anomalia da riferire, non la norma.
+   **Checkpoint** (playbook, "Diritto di parola dopo ogni passo"): mostra
+   i quattro bucket con l'identificatore in prima colonna e apri il
+   diritto di parola prima di procedere alle stime.
 
 3. **Stima di settimane di delivery.** Per ogni iniziativa
    `classification: idea` nei bucket `analysis_todo` / `in_development` /
@@ -79,6 +82,9 @@ in aggiunta, i passi specifici sotto.
    Se la valutazione porta il team a **spostare una voce tra bucket** del
    piano (es. un'iniziativa che non è pronta per lo sviluppo torna in
    `analysis_todo`) o a **toglierla**, quello confluisce nel passo 5.
+   Chiudi con un **checkpoint** (playbook, "Diritto di parola dopo ogni
+   passo"): la parola al PM sulle voci discusse prima di generare la
+   proposta aggiornata.
 
 5. **Produci la proposta di Piano di Iterazione aggiornata**, se il passo
    3 o il passo 4 hanno cambiato qualcosa (stime di delivery inserite,

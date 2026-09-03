@@ -95,21 +95,26 @@ direttamente, questi passi sono tutto ciò che serve.
 
    La skill di cerimonia che ti ha invocato (`backlog-refinement`,
    `iteration-planning`) ti passa anche il proprio materiale specifico da
-   riversare qui: per il Backlog Refinement i riepiloghi delle watch, le
-   `reprioritizations`, `approvals_reviewed` (esito della camminata della
-   coda `pending/`), `retro_notes` e `iteration_plan_ref` (path della
-   proposta `type: iteration_plan` generata dalla cerimonia); per
+   riversare qui: per il Backlog Refinement i riepiloghi delle watch, gli
+   **esiti dei checkpoint** (le azioni e i commenti che il PM ha espresso
+   dopo ogni watch — vedi playbook, "Diritto di parola dopo ogni passo"),
+   le `reprioritizations`, `approvals_reviewed` (esito della camminata
+   della coda `pending/`), `retro_notes` e `iteration_plan_ref` (path
+   della proposta `type: iteration_plan` generata dalla cerimonia); per
    l'Iteration Planning le stime di delivery, la valutazione 80/20 e
-   l'eventuale `iteration_plan_ref` della proposta rifinita. Includili
-   nelle `decisions`/campi appositi di `decisions.yaml` — non rieseguire
-   tu quei passi, sono di competenza della skill chiamante.
+   l'eventuale `iteration_plan_ref` della proposta rifinita. Gli esiti dei
+   checkpoint vanno in `decisions[]`, **una `decision` per azione**, con
+   `impacts.idea_ids` valorizzato (es. "archiviata l'idea {ID}, non più
+   pertinente" → `impacts.idea_ids: [{id}]`). Non rieseguire tu quei
+   passi, sono di competenza della skill chiamante.
 
 6. **Mostra un riepilogo delle decisioni estratte all'utente** prima di
    considerare il log completo — è più facile correggere un
    fraintendimento ora che scoprirlo settimane dopo in una revisione.
-   Se la skill chiamante ha fornito reprioritizzazioni o riepiloghi di
-   watch a rischio, includili con la **stessa evidenza** — non in coda,
-   non come nota a margine. Per il Backlog Refinement, **apri sempre il
+   Se la skill chiamante ha fornito reprioritizzazioni, esiti di
+   checkpoint (idee archiviate, scadenze pulite, misurazioni chiuse) o
+   riepiloghi di watch a rischio, includili con la **stessa evidenza** —
+   non in coda, non come nota a margine. Per il Backlog Refinement, **apri sempre il
    riepilogo con gli allarmi di `nsm-watch`** se ce ne sono (è il segnale
    più strategico della cerimonia, per playbook), seguiti dalle scadenze
    `overdue`/`due_soon` di `mandate-watch` e `deadline-watch`.

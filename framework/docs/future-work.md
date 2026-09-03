@@ -128,6 +128,20 @@ watch (separare "cosa calcola" da "come persiste"), il passo 2 di
 `backlog-refinement` e `iteration-planning`. Una o due PR sul canonico.
 Discusso in sessione 2026-09-03, fuori scope adesso.
 
+## Skill `short-ref-remap`
+
+Il framework ora vieta che `short_ref_prefix` coincida con
+`jira.project_key` (guard in `init-governance-project` e
+`backlog-refinement`) — ma un'istanza che ha già assegnato handle
+collidenti (`EPITA-054` idea vs. `EPITA-121` card) deve rinominarli a
+mano: `grep -rl` su `product/`, `sed`, più i titoli dei PRD e delle card
+Jira. Se più istanze incappano nella stessa collisione, vale la pena una
+skill `short-ref-remap` che: rilegge tutti gli `short_ref` di un'istanza,
+li rimappa a un nuovo prefisso mantenendo i numeri, aggiorna
+`idea.yaml`/PRD/`decisions.yaml`/snapshot/piani di iterazione in un unico
+commit, e stampa la lista dei titoli Jira da correggere a mano (mai
+un'azione in uscita automatica). Fuori scope finché è un caso isolato.
+
 ## Integrazione DB/analytics in lettura per measurement-watch
 
 Idea dell'utente: dare al sistema, a livello di configurazione, accesso

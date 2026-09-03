@@ -43,7 +43,7 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `product/ideas/*/summary`, `product/ideas/*/notes` | Istanza | `idea-intake`/`inbox-triage` all'origine, poi qualunque skill/PM in conversazione — descrizione e note di contesto, non decisioni di priorità, scrittura diretta |
 | `product/ideas/*/short_ref` | Istanza | Solo `backlog-refinement`, assegnato pigramente (`{prefisso}-{NNN}`, `next = max+1`) al primo refinement che incontra l'idea senza handle. Il refinement è un punto di serializzazione a scrittore singolo → niente collisioni offline; nessun file contatore. Fatto di housekeeping, scrittura diretta, non passa da `pending/`. Una volta assegnato non cambia. `id`/nome cartella restano l'identificatore canonico |
 | `product/ideas/*/requester_reply` | Istanza | `idea-intake`/`inbox-triage` — bozza di risposta al richiedente, **mai inviata in automatico** (la manda il PM). Cortesia 1:1 con l'idea, non una decisione applicata a un target file: nessuna approvazione via `pending/`, stessa logica di `clarification.draft_message` |
-| `product/ideas/*/status: declined`, `product/ideas/*/decline_reason` | Istanza | `idea-intake`/`inbox-triage` propongono lo scarto al triage, il PM conferma **in conversazione** prima della scrittura (è un giudizio) — non passa dalla coda `pending/`, ma non è mai deciso dalla sola skill |
+| `product/ideas/*/status: declined`/`aborted`, `product/ideas/*/decline_reason` | Istanza | `idea-intake`/`inbox-triage` propongono lo scarto al triage, **oppure** `backlog-refinement` a un checkpoint della sweep di apertura quando il PM decide che un'idea non ha più motivo di esistere (`declined` se non è mai partita, `aborted` se era in lavorazione). Sempre su conferma **in conversazione** (è un giudizio) — non passa dalla coda `pending/`, ma non è mai deciso dalla sola skill; l'azione va registrata in `decisions.yaml` della cerimonia |
 | `product/ideas/*/deadline.due_date`, `product/ideas/*/deadline.note` | Istanza | Qualunque skill che la incontra in conversazione (tipicamente `idea-intake`/`inbox-triage` all'origine) — cattura di un fatto dichiarato dal PM, mai presunto; impostarlo non cambia la priorità, stessa logica di `rice_status`, nessuna approvazione |
 | `product/ideas/*/deadline.escalation_status` | Istanza | Solo `deadline-watch` — fatto calcolato, scrittura diretta senza approvazione (stesso principio di `mandate.escalation_status`) |
 | `product/prds/*/measurement*.yaml` (creazione) | Istanza | Solo `prd-draft`, contestualmente alla creazione del PRD — non passa da approvazione (stessa logica della creazione di idee/PRD) |
@@ -171,6 +171,15 @@ regola: è un handle corto *aggiuntivo* per la conversazione e i
 cross-reference (Jira, PRD), non l'identificatore su filesystem. Il nome
 cartella resta lo slug parlante. Vedi `idea.template.yaml`, campo
 `short_ref`, e skill `backlog-refinement` (che lo assegna).
+
+Il **prefisso** dello `short_ref` (`short_ref_prefix` in
+`.governance/config.yaml`, default `PG` = Product Governance) è un
+namespace di **governance**, deliberatamente distinto da
+`jira.project_key`: `PG-042` (un'idea) e `EPITA-121` (una card del tracker
+di esecuzione) non devono potersi confondere in riunione. Non usare mai la
+sigla del prodotto o la project key di Jira come prefisso —
+`init-governance-project` lo rifiuta all'intervista e `backlog-refinement`
+si ferma se i due coincidono.
 
 ## Quando scrivi codice/script in questo repo
 
