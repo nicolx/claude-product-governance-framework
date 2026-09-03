@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# Promemoria (non bloccante) a inizio sessione: quali connettori esterni
+# programmatici la config dell'istanza dichiara.
+#
+# Perché serve. `.governance/config.yaml` può dichiarare connettori a
+# sistemi esterni — `jira:` (tracker di esecuzione) e `metrics:`
+# (analytics per NSM/KPI). Le skill che li usano ne verificano la
+# raggiungibilità a inizio processo (playbook, "Connettori esterni:
+# dichiarati, verificati a inizio processo, mai un fallback silenzioso"),
+# ma un connettore MCP può essere non loggato / OAuth scaduto: meglio
+# saperlo subito che scoprirlo a metà di un Backlog Refinement. Questo
+# hook NON può verificare i tool MCP da bash — è solo un promemoria di
+# controllare `/mcp`.
+#
+# Simmetrico a check-inbox.sh / check-pending-approvals.sh / check-unpushed.sh:
+# un solo messaggio testuale, nessuna azione. Attivo anche in dry-run.
+# No-op sul canonico / istanza non inizializzata (manca
+# .governance/config.yaml) e se nessun connettore programmatico è dichiarato.
+
+set -uo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+[ -z "$REPO_ROOT" ] && exit 0
+cd "$REPO_ROOT" || exit 0
+
+CONFIG=".governance/config.yaml"
+[ -f "$CONFIG" ] || exit 0   # canonico o istanza non inizializzata -> no-op
+
+# Estrae il valore scalare di una chiave annidata: block_key + field.
+# Cerca "field:" indentato che compaia dopo la riga "block_key:".
+nested_value() {
+  # nested_value <block> <field>
+  awk -v blk="$1:" -v fld="$2:" '
+    $0 ~ "^"blk"[[:space:]]*$" { inblk=1; next }
+    /^[^[:space:]#]/ { inblk=0 }
+    inblk && $1 == fld {
+      sub(/^[[:space:]]*[^:]+:[[:space:]]*/, "")
+      sub(/[[:space:]]*#.*$/, "")
+      gsub(/[[:space:]]+$/, "")
+      gsub(/^["'\''"]|["'\''"]$/, "")
+      print
+      exit
+    }
+  ' "$CONFIG"
+}
+
+# Un'integrazione è "programmatica" se non è vuota e non è "manuale".
+is_programmatic() {
+  case "$1" in
+    ""|manuale|manual) return 1 ;;
+    *) return 0 ;;
+  esac
+}
+
+DECLARED=""
+
+JIRA_INT="$(nested_value jira integration)"
+if is_programmatic "$JIRA_INT"; then
+  DECLARED="${DECLARED}jira: ${JIRA_INT}; "
+fi
+
+METRICS_INT="$(nested_value metrics integration)"
+if is_programmatic "$METRICS_INT"; then
+  DECLARED="${DECLARED}metrics: ${METRICS_INT}; "
+fi
+
+[ -z "$DECLARED" ] && exit 0
+
+DECLARED="${DECLARED%; }"
+
+MSG="⚙ La config dichiara connettori esterni ($DECLARED). Le skill che li usano (jira-sync, nsm-watch, measurement-watch, cerimonie) li verificano a inizio processo — se /mcp non mostra la connessione attiva, riattivala prima. Dichiarato ma irraggiungibile non è un fallback silenzioso (playbook, sezione Connettori esterni)."
+
+# JSON-escape minimale del messaggio (\ e ") — coerente con gli altri hook,
+# ma qui il messaggio è costruito da valori di config, meglio essere sicuri.
+esc_json() {
+  printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+}
+
+printf '{"systemMessage": "%s"}\n' "$(esc_json "$MSG")"
+exit 0
