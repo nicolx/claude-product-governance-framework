@@ -312,7 +312,10 @@ hook**, non alla memoria del PM:
   dipendono dal quadro completo — `inbox-triage`, `roadmap-snapshot`,
   `pending-approval`, `backlog-list`, `iteration-board`, `jira-sync`
   (pull), e le watch (`nsm-watch`, `mandate-watch`, `deadline-watch`,
-  `rice-watch`, `measurement-watch`).
+  `rice-watch`, `measurement-watch`) nell'uso *standalone*. Nella sweep di
+  apertura del Backlog Refinement il pull è **uno solo** per l'intera
+  sweep (la logica delle watch gira inline, non come skill separate — vedi
+  "Product Backlog Refinement").
 - **Commit + push**: come ultimo passo di ogni skill che scrive stato
   tracciato (`idea-intake`, `inbox-triage`, `rice-update`, `prd-draft`,
   `backlog-refinement`, `iteration-planning`, `log-ceremony`,
@@ -1129,6 +1132,20 @@ precedente? Quali impedimenti? Cosa è mancato a livello di informazioni?
 **60 minuti**, meno se possibile. Bando alle discussioni troppo
 dettagliate (sono oggetto della fase successiva). Va bene anche da remoto.
 
+**La sweep di apertura dev'essere calcolo, non attesa di I/O.** La
+cerimonia blocca il tempo di molte persone in riunione: non si può
+lasciarle a guardare lo schermo mentre l'automazione rilegge le stesse
+decine di `idea.yaml` una volta per watch. La skill `backlog-refinement`
+fa **un solo** `pull`, **un solo** dump dello stato
+(`.claude/hooks/governance-dump.sh sweep`), calcola *inline* la logica di
+tutte le watch (NSM, misurazioni, mandate, scadenze, RICE — sono
+aritmetica di date e soglie), lancia la riconciliazione Jira **in
+background** mentre il team discute, e chiude con **un solo commit** per
+l'intera sweep. Le watch (`nsm-watch`, `mandate-watch`, …) restano skill
+a sé per l'uso *standalone* fuori cerimonia. I checkpoint dopo ogni
+blocco (sotto) restano — quello è tempo umano, è il senso della riunione;
+è il calcolo tra un checkpoint e l'altro che dev'essere istantaneo.
+
 *Principi Agile da incarnare in questa fase:*
 - *Consegniamo frequentemente software funzionante, preferendo i periodi
   brevi.*
@@ -1136,8 +1153,9 @@ dettagliate (sono oggetto della fase successiva). Va bene anche da remoto.
   poi regola il proprio comportamento di conseguenza.*
 
 Questa cerimonia va registrata con la skill **`backlog-refinement`**, che
-apre la sweep delle watch nell'ordine giusto (`nsm-watch` per prima),
-**cammina la coda di approvazione** (`pending-approval`, i `rice_diff`
+apre la sweep di apertura in un solo passaggio (logica delle watch
+calcolata inline, `nsm-watch` per prima), **cammina la coda di
+approvazione** (`pending-approval`, i `rice_diff`
 voce per voce con il team), **presenta il backlog ordinato**
 (`backlog-list`) come base della prioritizzazione, assegna gli handle
 corti `short_ref` (`PG-042`) alle idee che ancora non ne hanno — il

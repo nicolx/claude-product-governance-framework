@@ -95,9 +95,13 @@ direttamente, questi passi sono tutto ciò che serve.
 
    La skill di cerimonia che ti ha invocato (`backlog-refinement`,
    `iteration-planning`) ti passa anche il proprio materiale specifico da
-   riversare qui: per il Backlog Refinement i riepiloghi delle watch, gli
+   riversare qui: per il Backlog Refinement i riepiloghi delle watch —
+   **già consolidati da un unico calcolo inline sul dump**
+   (`governance-dump.sh sweep`), non da 6 skill separate — più l'esito
+   della riconciliazione Jira raccolto dal task in background, gli
    **esiti dei checkpoint** (le azioni e i commenti che il PM ha espresso
-   dopo ogni watch — vedi playbook, "Diritto di parola dopo ogni passo"),
+   dopo ogni blocco della sweep — vedi playbook, "Diritto di parola dopo
+   ogni passo"),
    le `reprioritizations`, `approvals_reviewed` (esito della camminata
    della coda `pending/`), `retro_notes` e `iteration_plan_ref` (path
    della proposta `type: iteration_plan` generata dalla cerimonia); per

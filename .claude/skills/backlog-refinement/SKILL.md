@@ -12,16 +12,17 @@ rispecificare ogni volta e tiene insieme, in un unico posto, la sequenza
 "si apre guardando indietro, poi si prioritizza".
 
 > **Dry-run.** Se l'utente chiede la simulazione (`dry-run`, "simula la
-> cerimonia"), propaga l'argomento a ogni skill che invochi
-> (`log-ceremony`, le watch, `pending-approval`): nessuna scrittura
-> (nemmeno l'assegnazione di `short_ref`, nessuna approvazione applicata,
-> nessuna proposta `iteration_plan` scritta in `pending/`, **nessuna
-> azione di checkpoint applicata** — archiviazioni, pulizie di scadenza,
-> `closure` restano mostrate come testo), nessun commit, chiusura con
-> `🔍 DRY-RUN`. Vedi playbook, "Modalità dry-run (simulazione)". In
+> cerimonia"), propaga l'argomento a `log-ceremony` e `pending-approval`:
+> nessuna scrittura (nemmeno l'assegnazione di `short_ref`, nessuna
+> approvazione applicata, nessuna proposta `iteration_plan` scritta in
+> `pending/`, **nessuna azione di checkpoint applicata** — archiviazioni,
+> pulizie di scadenza, `closure` restano mostrate come testo), nessun
+> commit, chiusura con `🔍 DRY-RUN`. Vedi playbook, "Modalità dry-run
+> (simulazione)". `governance-dump.sh` gira comunque (è sola lettura), e
+> la riconciliazione Jira in background è comunque sola lettura. In
 > dry-run i checkpoint del passo 2 si eseguono comunque (mostri le
-> tabelle, raccogli i commenti del PM, dici cosa *scriveresti*). Al passo
-> 3 elenca comunque cosa c'è in coda,
+> tabelle, raccogli i commenti del PM, dici cosa *scriveresti* al commit
+> unico di fine sweep). Al passo 3 elenca comunque cosa c'è in coda,
 > al passo 5 mostra sia il ranking ufficiale sia quello che risulterebbe
 > approvando le proposte in `pending/`, e al passo 6 mostra comunque per
 > intero la board a quattro bucket del Piano di Iterazione che *avresti*
@@ -57,70 +58,90 @@ piano passa **sempre** da `product/approvals/pending/`
 
 ## Passi specifici del Backlog Refinement
 
-1. **Sincronizza da `origin`** (`governance-sync.sh pull`) prima di
-   leggere lo stato — la sweep confronta lo stato di molte idee, deve
-   partire da dati aggiornati.
+1. **Sincronizza da `origin`** — **un solo** `governance-sync.sh pull`
+   per l'intera sweep (non uno per watch), prima di leggere lo stato.
 
 2. **Apri "guardando indietro", non avanti** (playbook: "la riunione si
-   apre guardando indietro"). Richiama, **in quest'ordine**:
-   1. `nsm-watch` — per prima: è il segnale più strategico. NSM in
-      degrado con `alert.status` attivo aprono il riepilogo, prima di
-      tutto il resto.
-   2. `measurement-watch` — iniziative rilasciate che dovrebbero già
-      mostrare impatti: KPI `check_due`, `at_risk`, `invalidated`.
-   3. `mandate-watch` — iniziative mandatarie `overdue`/`due_soon`/
-      `pending_review`.
-   4. `deadline-watch` — idee normali/strategic exception con scadenza a
-      ≤4 settimane: push forte, non una riga tra le altre.
-   5. `rice-watch` — idee `classification: idea` ancora senza RICE:
-      `stale`, `blocked_on`, `needs_deep_dive`.
-   6. `jira-sync` **modalità Riconciliazione** — idee mai passate dal
-      RICE il cui lavoro è già partito in Jira (falla di governance).
-      Saltala **senza rumore** solo se `jira.integration` non ha capacità
-      di ricerca (`manuale`, vuoto) — è una scelta di setup. Se invece è
-      dichiarato un connettore con ricerca (`atlassian-mcp`) ma **non
-      risponde** al momento del run (tool `mcp__atlassian__*` assenti,
-      `ENOTFOUND`/timeout su `mcp.atlassian.com`), **non saltarla in
-      silenzio**: applica "Connettore dichiarato ma irraggiungibile" di
-      `jira-sync` — segnala il guasto, proponi al PM di riattivare la
-      connessione (`/mcp`) e ritentare il passo. Se sceglie di proseguire,
-      la riconciliazione va registrata come **rimandata** nel riepilogo
-      della cerimonia (debito visibile, da rilanciare `jira-sync`
-      standalone quando il connettore torna su), mai come completata o
-      non applicabile.
+   apre guardando indietro") — la sweep di apertura, **in un solo
+   passaggio**. Questa cerimonia blocca il tempo di molte persone in
+   riunione: la sweep dev'essere *calcolo*, non attesa di I/O. **Non
+   invocare le watch come skill separate** — ognuna rifarebbe `pull` +
+   glob di tutte le `idea.yaml` + scritture + `push`, e le stesse idee
+   verrebbero lette 3-4 volte. Invece:
 
-   Ogni watch **solo segnala** — nessuna azione automatica. I riepiloghi
-   vanno passati a `log-ceremony` perché li includa nel `decisions.yaml`
-   della cerimonia.
+   a. **Lancia la riconciliazione Jira in background.** Se
+      `jira.integration` è un connettore con ricerca (`atlassian-mcp`),
+      avvia `jira-sync` **modalità Riconciliazione** come **task in
+      background** (idee mai passate dal RICE il cui lavoro è già partito
+      in Jira — falla di governance) e prosegui subito con la sweep
+      locale: ne raccogli l'esito al punto e. Saltala **senza rumore**
+      solo se `jira.integration` è `manuale`/vuoto (scelta di setup). Se è
+      dichiarato `atlassian-mcp` ma **non risponde** (tool
+      `mcp__atlassian__*` assenti, `ENOTFOUND`/timeout su
+      `mcp.atlassian.com`), applica "Connettore dichiarato ma
+      irraggiungibile" di `jira-sync`: segnala il guasto, proponi al PM di
+      riconnettere (`/mcp`) e ritentare; se sceglie di proseguire, la
+      riconciliazione va registrata come **rimandata** nel riepilogo
+      (debito visibile), mai come completata o non applicabile.
 
-   **Checkpoint dopo ogni watch (diritto di parola).** Non eseguire le
-   watch di fila e poi chiedere: dopo *ciascuna*, prima di passare alla
-   successiva —
-   1. mostra la sua tabella con l'**identificatore in prima colonna**
-      (passo di presentazione della watch — vedi playbook, "Ogni elenco
-      prodotto dal sistema è indirizzabile");
-   2. chiedi esplicitamente: *"Prima di procedere — vuoi commentare o
-      agire su una di queste voci? Puoi riferirti a {ID}."* Le azioni
-      tipiche (playbook, "Diritto di parola dopo ogni passo"):
-      archiviare un'idea che non serve più (`status: declined` +
-      `decline_reason`, o `status: aborted` se era in lavorazione — **solo
-      con conferma esplicita del PM**, mai di iniziativa tua); svuotare
-      una `deadline` non più rilevante; chiudere una misurazione
-      (`closure`) o un allarme NSM (`alert.status: resolved`); annotare
-      `notes`; rimandare una revisione di RICE a `rice-update` (che passa
-      da `pending/`). Se non c'è nulla, un "procedi" e si va avanti;
-   3. applica le azioni concordate — scrittura diretta sui campi di
-      housekeeping/stato secondo la tabella dei confini di `CLAUDE.md` —
-      e **sincronizza subito** (come le scritture delle watch:
-      `bash .claude/hooks/governance-sync.sh push "backlog-refinement: checkpoint <watch>" product/ideas/ product/prds/`);
-   4. registra ogni azione/commento del checkpoint perché `log-ceremony`
-      lo metta in `decisions[]` di `decisions.yaml`, con
-      `impacts.idea_ids` valorizzato.
-   Le domande *interne* che alcune watch già pongono (deep-dive di
-   `rice-watch`, discovery focus di `nsm-watch`, escalation di
-   `deadline-watch`) restano dove sono: sono cattura di contesto che serve
-   alla watch. Il checkpoint è il momento uniforme *in più* — "la parola
-   al PM su queste voci".
+   b. **Un solo** `bash .claude/hooks/governance-dump.sh sweep` → tutto lo
+      stato rilevante (idee attive, misurazioni, NSM, denominatori,
+      target annuale, piani di iterazione, coda `pending/`) in un unico
+      tool result.
+
+   c. **Calcola inline, dal dump**, la logica di ogni watch — è aritmetica
+      di date e soglie, non serve invocare la skill. **In quest'ordine:**
+      1. `nsm-watch` — per prima, è il segnale più strategico: trend delle
+         NSM dalle `readings` in `nsm-tracking.yaml`, `alert.status`.
+      2. `measurement-watch` — KPI `check_due`/`at_risk`/`invalidated`
+         delle iniziative `status: done` con `closure.closed: false`.
+      3. `mandate-watch` — `escalation_status` dei `classification: mandate`
+         da `analysis_start_by` vs oggi.
+      4. `deadline-watch` — `escalation_status` delle idee con
+         `deadline.due_date`; **push forte** a ≤ 4 settimane, non una riga
+         tra le altre.
+      5. `rice-watch` — idee `classification: idea` con `rice_history`
+         vuoto: `stale`, `blocked_on`, `needs_deep_dive`.
+      Le **formule sono quelle documentate nelle rispettive skill**
+      (`nsm-watch`, `measurement-watch`, `mandate-watch`, `deadline-watch`,
+      `rice-watch`) — applicale, non reinventarle; se un caso è ambiguo
+      apri quella skill.
+
+   d. **Checkpoint dopo ogni blocco (diritto di parola).** Non calcolare
+      tutti e cinque e poi chiedere: dopo *ciascuno*, prima del
+      successivo —
+      1. mostra la sua tabella con l'**identificatore in prima colonna**
+         (playbook, "Ogni elenco prodotto dal sistema è indirizzabile");
+      2. chiedi esplicitamente: *"Prima di procedere — vuoi commentare o
+         agire su una di queste voci? Puoi riferirti a {ID}."* Azioni
+         tipiche (playbook, "Diritto di parola dopo ogni passo"):
+         archiviare un'idea che non serve più (`status: declined` +
+         `decline_reason`, o `status: aborted` se era in lavorazione —
+         **solo con conferma esplicita del PM**); svuotare una `deadline`
+         non più rilevante; chiudere una misurazione (`closure`) o un
+         allarme NSM (`alert.status: resolved`); annotare `notes`;
+         rimandare una revisione di RICE a `rice-update` (che passa da
+         `pending/`). Se non c'è nulla, un "procedi" e si va avanti;
+      3. **accumula** le azioni concordate — non scrivere ancora: la
+         scrittura è unica, al punto f.
+      Le domande *interne* delle watch (deep-dive di `rice`, discovery
+      focus di `nsm`, escalation forte di `deadline`, chiusura misurazioni
+      di `measurement`) restano: falle inline qui, con le stesse regole
+      garantiste. Sono cattura di contesto che serve alla watch; il
+      checkpoint è il momento uniforme *in più*.
+
+   e. **Raccogli** l'esito della riconciliazione Jira lanciata al punto a.
+
+   f. **Una sola scrittura, un solo commit.** Applica *tutti* i valori
+      calcolati (`escalation_status`, `rice_status.*`, `alert.*`,
+      `closure`) e *tutte* le azioni di checkpoint concordate, poi:
+      `bash .claude/hooks/governance-sync.sh push "backlog-refinement: sweep di apertura <settimana>" product/`.
+      Un commit per l'intera sweep, non uno per watch né uno per
+      checkpoint.
+
+   g. **Passa a `log-ceremony`** i riepiloghi consolidati (un blocco per
+      watch), le azioni di checkpoint (una `decision` ciascuna, con
+      `impacts.idea_ids`), e l'esito della riconciliazione Jira.
 
 3. **Svuota la coda di approvazione — prima di guardare il backlog.**
    Elenca `product/approvals/pending/` (usa `pending-approval`, sezione
@@ -168,7 +189,7 @@ piano passa **sempre** da `product/approvals/pending/`
    collide (hai appena fatto `pull` al passo 1). È un fatto di
    housekeeping — scrittura **diretta** su `idea.yaml`, non passa da
    `pending/` — e una volta assegnato non cambia più. Sincronizza subito
-   queste scritture (come le watch):
+   queste scritture (non aspettare il commit finale della cerimonia):
    `bash .claude/hooks/governance-sync.sh push "backlog-refinement: assegnati short_ref" product/ideas/`.
    Non toccare le idee che un `short_ref` ce l'hanno già.
 
@@ -212,8 +233,8 @@ piano passa **sempre** da `product/approvals/pending/`
         `classification: idea` iniziano l'analisi questa settimana?* —
         **è la domanda centrale della riunione**, non una formalità. Per
         ciascuna registra `why_now`.
-      - `in_development`: card nuove emerse nella riconciliazione Jira del
-        passo 2.6 e non ancora nel piano.
+      - `in_development`: card nuove emerse nella riconciliazione Jira
+        (passo 2, punto a) e non ancora nel piano.
       - `urgent_priority`: **questo assorbe il vecchio "rileva le
         reprioritizzazioni fuori-RICE".** Sono le iniziative
         `classification: idea` che entrano nell'iterazione **davanti a
