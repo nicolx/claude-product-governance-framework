@@ -21,11 +21,13 @@ l'attenzione lì, non un'eccezione da gestire in silenzio.
 
 - **Standalone**, in qualunque momento: "come stanno andando le nostre
   NSM?", "abbiamo una nuova lettura per la NSM X?".
-- **Richiamata da `backlog-refinement`**, e **per prima tra tutte le watch**
-  in apertura del Backlog Refinement — è il segnale più strategico, va
-  visto prima di misurare l'impatto delle singole iniziative
-  (`measurement-watch`) o di controllare le scadenze e l'housekeeping
-  operativo (`mandate-watch`, `deadline-watch`, `rice-watch`).
+- **Durante il Backlog Refinement** la logica di questa skill gira
+  **inline** nella sweep di apertura di `backlog-refinement`, **per prima
+  tra tutte** (è il segnale più strategico). La sweep fa un solo `pull`,
+  un solo `governance-dump.sh sweep` e un solo commit per tutte le watch
+  (playbook, "La sweep di apertura dev'essere calcolo, non attesa di
+  I/O"). Non invocarla da lì. Questo file resta il punto d'ingresso
+  **standalone** e la fonte normativa delle formule di seguito.
 
 ## Passi
 
@@ -39,11 +41,11 @@ l'attenzione lì, non un'eccezione da gestire in silenzio.
 > avresti prodotto, e chiudi con `🔍 DRY-RUN — nessun file scritto,
 > nessun commit, nessun push.`
 
-0. **Sincronizza da `origin`**: esegui
-   `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
-   "Sincronizzazione dell'istanza (`origin`)") — è il segnale più
+0. **Sincronizza da `origin`** (uso standalone): esegui
+   `bash .claude/hooks/governance-sync.sh pull` — è il segnale più
    strategico del framework, non ha senso giudicarlo su un
-   `nsm-tracking.yaml` locale vecchio.
+   `nsm-tracking.yaml` locale vecchio. Per il quadro completo (tracking +
+   idee con `links.nsm_targeted`): `bash .claude/hooks/governance-dump.sh reference`.
 
 1. **Se `product/reference/nsm-tracking.yaml` non esiste ancora**,
    scaffoldalo da `framework/schema/nsm-tracking.template.yaml`: una

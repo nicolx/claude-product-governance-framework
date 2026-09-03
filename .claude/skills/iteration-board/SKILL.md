@@ -21,10 +21,12 @@ non richiama skill di scrittura.
 
 ## Passi
 
-0. **Sincronizza da `origin`**: esegui
-   `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
-   "Sincronizzazione dell'istanza (`origin`)") — una vista su dati locali
-   vecchi è fuorviante.
+0. **Sincronizza e leggi in blocco**: `bash
+   .claude/hooks/governance-sync.sh pull` (una vista su dati vecchi è
+   fuorviante), poi `bash .claude/hooks/governance-dump.sh iterations` —
+   gli ultimi due piani di iterazione (corrente + `based_on`) in una tool
+   call. Aggiungi `governance-dump.sh pending` se devi controllare una
+   proposta `iteration_plan` non ancora approvata.
 
 1. **Determina il piano da mostrare.**
    - Di default: il file `product/roadmap/iterations/{YYYY-Www}.yaml` con

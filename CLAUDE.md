@@ -133,8 +133,19 @@ l'helper `.claude/hooks/governance-sync.sh` (richiamato anche dall'hook
 mai, no-op sul canonico. Ogni skill che scrive in `product/`/`context/`
 deve chiudere con `governance-sync.sh push`; quelle elencate nel playbook
 come "read-critical" devono aprire con `governance-sync.sh pull`. Vedi
-playbook, sezione "Sincronizzazione dell'istanza (`origin`)". Da non
-confondere con `sync-framework-updates`, che riguarda `upstream` (il
+playbook, sezione "Sincronizzazione dell'istanza (`origin`)".
+
+Helper gemello per la **lettura in blocco**: `.claude/hooks/governance-dump.sh`
+(`sweep`|`backlog`|`ideas`|`measurements`|`iterations`|`pending`|
+`reference`) concatena in **una sola tool call** i file YAML rilevanti,
+così una skill non fa glob-e-leggi-ognuna N volte. Sola lettura, no-op sul
+canonico. La sweep di apertura del Backlog Refinement lo usa una volta e
+calcola tutte le watch inline; le scritture risultanti
+(`escalation_status`/`rice_status`/`alert`/`closure`) sono **un unico
+commit** di fine sweep — resta il principio "commit subito dopo la
+scrittura", solo che la scrittura è una.
+
+Da non confondere con `sync-framework-updates`, che riguarda `upstream` (il
 metodo), non i dati.
 
 ## Modalità dry-run (simulazione)

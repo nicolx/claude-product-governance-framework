@@ -60,73 +60,23 @@ scope adesso, da rivedere se emerge la domanda:
 
 ## Parallelizzazione della sweep di apertura delle cerimonie
 
-Idea dell'utente: durante il Backlog Refinement (e l'Iteration Planning) il
-team resta a guardare lo schermo mentre la sweep di apertura — passo 2 di
-`backlog-refinement`, "si apre guardando indietro" — gira **rigorosamente
-in sequenza**: `nsm-watch` → `measurement-watch` → `mandate-watch` →
-`deadline-watch` → `rice-watch` → `jira-sync` (riconciliazione). Ogni watch
-fa da sola il ciclo completo `pull → scansiona tutte le idea.yaml →
-calcola → scrive diretto → commit + push`, quindi il tempo di attesa =
-**somma di 6 cicli**, con rilettura ripetuta delle stesse `idea.yaml` (3
-watch su 6 le toccano tutte) e 6 commit separati.
+**In gran parte FATTO** (2026-09-03). La sweep di apertura di
+`backlog-refinement` non invoca più 6 watch in sequenza: fa un solo
+`pull`, un solo dump dello stato (`.claude/hooks/governance-dump.sh
+sweep`), calcola la logica delle watch **inline**, lancia la
+riconciliazione Jira **in background**, e chiude con **un solo commit**.
+Wall-clock da `somma(6 cicli) + 6 commit` a `≈ dump + calcolo + 1 commit`.
+La parte "leggi-una-volta / scrivi-una-volta / un commit" della
+decomposizione originale è quindi coperta.
 
-**Perché "6 agenti autonomi in parallelo" non basta.** Se ogni watch gira
-come subagent che fa il proprio ciclo completo, si rompono tre invarianti:
-(a) git è un punto di serializzazione a scrittore singolo — 6
-`governance-sync.sh push` concorrenti danno push non-fast-forward, proprio
-il conflitto che il playbook vieta di risolvere in automatico; (b)
-`mandate-watch`/`deadline-watch`/`rice-watch` scrivono campi diversi della
-**stessa** `idea.yaml` → `Edit` paralleli si sovrascrivono; (c) ordine di
-commit e narrazione non deterministici infrangono la promessa "dry-run
-ripetibile identica". In più la cerimonia è una riunione dal vivo: l'ordine
-fisso (`nsm-watch` per prima) è una scelta narrativa deliberata, e output
-interlacciato da più agenti è peggio per chi segue.
-
-**Decomposizione proposta — fan-out del calcolo, scrittura serializzata:**
-
-- **Fase A (parallelizzabile) — calcolo.** Ogni watch in *modalità
-  compute-only*: `pull`, scansiona, calcola i campi che dovrebbe cambiare,
-  restituisce `{diff proposti, riepilogo per la stanza}`. Nessun `Edit`,
-  nessun `push`.
-- **Fase B (seriale, scrittore singolo) — scrittura.** L'orchestratore
-  (`backlog-refinement`/`iteration-planning`) applica tutti i diff
-  calcolati in un solo passaggio, **un commit, un push**, ordine
-  deterministico.
-- **Fase C (seriale, ordine voluto) — narrazione.** Presenta i riepiloghi
-  alla stanza nell'ordine canonico — veloce, sta solo renderizzando
-  risultati già pronti.
-
-Wall-clock atteso: da `somma(6 watch) + 6 commit` a circa `max(watch) + 1
-commit`. Tutti gli invarianti restano (git single-writer, merge
-deterministico di campi disgiunti, dry-run riproducibile — la Fase A non
-scrive comunque).
-
-**Cosa resta seriale e va lasciato così:** walk di `pending-approval`
-(passo 3, interattivo voce per voce), assegnazione `short_ref` (passo 4, è
-*esplicitamente* il punto di serializzazione a scrittore singolo),
-rilevamento reprioritizzazioni (passo 6), `jira-sync` in push (side-effect
-esterni + dedup JQL).
-
-**Due modi di implementare la Fase A (da decidere quando diventa lavoro
-attivo):**
-
-- *Consigliato:* una skill `watch-sweep` unica, un solo passaggio sulle
-  `idea.yaml` — legge ogni file una volta, calcola i fatti di
-  mandate/deadline/rice (+ nsm/measurement sui loro file) in quel
-  passaggio, restituisce tutti i diff. Niente subagent. Prende ~80% del
-  guadagno (leggi-una-volta / scrivi-una-volta / commit-una-volta) con la
-  massima semplicità e determinismo. Le watch standalone restano com'sono
-  per l'uso fuori cerimonia.
-- Subagent paralleli veri solo per la watch il cui costo è realmente alto e
-  indipendente — in pratica **solo `jira-sync`** (rete): isolarla in un
-  subagent che gira mentre l'orchestratore fa il resto, raccoglierne il
-  risultato alla fine.
-
-**Costo del cambiamento:** tocca il playbook (le watch acquisiscono un
-contratto documentato "compute-only" vs. "standalone"), i `SKILL.md` di 5
-watch (separare "cosa calcola" da "come persiste"), il passo 2 di
-`backlog-refinement` e `iteration-planning`. Una o due PR sul canonico.
-Discusso in sessione 2026-09-03, fuori scope adesso.
+**Cosa resta aperto (parallelismo multi-agente vero).** Serve quasi solo
+se una singola watch diventa costosa e indipendente — in pratica **solo
+`jira-sync`**, che ora è già in un task in background durante la sweep. Un
+fan-out ulteriore (più subagent compute-only in parallelo, ognuno che
+restituisce diff, orchestratore che serializza la scrittura) darebbe un
+guadagno marginale a fronte di cold-start e non-determinismo — da
+riprendere solo se il profiling di un run reale mostra che il *calcolo*
+inline (non l'I/O, ormai risolto) è il collo di bottiglia.
 
 ## Skill `short-ref-remap`
 
