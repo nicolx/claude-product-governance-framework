@@ -43,6 +43,35 @@ Se `jira.integration` è vuoto o assente, comportati come `manuale` e
 segnala che conviene configurare il connettore (rende possibili dedup e
 riconciliazione automatici — vedi sotto).
 
+### Connettore dichiarato ma irraggiungibile — non è lo stesso di `manuale`
+
+Se `jira.integration` è `atlassian-mcp` o `cli:<nome>` ma **al momento
+dell'uso** il connettore non risponde — tool `mcp__atlassian__*` non
+disponibili perché `/mcp` non è loggato o la sessione OAuth è scaduta,
+`ENOTFOUND`/timeout su `mcp.atlassian.com`, la CLI esce con errore — **non
+degradare a `manuale` in silenzio e non saltare il passo**: è un guasto
+transitorio, non una scelta di setup, e trattarlo come "Jira non
+configurato" nasconde una falla di governance invece di renderla visibile.
+
+Comportati così:
+
+1. **Segnala esplicitamente** cosa non risponde e come rimetterlo su:
+   - `atlassian-mcp`: `/mcp` in sessione per ri-loggarsi (OAuth 2.1,
+     login in browser); se è `ENOTFOUND`/timeout è rete o servizio giù —
+     riprovare tra poco.
+   - `cli:<nome>`: verificare che il binario sia nel PATH e le
+     credenziali valide.
+2. **Chiedi al PM** se riattivare la connessione ora e ritentare, oppure
+   procedere senza.
+3. Se sceglie di **procedere senza**, il passo che dipendeva dal
+   connettore (dedup del push, o l'intera Riconciliazione) resta
+   **rimandato**: gap esplicito nel riepilogo / nel `decisions.yaml` se
+   richiamata da una cerimonia, con promemoria di rilanciare `jira-sync`
+   in standalone quando il connettore torna su. Mai saltato in silenzio,
+   mai segnato come "non applicabile".
+
+Vale in dry-run come a regime (la ricerca JQL è comunque una lettura).
+
 ## Modalità Push (idea/PRD → Jira)
 
 Da usare quando un'idea è stata prioritizzata ed è pronta a entrare nel
@@ -135,8 +164,12 @@ silenziosa.
 Da usare **periodicamente** (richiamata da `backlog-refinement` nella
 sweep di apertura, se `jira.integration` permette la ricerca) o
 **standalone** ("controlliamo se c'è lavoro Jira fuori governance").
-Richiede un connettore con ricerca — con `manuale` non è praticabile in
-automatico, segnalalo e fermati.
+Richiede un connettore con ricerca — con `manuale` (o `jira.integration`
+vuoto) non è praticabile in automatico: segnalalo e fermati, è una scelta
+di setup. Se invece il connettore con ricerca **è dichiarato ma non
+risponde**, non fermarti in silenzio: applica "Connettore dichiarato ma
+irraggiungibile" sopra — segnala il guasto, proponi di riattivarlo,
+rimanda la riconciliazione se il PM sceglie di proseguire.
 
 0. **Sincronizza da `origin`** (`governance-sync.sh pull`).
 1. **Elenca le idee candidate**: `classification: idea` (i bug/mandate/

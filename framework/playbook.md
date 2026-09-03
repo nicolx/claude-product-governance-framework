@@ -384,10 +384,12 @@ lanciato una cerimonia *vera* e vuoi annullarla, serve `rollback-ceremony`
 modalità dry-run (il primo è bootstrap una-tantum, il secondo riguarda il
 *metodo* su `upstream`, con una sua revisione umana).
 
-**Hook.** `SessionStart` fa solo `pull` (già read-only). `check-unpushed.sh`
-e `check-inbox.sh` (hook `Stop`) restano attivi anche in dry-run e sono
-utili — ti dicono se resta lavoro non pushato da run precedenti o
-`inbox/` non processata — non vanno silenziati.
+**Hook.** `SessionStart` fa `pull` (già read-only) e
+`check-pending-approvals.sh`. `check-unpushed.sh`, `check-inbox.sh` e
+`check-pending-approvals.sh` (hook `Stop`, il terzo anche su
+`SessionStart`) restano attivi anche in dry-run e sono utili — ti dicono
+se resta lavoro non pushato da run precedenti, `inbox/` non processata, o
+proposte arretrate nella coda di approvazione — non vanno silenziati.
 
 ## Annullare un run di cerimonia (`rollback-ceremony`)
 
@@ -1003,6 +1005,17 @@ voce, approvati o rifiutati dal team — e poi si mette davanti a tutti la
 È il materiale su cui si sceglie: la cerimonia registra le decisioni, ma
 prima espone le opzioni.
 
+**La coda di approvazione non dovrebbe accumularsi tra una cerimonia e
+l'altra.** Arrivare al Backlog Refinement con decine di `rice_diff`
+arretrati significa che per settimane la prioritizzazione è girata su un
+ranking incompleto (gli score proposti non contano finché non sono
+approvati). Le proposte vanno riviste via `pending-approval` man mano che
+emergono — il Refinement è il *backstop*, non l'unico momento in cui si
+guarda la coda. L'hook `check-pending-approvals.sh` (a inizio e fine
+sessione Claude Code) la rende visibile: quante proposte, di che tipo, da
+quanto tempo — con un'escalation quando la coda è ampia o stantia. Nessun
+altro segnale lo fa (`git status` è pulito: i file *sono* committati).
+
 > **Nota su Scrum vs Kanban.** Un approccio più Kanban (una cosa dopo
 > l'altra, ben ordinate per priorità) è spesso preferibile a un
 > commitment rigido per sprint: un Gantt che promette la feature X nello
@@ -1288,6 +1301,17 @@ Refinement, se il connettore permette la ricerca) confronta le idee
 ancora senza RICE con i ticket "attivi" del progetto e segnala i match —
 lavoro in esecuzione fuori dalla governance, da riallineare
 esplicitamente.
+
+Un connettore **dichiarato ma irraggiungibile** al momento del run (MCP
+non loggato o sessione scaduta, servizio giù, `ENOTFOUND`/timeout) non
+equivale a «non configurato»: è un guasto transitorio, non una scelta di
+setup. La cerimonia non salta la riconciliazione in silenzio — segnala
+cosa non risponde, propone di riattivare la connessione (`/mcp` per il
+login) e di ritentare il passo prima di proseguire. Se si sceglie
+comunque di andare avanti, la riconciliazione resta **rimandata** e
+visibile nel record della cerimonia (da rilanciare `jira-sync` standalone
+quando il connettore torna su), mai persa né segnata come non
+applicabile.
 
 Il connettore consigliato è l'**Atlassian Remote MCP Server ufficiale**
 (OAuth 2.1, nessun token da gestire); una CLI o l'operatività manuale
