@@ -32,12 +32,13 @@ creato/aggiornato.
 > `mandate-watch`, `deadline-watch`, `rice-watch`, `measurement-watch` se
 > le richiami.
 
-0. **Sincronizza da `origin` prima di leggere lo stato**: esegui
-   `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
-   "Sincronizzazione dell'istanza (`origin`)"). Uno snapshot generato su
-   uno stato locale vecchio omette iniziative e proposte che i colleghi
-   hanno già scritto. Se l'helper segnala un disallineamento
-   non-fast-forward, fermati e riferiscilo all'utente.
+0. **Sincronizza e leggi in blocco**: `bash
+   .claude/hooks/governance-sync.sh pull` (uno snapshot su stato vecchio
+   omette iniziative e proposte già scritte dai colleghi; se l'helper
+   segnala un non-fast-forward, fermati e riferiscilo), poi `bash
+   .claude/hooks/governance-dump.sh sweep` — lo stesso quadro completo
+   che serve alla sweep di apertura (idee, misurazioni, NSM, piani di
+   iterazione, coda `pending/`) in una tool call.
 
 1. Determina la settimana ISO di riferimento (`YYYY-Www`).
 

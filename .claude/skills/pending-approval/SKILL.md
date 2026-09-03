@@ -21,11 +21,13 @@ diff di roadmap/RICE sia per le comunicazioni in uscita.
 
 ## Elenco
 
-Se l'utente chiede genericamente cosa c'è da approvare, elenca tutti i
-file in `product/approvals/pending/`, per ciascuno un riepilogo leggibile
-(non lo YAML grezzo): tipo, cosa cambierebbe, chi/cosa l'ha proposto,
-quando. Ordina per data, più vecchi prima — una coda che si accumula è un
-segnale da far notare esplicitamente all'utente, non da nascondere.
+Se l'utente chiede genericamente cosa c'è da approvare: `bash
+.claude/hooks/governance-dump.sh backlog` (coda `pending/` + idee attive
+per il contesto della tabella, in **una** tool call). Elenca ogni voce in
+`product/approvals/pending/` con un riepilogo leggibile (non lo YAML
+grezzo): tipo, cosa cambierebbe, chi/cosa l'ha proposto, quando. Ordina
+per data, più vecchi prima — una coda che si accumula è un segnale da far
+notare esplicitamente all'utente, non da nascondere.
 
 Per le voci con un `target_file` che punta a un'idea (`rice_diff`,
 `strategic_exception_flag`, `mandate_update`, `mandate_reclassification`)

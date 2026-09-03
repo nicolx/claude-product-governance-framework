@@ -18,11 +18,11 @@ li mette tutti sulla stessa riga.
 
 ## Passi
 
-0. **Sincronizza da `origin`**: esegui
-   `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
-   "Sincronizzazione dell'istanza (`origin`)") — una vista del backlog su
-   dati locali vecchi è fuorviante, e la sezione 2 dipende da vedere la
-   coda di approvazione aggiornata.
+0. **Sincronizza e leggi in blocco**: `bash
+   .claude/hooks/governance-sync.sh pull` (una vista su dati vecchi è
+   fuorviante, e la sezione 2 dipende dalla coda aggiornata), poi `bash
+   .claude/hooks/governance-dump.sh backlog` — tutte le `idea.yaml` attive
+   + la coda `pending/` in **una** tool call, invece di glob-e-leggi-ognuna.
 
 1. **Idee RICE-ranked.** Elenca tutte le idee `classification: idea` con
    almeno una voce in `rice_history`, **ordinate per lo `score` della
