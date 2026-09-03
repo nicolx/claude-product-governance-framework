@@ -41,11 +41,24 @@ l'attenzione lì, non un'eccezione da gestire in silenzio.
 > avresti prodotto, e chiudi con `🔍 DRY-RUN — nessun file scritto,
 > nessun commit, nessun push.`
 
-0. **Sincronizza da `origin`** (uso standalone): esegui
-   `bash .claude/hooks/governance-sync.sh pull` — è il segnale più
-   strategico del framework, non ha senso giudicarlo su un
-   `nsm-tracking.yaml` locale vecchio. Per il quadro completo (tracking +
-   idee con `links.nsm_targeted`): `bash .claude/hooks/governance-dump.sh reference`.
+0. **Sincronizza e verifica il connettore metriche** (uso standalone):
+   `bash .claude/hooks/governance-sync.sh pull` (non ha senso giudicare le
+   NSM su un `nsm-tracking.yaml` vecchio); per il quadro completo
+   `bash .claude/hooks/governance-dump.sh reference`.
+   - **Se `.governance/config.yaml` ha `metrics.integration` = `mcp:*` o
+     `cli:*`** (non `manuale`/vuoto), verifica che il connettore risponda:
+     tool con prefisso `metrics.tool_hint` presenti, o una probe minima.
+     - **raggiungibile** → potrai leggere le letture NSM da lì invece di
+       chiederle al PM;
+     - **dichiarato ma irraggiungibile** → applica la regola del
+       playbook, "Connettori esterni: dichiarati, verificati a inizio
+       processo, mai un fallback silenzioso": segnala cosa non risponde,
+       offri `/mcp`, chiedi al PM se riattivare e ritentare o procedere.
+       Se procede: le letture di questo run le dà il PM a mano **e** nel
+       riepilogo il fatto che la lettura automatica è stata saltata va
+       registrato come **rimandato**, mai in silenzio;
+     - `manuale`/`configured: false` → chiedi le letture al PM come sempre,
+       nessuna segnalazione.
 
 1. **Se `product/reference/nsm-tracking.yaml` non esiste ancora**,
    scaffoldalo da `framework/schema/nsm-tracking.template.yaml`: una

@@ -41,10 +41,19 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
 > che avresti prodotto, e chiudi con `🔍 DRY-RUN — nessun file scritto,
 > nessun commit, nessun push.`
 
-0. **Sincronizza e leggi in blocco** (uso standalone): `bash
-   .claude/hooks/governance-sync.sh pull`, poi `bash
+0. **Sincronizza, leggi in blocco, verifica il connettore metriche** (uso
+   standalone): `bash .claude/hooks/governance-sync.sh pull`, poi `bash
    .claude/hooks/governance-dump.sh measurements` — i `measurement*.yaml`
    e le `idea.yaml` in un colpo.
+   - **Se `.governance/config.yaml` ha `metrics.integration` = `mcp:*` o
+     `cli:*`**, verifica che il connettore risponda (tool con prefisso
+     `metrics.tool_hint`, o una probe). Se **dichiarato ma
+     irraggiungibile**, applica la regola del playbook, "Connettori
+     esterni: dichiarati, verificati a inizio processo, mai un fallback
+     silenzioso" — non degradare in silenzio all'inserimento manuale:
+     segnala, offri `/mcp`, chiedi al PM; se procede, le letture di questo
+     run le dà lui a mano e il gap va nel riepilogo come **rimandato**.
+     `manuale`/`configured: false` → come sempre, nessuna segnalazione.
 
 1. **Elenca le iniziative rilevanti**: idee con `status: done` e
    `done_at` valorizzato, che hanno almeno un PRD collegato (`links.prd_ids`
@@ -76,16 +85,25 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
      **questo è il caso centrale**. Guarda `data_source.mode`:
      - `manual` — chiedi al PM il valore attuale della metrica (ha
        accesso agli strumenti di analytics dell'istanza, per playbook).
-     - `automated` — se l'istanza ha una vera integrazione configurata
-       localmente (vedi `framework/docs/future-work.md` — non esiste
-       ancora nel framework di base), tenta la lettura da lì; **se non
-       esiste**, comportati esattamente come `manual` e chiedi al PM —
-       non bloccare né inventare un valore solo perché il PRD dichiara
-       "automated" come intento. In entrambi i casi, quando ottieni un
-       valore (dal PM o da un'integrazione reale), **mostralo sempre nel
-       riepilogo del run prima/al momento di scriverlo** — è
-       trasparenza, non un gate di approvazione: non serve una conferma
-       aggiuntiva per una lettura automatica riuscita.
+     - `automated` — dipende da `metrics` in `.governance/config.yaml`
+       (verificato al passo 0):
+       - **`metrics.configured: true` e connettore raggiungibile** →
+         tenta la lettura dal connettore. Il *contratto di query* vero non
+         esiste ancora nel framework di base (`framework/docs/future-work.md`):
+         finché non c'è, questo caso si riduce a "chiedi al PM il valore
+         letto dal connettore".
+       - **`metrics.configured: true` ma connettore irraggiungibile** →
+         **non** è come `manual`: è il caso "dichiarato ma irraggiungibile"
+         (playbook, "Connettori esterni…"). Segnalato già al passo 0; qui
+         la lettura la dà il PM a mano per questo run e la mancata lettura
+         automatica resta **rimandata** nel riepilogo.
+       - **`metrics.configured: false`** → `automated` è solo un intento
+         del PRD senza connettore: comportati come `manual` e chiedi al
+         PM, nessuna segnalazione. Non bloccare né inventare un valore.
+       In tutti i casi, quando ottieni un valore, **mostralo sempre nel
+       riepilogo del run prima/al momento di scriverlo** — è trasparenza,
+       non un gate di approvazione: non serve una conferma aggiuntiva per
+       una lettura automatica riuscita.
      Se ottieni un valore, appendi una nuova voce a `readings` con
      `date`, `value`, `source`. Se resta senza valore, lascialo
      `check_due` e segnalalo comunque nel riepilogo — non è un errore, è

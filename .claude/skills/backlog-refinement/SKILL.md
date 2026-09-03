@@ -69,20 +69,25 @@ piano passa **sempre** da `product/approvals/pending/`
    glob di tutte le `idea.yaml` + scritture + `push`, e le stesse idee
    verrebbero lette 3-4 volte. Invece:
 
-   a. **Lancia la riconciliazione Jira in background.** Se
-      `jira.integration` è un connettore con ricerca (`atlassian-mcp`),
-      avvia `jira-sync` **modalità Riconciliazione** come **task in
-      background** (idee mai passate dal RICE il cui lavoro è già partito
-      in Jira — falla di governance) e prosegui subito con la sweep
-      locale: ne raccogli l'esito al punto e. Saltala **senza rumore**
-      solo se `jira.integration` è `manuale`/vuoto (scelta di setup). Se è
-      dichiarato `atlassian-mcp` ma **non risponde** (tool
-      `mcp__atlassian__*` assenti, `ENOTFOUND`/timeout su
-      `mcp.atlassian.com`), applica "Connettore dichiarato ma
-      irraggiungibile" di `jira-sync`: segnala il guasto, proponi al PM di
-      riconnettere (`/mcp`) e ritentare; se sceglie di proseguire, la
-      riconciliazione va registrata come **rimandata** nel riepilogo
-      (debito visibile), mai come completata o non applicabile.
+   a. **Verifica i connettori esterni dichiarati** (playbook, "Connettori
+      esterni: dichiarati, verificati a inizio processo, mai un fallback
+      silenzioso") — *prima* di entrare nella sweep, così
+      `nsm-watch`/`measurement-watch` inline non scoprono il guasto a
+      metà:
+      - **`metrics`** (`mcp:*`/`cli:*`): se dichiarato ma irraggiungibile,
+        applica la regola del playbook — segnala, offri `/mcp`, chiedi al
+        PM. Se si procede, le letture NSM/KPI del run le dà il PM a mano e
+        i punti "lettura automatica saltata" vanno nel riepilogo come
+        **rimandati**.
+      - **`jira`** (`atlassian-mcp`/`cli:*`): idem. Se risponde, **lancia
+        la riconciliazione Jira come task in background** (`jira-sync`
+        modalità Riconciliazione — idee mai passate dal RICE il cui lavoro
+        è già partito in Jira) e prosegui subito con la sweep locale: ne
+        raccogli l'esito al punto e. Se `jira.integration` è
+        `manuale`/vuoto, salta la riconciliazione **senza rumore** (scelta
+        di setup). Se dichiarato ma irraggiungibile e il PM sceglie di
+        proseguire, la riconciliazione resta **rimandata** nel riepilogo,
+        mai completata o non applicabile.
 
    b. **Un solo** `bash .claude/hooks/governance-dump.sh sweep` → tutto lo
       stato rilevante (idee attive, misurazioni, NSM, denominatori,

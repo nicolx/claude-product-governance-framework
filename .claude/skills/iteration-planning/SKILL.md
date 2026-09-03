@@ -33,7 +33,10 @@ in aggiunta, i passi specifici sotto.
 ## Passi specifici dell'Iteration Planning
 
 1. **Sincronizza da `origin`** (`governance-sync.sh pull`) prima di
-   leggere lo stato delle idee in iterazione.
+   leggere lo stato delle idee in iterazione. Se la config dichiara
+   connettori esterni (`jira`, `metrics`), **verificali** con lo stesso
+   criterio del Backlog Refinement (playbook, "Connettori esterni:
+   dichiarati, verificati a inizio processo, mai un fallback silenzioso").
 
 2. **Carica il Piano di Iterazione della settimana.** Cerca, nell'ordine:
    una proposta `type: iteration_plan` per questa settimana in
