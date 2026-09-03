@@ -17,9 +17,12 @@ agire da sola sulla priorità.
 
 - **Standalone**, in qualunque momento: "controlla lo stato dei mandate",
   "siamo a rischio su qualche scadenza mandataria?".
-- **Richiamata da `backlog-refinement`** durante il Backlog Refinement — è così
-  che il controllo avviene ad ogni ciclo settimanale, non solo quando
-  qualcuno se ne ricorda.
+- **Durante il Backlog Refinement** la logica di questa skill gira
+  **inline** nella sweep di apertura di `backlog-refinement` (un solo
+  `pull`, un solo `governance-dump.sh sweep`, un solo commit per tutte le
+  watch — vedi playbook, "La sweep di apertura dev'essere calcolo, non
+  attesa di I/O"). Non invocarla da lì. Questo file resta il punto
+  d'ingresso **standalone** e la fonte normativa delle formule di seguito.
 
 ## Passi
 
@@ -32,14 +35,14 @@ agire da sola sulla priorità.
 > come testo l'output completo che avresti prodotto, e chiudi con
 > `🔍 DRY-RUN — nessun file scritto, nessun commit, nessun push.`
 
-0. **Sincronizza da `origin`**: esegui
-   `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
-   "Sincronizzazione dell'istanza (`origin`)") prima di leggere le idee —
-   uno scan su dati locali vecchi rischia falsi `overdue`/`due_soon` su
+0. **Sincronizza e leggi in blocco** (uso standalone): `bash
+   .claude/hooks/governance-sync.sh pull`, poi `bash
+   .claude/hooks/governance-dump.sh ideas` — tutte le `idea.yaml` in un
+   colpo. Uno scan su dati vecchi rischia falsi `overdue`/`due_soon` su
    mandate che un collega ha già mosso avanti.
 
-1. **Elenca tutte le idee** in `product/ideas/*/idea.yaml` con
-   `classification: mandate` e `status` diverso da `done` o `aborted`.
+1. **Elenca tutte le idee** (dal dump) con `classification: mandate` e
+   `status` diverso da `done` o `aborted`.
    Se non ce ne sono, dillo esplicitamente e fermati — non è un errore,
    è uno stato normale. Le idee `classification: idea`/
    `strategic_exception` con solo un blocco `deadline` (non ancora

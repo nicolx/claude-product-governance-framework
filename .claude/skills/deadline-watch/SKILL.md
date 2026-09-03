@@ -26,9 +26,13 @@ skill esiste per evitare.
 
 - **Standalone**, in qualunque momento: "quali idee hanno una scadenza in
   arrivo?", "rischiamo di perdere qualche finestra?".
-- **Richiamata da `backlog-refinement`** durante il Backlog Refinement, subito
-  dopo `mandate-watch` — stesso principio: il controllo deve avvenire ad
-  ogni ciclo settimanale, non solo quando qualcuno se ne ricorda.
+- **Durante il Backlog Refinement** la logica di questa skill gira
+  **inline** nella sweep di apertura di `backlog-refinement` (che fa un
+  solo `pull`, un solo `governance-dump.sh sweep` e un solo commit per
+  tutte le watch — vedi playbook, "La sweep di apertura dev'essere
+  calcolo, non attesa di I/O"). Non invocare questa skill da lì. Questo
+  file resta il punto d'ingresso **standalone** e la fonte normativa
+  delle formule di seguito.
 
 ## Passi
 
@@ -41,15 +45,13 @@ skill esiste per evitare.
 > avresti prodotto, e chiudi con `🔍 DRY-RUN — nessun file scritto,
 > nessun commit, nessun push.`
 
-0. **Sincronizza da `origin`**: esegui
-   `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
-   "Sincronizzazione dell'istanza (`origin`)") prima di scansionare —
-   uno scan su dati locali vecchi rischia di mancare una scadenza che un
-   collega ha già dichiarato.
+0. **Sincronizza e leggi in blocco** (uso standalone): `bash
+   .claude/hooks/governance-sync.sh pull`, poi `bash
+   .claude/hooks/governance-dump.sh ideas` per avere tutte le `idea.yaml`
+   in un colpo invece di leggerle una per una.
 
-1. **Elenca tutte le idee** in `product/ideas/*/idea.yaml` con
-   `deadline.due_date` valorizzato e `status` diverso da `done` o
-   `aborted`. Includi qualunque `classification` — `idea`,
+1. **Elenca tutte le idee** (dal dump) con `deadline.due_date` valorizzato
+   e `status` diverso da `done` o `aborted`. Includi qualunque `classification` — `idea`,
    `strategic_exception`, `platform` — **ma non `mandate`**: quelle hanno
    già `mandate-watch` con la propria logica di lead time; includerle qui
    duplicherebbe il segnale. Se non ce ne sono, dillo esplicitamente e

@@ -17,9 +17,12 @@ silenzio.
 
 - **Standalone**, in qualunque momento: "quali idee non hanno ancora un
   RICE?", "siamo in attesa di info da qualcuno per quotare qualcosa?".
-- **Richiamata da `backlog-refinement`** durante il Backlog Refinement — stesso
-  principio di `mandate-watch`: il controllo deve avvenire ad ogni ciclo
-  settimanale, non solo quando qualcuno se ne ricorda.
+- **Durante il Backlog Refinement** la logica di questa skill gira
+  **inline** nella sweep di apertura di `backlog-refinement` (un solo
+  `pull`, un solo `governance-dump.sh sweep`, un solo commit per tutte le
+  watch — vedi playbook, "La sweep di apertura dev'essere calcolo, non
+  attesa di I/O"). Non invocarla da lì. Questo file resta il punto
+  d'ingresso **standalone** e la fonte normativa delle formule di seguito.
 
 ## Passi
 
@@ -32,14 +35,14 @@ silenzio.
 > mostra come testo l'output completo che avresti prodotto, e chiudi con
 > `🔍 DRY-RUN — nessun file scritto, nessun commit, nessun push.`
 
-0. **Sincronizza da `origin`**: esegui
-   `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
-   "Sincronizzazione dell'istanza (`origin`)") prima di scansionare — non
-   vuoi segnalare come "senza RICE" un'idea che un collega ha già
-   quotato in locale e non hai ancora ricevuto.
+0. **Sincronizza e leggi in blocco** (uso standalone): `bash
+   .claude/hooks/governance-sync.sh pull`, poi `bash
+   .claude/hooks/governance-dump.sh ideas` — tutte le `idea.yaml` in un
+   colpo. Non vuoi segnalare come "senza RICE" un'idea che un collega ha
+   già quotato in locale e non hai ancora ricevuto.
 
-1. **Elenca tutte le idee** in `product/ideas/*/idea.yaml` con
-   `classification: idea` (bug, strategic_exception e mandate non
+1. **Elenca tutte le idee** (dal dump) con `classification: idea` (bug,
+   strategic_exception e mandate non
    passano mai dal RICE per disegno — non sono "in ritardo", sono
    strutturalmente esenti, non includerle) e `rice_history` vuoto. Se
    non ce ne sono, dillo esplicitamente e fermati.

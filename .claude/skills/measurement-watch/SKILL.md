@@ -22,11 +22,13 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
 - **Standalone**, in qualunque momento: "quali iniziative dovrebbero
   già mostrare impatti?", "controlliamo lo stato delle misurazioni",
   "possiamo chiudere il cantiere di misurazione di X?".
-- **Richiamata da `backlog-refinement`**, e idealmente **in apertura** del
-  Backlog Refinement (playbook, sezione "Product Backlog Refinement"):
-  prima di guardare cosa entra in agenda, si guarda cosa è già stato
-  rilasciato e se sta rendendo — è tracciare le metriche su Git, nel
-  tempo, che permette di capire dove veicolare gli investimenti futuri.
+- **Durante il Backlog Refinement** la logica di questa skill gira
+  **inline** nella sweep di apertura di `backlog-refinement` (un solo
+  `pull`, un solo `governance-dump.sh sweep`, un solo commit per tutte le
+  watch — vedi playbook, "La sweep di apertura dev'essere calcolo, non
+  attesa di I/O"; l'apertura "guardando indietro" resta il principio).
+  Non invocarla da lì. Questo file resta il punto d'ingresso
+  **standalone** e la fonte normativa delle formule di seguito.
 
 ## Passi
 
@@ -39,10 +41,10 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
 > che avresti prodotto, e chiudi con `🔍 DRY-RUN — nessun file scritto,
 > nessun commit, nessun push.`
 
-0. **Sincronizza da `origin`**: esegui
-   `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
-   "Sincronizzazione dell'istanza (`origin`)") prima di scansionare le
-   iniziative rilasciate.
+0. **Sincronizza e leggi in blocco** (uso standalone): `bash
+   .claude/hooks/governance-sync.sh pull`, poi `bash
+   .claude/hooks/governance-dump.sh measurements` — i `measurement*.yaml`
+   e le `idea.yaml` in un colpo.
 
 1. **Elenca le iniziative rilevanti**: idee con `status: done` e
    `done_at` valorizzato, che hanno almeno un PRD collegato (`links.prd_ids`
