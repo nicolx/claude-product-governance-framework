@@ -92,18 +92,23 @@ li rimappa a un nuovo prefisso mantenendo i numeri, aggiorna
 commit, e stampa la lista dei titoli Jira da correggere a mano (mai
 un'azione in uscita automatica). Fuori scope finché è un caso isolato.
 
-## Integrazione DB/analytics in lettura per measurement-watch
+## Integrazione DB/analytics in lettura per NSM e measurement-watch
 
-Idea dell'utente: dare al sistema, a livello di configurazione, accesso
-in autonomia (in lettura) a DB/tool di analytics, per controllare le
-metriche delle iniziative senza dover chiedere ogni volta al PM. Lo
-schema è già pronto ad accoglierlo (`measurement.yaml`, campo
-`data_source.mode: manual | automated` per KPI, dichiarato nel PRD —
-vedi `prd-draft`/`measurement-watch`), ma il connettore vero e proprio
-**non esiste**: ogni istanza avrà uno stack diverso (DataBricks, altro,
-niente), quindi non è qualcosa che il repo canonico può implementare in
-modo agnostico. Discusso in sessione, punti fermi già decisi (da
-rispettare quando si progetta il connettore reale):
+**Dichiarazione + verifica: FATTO** (2026-09-03). `.governance/config.yaml`
+ha un blocco `metrics:` (`configured`/`integration`/`tool_hint`/`note`,
+parallelo a `jira:`); `nsm-watch`, `measurement-watch` e le cerimonie
+**verificano il connettore a inizio processo** e applicano la regola
+"dichiarato ma irraggiungibile ≠ fallback silenzioso" (playbook,
+"Connettori esterni…"); l'hook `check-connectors.sh` lo ricorda a inizio
+sessione. `measurement.yaml` ha già `data_source.mode: manual | automated`
+per KPI.
+
+**Cosa resta aperto: il contratto di query.** Come una richiesta KPI
+("conversion funnel della Product Line X, ultimi 30 giorni") diventa una
+query sullo stack dell'istanza e torna un **aggregato** — indipendente da
+DataBricks/altro. Il connettore vero non esiste ancora: ogni istanza avrà
+uno stack diverso, non è qualcosa che il canonico può implementare in modo
+agnostico. Punti fermi già decisi (da rispettare quando si progetta):
 
 - **Mai credenziali su Git.** Configurazione 100% locale per istanza
   (env, secret manager, o un file locale esplicitamente escluso da git)
@@ -130,9 +135,9 @@ rispettare quando si progetta il connettore reale):
   chiesto di non depotenziare l'automazione con un controllo ridondante
   per ogni singola lettura).
 
-**Ancora da capire (la "giusta astrazione"):** come si dichiara/configura
-concretamente un'integrazione per istanza — un file locale con endpoint
-dichiarati? Un MCP tool dedicato che l'istanza collega? Un contratto
-minimo (query in ingresso, valore aggregato in uscita) che qualunque
-connettore deve rispettare, indipendente dallo stack sottostante? Da
-decidere quando si affronta il lavoro attivo, non ora.
+**Ancora da capire (la "giusta astrazione"):** il *contratto* — query in
+ingresso (mirata a una KPI/NSM dichiarata, mai libera), aggregato in
+uscita (mai righe grezze) — che qualunque connettore deve rispettare,
+indipendente dallo stack. La *dichiarazione* del connettore
+(`metrics.integration`) c'è già; manca la forma della richiesta e della
+risposta. Da decidere quando si affronta il lavoro attivo, non ora.

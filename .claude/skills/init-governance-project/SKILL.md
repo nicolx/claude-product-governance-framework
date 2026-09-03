@@ -106,10 +106,21 @@ per raccogliere:
    - **Nessun accesso programmatico** — `integration: manuale`:
      `jira-sync` preparerà i testi e il PM agirà a mano. Va bene per
      partire, si può aggiungere l'MCP in seguito.
-7. **Eventuali altre configurazioni rilevanti** — canale Slack/Teams per
-   comunicazioni, link a strumenti di analytics (es. DataBricks), altro
-   che l'utente ritenga utile avere a portata di mano nel config.
-8. **Materiale di contesto aziendale già disponibile** — chiedi se il PM
+7. **Connettore analytics / metriche** (blocco `metrics` in
+   `framework/schema/governance-config.template.yaml`) — c'è un modo
+   programmatico per leggere NSM e KPI dai dati di produzione (un MCP
+   server tipo DataBricks, una CLI)? Se sì: `metrics.configured: true`,
+   `integration` (`mcp:<server>` / `cli:<nome>`), `tool_hint` (il prefisso
+   dei tool MCP, es. `mcp__databricks__`, per la verifica di
+   raggiungibilità), `note` (quali dataset/metriche, owner del dato). Se
+   no: lascia `metrics.configured: false` e non scrivere il resto del
+   blocco — `nsm-watch`/`measurement-watch` chiederanno i valori al PM a
+   mano. Si può aggiungere in seguito. **Nessuna credenziale nel config**
+   (né altrove nel repo tracciato) — solo il *nome* del connettore.
+8. **Eventuali altre configurazioni rilevanti** — canale Slack/Teams per
+   comunicazioni, altro che l'utente ritenga utile avere a portata di
+   mano nel config.
+9. **Materiale di contesto aziendale già disponibile** — chiedi se il PM
    ha materiale (bilanci pubblici, slide, export Confluence, documenti
    strategici) utile a capire il business/l'azienda, non solo il
    prodotto. Se sì, non serve trascriverlo a mano ora: crea `context/`
@@ -128,8 +139,9 @@ che serve da lì e chiedi solo quello che manca.
    esiste) da `framework/schema/governance-config.template.yaml` —
    compila i campi noti dall'intervista: `project`, `initialized_at`,
    `pm_roster`, `framework.upstream_ref` (`git rev-parse upstream/main`
-   se disponibile, altrimenti `HEAD`), il blocco `jira` (passo 6
-   dell'intervista), `apps`.
+   se disponibile, altrimenti `HEAD`), il blocco `jira` (passo 6), il
+   blocco `metrics` (passo 7 — solo se c'è un connettore; altrimenti
+   `configured: false` e stop), `apps`.
    Il blocco `sync` (`auto_pull`/`auto_push`, default `true` entrambi) è
    ciò che attiva la sincronizzazione automatica con `origin` per tutte
    le skill successive (vedi playbook, "Sincronizzazione dell'istanza
@@ -179,7 +191,7 @@ che serve da lì e chiedi solo quello che manca.
    vuota. A differenza di `product/inbox/`, **non va aggiunta al
    `.gitignore`**: il contenuto che ci finisce (via `context-intake`) è
    già la trascrizione tracciabile, non il materiale grezzo. Se il PM ha
-   fornito materiale al passo 8 dell'intervista, droppalo qui e richiama
+   fornito materiale al passo 9 dell'intervista, droppalo qui e richiama
    `context-intake` prima di chiudere l'inizializzazione.
 
 ## Dopo l'inizializzazione

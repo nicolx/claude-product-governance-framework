@@ -45,30 +45,27 @@ riconciliazione automatici — vedi sotto).
 
 ### Connettore dichiarato ma irraggiungibile — non è lo stesso di `manuale`
 
+Caso specifico della regola generale del playbook, "Connettori esterni:
+dichiarati, verificati a inizio processo, mai un fallback silenzioso".
+
 Se `jira.integration` è `atlassian-mcp` o `cli:<nome>` ma **al momento
 dell'uso** il connettore non risponde — tool `mcp__atlassian__*` non
 disponibili perché `/mcp` non è loggato o la sessione OAuth è scaduta,
 `ENOTFOUND`/timeout su `mcp.atlassian.com`, la CLI esce con errore — **non
-degradare a `manuale` in silenzio e non saltare il passo**: è un guasto
-transitorio, non una scelta di setup, e trattarlo come "Jira non
-configurato" nasconde una falla di governance invece di renderla visibile.
+degradare a `manuale` in silenzio e non saltare il passo**.
 
-Comportati così:
+Dettagli specifici del connettore Jira (il resto è nella regola del
+playbook):
 
-1. **Segnala esplicitamente** cosa non risponde e come rimetterlo su:
-   - `atlassian-mcp`: `/mcp` in sessione per ri-loggarsi (OAuth 2.1,
-     login in browser); se è `ENOTFOUND`/timeout è rete o servizio giù —
-     riprovare tra poco.
-   - `cli:<nome>`: verificare che il binario sia nel PATH e le
-     credenziali valide.
-2. **Chiedi al PM** se riattivare la connessione ora e ritentare, oppure
-   procedere senza.
-3. Se sceglie di **procedere senza**, il passo che dipendeva dal
-   connettore (dedup del push, o l'intera Riconciliazione) resta
-   **rimandato**: gap esplicito nel riepilogo / nel `decisions.yaml` se
-   richiamata da una cerimonia, con promemoria di rilanciare `jira-sync`
-   in standalone quando il connettore torna su. Mai saltato in silenzio,
-   mai segnato come "non applicabile".
+- **Come rimetterlo su:** `atlassian-mcp` → `/mcp` in sessione per
+  ri-loggarsi (OAuth 2.1, login in browser); se è `ENOTFOUND`/timeout è
+  rete o servizio giù, riprovare tra poco. `cli:<nome>` → verificare
+  binario nel PATH e credenziali valide.
+- **Cosa resta rimandato** se il PM procede senza: il dedup del push, o
+  l'intera Riconciliazione — gap esplicito nel riepilogo / nel
+  `decisions.yaml` se in cerimonia, con promemoria di rilanciare
+  `jira-sync` standalone quando il connettore torna su. Mai "non
+  applicabile".
 
 Vale in dry-run come a regime (la ricerca JQL è comunque una lettura).
 
