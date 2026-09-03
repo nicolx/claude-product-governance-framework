@@ -1,6 +1,6 @@
 ---
 name: roadmap-snapshot
-description: Genera la proposta di snapshot settimanale della roadmap a partire dalle cerimonie loggate e dallo stato Jira, inclusi allarmi sulle NSM in degrado, capacità protetta per il debito tecnico (platform), iniziative mandatarie a rischio, scadenze in avvicinamento su idee normali, idee senza RICE e stato delle misurazioni — scrivendola in product/approvals/pending/, mai direttamente in product/roadmap/snapshots/.
+description: Genera la proposta di snapshot settimanale della roadmap (il rollup strategico per MBR/MTR) a partire dalle cerimonie loggate e dallo stato Jira, inclusi allarmi sulle NSM in degrado, capacità protetta per il debito tecnico (platform), iniziative mandatarie a rischio, scadenze in avvicinamento su idee normali, idee senza RICE e stato delle misurazioni. Referenzia il Piano di Iterazione della settimana (iteration_plan_ref) invece di ricostruire una propria lista di iniziative. Scrive in product/approvals/pending/, mai direttamente in product/roadmap/snapshots/.
 ---
 
 # roadmap-snapshot
@@ -50,8 +50,13 @@ creato/aggiornato.
      se lo stato non è stato aggiornato di recente, suggerisci di
      lanciare un pull prima di generare lo snapshot, per non proporre
      dati stantii).
-   - `product/ideas/*/idea.yaml` con `status` in `in_roadmap` o
-     `in_jira`, per popolare la lista `initiatives`.
+   - **Il Piano di Iterazione della settimana**
+     (`product/roadmap/iterations/{settimana}.yaml` approvato, o la
+     proposta `type: iteration_plan` ancora in `pending/` se non ancora
+     approvata) — è la fonte di `iteration_goal` e, quando serve, della
+     lista `initiatives`. Se manca del tutto, `iteration_plan_ref` resta
+     `null` e lo si segnala: il Backlog Refinement non ha prodotto il
+     piano.
    - Se i riepiloghi delle cerimonie non coprono già lo stato più
      recente, richiama direttamente `nsm-watch`, `mandate-watch`,
      `deadline-watch`, `rice-watch` e `measurement-watch` prima di
@@ -66,18 +71,28 @@ creato/aggiornato.
      `resolved`), leggendo `trend_status`/`alert` già calcolati da
      `nsm-watch`. È il segnale più strategico dello snapshot, va in cima
      al documento, non in coda dopo tutto il resto.
-   - `iteration_goal`, `ceremony_refs` (link alle cartelle cerimonia
-     usate come fonte), `initiatives` (idea_id, prd_id, jira_card_id,
-     status, completion_pct), `retro_notes` se disponibili dal Backlog
-     Refinement.
-   - `capacity_allocation`: somma `platform.estimated_effort_weeks`
-     delle iniziative `classification: platform` presenti in
-     `initiatives` questa settimana (→ `platform_weeks`) e
+   - `iteration_plan_ref` (path del Piano di Iterazione della settimana),
+     `iteration_goal` **copiato da quel piano**, `ceremony_refs` (link
+     alle cartelle cerimonia usate come fonte), `retro_notes` se
+     disponibili dal Backlog Refinement.
+   - `initiatives` è **derivata/opzionale**: NON ricostruirla da
+     `idea.status`. Compilala solo se un MBR/MTR chiede l'elenco piatto
+     delle iniziative in lavorazione — in quel caso leggi i quattro
+     bucket del Piano di Iterazione (`analysis_todo`,
+     `analysis_in_progress`, `in_development`, `urgent_priority`) e per
+     ciascuna voce riporta `idea_id`, `prd_id`, `jira_card_id`, `status`,
+     `completion_pct`, `iteration_bucket`. Altrimenti lasciala vuota: il
+     dettaglio operativo vive nel piano referenziato.
+   - `capacity_allocation`: `roadmap_weeks` = somma di
      `delivery.estimated_effort_weeks` delle iniziative `classification:
-     idea` (→ `roadmap_weeks`). **NON** usare la `entanglement_score` del
-     RICE per `roadmap_weeks`: è un footprint 1-10, non settimane. Le
-     iniziative `idea` senza `delivery.estimated_effort_weeks` (non ancora
-     passate da Iteration Planning) vanno in
+     idea` nei bucket `analysis_todo` / `in_development` /
+     `urgent_priority` del Piano di Iterazione; `platform_weeks` = somma
+     di `platform.estimated_effort_weeks` delle iniziative
+     `classification: platform` in lavorazione questa settimana. **NON**
+     usare la `entanglement_score` del RICE per `roadmap_weeks`: è un
+     footprint 1-10, non settimane. Le iniziative `idea` di quei bucket
+     senza `delivery.estimated_effort_weeks` (non ancora passate da
+     Iteration Planning) vanno in
      `capacity_allocation.undimensioned_ideas` (lista di `idea_id`), non
      stimate d'ufficio né ignorate silenziosamente. **Chiedi sempre**
      `total_capacity_weeks` al team tech (non presumerlo, non dedurlo da
