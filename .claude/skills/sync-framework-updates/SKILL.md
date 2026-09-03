@@ -81,6 +81,27 @@ segnalalo invece di procedere.
      `short_ref`, assegnato dal prossimo `backlog-refinement` alle idee
      ancora senza handle).
 
+   - "Reach del RICE è passata da percentuale 0-100 a banda intera 1-10"
+     → **migrazione dati MECCANICA** (a differenza del caso Entanglement
+     sopra, che richiede ri-stima): non serve giudizio, è pura
+     conversione di formato. Per **ogni** voce di `rice_history` di
+     **ogni** idea con `reach_percent` valorizzato:
+     - `reach_points = max(1, ceil(reach_percent / 10))`;
+     - `score` ricalcolato = `reach_points * impact_points *
+       confidence_score / entanglement_score`;
+     - il vecchio valore va spostato in `reach_absolute_note`
+       (prependi "≈{reach_percent}% della popolazione → {reach_points}"
+       se la nota ha già contenuto), poi rimuovi la chiave `reach_percent`
+       (o lasciala a `null` — è marcata deprecata nello schema).
+     Questo **puoi applicarlo direttamente su conferma esplicita
+     dell'utente** — idea per idea, un unico commit
+     (`sync-framework-updates: migrazione Reach %→1-10`), poi
+     `governance-sync.sh push`. Non passa da `product/approvals/pending/`:
+     è un riscalamento di formato, non una revisione di priorità (vedi
+     `idea.template.yaml`, nota sull'append-only). Mostra all'utente la
+     tabella prima/dopo degli `score` così vede se qualche ranking si
+     sposta ai confini di banda — è un effetto atteso, non un errore.
+
    - "il framework ora vieta che `short_ref_prefix` coincida con
      `jira.project_key`" → **controllo di setup**: leggi
      `.governance/config.yaml`. Se `short_ref_prefix` (o il default `PG`
