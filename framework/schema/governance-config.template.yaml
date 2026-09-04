@@ -45,6 +45,12 @@ sync:
 # essere altri connettori — design, ecc.). I due blocchi sotto sono
 # quelli che le skill del framework di base usano; altri vanno in
 # `connectors` (in fondo).
+# NB: per ogni connettore dichiarato, init-governance-project scrive le
+# allow entries dei suoi tool non distruttivi (ricerca/lettura + creazione
+# ticket) in .claude/settings.local.json, così le skill non chiedono
+# permesso per i passi che il metodo impone (probe, dedup, e per un bug
+# confermato l'apertura immediata del ticket). Vedi playbook, "Connettori
+# esterni", e la skill init-governance-project, "Cosa scrivere", punto 7.
 
 # --- Tracker di esecuzione (lo usa jira-sync; tipicamente Jira) ---
 jira:

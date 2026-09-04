@@ -415,6 +415,19 @@ interattivi da riga di comando, che vanno rifatti ogni volta. Per questo:
    sempre, nessuna segnalazione: è la configurazione scelta, non un
    guasto.
 
+**Le azioni che il processo impone non sono interattive.** Il probe di un
+connettore, il `pull`/`push` di sincronizzazione del repo
+(`governance-sync.sh`), le letture in blocco (`governance-dump.sh`) e — per
+un bug confermato — la creazione del ticket sul tracker sono passi previsti
+dal metodo: la skill li esegue senza chiedere conferma volta per volta.
+Perché funzionino senza attriti vanno **pre-autorizzati** nei permessi di
+Claude Code — la parte stack-agnostica sta in `.claude/settings.json`
+(proprietà framework), i tool del connettore dichiarato li scrive
+`init-governance-project` in `.claude/settings.local.json` (proprietà
+istanza, non tracciato). Restano interattivi solo: le decisioni di priorità
+(coda `product/approvals/pending/`), l'invio di comunicazioni verso persone
+(mail, Slack), e la conferma di classificazione del bug stesso.
+
 Vale in dry-run come a regime — una query analytics o una ricerca JQL è
 comunque una lettura. La skill `jira-sync` ha i dettagli specifici del
 connettore Jira; questa sezione è la regola generale di cui quello è un
@@ -559,6 +572,23 @@ di business attesa: quella è un'ipotesi di prodotto invalidata (va in
 Measurement). L'impatto prodotto determina la priorità di risoluzione: un
 tema di security va gestito ASAP.
 
+Un bug **confermato dal PM** va aperto sul tracker di esecuzione **subito**,
+contestualmente all'intake, con un impatto stimato — non rimandato a un
+secondo assenso. L'unica conferma richiesta è quella sulla classificazione
+stessa ("è davvero un bug?"): superata quella, il filing è automatico e non
+interattivo. Il razionale è operativo: un bug lasciato come bozza in un
+riepilogo di conversazione si perde, ed è esattamente la perdita di
+informazione che il metodo esiste per prevenire. Prima di aprirlo vale
+comunque la dedup contro ticket già esistenti (regola "non duplicare", vedi
+"Il tracker di esecuzione (Jira): collegamento, non duplicazione"): se
+emergono candidati plausibili si mostrano al PM per la disambiguazione, se è
+chiaramente nuovo si crea. Se il connettore è `manuale` o dichiarato ma
+irraggiungibile, il bug non può essere filato in automatico: si consegna il
+testo del ticket pronto e lo si segnala come **azione aperta** da completare
+appena il connettore torna su — mai come "fatto", mai come "non applicabile"
+(vedi "Connettori esterni"). Questa regola vale per qualunque skill che
+confermi un bug, non solo per l'intake.
+
 **b) Strategic Exception.** Quando una richiesta arriva da uno stakeholder
 molto rilevante (tipicamente C-level), si può accogliere su un canale
 privilegiato, bypassando il RICE. Il PM ha comunque il dovere di
@@ -580,7 +610,7 @@ Strategic Exception si verifica ogni settimana, non è più un'eccezione.
 
 **Checklist operativa**
 - [ ] L'idea è stata registrata con titolo, `summary` leggibile, proponente, descrizione del contesto?
-- [ ] Se è un bug: è già stato aperto un ticket con impatto stimato nel tracker di esecuzione?
+- [ ] Se è un bug confermato: il ticket è stato aperto **ora** sul tracker di esecuzione con impatto stimato (o, se il connettore è giù/`manuale`, è stato consegnato il testo pronto e segnalato come azione aperta)? Non "è già stato aperto" — l'apertura è parte di questo passo.
 - [ ] Se è una Strategic Exception: è stata approvata al livello richiesto (o è chiaro che è ancora in attesa di conferma)?
 - [ ] Se non è un'idea: è stata scartata come `declined` con `decline_reason`, non cancellata né lasciata in inbox?
 - [ ] L'idea è stata categorizzata per Product Line?
@@ -1462,6 +1492,12 @@ non ci fa sync in tempo reale — tiene solo un puntatore (`jira.card_id`)
 sull'idea e ne fa polling periodico. La skill `jira-sync` gestisce il
 collegamento in tre modi: Push (idea prioritizzata → nuovo ticket), Pull
 (stato dei ticket collegati → repo), Riconciliazione.
+
+Push non è solo il caso "idea prioritizzata": serve anche il **bug
+confermato all'intake**, che entra sul tracker **subito**, saltando per
+disegno la coda di priorità e il RICE (vedi "Alimentazione del bucket delle
+idee", punto a). In quel caso `idea-intake`/`inbox-triage` invocano Push
+appena il PM conferma la classificazione, senza un secondo assenso.
 
 La regola "non duplicare" vale **nei due sensi**. Non solo "non copiare
 Jira nel repo": anche **non aprire su Jira un ticket per qualcosa che è

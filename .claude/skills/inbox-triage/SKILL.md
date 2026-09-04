@@ -89,9 +89,11 @@ soli non coprono. In sintesi:
 > applica il contratto della sezione "Modalità dry-run (simulazione)" del
 > playbook: esegui letture e analisi normalmente, **non** scrivere su
 > `product/`/`context/`/`.governance/` (nemmeno spostando file da
-> `product/inbox/`), **non** invocare `governance-sync.sh push`, mostra
-> come testo l'output completo che avresti prodotto, e chiudi con
-> `🔍 DRY-RUN — nessun file scritto, nessun commit, nessun push.`
+> `product/inbox/`), **non** invocare `governance-sync.sh push`, **non**
+> creare ticket sul tracker di esecuzione (per un bug, mostra come testo il
+> ticket che avresti aperto), mostra come testo l'output completo che
+> avresti prodotto, e chiudi con `🔍 DRY-RUN — nessun file scritto, nessun
+> commit, nessun push, nessun ticket creato.`
 
 0. **Sincronizza da `origin` prima di leggere lo stato**: esegui
    `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
@@ -202,14 +204,19 @@ soli non coprono. In sintesi:
    - **Bug** — stessa regola di `idea-intake`: **crea comunque la cartella
      idea** (`classification: bug`, `rice_history` che resta `[]` per
      sempre — un bug non passa mai dal RICE) per non perdere il materiale
-     e avere un record archiviato. In più, prepara il testo del ticket
-     per il tracker di esecuzione e chiedi conferma prima di aprirlo (se
-     è disponibile un'integrazione) o consegna il testo pronto
-     all'utente. Se il connettore Jira permette la ricerca, prima cerca
-     un ticket già esistente per lo stesso bug e proponi di linkare
-     quello (dedup — vedi `jira-sync` Push). Il materiale grezzo si
-     sposta comunque in `source/` — mai lasciato solo nel testo del
-     ticket.
+     e avere un record archiviato. Il materiale grezzo si sposta comunque
+     in `source/` — mai lasciato solo nel testo del ticket.
+     **Appena il PM conferma che è un bug, apri il ticket sul tracker di
+     esecuzione subito** — non chiedere un secondo assenso (vedi playbook,
+     "Alimentazione del bucket delle idee", punto a, e `idea-intake` bullet
+     Bug per la procedura completa): dedup prima (cerca un ticket
+     esistente se il connettore permette la ricerca, mostra i candidati al
+     PM), poi crea con **impatto stimato**, popola
+     `jira.card_id`/`jira.url`/`jira.status` e porta `status: in_jira`
+     (fatto, scrittura diretta, niente `pending/`). Se il connettore è
+     `manuale` o non risponde, consegna il testo pronto e riportalo nel
+     riepilogo (passo 7) come **AZIONE NON COMPLETATA** con il promemoria
+     di rilanciare `jira-sync` — mai come "fatto".
 
    - **Strategic Exception** — crea comunque la cartella idea (per
      traccia), `classification: strategic_exception`, e aggiungi una voce
@@ -285,10 +292,13 @@ soli non coprono. In sintesi:
    elemento**, non elencarle come se fossero scollegate. **Elenca tutte
    le bozze di `requester_reply` generate** (idea normale, SE, decline,
    clarification), pronte per la revisione e l'invio manuale del PM — non
-   inviarne nessuna in automatico. Se qualcosa non è stato processato per
-   un problema tecnico (file illeggibile, formato non gestito) dillo
-   esplicitamente e lascialo in `product/inbox/` piuttosto che farlo
-   sparire silenziosamente.
+   inviarne nessuna in automatico. **Per ogni bug**, di' se il ticket è
+   stato aperto (con `card_id`/URL) o se resta un'**AZIONE NON COMPLETATA**
+   (connettore giù/`manuale`): in quel caso metti in evidenza il testo
+   pronto e il promemoria di rilanciare `jira-sync`. Se qualcosa non è
+   stato processato per un problema tecnico (file illeggibile, formato non
+   gestito) dillo esplicitamente e lascialo in `product/inbox/` piuttosto
+   che farlo sparire silenziosamente.
 
 8. **Verifica che `product/inbox/` sia vuota** (a parte `.gitkeep` e gli
    eventuali elementi non processabili segnalati al passo 7) prima di
@@ -312,7 +322,9 @@ soli non coprono. In sintesi:
 - Non riscrivere PRD esistenti — è compito di `prd-draft`, su richiesta
   esplicita.
 - Non inviare comunicazioni (email, Slack) senza conferma esplicita per
-  ogni singolo invio.
+  ogni singolo invio. Questo vale per le comunicazioni verso **persone** —
+  **non** per l'apertura del ticket di un bug confermato, che è obbligatoria
+  e immediata (l'unica conferma è quella sulla classificazione).
 - Non lasciare materiale "a metà": o finisce in una cartella tracciata
   (idea/PRD, anche come needs_clarification), o resta visibilmente in
   `product/inbox/` con una spiegazione del perché.

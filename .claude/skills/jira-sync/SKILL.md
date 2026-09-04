@@ -76,6 +76,15 @@ Da usare quando un'idea è stata prioritizzata ed è pronta a entrare nel
 backlog di esecuzione (tipicamente dopo Backlog Refinement / Iteration
 Planning).
 
+> **Bug confermato all'intake.** Push serve anche il bug appena classificato:
+> `idea-intake`/`inbox-triage` lo invocano **subito** dopo la conferma del PM
+> sulla classificazione, senza gate di priorità e senza RICE (vedi playbook,
+> "Alimentazione del bucket delle idee", punto a). In quel caso **il passo 1
+> non si applica** — un bug non ha e non avrà mai un RICE approvato né un
+> PRD. Tutti gli altri passi (dedup al passo 3, creazione, scrittura
+> `jira.*`, `status: in_jira`, sync del repo) valgono identici. Il ticket
+> porta un **impatto stimato**; un tema di security va marcato ASAP.
+
 0. **Sincronizza da `origin`**: esegui
    `bash .claude/hooks/governance-sync.sh pull` (vedi playbook,
    "Sincronizzazione dell'istanza (`origin`)") — verifica che l'idea non

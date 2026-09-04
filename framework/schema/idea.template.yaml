@@ -2,7 +2,9 @@
 #
 # Un'idea nasce da materiale grezzo (email, trascrizione, segnalazione) e
 # viene classificata secondo il playbook (sezione "Alimentazione del bucket
-# delle idee"): idea normale, bug (bypassa il RICE, va su Jira), Strategic
+# delle idee"): idea normale, bug (bypassa il RICE; il ticket sul tracker
+# di esecuzione si apre SUBITO alla conferma di classificazione, non dopo
+# un secondo assenso — il blocco `jira` sotto si popola all'intake), Strategic
 # Exception (bypassa il RICE, richiede approvazione CEO/CPO-CTO),
 # Iniziativa Mandataria/mandate (bypassa SOLO il RICE — non l'analisi —
 # perché imposta dall'alto, marcata "critical" da leadership, o vincolata
@@ -384,7 +386,10 @@ iteration:
   current: null                   # settimana ISO dell'ultimo iteration_plan approvato in cui l'idea compare; null se in nessuno
   bucket: null                    # analysis_todo | analysis_in_progress | in_development | urgent_priority
 
-# --- Popolato solo al momento della prioritizzazione/push su Jira ---
+# --- Popolato al push sul tracker di esecuzione: alla prioritizzazione per
+# le idee normali, GIÀ ALL'INTAKE per classification: bug (il ticket di un
+# bug confermato si apre subito — vedi playbook, "Alimentazione del bucket
+# delle idee", punto a). Fatto osservato, scrittura diretta, mai da pending/ ---
 jira:
   card_id: null
   url: null
