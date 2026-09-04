@@ -200,6 +200,30 @@ che serve da lì e chiedi solo quello che manca.
    già la trascrizione tracciabile, non il materiale grezzo. Se il PM ha
    fornito materiale al passo 9 dell'intervista, droppalo qui e richiama
    `context-intake` prima di chiudere l'inizializzazione.
+7. `.claude/settings.local.json` — le **allow entries dei tool del
+   connettore dichiarato** (passo 6/7 dell'intervista), così le skill non
+   si fermano a chiedere permesso per azioni che il metodo impone già
+   (probe del connettore, dedup, e — per un bug confermato — la creazione
+   del ticket, che è un passo obbligato non interattivo: vedi playbook,
+   "Alimentazione del bucket delle idee", punto a, e "Connettori esterni").
+   La parte stack-agnostica (helper `governance-*.sh`, git read-only) è già
+   in `.claude/settings.json` (proprietà framework) — qui va **solo** ciò
+   che dipende dal connettore di questa istanza:
+   - connettore `mcp:<server>` / `atlassian-mcp` → allowlista i suoi tool
+     di **lettura e ricerca** e quello di **creazione ticket**. Per
+     Atlassian: `mcp__atlassian__searchJiraIssuesUsingJql`,
+     `mcp__atlassian__getJiraIssue`, `mcp__atlassian__getVisibleJiraProjects`,
+     `mcp__atlassian__getAccessibleAtlassianResources`,
+     `mcp__atlassian__createJiraIssue`. Per un altro server MCP, gli
+     equivalenti con il suo prefisso.
+   - connettore `cli:<nome>` → `Bash(<nome> <sottocomando>:*)` per i
+     sottocomandi di ricerca/lettura e creazione ticket.
+   - connettore `manuale` o assente → non scrivere nulla qui.
+   **Mostra al PM l'elenco esatto che stai per allowlistare e chiedi
+   conferma** — è l'unico punto in cui l'inizializzazione tocca dei
+   permessi. `.claude/settings.local.json` non è tracciato da git (è
+   proprietà istanza, vedi `CLAUDE.md`): ogni collega che clona lo rigenera
+   o lo copia a parte.
 
 ## Dopo l'inizializzazione
 

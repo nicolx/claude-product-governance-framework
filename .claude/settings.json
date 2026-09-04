@@ -1,4 +1,22 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(bash .claude/hooks/governance-sync.sh:*)",
+      "Bash(bash .claude/hooks/governance-dump.sh:*)",
+      "Bash(bash .claude/hooks/check-connectors.sh:*)",
+      "Bash(bash .claude/hooks/check-pending-approvals.sh:*)",
+      "Bash(bash .claude/hooks/check-inbox.sh:*)",
+      "Bash(bash .claude/hooks/check-unpushed.sh:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git fetch:*)"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {

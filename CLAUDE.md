@@ -41,6 +41,7 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `product/ideas/*/mandate.analysis_start_by`, `product/ideas/*/mandate.escalation_status` | Istanza | Solo `mandate-watch` — fatti calcolati, non decisioni, scrittura diretta senza approvazione (stesso principio di `jira.status`) |
 | `product/ideas/*/rice_status` (incluso `deep_dive`) | Istanza | `rice-watch` (e `idea-intake`/`inbox-triage` per `deep_dive.needed`/`requested_at` all'origine) — `flagged_since` è un fatto osservato; `blocked_reason`/`waiting_on`/`deep_dive.*` sono cattura di contesto (chiesti al PM, mai presunti), non decisioni di priorità: nessuna passa da approvazione |
 | `product/ideas/*/summary`, `product/ideas/*/notes` | Istanza | `idea-intake`/`inbox-triage` all'origine, poi qualunque skill/PM in conversazione — descrizione e note di contesto, non decisioni di priorità, scrittura diretta |
+| `product/ideas/*/jira.*` | Istanza | `jira-sync` (tutte le modalità) e `idea-intake`/`inbox-triage` per i bug all'intake — fatto osservato (il ticket esiste), scrittura diretta senza approvazione (stessa logica di `jira.status`). Per un `classification: bug` il filing è **immediato e obbligatorio** appena il PM conferma la classificazione: il ticket si apre subito (con impatto stimato), mai rimandato a un secondo assenso — vedi playbook, "Alimentazione del bucket delle idee", punto a. Se il connettore è `manuale`/irraggiungibile resta un'azione aperta esplicita, mai un filing silenziosamente saltato |
 | `product/ideas/*/short_ref` | Istanza | Solo `backlog-refinement`, assegnato pigramente (`{prefisso}-{NNN}`, `next = max+1`) al primo refinement che incontra l'idea senza handle. Il refinement è un punto di serializzazione a scrittore singolo → niente collisioni offline; nessun file contatore. Fatto di housekeeping, scrittura diretta, non passa da `pending/`. Una volta assegnato non cambia. `id`/nome cartella restano l'identificatore canonico |
 | `product/ideas/*/requester_reply` | Istanza | `idea-intake`/`inbox-triage` — bozza di risposta al richiedente, **mai inviata in automatico** (la manda il PM). Cortesia 1:1 con l'idea, non una decisione applicata a un target file: nessuna approvazione via `pending/`, stessa logica di `clarification.draft_message` |
 | `product/ideas/*/status: declined`/`aborted`, `product/ideas/*/decline_reason` | Istanza | `idea-intake`/`inbox-triage` propongono lo scarto al triage, **oppure** `backlog-refinement` a un checkpoint della sweep di apertura quando il PM decide che un'idea non ha più motivo di esistere (`declined` se non è mai partita, `aborted` se era in lavorazione). Sempre su conferma **in conversazione** (è un giudizio) — non passa dalla coda `pending/`, ma non è mai deciso dalla sola skill; l'azione va registrata in `decisions.yaml` della cerimonia |
@@ -54,6 +55,7 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `product/reference/nsm-tracking.yaml` | Istanza | Solo `nsm-watch` — creato lazy al primo run (non da `init-governance-project`), scritto direttamente: `readings`/`trend_status`/`alert.status` sono fatti/calcoli osservati, `discovery_focus_confirmed`/`resolved_*` sono cattura di decisioni già espresse dal PM in conversazione. Nessuno di questi passa da approvazione |
 | `product/reference/annual-target.yaml` | Istanza | Creato da `init-governance-project` (passo 4 intervista); aggiornato in seguito solo su richiesta esplicita dell'utente (nuovo Budget/BP, override per Product Line). È l'incremento atteso, mai il totale a budget — `rice-update` lo legge per calibrare l'Impact. Non passa da approvazione (è un dato di riferimento condiviso, come il denominatore Reach) |
 | `.governance/config.yaml` | Istanza | Solo `init-governance-project`, in scrittura successiva solo su richiesta esplicita dell'utente |
+| `.claude/settings.local.json` | Istanza, **NON tracciata da git** | Solo `init-governance-project` (allow entries dei tool del connettore dichiarato — ricerca/lettura + creazione ticket, così le skill non chiedono permesso per i passi che il metodo impone: probe, dedup, filing immediato di un bug) e richiesta esplicita dell'utente. La parte stack-agnostica dei permessi sta invece in `.claude/settings.json` (proprietà framework) |
 
 Non spostare mai contenuto da `framework/` verso cartelle di istanza per
 "personalizzarlo": se una regola del metodo va adattata a un progetto
@@ -123,6 +125,15 @@ l'evidenza esce verso gli stakeholder è sempre un atto manuale del PM
 (stessa logica di `requester_reply`): non c'è comunicazione in uscita da
 far passare da `pending/`.
 
+Corollario: l'apertura del ticket di un **bug confermato** sul tracker di
+esecuzione non passa da `pending/` — non è una decisione di priorità (un
+bug bypassa il RICE per disegno) e rimandarla a un secondo assenso
+significa perderla. Stessa esenzione di `jira-sync` Push, e per lo stesso
+motivo: il ticket è un fatto, non una proposta. L'unica conferma richiesta
+è quella del PM sulla classificazione (è davvero un bug?); superata quella,
+`idea-intake`/`inbox-triage` filano subito — vedi playbook, "Alimentazione
+del bucket delle idee", punto a.
+
 ## Sincronizzazione dell'istanza (`origin`)
 
 Le skill che leggono o scrivono stato tracciato sincronizzano
@@ -165,6 +176,16 @@ connettori la config dichiara e **mostra i comandi `reauth`** (utile per i
 connettori il cui login scade a ogni sessione). Il *contratto di query*
 della fonte `metrics` (come una richiesta KPI diventa una query e torna un
 aggregato) non esiste ancora — vedi `framework/docs/future-work.md`.
+
+Le azioni che il metodo impone non sono interattive: probe del connettore,
+`pull`/`push` di `governance-sync.sh`, letture di `governance-dump.sh` e —
+per un bug confermato — la creazione del ticket. Vanno pre-autorizzate nei
+permessi: la parte stack-agnostica (helper, git read-only) è in
+`.claude/settings.json` (framework); i tool del connettore dichiarato li
+scrive `init-governance-project` in `.claude/settings.local.json` (istanza,
+non tracciato). Restano interattivi solo le decisioni di priorità
+(`pending/`), le comunicazioni verso persone, e la conferma di
+classificazione del bug.
 
 ## Modalità dry-run (simulazione)
 

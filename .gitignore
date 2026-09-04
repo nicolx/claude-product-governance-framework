@@ -12,5 +12,11 @@ product/inbox/*
 # resta invece tracciato.
 product/demos/captures/*/screenshots/
 
+# .claude/settings.local.json: permessi/override locali a un'istanza —
+# init-governance-project ci scrive le allow entries dei tool del connettore
+# dichiarato (vedi CLAUDE.md, tabella "Confini di proprietà"). Locale al clone,
+# mai committato. La parte condivisa dei permessi è in .claude/settings.json.
+.claude/settings.local.json
+
 # Artefatti locali comuni
 .DS_Store

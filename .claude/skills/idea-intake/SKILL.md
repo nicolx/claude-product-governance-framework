@@ -41,9 +41,11 @@ presente nel materiale di origine.
 > applica il contratto della sezione "Modalità dry-run (simulazione)" del
 > playbook: esegui letture e analisi normalmente, **non** scrivere su
 > `product/`/`context/`/`.governance/` (nemmeno spostando file), **non**
-> invocare `governance-sync.sh push`, mostra come testo l'output completo
-> che avresti prodotto, e chiudi con `🔍 DRY-RUN — nessun file scritto,
-> nessun commit, nessun push.`
+> invocare `governance-sync.sh push`, **non** creare ticket sul tracker di
+> esecuzione (per un bug, mostra come testo il ticket che avresti aperto),
+> mostra come testo l'output completo che avresti prodotto, e chiudi con
+> `🔍 DRY-RUN — nessun file scritto, nessun commit, nessun push, nessun
+> ticket creato.`
 
 1. **Leggi il materiale grezzo** fornito dall'utente (allegato, testo
    incollato, o riferimento a un file).
@@ -67,16 +69,33 @@ presente nel materiale di origine.
      per non perdere il materiale grezzo e per avere un record archiviato
      e diffabile. La differenza rispetto a un'idea normale: **non passa
      mai dal RICE** (`rice_history` resta `[]` per sempre, non solo in
-     questo passo) e non entra nel Backlog Refinement per priorità —
-     segnala esplicitamente all'utente che va aperto anche nel tracker di
-     esecuzione (Jira) con impatto stimato, e chiedi se vuole che tu
-     prepari il testo del ticket. **Prima di aprirne uno nuovo**, se il
-     connettore Jira permette la ricerca (`jira.integration`), cerca un
-     ticket già esistente per lo stesso bug e proponi di linkare quello —
-     stesso dedup del passo 3 di `jira-sync` Push. Una volta creato (o
-     linkato) il ticket, popola `jira.card_id`/`jira.url` sull'idea (vedi
-     skill `jira-sync`), così il record locale resta collegato a dove il
-     lavoro viene davvero tracciato.
+     questo passo) e non entra nel Backlog Refinement per priorità.
+
+     **Appena il PM conferma che è un bug, il ticket sul tracker di
+     esecuzione va aperto subito** — vedi playbook, "Alimentazione del
+     bucket delle idee", punto a. Non chiedere un secondo assenso ("vuoi
+     che prepari il testo?", "lo apro?"): la conferma sulla classificazione
+     è l'unico gate. Dopo aver completato la cartella (passi 4-7):
+     - **Dedup prima.** Se il connettore permette la ricerca
+       (`jira.integration`), cerca un ticket già esistente per lo stesso
+       bug — stesso dedup del passo 3 di `jira-sync` Push. Se emergono
+       candidati plausibili, mostrali al PM e chiedi qual è (o "è nuovo");
+       se è chiaramente nuovo, procedi.
+     - **Crea (o linka) il ticket** via il connettore dichiarato,
+       includendo un **impatto stimato** (chiedilo al PM se non ricavabile
+       dal materiale; per un tema di security segnala che va gestito ASAP).
+       Delega a `jira-sync` Push (passi 3-6) per i dettagli del connettore.
+     - **Popola `jira.card_id`/`jira.url`/`jira.status`** sull'idea e porta
+       `status: in_jira`. È un fatto (il ticket esiste), scrittura diretta,
+       **non** passa da `product/approvals/pending/` — segnalalo all'utente.
+     - **Connettore `manuale` o dichiarato ma irraggiungibile** (non
+       risponde): il bug non è filabile in automatico. Applica la regola di
+       `jira-sync`, "Connettore dichiarato ma irraggiungibile" — prepara il
+       testo del ticket pronto da incollare e riportalo nel riepilogo
+       finale (passo 9) come **AZIONE NON COMPLETATA** in evidenza, con il
+       comando `jira.reauth` e il promemoria di rilanciare `jira-sync`
+       standalone appena il connettore torna su. Mai chiudere il punto come
+       se il bug fosse stato filato.
    - **Strategic Exception** — se il proponente è a un livello che nel
      `product/reference/` (o dichiarato dall'utente) qualifica per bypass
      del RICE. Crea comunque la cartella idea (serve comunque traccia),
@@ -226,7 +245,11 @@ presente nel materiale di origine.
    contenuto creato — **se sono state create più unità dalla stessa
    fonte, elencale tutte insieme nel riepilogo finale**, non una alla
    volta senza collegarle — prima di considerare il passo concluso.
-   Includi nel riepilogo le bozze di `requester_reply` generate.
+   Includi nel riepilogo le bozze di `requester_reply` generate. **Per ogni
+   bug**, di' esplicitamente se il ticket è stato aperto (con `card_id`/URL)
+   o se resta un'**AZIONE NON COMPLETATA** perché il connettore era
+   giù/`manuale` — in quel caso metti in evidenza il testo pronto e il
+   promemoria di rilanciare `jira-sync`.
 
 10. **Sincronizza il repo**: come ultimo passo, esegui
     `bash .claude/hooks/governance-sync.sh push "idea-intake: <slug>[, +N unità]" product/ideas/`
