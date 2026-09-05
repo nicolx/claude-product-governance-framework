@@ -1,22 +1,33 @@
 # Template per context/.sources-seen.yaml
 #
 # Stato di sincronizzazione dei documenti tirati da un connettore sorgente
-# di contesto (context-intake, canale "pull da cartelle collegate" — vedi
-# playbook, "Contesto aziendale (context/)").
+# di contesto (canale "pull da cartelle collegate" — vedi playbook,
+# "Contesto aziendale (context/)").
 #
 # Tracciato da git: è stato condiviso col team, non materiale grezzo — solo
-# id + revisione + data, così un run successivo di context-intake propone
-# soltanto i documenti nuovi o modificati e non ri-mostra quelli già
-# trascritti. Scritto SOLO da context-intake, mai a mano.
+# id + revisione + data + materialità, così un run successivo di
+# context-watch/context-intake propone soltanto i documenti nuovi o
+# modificati e non ri-mostra quelli già trascritti (o già in coda di
+# approvazione). Scritto SOLO da context-watch, context-intake e
+# pending-approval (all'approvazione di un context_update), mai a mano.
 #
 # Non creato necessariamente durante init-governance-project: lo scaffolda
 # init se il PM dichiara almeno una cartella di contesto (connectors[].folders),
-# altrimenti lo crea context-intake al primo pull (stesso principio di
+# altrimenti lo crea la prima skill che fa un pull (stesso principio di
 # nsm-tracking.yaml).
 #
 # Nessun contenuto dei documenti vive qui: la sintesi sta in context/*.md,
 # la fonte è il link citato lì. Questo file è solo il registro di "cosa ho
-# già visto e a che revisione".
+# già visto, a che revisione, e con che esito".
+
+# Esito dell'ultimo giro di context-watch — per il "controllato N giorni fa"
+# e per sapere quali connettori non è stato possibile interrogare.
+last_watch:
+  run_at: null                      # data ISO dell'ultimo run di context-watch
+  connectors: []
+  # - name: ""                      # connectors[].name
+  #   status: ""                    # reachable | unreachable
+  #   note: ""                      # es. "OAuth scaduto — reauth: /mcp"
 
 documents: []
 # Esempio di singola voce:
@@ -25,5 +36,8 @@ documents: []
 #   file_id: ""          # id stabile del documento nel sistema sorgente
 #   file_name: ""        # nome del documento all'ultima trascrizione (solo lettura umana)
 #   revision: ""         # id/hash di revisione, o data-modifica, come esposto dal connettore
-#   transcribed_at: ""   # data ISO dell'ultima trascrizione in context/
-#   context_file: ""     # quale context/*.md ha ricevuto la sintesi
+#   transcribed_at: ""   # data ISO dell'ultima trascrizione in context/ (null finché un context_update non è approvato)
+#   context_file: ""     # quale context/*.md ha ricevuto (o riceverebbe) la sintesi
+#   materiality: ""      # routine | material — come context-watch ha classificato l'ultimo cambiamento
+#   pending_ref: null    # se materiality=material e in attesa: id della voce in product/approvals/pending/ (context-watch non ri-accoda finché è pending; pending-approval lo azzera all'esito)
+#   rejected_revision: null  # revisione di un context_update RIFIUTATO — context-watch non la ri-propone (aspetta una revisione successiva)

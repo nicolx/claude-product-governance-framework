@@ -13,7 +13,7 @@
 #                 comunque in decided/ con decision: rejected (per audit)
 
 id: "2026-01-08-slug-descrittivo"
-type: rice_diff                     # rice_diff | roadmap_snapshot | iteration_plan | outbound_comm | strategic_exception_flag | mandate_update | mandate_reclassification
+type: rice_diff                     # rice_diff | roadmap_snapshot | iteration_plan | outbound_comm | strategic_exception_flag | mandate_update | mandate_reclassification | context_update
 proposed_at: "2026-01-08"
 proposed_by: ""                     # nome della skill che ha generato la proposta (es. rice-update, roadmap-snapshot, backlog-refinement)
 
@@ -46,9 +46,20 @@ proposed_by: ""                     # nome della skill che ha generato la propos
 #   valori iniziali del blocco `mandate` (mandated_by, rationale,
 #   is_critical, due_date, lead_time_weeks). rice_history NON viene
 #   toccato — resta come storico, append-only.
+# - context_update: un cambiamento MATERIALE del contesto aziendale
+#   rilevato da context-watch in un documento di una cartella collegata —
+#   uno che cambierebbe come si scrivono i PRD / l'evoluzione del prodotto
+#   (pivot di business model, NSM ridefinita, vincolo regolatorio nuovo,
+#   riposizionamento, riorg che sposta l'ownership di prodotto). Gli
+#   aggiornamenti di ROUTINE non passano da qui: context-watch li applica
+#   direttamente. Payload: link del documento sorgente, sintesi del
+#   cambiamento, la trascrizione (o il diff) proposta sul context/*.md, e
+#   il razionale di materialità. target_file = il context/*.md
+#   interessato. All'approvazione, pending-approval invoca context-intake
+#   per scrivere la trascrizione e aggiornare context/.sources-seen.yaml.
 payload: {}
 
-target_file: null                   # es. "product/ideas/2026-01-08-slug/idea.yaml" — null per outbound_comm
+target_file: null                   # es. "product/ideas/2026-01-08-slug/idea.yaml" — null per outbound_comm; per context_update: il "context/<argomento>.md"
 
 decision: pending                   # pending | approved | rejected
 decided_by: null

@@ -285,26 +285,65 @@ gestiti da `context-intake`:
 1. **Materiale grezzo droppato in `context/`** — un file non-Markdown alla
    radice della cartella. La skill lo trascrive e poi lo rimuove (è la
    copia grezza da non conservare).
-2. **Pull da cartelle documentali collegate** — una raccolta condivisa
-   (una cartella Drive, uno spazio SharePoint o Confluence…) dichiarata
-   come connettore in `.governance/config.yaml` (`connectors:`, campo
-   `folders:`; vedi `framework/schema/governance-config.template.yaml`).
-   `context-intake` elenca la cartella **in sola lettura** tramite i tool
-   del connettore, legge i documenti nuovi o modificati e li trascrive in
-   `context/*.md` esattamente come al punto 1, citando come fonte il link
-   del documento. Qui **non si rimuove nulla**: il documento resta nella
-   cartella, dove *è* la fonte di sistema condivisa — non una copia da
-   ripulire. Un file di stato tracciato, `context/.sources-seen.yaml`
-   (id + revisione + data dell'ultima trascrizione, scritto solo dalla
-   skill), evita che un run successivo ri-proponga documenti invariati.
+2. **Pull da cartelle documentali collegate** — una o più raccolte
+   condivise (una cartella Drive, uno spazio OneDrive/SharePoint o
+   Confluence, qualunque store documentale raggiungibile via MCP), anche
+   di ecosistemi diversi affiancati, dichiarate come connettori in
+   `.governance/config.yaml` (`connectors:`, campo `folders:`; vedi
+   `framework/schema/governance-config.template.yaml`). `context-intake`
+   elenca ogni cartella **in sola lettura** tramite i tool del connettore,
+   legge i documenti nuovi o modificati e li trascrive in `context/*.md`,
+   citando come fonte il link del documento. Qui **non si rimuove nulla**:
+   il documento resta nella cartella, dove *è* la fonte di sistema
+   condivisa — non una copia da ripulire. Un file di stato tracciato,
+   `context/.sources-seen.yaml` (id + revisione + data + materialità
+   dell'ultima trascrizione, scritto solo dalle skill), evita che un run
+   successivo ri-proponga documenti invariati. La skill **`context-watch`**
+   rende questo pull periodico — non serve ricordarsi di lanciarlo: gira
+   standalone e come ultimo passo della sweep di apertura del Backlog
+   Refinement.
 
 Il connettore-sorgente segue la stessa disciplina di ogni altro
 connettore (`integration`/`probe`/`reauth`, verifica a inizio processo,
-«dichiarato ma irraggiungibile ≠ `manuale`» — vedi "Connettori esterni").
-In entrambi i canali la scrittura in `context/*.md` avviene **solo dopo
-conferma esplicita del PM** nella conversazione: non è una decisione di
-priorità (niente coda `product/approvals/pending/`), ma è
-un'interpretazione di materiale grezzo, non un fatto mai presunto.
+«dichiarato ma irraggiungibile ≠ `manuale`», per-connettore — vedi
+"Connettori esterni"). Un ecosistema che l'istanza non collega al setup
+semplicemente non esiste per il framework: nessuna cartella lì viene
+cercata.
+
+### Aggiornamento di routine vs. cambiamento materiale
+
+Il canale 1 (drop manuale) e un run di `context-intake` avviato dal PM
+scrivono **sempre dopo conferma esplicita** nella conversazione: è il PM
+che ha portato quel materiale, la conferma è naturale. Ma per il pull
+periodico di `context-watch` la conferma-per-ogni-documento è proprio
+l'attrito da eliminare — un report trimestrale che arriva con le cifre
+aggiornate non ha bisogno di un assenso ogni volta. Quindi
+`context-watch` **classifica** ogni documento nuovo o cambiato e lo
+instrada:
+
+- **Aggiornamento di routine** — rinfresca dati o aggiunge dettaglio
+  **senza cambiare le conclusioni** che `idea-intake`/`prd-draft` traggono
+  dal contesto: nuove cifre in un report ricorrente, un trimestre in più
+  di dati di mercato, un contatto o una sezione ampliata.
+  → `context-watch` lo **applica direttamente** (via `context-intake`),
+  con commit tracciato, e lo elenca nel recap.
+- **Cambiamento materiale** — cambierebbe **come si scrive un PRD o come
+  evolve il prodotto**: un pivot di modello di business, una NSM
+  ridefinita, un vincolo regolatorio nuovo, un riposizionamento di
+  mercato, una riorganizzazione che sposta l'ownership di prodotto, un
+  cambio di strategia dichiarato.
+  → **non si scrive `context/`**: va in `product/approvals/pending/`
+  (`type: context_update`) e il PM approva esplicitamente prima che tocchi
+  il contesto. È lo stesso principio di difendibilità del resto del
+  framework: una svolta di direzione di prodotto deve avere un trail.
+- **Nel dubbio → materiale.** Un contesto sbagliato si propaga in
+  silenzio in ogni PRD futuro; un'approvazione in più costa poco (stesso
+  principio garantista di `inbox-triage`).
+
+In **ogni** caso il PM riceve un **recap** di cosa è cambiato — applicato
+o in attesa. La rete di sicurezza dell'auto-apply di routine è questa:
+test di materialità + recap obbligatorio + i cambiamenti materiali
+comunque gated + ogni scrittura è un commit rivedibile e revertibile.
 
 **È un documento vivo, non un archivio statico.** Quando materiale già in
 lavorazione da un'altra skill (un PRD, un elemento smistato da
@@ -313,12 +352,6 @@ business — una riorganizzazione, un nuovo dato di mercato, un pivot
 dichiarato — quella skill non scrive da sola in `context/`: segnala il
 candidato e richiama `context-intake`, che **propone l'aggiornamento e lo
 scrive solo dopo conferma esplicita del PM** nella stessa conversazione.
-A differenza delle poche scritture dirette che il framework ammette senza
-passare da `product/approvals/pending/` (`mandate-watch`, `rice-watch`,
-`nsm-watch`, `deadline-watch`), qui non si tratta di un fatto mai presunto ma di
-un'interpretazione di materiale grezzo — per questo la conferma in
-conversazione è sempre richiesta, anche se non serve la coda `pending/`
-completa (non è una decisione di priorità).
 
 ## Sincronizzazione dell'istanza (`origin`)
 
@@ -339,15 +372,16 @@ hook**, non alla memoria del PM:
   dipendono dal quadro completo — `inbox-triage`, `roadmap-snapshot`,
   `pending-approval`, `backlog-list`, `iteration-board`, `jira-sync`
   (pull), e le watch (`nsm-watch`, `mandate-watch`, `deadline-watch`,
-  `rice-watch`, `measurement-watch`) nell'uso *standalone*. Nella sweep di
+  `rice-watch`, `measurement-watch`, `context-watch`) nell'uso
+  *standalone*. Nella sweep di
   apertura del Backlog Refinement il pull è **uno solo** per l'intera
   sweep (la logica delle watch gira inline, non come skill separate — vedi
   "Product Backlog Refinement").
 - **Commit + push**: come ultimo passo di ogni skill che scrive stato
   tracciato (`idea-intake`, `inbox-triage`, `rice-update`, `prd-draft`,
   `backlog-refinement`, `iteration-planning`, `log-ceremony`,
-  `roadmap-snapshot`, `pending-approval`, `context-intake`, `jira-sync`,
-  `demo-capture`, le watch, `init-governance-project`). Il
+  `roadmap-snapshot`, `pending-approval`, `context-intake`, `context-watch`,
+  `jira-sync`, `demo-capture`, le watch, `init-governance-project`). Il
   commit è **immediato** dopo la scrittura: è ciò che tiene il working
   tree pulito e rende sicuri i pull successivi.
 
@@ -401,9 +435,13 @@ lo usa. Si dichiarano in `.governance/config.yaml`:
   PM.
 - **`connectors:`** — lista aperta per qualunque altro connettore. Una
   voce con un campo `folders:` non vuoto è una **sorgente di contesto**:
-  `context-intake` ne elenca e legge i documenti per alimentare `context/`
-  (vedi "Contesto aziendale (`context/`)"). Le altre voci sono per skill
-  custom o future.
+  `context-watch` e `context-intake` ne elencano e leggono i documenti per
+  alimentare `context/` (vedi "Contesto aziendale (`context/`)"). Più
+  sorgenti di contesto affiancate (Drive **e** OneDrive/SharePoint, ecc.)
+  sono normali — ognuna è un connettore a sé, sondato e gestito
+  indipendentemente: un guasto su uno non ferma gli altri, e un ecosistema
+  non collegato al setup semplicemente non viene interrogato. Le altre
+  voci sono per skill custom o future.
 
 Ogni connettore ha lo stesso schema di base: `configured` (c'è davvero?),
 `integration` (`mcp:<server>` / `cli:<nome>` / `manuale` / vuoto), `probe`
@@ -422,7 +460,8 @@ interattivi da riga di comando, che vanno rifatti ogni volta. Per questo:
    il `probe` dichiarato): a inizio cerimonia (`backlog-refinement`,
    `iteration-planning` verificano `jira` e `metrics`), al passo 0 delle
    watch di metriche e di `jira-sync` standalone, all'inizio di
-   `context-intake` quando pesca da una sorgente di contesto. L'hook
+   `context-watch`/`context-intake` (per-connettore) quando pescano da una
+   sorgente di contesto. L'hook
    `check-connectors.sh` (a inizio sessione) ricorda quali connettori la
    config dichiara e **mostra il comando `reauth`** — non può verificare
    lo stato da bash, ma ti dà subito cosa rilanciare.
@@ -1148,7 +1187,9 @@ no (sezione "Measurement"), quali iniziative mandatarie richiedono
 attenzione per la loro scadenza (sezione "Iniziative Mandatarie"), quali
 idee normali hanno una scadenza dichiarata in avvicinamento (sezione
 "Scadenze su idee normali"), quali idee restano senza RICE da troppo
-tempo (sezione "Ideas prioritization"). Solo dopo si passa a decidere le
+tempo (sezione "Ideas prioritization"), e se il contesto aziendale è
+cambiato nelle cartelle documentali collegate (`context-watch` — sezione
+"Contesto aziendale"). Solo dopo si passa a decidere le
 priorità del prossimo periodo — è più
 facile prioritizzare bene quando si parte da un quadro aggiornato di cosa
 sta già funzionando, invece di scoprirlo a posteriori.
@@ -1298,6 +1339,7 @@ d'occhio" del piano si ottiene con la skill **`iteration-board`**.
 
 **Checklist operativa**
 - [ ] Dopo ogni watch della sweep di apertura c'è stato un checkpoint: tabella con `{ID}` in prima colonna e diritto di parola al PM prima di procedere? Le azioni concordate (archiviazioni, scadenze pulite, misurazioni chiuse) sono in `decisions.yaml`?
+- [ ] `context-watch` ha controllato le cartelle di contesto collegate? Gli aggiornamenti di routine sono stati applicati e messi nel recap; i cambiamenti materiali sono in `product/approvals/pending/` (`type: context_update`)?
 - [ ] La coda `product/approvals/pending/` è stata camminata: ogni `rice_diff` approvato o rifiutato dal team? Quel che resta in coda è stato segnalato?
 - [ ] Il backlog ordinato (`backlog-list`) è stato mostrato al team prima di decidere cosa entra in iterazione?
 - [ ] Il Piano di Iterazione è stato generato **partendo da quello della settimana precedente** (`based_on`)?
@@ -1894,10 +1936,23 @@ sezione "Salute delle NSM e Product Discovery".
 **`context/`** — Cartella alla radice dell'istanza (non sotto `product/`)
 che raccoglie la comprensione del business/azienda (modello di business,
 finanza, organizzazione, mercato) come file Markdown tracciati, citando
-sempre la fonte del materiale grezzo da cui derivano. Alimentata e fatta
-evolvere dalla skill `context-intake`. Nessun file grezzo (PDF, slide,
+sempre la fonte del materiale grezzo da cui derivano. Alimentata dalla
+skill `context-intake` (drop manuale o pull da cartelle collegate) e
+tenuta aggiornata da `context-watch`. Nessun file grezzo (PDF, slide,
 docx) vi persiste: solo la trascrizione. Vedi sezione "Contesto aziendale
 (`context/`)".
+
+**`context-watch`** — Skill che controlla periodicamente le cartelle
+documentali collegate come sorgente di contesto (`connectors:` con
+`folders:` in `.governance/config.yaml`) e porta in `context/` i documenti
+nuovi o cambiati: applica direttamente gli **aggiornamenti di routine**
+(rinfresco di dati senza cambiare le conclusioni), manda in
+`product/approvals/pending/` (`type: context_update`) i **cambiamenti
+materiali** (che cambierebbero come si scrivono i PRD), e in ogni caso
+produce un recap al PM. Gira standalone e come ultimo passo della sweep di
+apertura del Backlog Refinement. Vedi sezione "Contesto aziendale
+(`context/`)", sottosezione "Aggiornamento di routine vs. cambiamento
+materiale".
 
 **Ideas Bucket** — Il repository dove vengono raccolte tutte le idee,
 richieste e segnalazioni prima di essere valutate. Non è una coda di

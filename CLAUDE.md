@@ -30,8 +30,8 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 |---|---|---|
 | `bootstrap.sh`, `.githooks/`, `framework/`, `.claude/skills/`, `.claude/settings.json`, `.claude/hooks/`, `.gitignore` | Framework (upstream) | Solo PR sul canonico, mai un'istanza |
 | `apps/` | Istanza | Solo `init-governance-project` (aggiunta submodule) |
-| `context/` | Istanza, **tracciata da git** (a differenza di `product/inbox/`) | Solo `context-intake`, sempre con conferma esplicita del PM prima di scrivere — è interpretazione di materiale grezzo, non un fatto mai presunto come `jira.status`/`rice_status`. Nessuna approvazione via `pending/` (non è una decisione di priorità). Due canali di ingresso: file grezzi droppati in `context/` (poi rimossi), e pull da cartelle documentali collegate (`.governance/config.yaml`, `connectors:` con `folders:` — connettore in sola lettura, vedi skill `context-intake`). Nessun file grezzo (PDF, slide, docx) vi persiste, né tracciato né gitignorato — vedi playbook, sezione "Contesto aziendale" |
-| `context/.sources-seen.yaml` | Istanza, **tracciata da git** | Solo `context-intake` (pull da cartella collegata) — registro append-only di quali documenti sono già stati pescati da un connettore sorgente di contesto e a quale revisione. Fatto di sync osservato, non decisione: scrittura diretta, nessuna approvazione (stessa logica di `jira.status`). Creato da `init-governance-project` se il PM dichiara cartelle di contesto, altrimenti lazy al primo pull |
+| `context/` | Istanza, **tracciata da git** (a differenza di `product/inbox/`) | `context-intake` (drop manuale o pull da cartelle collegate) e `context-watch` (pull periodico). Due canali di ingresso: file grezzi droppati in `context/` (poi rimossi), e pull da cartelle documentali collegate (`.governance/config.yaml`, una o più voci `connectors:` con `folders:` — connettori in sola lettura). Regole di scrittura: un run avviato dal PM o dal drop chiede **sempre conferma in conversazione** (nessuna coda `pending/`); il pull periodico di `context-watch` **auto-applica** gli aggiornamenti di routine (recap al PM) e manda i **cambiamenti materiali** in `product/approvals/pending/` (`type: context_update`). Nessun file grezzo (PDF, slide, docx) vi persiste — vedi playbook, "Contesto aziendale", sottosezione "Aggiornamento di routine vs. cambiamento materiale" |
+| `context/.sources-seen.yaml` | Istanza, **tracciata da git** | `context-watch` (stato del giro: `last_watch`, `materiality`, `pending_ref`), `context-intake` (voce per documento trascritto), `pending-approval` (all'esito di un `context_update`). Fatti di sync osservati, non decisioni: scrittura diretta, nessuna approvazione a sé. Creato da `init-governance-project` se il PM dichiara cartelle di contesto, altrimenti lazy al primo pull |
 | `product/inbox/` | Istanza, NON tracciata da git | `inbox-triage` la svuota spostando ogni elemento altrove; nessuna approvazione richiesta per lo spostamento in sé |
 | `product/ideas/`, `product/prds/` (creazione) | Istanza | `idea-intake`, `inbox-triage`, `prd-draft` — creazione diretta, non passa da approvazione (non è ancora una decisione di priorità) |
 | `product/ceremonies/` (cartella cerimonia, `source/`, `decisions.yaml`, `.run-meta.yaml`) | Istanza | `backlog-refinement`, `iteration-planning`, `log-ceremony` — registrazione diretta di una riunione di team: trascrizione + esito qualitativo + metadati di esecuzione. Non passa da `pending/` (non è una decisione di priorità: gli impatti su RICE/roadmap che ne derivano, sì). `.run-meta.yaml` è metadato di esecuzione scritto dalla skill, mai a mano. `rollback-ceremony` può annullare un run (revert forward dei commit + cartella `-void` con la trascrizione), mai una decisione già approvata |
@@ -79,8 +79,9 @@ popolare la cartella).
 ## Regola non negoziabile: pending approval
 
 Nessuna skill scrive mai direttamente in `product/ideas/`, `product/prds/`,
-`product/roadmap/` o invia comunicazioni in uscita senza prima passare da
-`product/approvals/pending/`. Questo vale per:
+`product/roadmap/`, non invia comunicazioni in uscita, e non scrive in
+`context/` un **cambiamento materiale** rilevato automaticamente senza
+prima passare da `product/approvals/pending/`. Questo vale per:
 
 - Ogni diff di RICE proposto da nuova evidenza
 - Ogni snapshot di roadmap generato da una cerimonia
@@ -106,6 +107,17 @@ Nessuna skill scrive mai direttamente in `product/ideas/`, `product/prds/`,
   soddisfare davvero la definizione di Iniziativa Mandataria (`type:
   mandate_reclassification`) — il `rice_history` esistente non si
   cancella, resta append-only come storico
+- Ogni **cambiamento materiale** del contesto aziendale che `context-watch`
+  rileva in un documento di una cartella collegata (`type: context_update`)
+  — uno che cambierebbe come si scrivono i PRD / l'evoluzione del prodotto
+  (pivot di business model, NSM ridefinita, vincolo regolatorio, riorg che
+  sposta l'ownership di prodotto). Gli **aggiornamenti di routine**
+  (rinfresco di dati senza cambiare le conclusioni) **non** passano da qui:
+  `context-watch` li auto-applica via `context-intake` e li mette nel recap
+  al PM. Un run di `context-intake` avviato dal PM (drop manuale, o pull
+  esplicito) conferma sempre in conversazione, ma non passa da `pending/`.
+  Vedi playbook, "Contesto aziendale", sottosezione "Aggiornamento di
+  routine vs. cambiamento materiale"
 
 L'automazione propone (scrive in `pending/` con il diff/contenuto
 proposto), un umano approva esplicitamente (la voce si sposta in

@@ -1,6 +1,6 @@
 ---
 name: context-intake
-description: Trascrive materiale grezzo sul contesto aziendale (Confluence, PDF, slide, bilanci, docx, ecc.) in file Markdown tracciati con citazione della fonte — da file droppati in context/ (poi eliminati, mai una copia raw persistente) o pescandolo da cartelle documentali condivise (Drive/SharePoint/Confluence) collegate come connettore in .governance/config.yaml. Richiamata anche da altre skill (prd-draft, inbox-triage) quando materiale già in lavorazione rivela contesto aziendale rilevante, sempre con conferma esplicita del PM prima di scrivere. Usala per popolare o far evolvere la comprensione del business che idea-intake e prd-draft usano insieme al codice.
+description: Trascrive materiale grezzo sul contesto aziendale (Confluence, PDF, slide, bilanci, docx, ecc.) in file Markdown tracciati con citazione della fonte — da file droppati in context/ (poi eliminati, mai una copia raw persistente) o pescandolo dalle cartelle documentali condivise (Drive/OneDrive/SharePoint/Confluence) collegate come connettori in .governance/config.yaml. Richiamata anche da context-watch (pull periodico, modalità auto-apply per gli aggiornamenti di routine), da pending-approval (all'approvazione di un context_update), e da prd-draft/inbox-triage quando materiale già in lavorazione rivela contesto rilevante. Usala per popolare o far evolvere la comprensione del business che idea-intake e prd-draft usano insieme al codice.
 ---
 
 # context-intake
@@ -52,13 +52,15 @@ domanda in più.
    questa skill.
 3. **Pull da una cartella documentale collegata** — `.governance/config.yaml`
    dichiara nella lista `connectors:` una o più voci con un campo
-   `folders:` non vuoto (cartelle Drive/SharePoint/spazio Confluence). La
-   skill le elenca **in sola lettura** tramite il connettore, trova i
-   documenti nuovi o modificati dall'ultima volta e li trascrive. Vedi
-   "Caso 3" sotto. Si attiva quando l'utente lo chiede esplicitamente
-   ("aggiorna il contesto dalle cartelle collegate", "pesca da Drive") o
-   quando la skill è invocata senza file droppati e almeno un connettore
-   sorgente di contesto è dichiarato.
+   `folders:` non vuoto (cartelle Drive/OneDrive/SharePoint/Confluence,
+   anche di ecosistemi diversi affiancati). La skill elenca **in sola
+   lettura** le cartelle di **ogni** connettore, trova i documenti nuovi o
+   modificati dall'ultima volta e li trascrive. Vedi "Caso 3" sotto. Si
+   attiva quando l'utente lo chiede esplicitamente ("aggiorna il contesto
+   dalle cartelle collegate"), quando la skill è invocata senza file
+   droppati e almeno un connettore sorgente di contesto è dichiarato,
+   **oppure** quando `context-watch` la richiama in **modalità auto-apply**
+   per un aggiornamento di routine (vedi sotto).
 
 ## Passi
 
@@ -109,13 +111,24 @@ domanda in più.
    senza fonte tracciata.
 
 5. **Mostra al PM un riepilogo di cosa stai per scrivere/modificare e
-   chiedi conferma esplicita prima di scrivere** — vale per tutti e tre i
-   casi d'innesco. Dedurre contesto aziendale da un documento è
-   un'interpretazione, non un fatto osservato: non rientra tra le poche
-   scritture dirette che il framework ammette senza conferma (vedi
-   `mandate-watch`/`rice-watch`/`nsm-watch`/`deadline-watch`, limitate a fatti mai
-   presunti). Non serve la coda `product/approvals/pending/` (non è una
-   decisione di priorità), ma la conferma in conversazione sì, sempre.
+   chiedi conferma esplicita prima di scrivere.** Dedurre contesto
+   aziendale da un documento è un'interpretazione, non un fatto osservato:
+   non rientra tra le poche scritture dirette che il framework ammette
+   senza conferma (vedi `mandate-watch`/`rice-watch`/`nsm-watch`/`deadline-watch`,
+   limitate a fatti mai presunti). Non serve la coda
+   `product/approvals/pending/` (non è una decisione di priorità), ma la
+   conferma in conversazione sì.
+
+   > **Eccezione — modalità auto-apply.** Se `context-watch` ti richiama
+   > per un cambiamento **di routine** già classificato (rinfresco di dati
+   > senza cambiare le conclusioni — vedi playbook, "Aggiornamento di
+   > routine vs. cambiamento materiale"), **salta questa conferma
+   > per-documento**: trascrivi, aggiorna `context/*.md` e
+   > `.sources-seen.yaml` (con `materiality: routine`), fai il commit. La
+   > rete di sicurezza è a monte (classificazione di `context-watch`) e a
+   > valle (recap al PM + commit revertibile). Un cambiamento **materiale**
+   > non arriva mai qui in auto-apply: `context-watch` lo manda in
+   > `pending/`.
 
 6. **Dopo la conferma**, scrivi/aggiorna il file `context/*.md`. Poi:
    - se l'elemento era un **file droppato** in `context/` (caso 1),
@@ -123,9 +136,12 @@ domanda in più.
      o meno (vedi principio guida sopra);
    - se veniva da una **cartella collegata** (caso 3), **non toccare la
      cartella sorgente** (il connettore è in sola lettura) e aggiorna
-     `context/.sources-seen.yaml` con la voce del documento
-     (`file_id`, `revision`, `transcribed_at`, `context_file`) — crea il
-     file da `framework/schema/sources-seen.template.yaml` se non esiste.
+     `context/.sources-seen.yaml` con la voce del documento (`connector`,
+     `folder`, `file_id`, `file_name`, `revision`, `transcribed_at`,
+     `context_file`, `materiality`) — crea il file da
+     `framework/schema/sources-seen.template.yaml` se non esiste. Quando è
+     `pending-approval` a richiamarti (approvazione di un `context_update`),
+     scrivi `materiality: material` e azzera `pending_ref`.
 
 7. **Chiudi con un riepilogo**: quanti elementi processati, quali file di
    contesto creati/aggiornati, e se qualcosa non è stato processato
@@ -142,24 +158,29 @@ domanda in più.
 
 ## Caso 3 — pull da un connettore sorgente di contesto
 
-Si applica quando `.governance/config.yaml` ha almeno una voce
-`connectors:` con un campo `folders:` non vuoto. Ogni voce di `folders:`
-ha `link` (URL della cartella), `label` e `topic` (argomento `context/`
-suggerito).
+Si applica quando `.governance/config.yaml` ha **almeno una** voce
+`connectors:` con un campo `folders:` non vuoto — e vale per **ognuna**:
+un'istanza può avere Drive **e** OneDrive/SharePoint affiancati, sono
+connettori distinti. Ogni voce di `folders:` ha `link` (URL della
+cartella), `label` e `topic` (argomento `context/` suggerito).
 
-1. **Probe del connettore** — prima di leggere qualunque cosa, verifica
-   che il connettore risponda, usando il `probe` dichiarato in config
-   (per un `mcp:<server>`: che i suoi tool siano disponibili). Applica la
-   regola del playbook "Connettori esterni": **dichiarato ma
-   irraggiungibile ≠ `manuale`**. Se non risponde, segnala cosa non va,
-   proponi il comando `reauth` dichiarato, e chiedi al PM se riautenticare
-   e ritentare o procedere senza. Se si procede senza, il pull resta
-   **rimandato** e visibile nel riepilogo (da rilanciare quando il
-   connettore torna su) — mai saltato in silenzio.
+Per il pull periodico e la classificazione routine/materiale c'è la skill
+dedicata **`context-watch`** — questo Caso 3 è il meccanismo di
+trascrizione che `context-watch` (e un pull avviato dal PM) usa.
 
-2. **Elenca i documenti** di ogni cartella in `folders:` tramite i tool
-   di lettura/elenco del connettore. **Sola lettura**: non creare, non
-   modificare, non spostare, non condividere nulla nella cartella
+1. **Probe di ogni connettore sorgente** — prima di leggere qualunque
+   cosa, per **ciascuna** voce `connectors:` con `folders:` verifica che
+   risponda con il suo `probe` dichiarato (per un `mcp:<server>`: che i
+   suoi tool siano disponibili). Applica la regola del playbook
+   "Connettori esterni" **per-connettore**: **dichiarato ma
+   irraggiungibile ≠ `manuale`**. Se uno non risponde, segnala *quale*,
+   proponi il suo comando `reauth`, chiedi al PM se riautenticare e
+   ritentare o procedere senza — e **prosegui con gli altri connettori**.
+   Quello saltato resta **rimandato** nel riepilogo, mai in silenzio.
+
+2. **Elenca i documenti** di ogni cartella di ogni connettore raggiungibile
+   tramite i suoi tool di lettura/elenco. **Sola lettura**: non creare,
+   non modificare, non spostare, non condividere nulla nella cartella
    sorgente.
 
 3. **Carica `context/.sources-seen.yaml`** (se non esiste, nessun
@@ -185,7 +206,10 @@ suggerito).
 ## Cosa NON fare
 
 - Non scrivere mai in un file `context/*.md` senza conferma esplicita del
-  PM, nemmeno per correzioni che sembrano ovvie.
+  PM, nemmeno per correzioni che sembrano ovvie — **unica eccezione**: la
+  modalità auto-apply richiamata da `context-watch` per un cambiamento
+  già classificato come *di routine* (passo 5). Un cambiamento materiale
+  non arriva mai qui in auto-apply.
 - Non conservare mai il file grezzo processato, né tracciato né
   gitignorato, dopo che la trascrizione è stata confermata.
 - **Caso 3: non scrivere mai nella cartella sorgente** (Drive,
