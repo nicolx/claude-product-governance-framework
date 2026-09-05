@@ -94,9 +94,15 @@ un'azione in uscita automatica). Fuori scope finché è un caso isolato.
 
 ## Estensioni del pull di contesto da cartelle collegate
 
-Il pull di `context-intake` da cartelle collegate (`connectors[].folders`
-— dichiarato all'init) nasce deliberatamente minimale. Fuori scope
-adesso, da rivedere se emerge la domanda:
+**Watch periodica: FATTO.** La skill `context-watch` (parallela a
+`rice-watch`/`nsm-watch`) controlla le cartelle collegate standalone e come
+ultimo passo della sweep del Backlog Refinement, classifica ogni
+cambiamento come *routine* (auto-applicato via `context-intake`) o
+*materiale* (in `product/approvals/pending/`, `type: context_update`) e
+manda sempre un recap al PM. `init-governance-project` propone un menu di
+sistemi documentali (Drive, OneDrive/SharePoint, Confluence, altro MCP).
+
+Restano fuori scope, da rivedere se emerge la domanda:
 
 - **Diff a livello di sezione.** Oggi un qualunque cambio di `revision`
   di un documento lo ri-propone **intero** per la ri-trascrizione. Un
@@ -106,15 +112,16 @@ adesso, da rivedere se emerge la domanda:
   `context/.sources-seen.yaml` di proposito non fa (tiene solo id +
   revisione, non il contenuto).
 - **Sincronizzazione bidirezionale / push-back.** Il connettore è
-  deliberatamente in sola lettura: `context-intake` non scrive mai nella
-  cartella sorgente. Un flusso che ripubblichi la sintesi `context/*.md`
-  verso Confluence/Drive sarebbe una comunicazione in uscita → andrebbe
-  instradato da `product/approvals/pending/`, non aggiunto come scrittura
-  diretta. Decisione da riprendere esplicitamente, non da ereditare.
-- **Watch periodica.** Oggi il pull è "pull" (il PM lancia la skill). Un
-  livello batch/cron che segnali "3 documenti nuovi nella cartella X
-  dall'ultimo giro" sarebbe utile — stesso discorso dei reminder batch ai
-  PM nella sezione "Livello web / DB derivato".
+  deliberatamente in sola lettura: le skill di contesto non scrivono mai
+  nella cartella sorgente. Un flusso che ripubblichi la sintesi
+  `context/*.md` verso Confluence/Drive sarebbe una comunicazione in
+  uscita → andrebbe instradato da `product/approvals/pending/`, non
+  aggiunto come scrittura diretta. Decisione da riprendere esplicitamente.
+- **Vero polling batch/cron.** `context-watch` resta "pull" (gira quando
+  la lanci o durante la cerimonia). Un livello batch che notifichi "3
+  documenti nuovi nella cartella X" senza un umano nel giro è lo stesso
+  discorso dei reminder batch ai PM nella sezione "Livello web / DB
+  derivato".
 
 ## Integrazione DB/analytics in lettura per NSM e measurement-watch
 

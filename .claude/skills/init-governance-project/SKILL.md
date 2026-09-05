@@ -135,21 +135,38 @@ per raccogliere:
    materiale pronto, va bene: `context/` resta popolabile in qualunque
    momento successivo, non è un blocco per l'inizializzazione.
 
-   Chiedi anche se esistono **cartelle documentali condivise** (una
-   cartella Drive, uno spazio SharePoint o Confluence…) che il team
-   tiene aggiornate e da cui varrebbe la pena pescare il contesto in
-   modo ricorrente. Se sì, per ciascuna raccogli: `link` (URL della
-   cartella), `label` parlante, `topic` (argomento `context/` a cui
-   punta, es. "finanza", "mercato-competitor"); e **come l'istanza si
-   connette** — tipicamente un server MCP:
-   `integration: "mcp:<server>"`, `probe` = prefisso dei suoi tool,
-   `reauth` = `/mcp`. Vanno in `.governance/config.yaml` come **una voce
-   `connectors:` con una lista `folders:`** (vedi
-   `framework/schema/governance-config.template.yaml`). Chiedi
-   esplicitamente se il login del connettore scade a ogni sessione (→
-   annotalo in `note`, `check-connectors.sh` mostrerà il `reauth` a ogni
-   avvio). Da qui in poi sarà `context-intake` (pull da cartella collegata) a leggerle e
-   trascriverle, sempre su conferma del PM.
+   **Sorgenti documentali collegate.** Molto contesto vive in cartelle
+   condivise che il team già mantiene aggiornate. **Proponi esplicitamente
+   il menu** di sistemi che il framework sa gestire e chiedi quali usa
+   questo team:
+
+   | Opzione | Integrazione tipica | Note |
+   |---|---|---|
+   | **Google Drive / Google Docs** | un server MCP per Google Drive; `ecosystem: google` | `reauth: /mcp` |
+   | **OneDrive / SharePoint (Microsoft 365)** | un server MCP per Microsoft 365 / Graph; `ecosystem: microsoft` | `reauth: /mcp` |
+   | **Confluence** | il Remote MCP Atlassian (lo stesso di `jira`, se già collegato) o un connettore dedicato; `ecosystem: confluence` | |
+   | **Altro store via MCP** | qualunque server MCP che elenchi cartelle e legga file | — |
+
+   Il menu **non è esclusivo**: il team può collegarne più d'uno (Drive
+   **e** SharePoint), o nessuno. Per ogni sistema che il team usa:
+   - aiutalo a collegare il server MCP (`claude mcp add …`, poi `/mcp` per
+     il login) se non è già presente;
+   - registra **una voce `connectors:`** con `name`, `ecosystem`,
+     `integration: "mcp:<server>"`, `probe` (prefisso dei suoi tool),
+     `reauth`, `note` (chiedi se il login scade a ogni sessione →
+     annotalo, `check-connectors.sh` mostrerà il `reauth` a ogni avvio);
+   - dentro, la lista `folders:` — per ciascuna cartella: `link` (URL),
+     `label` parlante, `topic` (argomento `context/`, es. "finanza",
+     "mercato-competitor").
+
+   Vedi `framework/schema/governance-config.template.yaml`. Per i sistemi
+   che il team **non** usa: non scrivere nulla — `context-watch` non li
+   interrogherà. Da qui in poi sarà **`context-watch`** a controllare
+   periodicamente queste cartelle (e come parte del Backlog Refinement):
+   applica gli aggiornamenti di routine, manda in approvazione i
+   cambiamenti materiali, e in ogni caso manda un recap al PM (vedi
+   playbook, "Contesto aziendale", sottosezione "Aggiornamento di routine
+   vs. cambiamento materiale").
 
 Non forzare un ordine rigido se l'utente fornisce più informazioni insieme
 (es. incolla una trascrizione di un meeting di kickoff): estrai tutto ciò
@@ -164,8 +181,8 @@ che serve da lì e chiedi solo quello che manca.
    se disponibile, altrimenti `HEAD`), il blocco `jira` (passo 6), il
    blocco `metrics` e la lista `connectors` (passo 7 — solo ciò che
    esiste; se non c'è una fonte metriche, `metrics.configured: false` e
-   stop; se il PM ha dichiarato cartelle di contesto al passo 9, una voce
-   `connectors:` con la lista `folders:`), `apps`.
+   stop; se il PM ha dichiarato cartelle di contesto al passo 9, una o più
+   voci `connectors:` con `ecosystem` e la lista `folders:`), `apps`.
    Il blocco `sync` (`auto_pull`/`auto_push`, default `true` entrambi) è
    ciò che attiva la sincronizzazione automatica con `origin` per tutte
    le skill successive (vedi playbook, "Sincronizzazione dell'istanza
@@ -217,12 +234,12 @@ che serve da lì e chiedi solo quello che manca.
    già la trascrizione tracciabile, non il materiale grezzo. Se il PM ha
    fornito materiale al passo 9 dell'intervista, droppalo qui e richiama
    `context-intake` prima di chiudere l'inizializzazione.
-   Se il PM ha dichiarato **cartelle di contesto** al passo 9 (voce
-   `connectors:` con `folders:`), crea anche `context/.sources-seen.yaml`
-   da `framework/schema/sources-seen.template.yaml` (registro append-only
-   di cosa `context-intake` ha già pescato, tracciato da git). Se non ne
-   ha dichiarate, non crearlo: lo scaffolda `context-intake` al primo
-   pull (stesso principio di `nsm-tracking.yaml`).
+   Se il PM ha dichiarato **cartelle di contesto** al passo 9 (una o più
+   voci `connectors:` con `folders:`), crea anche `context/.sources-seen.yaml`
+   da `framework/schema/sources-seen.template.yaml` (registro di cosa
+   `context-watch`/`context-intake` hanno già pescato, tracciato da git).
+   Se non ne ha dichiarate, non crearlo: lo scaffolda la prima skill che
+   fa un pull (stesso principio di `nsm-tracking.yaml`).
 7. `.claude/settings.local.json` — le **allow entries dei tool del
    connettore dichiarato** (passo 6/7 dell'intervista), così le skill non
    si fermano a chiedere permesso per azioni che il metodo impone già
@@ -242,13 +259,14 @@ che serve da lì e chiedi solo quello che manca.
    - connettore `cli:<nome>` → `Bash(<nome> <sottocomando>:*)` per i
      sottocomandi di ricerca/lettura e creazione ticket.
    - connettore `manuale` o assente → non scrivere nulla qui.
-   - **connettore sorgente di contesto** (voce `connectors:` con
-     `folders:`, passo 9) → allowlista **solo** i suoi tool di
+   - **connettori sorgente di contesto** (ogni voce `connectors:` con
+     `folders:`, passo 9 — possono essere più d'uno: Drive **e**
+     SharePoint) → per **ciascuno** allowlista **solo** i suoi tool di
      lettura/elenco (per un `mcp:<server>`: quelli col suo prefisso che
-     elencano una cartella e leggono un file — es. `search_files`,
-     `list_recent_files`, `read_file_content`, `get_file_metadata`).
-     **Mai** i tool di creazione/modifica/spostamento/condivisione:
-     `context-intake` legge queste cartelle in sola lettura.
+     elencano una cartella e leggono un file — tipicamente ricerca/elenco
+     file e lettura contenuto/metadati). **Mai** i tool di
+     creazione/modifica/spostamento/condivisione: `context-watch` e
+     `context-intake` leggono queste cartelle in sola lettura.
    **Mostra al PM l'elenco esatto che stai per allowlistare e chiedi
    conferma** — è l'unico punto in cui l'inizializzazione tocca dei
    permessi. `.claude/settings.local.json` non è tracciato da git (è

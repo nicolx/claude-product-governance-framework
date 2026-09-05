@@ -1,6 +1,6 @@
 ---
 name: backlog-refinement
-description: Conduce e registra il Product Backlog Refinement settimanale — si apre "guardando indietro" (NSM, impatti, scadenze, idee senza RICE), svuota la coda di approvazione RICE, presenta il backlog ordinato come base della prioritizzazione, compone il Piano di Iterazione della settimana (la board a quattro bucket, output primario, proposto in pending/) rilevando le reprioritizzazioni fuori-RICE, poi delega a log-ceremony per la registrazione. Punto d'ingresso dedicato: fissa ceremony_type e periodo. Usala per la cerimonia settimanale di team.
+description: Conduce e registra il Product Backlog Refinement settimanale — si apre "guardando indietro" (NSM, impatti, scadenze, idee senza RICE, aggiornamenti del contesto aziendale via context-watch), svuota la coda di approvazione RICE, presenta il backlog ordinato come base della prioritizzazione, compone il Piano di Iterazione della settimana (la board a quattro bucket, output primario, proposto in pending/) rilevando le reprioritizzazioni fuori-RICE, poi delega a log-ceremony per la registrazione. Punto d'ingresso dedicato: fissa ceremony_type e periodo. Usala per la cerimonia settimanale di team.
 ---
 
 # backlog-refinement
@@ -146,9 +146,23 @@ piano passa **sempre** da `product/approvals/pending/`
       Un commit per l'intera sweep, non uno per watch né uno per
       checkpoint.
 
-   g. **Passa a `log-ceremony`** i riepiloghi consolidati (un blocco per
-      watch), le azioni di checkpoint (una `decision` ciascuna, con
-      `impacts.idea_ids`), e l'esito della riconciliazione Jira.
+   g. **Contesto: `context-watch`.** Se `.governance/config.yaml` ha
+      almeno un connettore sorgente di contesto (`connectors:` con
+      `folders:`), richiama `context-watch` — riusa il `pull` già fatto al
+      punto 1. Applica gli **aggiornamenti di routine** (via
+      `context-intake`) e accoda i **cambiamenti materiali** in
+      `product/approvals/pending/` (`type: context_update`). Questo tocca
+      `context/` e `product/approvals/`, **non** le `idea.yaml`: il suo
+      commit è **distinto** da quello del punto f (helper con messaggio
+      `context-watch: …`), non lo si accorpa. Il **recap** (routine
+      applicati / materiali in coda / connettori rimandati) entra nel
+      riepilogo della sweep. Se non ci sono connettori di contesto, salta
+      senza rumore.
+
+   h. **Passa a `log-ceremony`** i riepiloghi consolidati (un blocco per
+      watch, **più** il recap di `context-watch`), le azioni di checkpoint
+      (una `decision` ciascuna, con `impacts.idea_ids`), e l'esito della
+      riconciliazione Jira.
 
 3. **Svuota la coda di approvazione — prima di guardare il backlog.**
    Elenca `product/approvals/pending/` (usa `pending-approval`, sezione

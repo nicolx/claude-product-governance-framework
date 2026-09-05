@@ -1,6 +1,6 @@
 ---
 name: pending-approval
-description: Elenca, spiega e applica (o rifiuta) le proposte in product/approvals/pending/ — l'unico punto in cui un diff di RICE, uno snapshot di roadmap, un Piano di Iterazione, una Strategic Exception rilevata in Backlog Refinement, un aggiornamento a un'iniziativa mandataria, o una comunicazione in uscita passano da proposti ad effettivi. Usala per rivedere la coda.
+description: Elenca, spiega e applica (o rifiuta) le proposte in product/approvals/pending/ — l'unico punto in cui un diff di RICE, uno snapshot di roadmap, un Piano di Iterazione, una Strategic Exception rilevata in Backlog Refinement, un aggiornamento a un'iniziativa mandataria, un cambiamento materiale del contesto aziendale (context_update, da context-watch), o una comunicazione in uscita passano da proposti ad effettivi. Usala per rivedere la coda.
 ---
 
 # pending-approval
@@ -65,8 +65,13 @@ tabella** con una riga per voce e queste colonne:
   - "—" per un'idea normale senza bypass.
 
 Le voci senza `target_file` verso un'idea (`roadmap_snapshot`,
-`iteration_plan`, `outbound_comm`) restano un riepilogo in prosa (tipo,
-cosa cambierebbe, chi l'ha proposto, quando) — la tabella non le riguarda.
+`iteration_plan`, `outbound_comm`, `context_update`) restano un riepilogo
+in prosa (tipo, cosa cambierebbe, chi l'ha proposto, quando) — la tabella
+non le riguarda. Per un `context_update`: mostra il documento sorgente (il
+link), quale `context/*.md` verrebbe toccato, e il **razionale di
+materialità** dal payload (perché `context-watch` l'ha giudicato un
+cambiamento che inciderebbe su come si scrivono i PRD) — è la parte su cui
+si decide se approvarlo.
 Per un `iteration_plan`, il riepilogo mostra `iteration_goal`, quante voci
 per bucket, e il diff `changes_since_last` (completate / avanzate /
 slittate / rimosse / nuove) — è la parte che dice se vale la pena
@@ -129,6 +134,14 @@ Quando l'utente approva una voce specifica (per nome file o descrizione):
      `mandate-watch`, non da questa approvazione; se il cambio di
      `due_date`/`lead_time_weeks` li rende stale, segnala all'utente di
      rilanciare `mandate-watch` dopo l'approvazione, non ricalcolarli qui.
+   - `context_update`: invoca `context-intake` per scrivere la
+     trascrizione proposta nel `target_file` (`context/<argomento>.md`) e
+     aggiornare `context/.sources-seen.yaml` per quel documento
+     (`revision`, `transcribed_at` = oggi, `materiality: material`,
+     `pending_ref` azzerato). Non trascrivi tu qui a mano: `context-intake`
+     ha già il contratto (cita la fonte, non tocca la cartella sorgente,
+     documento vivo non log). Il `context/*.md` e `.sources-seen.yaml`
+     viaggiano nello stesso commit della voce spostata in `decided/`.
    - `mandate_reclassification`: cambia `classification` a `mandate` e
      popola il blocco `mandate` con i valori iniziali del payload
      (`mandated_by`, `rationale`, `is_critical`, `due_date`,
@@ -147,7 +160,10 @@ Quando l'utente approva una voce specifica (per nome file o descrizione):
 5. **Sincronizza il repo in un unico commit atomico** — la voce spostata
    in `decided/` e il `target_file` aggiornato devono viaggiare insieme:
    `bash .claude/hooks/governance-sync.sh push "pending-approval: approvata <nome-voce>" product/`
-   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)").
+   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Per un
+   `context_update` il `target_file` è sotto `context/`: aggiungilo ai
+   path del push (`… product/ context/`) così `context/*.md` e
+   `.sources-seen.yaml` viaggiano nello stesso commit.
 6. Conferma all'utente cosa è stato effettivamente scritto/cambiato; se
    l'helper ha segnalato un push fallito, dillo.
 
@@ -160,10 +176,16 @@ Quando l'utente approva una voce specifica (per nome file o descrizione):
    l'audit trail, non lasciarla vuota.
 2. Sposta comunque il file in `product/approvals/decided/` — un rifiuto è
    una decisione tracciata, non va cancellato.
-3. **Non applicare nulla a `target_file`.**
+3. **Non applicare nulla a `target_file`.** Per un `context_update`
+   rifiutato: in `context/.sources-seen.yaml`, sulla voce del documento,
+   azzera `pending_ref` e scrivi `rejected_revision` = la revisione
+   rifiutata, così `context-watch` non la ri-accoda (aspetterà una
+   revisione successiva del documento).
 4. **Sincronizza il repo**: esegui
    `bash .claude/hooks/governance-sync.sh push "pending-approval: rifiutata <nome-voce>" product/approvals/`
-   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)").
+   (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Per un
+   `context_update` rifiutato aggiungi `context/` ai path del push (hai
+   toccato `context/.sources-seen.yaml`).
 
 ## Regole generali
 

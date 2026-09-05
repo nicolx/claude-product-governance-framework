@@ -61,7 +61,8 @@ inizializzata) e scaffolda `apps/` e `product/`.
 │   └── <dominio>/<nome-repo>/                (submodule git; o snapshot locale non-git per sistemi
 │                                             legacy non ancora distribuiti via git — vedi init-governance-project)
 ├── context/                                 ← comprensione del business di QUESTA istanza, tracciata da git
-│   └── *.md                                 (modello di business, finanza, org, mercato — vedi sotto)
+│   ├── *.md                                 (modello di business, finanza, org, mercato — vedi sotto)
+│   └── .sources-seen.yaml                   (stato del pull da cartelle collegate — scritto da context-watch)
 └── product/                                 ← artefatti di Product Management di QUESTA istanza
     ├── inbox/                   ← raccoglitore universale, NON tracciato da git (.gitignore)
     │                              qualsiasi cosa arrivi a casaccio (email, thread, trascrizioni,
@@ -119,7 +120,8 @@ dati. Il codice va in `apps/`, gli artefatti di prodotto in `product/` —
 nomi che dicono cosa contengono.
 
 **Regola non negoziabile:** nessuna skill scrive mai direttamente in
-`product/ideas`, `product/prds` o `product/roadmap` senza passare prima da
+`product/ideas`, `product/prds` o `product/roadmap` — né manda in `context/`
+un cambiamento *materiale* rilevato automaticamente — senza passare prima da
 `product/approvals/pending/`. L'automazione propone, un umano approva.
 Vedi `CLAUDE.md` e il playbook per il dettaglio.
 
@@ -137,35 +139,50 @@ per argomento, **citando sempre la fonte** (link se esiste, altrimenti
 documento + chi l'ha fornito + data), e cancella l'originale — nessuna
 copia raw persiste nel repo, né tracciata né gitignorata: un file locale
 esisterebbe solo nel clone di chi l'ha processato, e farebbe divergere
-silenziosamente il contesto tra le macchine del team. In alternativa al
-drop manuale, `context-intake` può **pescare da cartelle documentali
-condivise** (Drive, SharePoint, spazio Confluence) collegate all'avvio
-del progetto come connettore in `.governance/config.yaml` — stessa
-trascrizione, stessa citazione della fonte, stessa conferma del PM; il
-documento resta nella cartella (il connettore è usato in sola lettura).
-Il connettore si dichiara nella lista `connectors:`, con un campo
-`folders:` che elenca le cartelle da cui pescare:
+silenziosamente il contesto tra le macchine del team.
+
+**Cartelle documentali collegate.** All'avvio del progetto,
+`init-governance-project` propone un menu di sistemi documentali —
+**Google Drive**, **OneDrive/SharePoint**, **Confluence**, o qualunque
+altro store via MCP — e per quelli che il team usa raccoglie gli accessi
+e i link alle cartelle. Da lì la skill **`context-watch`** le controlla
+periodicamente (standalone e come parte del Backlog Refinement) e porta in
+`context/` i documenti nuovi o cambiati, **in sola lettura**:
+
+- un **aggiornamento di routine** (il nuovo report trimestrale, cifre
+  rinfrescate) viene **applicato direttamente**, con un recap al PM;
+- un **cambiamento materiale** (un pivot di strategia, una NSM ridefinita
+  — qualcosa che cambierebbe come si scrivono i PRD) va in coda di
+  approvazione (`type: context_update`) e lo conferma il PM.
+
+I connettori si dichiarano nella lista `connectors:`, una voce per
+ecosistema, ciascuna con un campo `folders:`:
 
 ```yaml
 connectors:
   - name: context-drive
-    integration: "mcp:<server>"     # es. un MCP server per Drive; oppure "cli:<nome>", "api:<nome>"
-    probe: "<prefisso tool MCP>"    # come verificare che il connettore risponda
-    reauth: "/mcp"                  # comando per riautenticare quando scade (alcuni login scadono a ogni sessione)
-    note: "login OAuth interattivo"
+    ecosystem: google
+    integration: "mcp:<server>"     # un MCP server per Google Drive
+    probe: "<prefisso tool MCP>"
+    reauth: "/mcp"
     folders:
       - link: "<url cartella condivisa>"
         label: "Strategia & Board deck"
         topic: "strategia"          # argomento context/ suggerito
+  - name: context-sharepoint
+    ecosystem: microsoft
+    integration: "mcp:<server>"     # un MCP server per Microsoft 365 / SharePoint
+    probe: "<prefisso tool MCP>"
+    reauth: "/mcp"
+    folders:
       - link: "<url cartella condivisa>"
         label: "Bilanci e reporting"
         topic: "finanza"
 ```
 
-Il file di stato `context/.sources-seen.yaml` (tracciato, scritto solo da
-`context-intake`) registra cosa è già stato trascritto e a quale
-revisione, così i run successivi propongono solo i documenti nuovi o
-modificati. `context/` è un
+Il file di stato `context/.sources-seen.yaml` (tracciato) registra cosa è
+già stato trascritto, a quale revisione e con che materialità, così i run
+successivi propongono solo ciò che è nuovo o cambiato. `context/` è un
 documento vivo: quando materiale in lavorazione altrove (un PRD, un
 elemento smistato da `inbox-triage`) rivela informazioni rilevanti,
 quella skill propone l'aggiornamento a `context-intake`, che lo scrive

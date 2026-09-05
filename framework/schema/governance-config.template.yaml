@@ -77,21 +77,25 @@ metrics:
 
 # --- Altri connettori (design, SQL ad-hoc, sorgenti di contesto, ecc.) ---
 # Stessa disciplina. check-connectors.sh li segnala a inizio sessione.
-# Una voce con `folders:` non vuoto è una SORGENTE DI CONTESTO: context-intake
-# ne elenca e legge i documenti (in sola lettura) per alimentare context/*.md
-# — vedi playbook, "Contesto aziendale (context/)". Le altre voci sono per
-# skill custom o future e le skill del framework di base non le usano.
+# Una voce con `folders:` non vuoto è una SORGENTE DI CONTESTO: context-watch
+# (periodico) e context-intake ne elencano e leggono i documenti (in sola
+# lettura) per alimentare context/*.md — vedi playbook, "Contesto aziendale
+# (context/)". PIÙ sorgenti di contesto affiancate sono normali (una voce
+# per ecosistema: Drive, OneDrive/SharePoint, Confluence…) — ognuna sondata
+# e gestita indipendentemente. Le altre voci sono per skill custom o future
+# e le skill del framework di base non le usano.
 # Per un connettore sorgente di contesto, init-governance-project allowlista
 # in .claude/settings.local.json SOLO i suoi tool di lettura/elenco (mai
 # creazione/modifica/condivisione).
 connectors: []
-# - name: ""                      # come lo chiami (es. "context-drive", "figma", "reporting-db")
+# - name: ""                      # come lo chiami (es. "context-drive", "context-sharepoint", "figma")
+#   ecosystem: ""                 # opzionale, per leggibilità del recap: "google" | "microsoft" | "confluence" | libero
 #   integration: ""               # "mcp:<server>" | "cli:<nome>" | "api:<nome>"
 #   probe: ""
 #   reauth: ""
 #   note: ""
-#   folders: []                   # SOLO sorgenti di contesto — cartelle condivise da cui context-intake pesca:
-#     - link: ""                  #   URL della cartella (Drive, SharePoint, spazio Confluence…)
+#   folders: []                   # SOLO sorgenti di contesto — cartelle condivise da cui context-watch/context-intake pescano:
+#     - link: ""                  #   URL della cartella (Drive, OneDrive/SharePoint, spazio Confluence…)
 #       label: ""                 #   nome parlante
 #       topic: ""                 #   argomento context/ suggerito (es. "finanza", "mercato-competitor")
 

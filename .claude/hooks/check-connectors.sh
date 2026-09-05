@@ -5,7 +5,7 @@
 # Perché serve. `.governance/config.yaml` può dichiarare connettori a
 # sistemi esterni — `jira:` (tracker di esecuzione), `metrics:`
 # (analytics per NSM/KPI) e voci in `connectors:` (fra cui le sorgenti di
-# contesto: `connectors[].folders`, lette da context-intake). Le skill
+# contesto: `connectors[].folders`, lette da context-watch/context-intake). Le skill
 # che li usano ne verificano la
 # raggiungibilità a inizio processo (playbook, "Connettori esterni:
 # dichiarati, verificati a inizio processo, mai un fallback silenzioso"),
@@ -89,7 +89,7 @@ if [ "${CUSTOM_COUNT:-0}" -gt 0 ]; then
   ' "$CONFIG")"
   if [ "${FOLDER_COUNT:-0}" -gt 0 ]; then
     if [ "$FOLDER_COUNT" -eq 1 ]; then FW="cartella"; else FW="cartelle"; fi
-    DECLARED="${DECLARED} (${FOLDER_COUNT} ${FW} di contesto per context-intake)"
+    DECLARED="${DECLARED} (${FOLDER_COUNT} ${FW} di contesto — le controlla context-watch)"
   fi
   DECLARED="${DECLARED}; "
   CUSTOM_RE="$(awk '
