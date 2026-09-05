@@ -3,8 +3,10 @@
 # programmatici la config dell'istanza dichiara.
 #
 # Perché serve. `.governance/config.yaml` può dichiarare connettori a
-# sistemi esterni — `jira:` (tracker di esecuzione) e `metrics:`
-# (analytics per NSM/KPI). Le skill che li usano ne verificano la
+# sistemi esterni — `jira:` (tracker di esecuzione), `metrics:`
+# (analytics per NSM/KPI) e voci in `connectors:` (fra cui le sorgenti di
+# contesto: `connectors[].folders`, lette da context-intake). Le skill
+# che li usano ne verificano la
 # raggiungibilità a inizio processo (playbook, "Connettori esterni:
 # dichiarati, verificati a inizio processo, mai un fallback silenzioso"),
 # ma un connettore MCP può essere non loggato / OAuth scaduto: meglio
@@ -77,7 +79,19 @@ CUSTOM_COUNT="$(awk '
   END { print n+0 }
 ' "$CONFIG")"
 if [ "${CUSTOM_COUNT:-0}" -gt 0 ]; then
-  DECLARED="${DECLARED}${CUSTOM_COUNT} in \`connectors\`; "
+  DECLARED="${DECLARED}${CUSTOM_COUNT} in \`connectors\`"
+  # Sorgenti di contesto: voci con `folders:` (cartelle -> `- link:`).
+  FOLDER_COUNT="$(awk '
+    /^connectors:/ { inlist=1; next }
+    inlist && /^[^[:space:]#]/ { inlist=0 }
+    inlist && /^[[:space:]]*-[[:space:]]*link:/ { n++ }
+    END { print n+0 }
+  ' "$CONFIG")"
+  if [ "${FOLDER_COUNT:-0}" -gt 0 ]; then
+    if [ "$FOLDER_COUNT" -eq 1 ]; then FW="cartella"; else FW="cartelle"; fi
+    DECLARED="${DECLARED} (${FOLDER_COUNT} ${FW} di contesto per context-intake)"
+  fi
+  DECLARED="${DECLARED}; "
   CUSTOM_RE="$(awk '
     /^connectors:/ { inlist=1; next }
     inlist && /^[^[:space:]#]/ { inlist=0 }

@@ -1,6 +1,6 @@
 ---
 name: context-intake
-description: Trascrive materiale grezzo sul contesto aziendale (Confluence, PDF, slide, bilanci, docx, ecc.) droppato in context/ in file Markdown tracciati con citazione della fonte, poi elimina l'originale — mai una copia raw persistente. Richiamata anche da altre skill (prd-draft, inbox-triage) quando materiale già in lavorazione rivela contesto aziendale rilevante, sempre con conferma esplicita del PM prima di scrivere. Usala per popolare o far evolvere la comprensione del business che idea-intake e prd-draft usano insieme al codice.
+description: Trascrive materiale grezzo sul contesto aziendale (Confluence, PDF, slide, bilanci, docx, ecc.) in file Markdown tracciati con citazione della fonte — da file droppati in context/ (poi eliminati, mai una copia raw persistente) o pescandolo da cartelle documentali condivise (Drive/SharePoint/Confluence) collegate come connettore in .governance/config.yaml. Richiamata anche da altre skill (prd-draft, inbox-triage) quando materiale già in lavorazione rivela contesto aziendale rilevante, sempre con conferma esplicita del PM prima di scrivere. Usala per popolare o far evolvere la comprensione del business che idea-intake e prd-draft usano insieme al codice.
 ---
 
 # context-intake
@@ -39,7 +39,7 @@ aziendale sbagliato in un file che tutte le altre skill consultano si
 propaga silenziosamente in idee e PRD futuri — è più costoso di una
 domanda in più.
 
-## Due modalità di innesco
+## Tre modalità di innesco
 
 1. **Materiale grezzo droppato direttamente in `context/`** — qualsiasi
    file non-Markdown alla radice della cartella (PDF, docx, pptx, txt,
@@ -50,17 +50,28 @@ domanda in più.
    un'email che parla di una riorganizzazione aziendale. Quella skill
    **non scrive da sola in `context/`**: segnala il candidato e richiama
    questa skill.
+3. **Pull da una cartella documentale collegata** — `.governance/config.yaml`
+   dichiara nella lista `connectors:` una o più voci con un campo
+   `folders:` non vuoto (cartelle Drive/SharePoint/spazio Confluence). La
+   skill le elenca **in sola lettura** tramite il connettore, trova i
+   documenti nuovi o modificati dall'ultima volta e li trascrive. Vedi
+   "Caso 3" sotto. Si attiva quando l'utente lo chiede esplicitamente
+   ("aggiorna il contesto dalle cartelle collegate", "pesca da Drive") o
+   quando la skill è invocata senza file droppati e almeno un connettore
+   sorgente di contesto è dichiarato.
 
 ## Passi
 
 > **Dry-run.** Se la skill è stata invocata in modalità simulazione
 > (argomento `dry-run`, o `dry_run: true` in `.governance/config.yaml`),
 > applica il contratto della sezione "Modalità dry-run (simulazione)" del
-> playbook: esegui letture e analisi normalmente, **non** scrivere su
-> `product/`/`context/`/`.governance/` (nemmeno spostando file), **non**
-> invocare `governance-sync.sh push`, mostra come testo l'output completo
-> che avresti prodotto, e chiudi con `🔍 DRY-RUN — nessun file scritto,
-> nessun commit, nessun push.`
+> playbook: esegui letture e analisi normalmente — incluso il probe del
+> connettore e l'elenco/lettura dei documenti di una cartella collegata
+> (caso 3), che sono sola lettura — ma **non** scrivere su
+> `product/`/`context/`/`.governance/` (nemmeno `context/.sources-seen.yaml`,
+> nemmeno spostando file), **non** invocare `governance-sync.sh push`,
+> mostra come testo l'output completo che avresti prodotto, e chiudi con
+> `🔍 DRY-RUN — nessun file scritto, nessun commit, nessun push.`
 
 1. Se innescata dal caso 1: elenca ogni file non-Markdown alla radice di
    `context/` (ignora sottocartelle già organizzate). Trattali come
@@ -68,6 +79,10 @@ domanda in più.
 
    Se innescata dal caso 2: usa il materiale/estratto passato dalla skill
    chiamante.
+
+   Se innescata dal caso 3: applica prima la sezione "Caso 3" qui
+   sotto per ottenere la lista dei documenti da trascrivere, poi procedi
+   dal passo 2 con ciascuno.
 
 2. **Leggi ogni elemento per intero** prima di sintetizzare. Per file
    grandi (PDF lunghi, bilanci con molte pagine), segui il vincolo del
@@ -94,18 +109,23 @@ domanda in più.
    senza fonte tracciata.
 
 5. **Mostra al PM un riepilogo di cosa stai per scrivere/modificare e
-   chiedi conferma esplicita prima di scrivere** — vale sia per il caso 1
-   sia per il caso 2. Dedurre contesto aziendale da un documento è
+   chiedi conferma esplicita prima di scrivere** — vale per tutti e tre i
+   casi d'innesco. Dedurre contesto aziendale da un documento è
    un'interpretazione, non un fatto osservato: non rientra tra le poche
    scritture dirette che il framework ammette senza conferma (vedi
    `mandate-watch`/`rice-watch`/`nsm-watch`/`deadline-watch`, limitate a fatti mai
    presunti). Non serve la coda `product/approvals/pending/` (non è una
    decisione di priorità), ma la conferma in conversazione sì, sempre.
 
-6. **Dopo la conferma**, scrivi/aggiorna il file `context/*.md` e — se
-   l'elemento era un file droppato in `context/` — rimuovilo. Non
-   lasciarlo né lì né altrove nel repository, tracciato o meno (vedi
-   principio guida sopra).
+6. **Dopo la conferma**, scrivi/aggiorna il file `context/*.md`. Poi:
+   - se l'elemento era un **file droppato** in `context/` (caso 1),
+     rimuovilo — non lasciarlo né lì né altrove nel repository, tracciato
+     o meno (vedi principio guida sopra);
+   - se veniva da una **cartella collegata** (caso 3), **non toccare la
+     cartella sorgente** (il connettore è in sola lettura) e aggiorna
+     `context/.sources-seen.yaml` con la voce del documento
+     (`file_id`, `revision`, `transcribed_at`, `context_file`) — crea il
+     file da `framework/schema/sources-seen.template.yaml` se non esiste.
 
 7. **Chiudi con un riepilogo**: quanti elementi processati, quali file di
    contesto creati/aggiornati, e se qualcosa non è stato processato
@@ -115,9 +135,52 @@ domanda in più.
 8. **Sincronizza il repo**: esegui
    `bash .claude/hooks/governance-sync.sh push "context-intake: <file aggiornati>" context/`
    (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Il commit
-   cattura solo la trascrizione tracciata: il file grezzo è già stato
-   rimosso al passo 6. Se l'helper segnala un push fallito, riferiscilo
-   nel riepilogo.
+   cattura solo lo stato tracciato: le trascrizioni `context/*.md`, e —
+   per il caso 3 — `context/.sources-seen.yaml`. Il file grezzo del
+   caso 1 è già stato rimosso al passo 6. Se l'helper segnala un push
+   fallito, riferiscilo nel riepilogo.
+
+## Caso 3 — pull da un connettore sorgente di contesto
+
+Si applica quando `.governance/config.yaml` ha almeno una voce
+`connectors:` con un campo `folders:` non vuoto. Ogni voce di `folders:`
+ha `link` (URL della cartella), `label` e `topic` (argomento `context/`
+suggerito).
+
+1. **Probe del connettore** — prima di leggere qualunque cosa, verifica
+   che il connettore risponda, usando il `probe` dichiarato in config
+   (per un `mcp:<server>`: che i suoi tool siano disponibili). Applica la
+   regola del playbook "Connettori esterni": **dichiarato ma
+   irraggiungibile ≠ `manuale`**. Se non risponde, segnala cosa non va,
+   proponi il comando `reauth` dichiarato, e chiedi al PM se riautenticare
+   e ritentare o procedere senza. Se si procede senza, il pull resta
+   **rimandato** e visibile nel riepilogo (da rilanciare quando il
+   connettore torna su) — mai saltato in silenzio.
+
+2. **Elenca i documenti** di ogni cartella in `folders:` tramite i tool
+   di lettura/elenco del connettore. **Sola lettura**: non creare, non
+   modificare, non spostare, non condividere nulla nella cartella
+   sorgente.
+
+3. **Carica `context/.sources-seen.yaml`** (se non esiste, nessun
+   documento è ancora stato trascritto). Per ogni documento elencato,
+   confrontane `file_id` e `revision` con la voce registrata:
+   - `file_id` assente dal file di stato → **documento nuovo**;
+   - `revision` diversa da quella registrata → **documento modificato**;
+   - `revision` invariata → **salta** (già trascritto).
+
+4. **Presenta al PM** l'elenco di nuovi + modificati (con `label` della
+   cartella, nome del documento, e il `topic` suggerito come
+   destinazione), e quanti sono stati saltati perché invariati. Da qui
+   procedi dal passo 2 della sezione "Passi" per ciascun documento: leggi
+   per intero, determina il `context/*.md` di destinazione (parti dal
+   `topic` della cartella, ma usa giudizio e chiedi se non torna),
+   **cita come fonte il `link` del documento**, mostra il riepilogo,
+   chiedi conferma, scrivi, e aggiorna `context/.sources-seen.yaml`
+   (passo 6).
+
+5. Se una cartella è vuota o tutti i suoi documenti sono invariati,
+   dillo nel riepilogo — non è un errore.
 
 ## Cosa NON fare
 
@@ -125,6 +188,14 @@ domanda in più.
   PM, nemmeno per correzioni che sembrano ovvie.
 - Non conservare mai il file grezzo processato, né tracciato né
   gitignorato, dopo che la trascrizione è stata confermata.
+- **Caso 3: non scrivere mai nella cartella sorgente** (Drive,
+  SharePoint, spazio Confluence). Il connettore è usato in sola lettura —
+  niente `create`/`update`/`trash`/`share`.
+- **Caso 3: non "ripulire" un documento dalla cartella sorgente dopo
+  averlo trascritto.** Lì la copia *è* la fonte citata, non una
+  duplicazione grezza da rimuovere come per il caso 1.
+- Non degradare in silenzio a "inserimento manuale" se il connettore non
+  risponde — segnala e chiedi (vedi Caso 3, passo 1).
 - Non inventare una fonte se non è nota — scrivi esplicitamente "fonte
   non specificata, verificare con [chi ha fornito il materiale]" invece
   di ometterla o indovinarla.

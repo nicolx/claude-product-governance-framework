@@ -75,15 +75,25 @@ metrics:
   reauth: ""                      # comando per rimetterla su quando scade. Alcuni connettori (login OAuth interattivo) scadono a OGNI sessione: check-connectors.sh mostra questo comando all'avvio.
   note: ""                        # scope: quali metriche/dataset copre, owner del dato, quirk
 
-# --- Altri connettori (design, SQL ad-hoc, ecc.) — stessa disciplina ---
-# Le skill del framework di base non li usano; sono per skill custom o
-# future. check-connectors.sh li segnala a inizio sessione.
+# --- Altri connettori (design, SQL ad-hoc, sorgenti di contesto, ecc.) ---
+# Stessa disciplina. check-connectors.sh li segnala a inizio sessione.
+# Una voce con `folders:` non vuoto è una SORGENTE DI CONTESTO: context-intake
+# ne elenca e legge i documenti (in sola lettura) per alimentare context/*.md
+# — vedi playbook, "Contesto aziendale (context/)". Le altre voci sono per
+# skill custom o future e le skill del framework di base non le usano.
+# Per un connettore sorgente di contesto, init-governance-project allowlista
+# in .claude/settings.local.json SOLO i suoi tool di lettura/elenco (mai
+# creazione/modifica/condivisione).
 connectors: []
-# - name: ""                      # come lo chiami (es. "figma", "reporting-db")
+# - name: ""                      # come lo chiami (es. "context-drive", "figma", "reporting-db")
 #   integration: ""               # "mcp:<server>" | "cli:<nome>" | "api:<nome>"
 #   probe: ""
 #   reauth: ""
 #   note: ""
+#   folders: []                   # SOLO sorgenti di contesto — cartelle condivise da cui context-intake pesca:
+#     - link: ""                  #   URL della cartella (Drive, SharePoint, spazio Confluence…)
+#       label: ""                 #   nome parlante
+#       topic: ""                 #   argomento context/ suggerito (es. "finanza", "mercato-competitor")
 
 # --- Repository applicativi collegati come submodule ---
 apps: []

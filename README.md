@@ -137,7 +137,12 @@ per argomento, **citando sempre la fonte** (link se esiste, altrimenti
 documento + chi l'ha fornito + data), e cancella l'originale — nessuna
 copia raw persiste nel repo, né tracciata né gitignorata: un file locale
 esisterebbe solo nel clone di chi l'ha processato, e farebbe divergere
-silenziosamente il contesto tra le macchine del team. `context/` è un
+silenziosamente il contesto tra le macchine del team. In alternativa al
+drop manuale, `context-intake` può **pescare da cartelle documentali
+condivise** (Drive, SharePoint, spazio Confluence) collegate all'avvio
+del progetto come connettore in `.governance/config.yaml` — stessa
+trascrizione, stessa citazione della fonte, stessa conferma del PM; il
+documento resta nella cartella. `context/` è un
 documento vivo: quando materiale in lavorazione altrove (un PRD, un
 elemento smistato da `inbox-triage`) rivela informazioni rilevanti,
 quella skill propone l'aggiornamento a `context-intake`, che lo scrive

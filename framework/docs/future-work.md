@@ -92,6 +92,30 @@ li rimappa a un nuovo prefisso mantenendo i numeri, aggiorna
 commit, e stampa la lista dei titoli Jira da correggere a mano (mai
 un'azione in uscita automatica). Fuori scope finché è un caso isolato.
 
+## Estensioni del pull di contesto da cartelle collegate
+
+Il pull di `context-intake` da cartelle collegate (`connectors[].folders`
+— dichiarato all'init) nasce deliberatamente minimale. Fuori scope
+adesso, da rivedere se emerge la domanda:
+
+- **Diff a livello di sezione.** Oggi un qualunque cambio di `revision`
+  di un documento lo ri-propone **intero** per la ri-trascrizione. Un
+  diff più fine (quali paragrafi/sezioni sono cambiati) eviterebbe di
+  rileggere documenti lunghi per una modifica marginale — ma richiede di
+  conservare abbastanza dello stato precedente da confrontare, cosa che
+  `context/.sources-seen.yaml` di proposito non fa (tiene solo id +
+  revisione, non il contenuto).
+- **Sincronizzazione bidirezionale / push-back.** Il connettore è
+  deliberatamente in sola lettura: `context-intake` non scrive mai nella
+  cartella sorgente. Un flusso che ripubblichi la sintesi `context/*.md`
+  verso Confluence/Drive sarebbe una comunicazione in uscita → andrebbe
+  instradato da `product/approvals/pending/`, non aggiunto come scrittura
+  diretta. Decisione da riprendere esplicitamente, non da ereditare.
+- **Watch periodica.** Oggi il pull è "pull" (il PM lancia la skill). Un
+  livello batch/cron che segnali "3 documenti nuovi nella cartella X
+  dall'ultimo giro" sarebbe utile — stesso discorso dei reminder batch ai
+  PM nella sezione "Livello web / DB derivato".
+
 ## Integrazione DB/analytics in lettura per NSM e measurement-watch
 
 **Dichiarazione + verifica: FATTO** (2026-09-03). `.governance/config.yaml`
