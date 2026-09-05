@@ -142,7 +142,30 @@ drop manuale, `context-intake` può **pescare da cartelle documentali
 condivise** (Drive, SharePoint, spazio Confluence) collegate all'avvio
 del progetto come connettore in `.governance/config.yaml` — stessa
 trascrizione, stessa citazione della fonte, stessa conferma del PM; il
-documento resta nella cartella. `context/` è un
+documento resta nella cartella (il connettore è usato in sola lettura).
+Il connettore si dichiara nella lista `connectors:`, con un campo
+`folders:` che elenca le cartelle da cui pescare:
+
+```yaml
+connectors:
+  - name: context-drive
+    integration: "mcp:<server>"     # es. un MCP server per Drive; oppure "cli:<nome>", "api:<nome>"
+    probe: "<prefisso tool MCP>"    # come verificare che il connettore risponda
+    reauth: "/mcp"                  # comando per riautenticare quando scade (alcuni login scadono a ogni sessione)
+    note: "login OAuth interattivo"
+    folders:
+      - link: "<url cartella condivisa>"
+        label: "Strategia & Board deck"
+        topic: "strategia"          # argomento context/ suggerito
+      - link: "<url cartella condivisa>"
+        label: "Bilanci e reporting"
+        topic: "finanza"
+```
+
+Il file di stato `context/.sources-seen.yaml` (tracciato, scritto solo da
+`context-intake`) registra cosa è già stato trascritto e a quale
+revisione, così i run successivi propongono solo i documenti nuovi o
+modificati. `context/` è un
 documento vivo: quando materiale in lavorazione altrove (un PRD, un
 elemento smistato da `inbox-triage`) rivela informazioni rilevanti,
 quella skill propone l'aggiornamento a `context-intake`, che lo scrive
