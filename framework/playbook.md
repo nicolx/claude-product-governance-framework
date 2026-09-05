@@ -279,6 +279,33 @@ altrimenti nome del documento, chi l'ha fornito, e la data), poi elimina
 l'originale. La verificabilità viene dal puntare alla fonte di sistema
 condivisa, non da una copia locale.
 
+**Due canali di ingresso.** `context/` si alimenta in due modi, entrambi
+gestiti da `context-intake`:
+
+1. **Materiale grezzo droppato in `context/`** — un file non-Markdown alla
+   radice della cartella. La skill lo trascrive e poi lo rimuove (è la
+   copia grezza da non conservare).
+2. **Pull da cartelle documentali collegate** — una raccolta condivisa
+   (una cartella Drive, uno spazio SharePoint o Confluence…) dichiarata
+   come connettore in `.governance/config.yaml` (`connectors:`, campo
+   `folders:`; vedi `framework/schema/governance-config.template.yaml`).
+   `context-intake` elenca la cartella **in sola lettura** tramite i tool
+   del connettore, legge i documenti nuovi o modificati e li trascrive in
+   `context/*.md` esattamente come al punto 1, citando come fonte il link
+   del documento. Qui **non si rimuove nulla**: il documento resta nella
+   cartella, dove *è* la fonte di sistema condivisa — non una copia da
+   ripulire. Un file di stato tracciato, `context/.sources-seen.yaml`
+   (id + revisione + data dell'ultima trascrizione, scritto solo dalla
+   skill), evita che un run successivo ri-proponga documenti invariati.
+
+Il connettore-sorgente segue la stessa disciplina di ogni altro
+connettore (`integration`/`probe`/`reauth`, verifica a inizio processo,
+«dichiarato ma irraggiungibile ≠ `manuale`» — vedi "Connettori esterni").
+In entrambi i canali la scrittura in `context/*.md` avviene **solo dopo
+conferma esplicita del PM** nella conversazione: non è una decisione di
+priorità (niente coda `product/approvals/pending/`), ma è
+un'interpretazione di materiale grezzo, non un fatto mai presunto.
+
 **È un documento vivo, non un archivio statico.** Quando materiale già in
 lavorazione da un'altra skill (un PRD, un elemento smistato da
 `inbox-triage`) rivela un'informazione che cambia la comprensione del
@@ -372,8 +399,11 @@ lo usa. Si dichiarano in `.governance/config.yaml`:
 - **`metrics:`** — la fonte da cui `nsm-watch` e `measurement-watch`
   leggono NSM e KPI dai dati di produzione, invece di chiederli a mano al
   PM.
-- **`connectors:`** — lista aperta per qualunque altro connettore che una
-  skill custom o futura richieda.
+- **`connectors:`** — lista aperta per qualunque altro connettore. Una
+  voce con un campo `folders:` non vuoto è una **sorgente di contesto**:
+  `context-intake` ne elenca e legge i documenti per alimentare `context/`
+  (vedi "Contesto aziendale (`context/`)"). Le altre voci sono per skill
+  custom o future.
 
 Ogni connettore ha lo stesso schema di base: `configured` (c'è davvero?),
 `integration` (`mcp:<server>` / `cli:<nome>` / `manuale` / vuoto), `probe`
@@ -391,7 +421,8 @@ interattivi da riga di comando, che vanno rifatti ogni volta. Per questo:
    connettore ne controllano la raggiungibilità *prima* di partire (con
    il `probe` dichiarato): a inizio cerimonia (`backlog-refinement`,
    `iteration-planning` verificano `jira` e `metrics`), al passo 0 delle
-   watch di metriche e di `jira-sync` standalone. L'hook
+   watch di metriche e di `jira-sync` standalone, all'inizio di
+   `context-intake` quando pesca da una sorgente di contesto. L'hook
    `check-connectors.sh` (a inizio sessione) ricorda quali connettori la
    config dichiara e **mostra il comando `reauth`** — non può verificare
    lo stato da bash, ma ti dà subito cosa rilanciare.
