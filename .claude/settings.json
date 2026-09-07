@@ -7,6 +7,7 @@
       "Bash(bash .claude/hooks/check-pending-approvals.sh:*)",
       "Bash(bash .claude/hooks/check-inbox.sh:*)",
       "Bash(bash .claude/hooks/check-unpushed.sh:*)",
+      "Bash(bash .claude/hooks/check-delivery-queue.sh:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
@@ -38,6 +39,12 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-connectors.sh\"",
             "timeout": 10,
             "statusMessage": "Verifica connettori esterni dichiarati…"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-delivery-queue.sh\"",
+            "timeout": 10,
+            "statusMessage": "Verifica coda transizioni di delivery…"
           }
         ]
       }
@@ -62,6 +69,12 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-pending-approvals.sh\"",
             "timeout": 10,
             "statusMessage": "Verifica coda di approvazione…"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-delivery-queue.sh\"",
+            "timeout": 10,
+            "statusMessage": "Verifica coda transizioni di delivery…"
           }
         ]
       }

@@ -241,13 +241,14 @@ riga di comando. L'identificatore **non** è opzionale "se presente":
 | NSM | `{product_line} / {name}` |
 | KPI di misurazione | `{prd_id} · {kpi_name}` |
 | Voce in coda di approvazione | il nome file della proposta in `product/approvals/pending/` |
+| Voce in coda di triage delivery | il suo `id` (`{data}-{card}-{evento}`) in `product/reference/delivery-watch.yaml` |
 | Cerimonia | `{tipo}/{periodo}` |
 
 Se lo `short_ref` di un'idea non è ancora stato assegnato, si mostra lo
 slug: qualcosa di digitabile c'è sempre. Questo vale per tutte le skill di
 vista e per i riepiloghi delle watch (`backlog-list`, `pending-approval`,
 `iteration-board`, `mandate-watch`, `deadline-watch`, `rice-watch`,
-`measurement-watch`, `nsm-watch`).
+`measurement-watch`, `nsm-watch`, `delivery-watch`).
 
 ## Contesto aziendale (`context/`)
 
@@ -372,11 +373,12 @@ hook**, non alla memoria del PM:
   dipendono dal quadro completo — `inbox-triage`, `roadmap-snapshot`,
   `pending-approval`, `backlog-list`, `iteration-board`, `jira-sync`
   (pull), e le watch (`nsm-watch`, `mandate-watch`, `deadline-watch`,
-  `rice-watch`, `measurement-watch`, `context-watch`) nell'uso
-  *standalone*. Nella sweep di
+  `rice-watch`, `measurement-watch`, `context-watch`, `delivery-watch`)
+  nell'uso *standalone*. Nella sweep di
   apertura del Backlog Refinement il pull è **uno solo** per l'intera
-  sweep (la logica delle watch gira inline, non come skill separate — vedi
-  "Product Backlog Refinement").
+  sweep (la logica delle watch di calcolo gira inline; `context-watch` e
+  `delivery-watch` girano come task in background con commit distinto —
+  vedi "Product Backlog Refinement").
 - **Commit + push**: come ultimo passo di ogni skill che scrive stato
   tracciato (`idea-intake`, `inbox-triage`, `rice-update`, `prd-draft`,
   `backlog-refinement`, `iteration-planning`, `log-ceremony`,
@@ -427,9 +429,10 @@ design…). La **disciplina è identica per tutti**; cambia solo quale skill
 lo usa. Si dichiarano in `.governance/config.yaml`:
 
 - **`jira:`** — il tracker di esecuzione, per il dedup e la
-  riconciliazione (`jira-sync`). Tipicamente Jira, ma il blocco vale per
-  qualunque tracker; solo i dettagli MCP/CLI in `jira-sync` sono
-  Jira-specifici.
+  riconciliazione (`jira-sync`) e per il monitoraggio delle transizioni
+  di delivery (`delivery-watch`, blocco `delivery_watch:`). Tipicamente
+  Jira, ma il blocco vale per qualunque tracker; solo i dettagli MCP/CLI
+  in `jira-sync` sono Jira-specifici.
 - **`metrics:`** — la fonte da cui `nsm-watch` e `measurement-watch`
   leggono NSM e KPI dai dati di produzione, invece di chiederli a mano al
   PM.
@@ -1187,10 +1190,12 @@ no (sezione "Measurement"), quali iniziative mandatarie richiedono
 attenzione per la loro scadenza (sezione "Iniziative Mandatarie"), quali
 idee normali hanno una scadenza dichiarata in avvicinamento (sezione
 "Scadenze su idee normali"), quali idee restano senza RICE da troppo
-tempo (sezione "Ideas prioritization"), e se il contesto aziendale è
+tempo (sezione "Ideas prioritization"), se il contesto aziendale è
 cambiato nelle cartelle documentali collegate (`context-watch` — sezione
-"Contesto aziendale"). Solo dopo si passa a decidere le
-priorità del prossimo periodo — è più
+"Contesto aziendale"), e quali transizioni di delivery sulle iniziative
+collegate meritano una comunicazione agli stakeholder (`delivery-watch`
+— sezione "Transizioni di delivery rilevanti per gli stakeholder"). Solo
+dopo si passa a decidere le priorità del prossimo periodo — è più
 facile prioritizzare bene quando si parte da un quadro aggiornato di cosa
 sta già funzionando, invece di scoprirlo a posteriori.
 
@@ -1340,6 +1345,7 @@ d'occhio" del piano si ottiene con la skill **`iteration-board`**.
 **Checklist operativa**
 - [ ] Dopo ogni watch della sweep di apertura c'è stato un checkpoint: tabella con `{ID}` in prima colonna e diritto di parola al PM prima di procedere? Le azioni concordate (archiviazioni, scadenze pulite, misurazioni chiuse) sono in `decisions.yaml`?
 - [ ] `context-watch` ha controllato le cartelle di contesto collegate? Gli aggiornamenti di routine sono stati applicati e messi nel recap; i cambiamenti materiali sono in `product/approvals/pending/` (`type: context_update`)?
+- [ ] `delivery-watch` ha girato (se `delivery_watch.enabled`) e la coda di triage è stata rivista? Ogni evento smarcato ha un esito esplicito — bozza di mail inviata a mano dal PM, o dismiss con motivo — e nessuna comunicazione è partita in automatico?
 - [ ] La coda `product/approvals/pending/` è stata camminata: ogni `rice_diff` approvato o rifiutato dal team? Quel che resta in coda è stato segnalato?
 - [ ] Il backlog ordinato (`backlog-list`) è stato mostrato al team prima di decidere cosa entra in iterazione?
 - [ ] Il Piano di Iterazione è stato generato **partendo da quello della settimana precedente** (`based_on`)?
@@ -1604,6 +1610,86 @@ Il connettore consigliato è l'**Atlassian Remote MCP Server ufficiale**
 sono fallback. Come l'istanza si connette è dichiarato in
 `.governance/config.yaml`, blocco `jira` (vedi
 `framework/schema/governance-config.template.yaml`).
+
+### Transizioni di delivery rilevanti per gli stakeholder (`delivery-watch`)
+
+`jira-sync` Pull risponde a "dov'è adesso questo ticket". Non risponde a
+"cosa è appena cambiato": non tiene memoria del valore precedente e non
+legge il `changelog` della card. Tra una sessione e l'altra il PM perde
+il fatto che una card si è bloccata, è andata in produzione o è
+regredita — proprio l'informazione che serve per tenere gli stakeholder
+nel ciclo con un aggiornamento, una rassicurazione, o la segnalazione
+onesta di una criticità.
+
+`delivery-watch` è la watch che colma quel buco. Osserva il tracker di
+esecuzione per una **tassonomia fissa** di transizioni sulle iniziative
+collegate (le idee con `jira.card_id`), basata sulla **status *category*
+di Jira** — `new` / `indeterminate` / `done`, universale su ogni board,
+nessuna mappatura delle colonne per-istanza — più il flag "Impediment" e
+l'`issuetype`. Gli eventi:
+
+| `event_type` | Segnale | Framing suggerito |
+|---|---|---|
+| `entered_development` | assegnatario impostato da vuoto, categoria `new`/`indeterminate` | *aggiornamento* — "è partita, se ne occupa {nome}" |
+| `delivered` | categoria → `done`, `issuetype` ≠ Bug | *rassicurazione* — "è in produzione" |
+| `bug_resolved` | categoria → `done`, `issuetype` = Bug | *rassicurazione* — "il problema segnalato è chiuso" |
+| `blocked` | flag "Impediment" aggiunto, o stato entrato in uno di `delivery_watch.blocked_status_names` | *criticità* — "lavorazione temporaneamente bloccata" |
+| `regression` | categoria `done` → `indeterminate`/`new` (riapertura), o label di `delivery_watch.regression_labels` aggiunta | *criticità* — "è emersa una regressione" |
+
+La prima volta che un ticket entra nel perimetro è una **baseline**, non
+un evento.
+
+Ogni evento rilevato è annotato in una **coda di triage che sopravvive
+tra le sessioni** (`product/reference/delivery-watch.yaml`). È la
+capacità deliberatamente nuova: il PM non deve perdere un evento di
+delivery solo perché non lo ha smarcato nella sessione in cui è stato
+rilevato. L'hook `check-delivery-queue.sh` (a inizio e fine sessione) ne
+mostra il conteggio, con lo stesso stile di sola-allerta di
+`check-pending-approvals.sh`.
+
+**`delivery-watch` non comunica.** Fa esattamente quello che fanno le
+altre watch — fatti osservati, un recap al PM, una coda — e nulla di
+più. È "solo segnalazione" nello stesso senso di `mandate-watch` e
+`deadline-watch`: la scrittura di `jira.status`/`jira.last_polled_at`
+sull'idea è lo stesso fatto osservato che scrive `jira-sync` (scrittura
+diretta, mai `pending/`).
+
+La comunicazione è un **atto separato e deliberato del PM**, in una
+sessione di triage dedicata. Per ogni evento in coda il PM sceglie:
+preparare una **bozza di mail** agli stakeholder — che poi **invia a
+mano**, stessa logica di `requester_reply` ("Chiudere il loop col
+richiedente"): nessun invio automatico, nessuna coda `pending/`; il testo
+inviato, i destinatari e la data restano nella voce di coda come trail —
+archiviare la voce con un motivo, o lasciarla per dopo. Non c'è nessun
+percorso non presidiato.
+
+**Lavoro che bypassa la governance.** Se `delivery_watch.board_jql` è
+configurata, `delivery-watch` guarda anche le card della board non
+collegate a nessuna idea. Quando ne intercetta una con una transizione
+rilevante — è lavoro partito dritto su Jira, fuori dal RICE —
+**crea l'idea in automatico** (via `idea-intake` in modalità backfill:
+classificazione e dati abbozzati dalla card, `backfill_review_needed:
+true`), la collega alla card, e accoda l'evento. Recupera il tracciamento
+senza fermare il rilevamento; il PM rivede la classificazione al triage.
+È il complemento della modalità Riconciliazione di `jira-sync` (che
+collega idee *già esistenti* a card attive): qui l'idea non c'è ancora e
+va creata.
+
+**Rediscussione esplicita.** `framework/docs/future-work.md` chiedeva che
+un livello di notifiche non fosse "ereditato per default" dalla decisione
+di `mandate-watch` ("solo segnalazione, nessuna comunicazione
+automatica"). Questa sezione **è** quella rediscussione: l'esito è che la
+*persistenza della coda* entra nel metodo, mentre l'*auto-invio* e un
+livello *batch/cron che spedisce a persone* restano fuori. Un cron
+opzionale (`/schedule`) può eseguire `delivery-watch` in modalità detect
+— rileva, accoda, committa — ma non fa triage e non manda nulla; il
+promemoria via hook resta il canale con cui la coda arriva davanti al PM.
+
+**Relazione con `demo-capture`.** Per un evento `delivered` su
+un'iniziativa con UI visibile, `delivery-watch` suggerisce
+`demo-capture`, così la mail allo stakeholder può mostrare "cosa si vede
+adesso". Definition of Done: "in produzione per Jira" si riporta, il
+giudizio DoD resta del PM (come in `jira-sync` Pull).
 
 ### Daily Standup
 

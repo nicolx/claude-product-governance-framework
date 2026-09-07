@@ -134,6 +134,10 @@ creato/aggiornato.
    coda di approvazione, così le due decisioni (pubblicare lo snapshot
    internamente / comunicarlo all'esterno) restano approvabili
    indipendentemente.
+   Lo snapshot **non** riproduce gli eventi di delivery per-card (bug
+   risolto, blocco, consegna): quelle sono comunicazioni verso
+   stakeholder gestite da `delivery-watch`, non il rollup strategico. Al
+   più, cita quante voci restano `pending` nella sua coda di triage.
 
 6. Mostra la proposta e ricorda che resta pending finché non approvata
    esplicitamente.

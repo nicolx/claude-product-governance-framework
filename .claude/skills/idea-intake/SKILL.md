@@ -34,6 +34,50 @@ per Product Line, per l'ipotesi che l'idea sia un duplicato di una già
 esistente, e per qualunque numero o affermazione non letteralmente
 presente nel materiale di origine.
 
+## Modalità backfill (invocata da `delivery-watch`, non interattiva)
+
+`delivery-watch` invoca questa skill in modalità **backfill** quando
+intercetta attività su una card del tracker di esecuzione **non collegata**
+a nessuna idea — lavoro partito dritto su Jira, fuori dalla governance
+(precedente: `context-watch` → `context-intake` in auto-apply). Non è un
+intake da materiale grezzo: la fonte è una card Jira già letta.
+
+In questa modalità:
+
+- **Nessuna conversazione, nessuna conferma per-elemento.** Si crea
+  comunque la cartella idea subito — recuperare il tracciamento è il
+  punto; la revisione avviene dopo.
+- **Seed dalla card**: `title` = summary della card; `summary` = una riga
+  dalla description (o dal summary se la description è vuota);
+  `classification` inferita — `issuetype: Bug` → `bug`, altrimenti
+  `idea`; `product_line` inferita dalla card se possibile, altrimenti
+  `delivery_watch.default_product_line` da `.governance/config.yaml`,
+  altrimenti `""`; `proposer` = reporter della card se disponibile,
+  altrimenti `""`.
+- `source.type: jira_backfill`, `source.ref` = chiave della card (es.
+  `EPITA-317`). In `source/` salva un breve `source/jira-<key>.md` con i
+  campi letti dalla card (summary, description, issuetype, status,
+  reporter, URL) — non un intero export.
+- `jira.card_id` / `jira.url` / `jira.status` popolati dalla card;
+  `jira.last_polled_at` = ora. `status` dell'idea: `in_jira` (il lavoro è
+  già sul tracker). `rice_history` vuoto, `short_ref: null` (li assegnano
+  `rice-update`/`backlog-refinement` come sempre).
+- **`backfill_review_needed: true`** — è ciò che segnala a
+  `delivery-watch` (triage) e a `backlog-refinement` che
+  classificazione/product_line/summary sono abbozzati e vanno confermati
+  dal PM (o l'idea archiviata come `declined`/`aborted` se è lavoro
+  spurio).
+- **NON** creare un nuovo ticket sul tracker (esiste già), **non**
+  compilare `requester_reply`/`clarification`, **non** aprire un
+  `deep_dive`.
+- Restituisci a `delivery-watch` lo slug creato. Il `push` lo fa
+  `delivery-watch` come parte del suo commit (o, se `idea-intake` gira
+  come sotto-skill con il proprio sync, con messaggio
+  `idea-intake: backfill <slug> da <key>`).
+
+Fuori da questa modalità, la skill si comporta come descritto nei
+"Passi" sotto.
+
 ## Passi
 
 > **Dry-run.** Se la skill è stata invocata in modalità simulazione

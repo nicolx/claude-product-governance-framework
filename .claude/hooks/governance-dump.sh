@@ -18,6 +18,7 @@
 #   governance-dump.sh iterations    # gli ultimi due product/roadmap/iterations/*.yaml
 #   governance-dump.sh pending       # contenuto di product/approvals/pending/*.yaml
 #   governance-dump.sh reference     # product/reference/*.yaml
+#   governance-dump.sh delivery      # delivery-watch.yaml + product-lines.yaml + le idea.yaml (per delivery-watch)
 #
 # SOLA LETTURA: non scrive niente, non fa commit, non tocca git. Stampa su
 # stdout. No-op (exit 0, nessun output) se non c'è una cartella product/
@@ -96,6 +97,7 @@ emit_reference() {
   emit_file "product/reference/annual-target.yaml"
   emit_file "product/reference/product-lines.yaml"
   emit_file "product/reference/friction-log.yaml"
+  emit_file "product/reference/delivery-watch.yaml"
 }
 
 footer() {
@@ -151,8 +153,15 @@ case "$MODE" in
     printf '# governance-dump: reference — SOLA LETTURA\n'
     emit_reference
     ;;
+  delivery)
+    printf '# governance-dump: delivery (delivery-watch) — SOLA LETTURA\n'
+    emit_file "product/reference/delivery-watch.yaml"
+    emit_file "product/reference/product-lines.yaml"
+    emit_ideas
+    footer
+    ;;
   *)
-    echo "Uso: governance-dump.sh sweep|backlog|ideas [--all]|measurements|iterations|pending|reference" >&2
+    echo "Uso: governance-dump.sh sweep|backlog|ideas [--all]|measurements|iterations|pending|reference|delivery" >&2
     exit 2
     ;;
 esac

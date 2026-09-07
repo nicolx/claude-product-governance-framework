@@ -87,7 +87,8 @@ inizializzata) e scaffolda `apps/` e `product/`.
     │       └── screenshots/               (PNG dimostrativi — NON tracciati, .gitignore)
     └── reference/
         ├── product-lines.yaml
-        └── friction-log.yaml
+        ├── friction-log.yaml
+        └── delivery-watch.yaml   ← coda di triage delle transizioni di delivery da comunicare (skill delivery-watch; lazy, richiede jira + delivery_watch.enabled)
 ```
 
 **Il punto d'ingresso per il materiale grezzo non ordinato è

@@ -57,8 +57,12 @@ proposer: ""                         # [NOME] di chi ha proposto l'idea
 notes: ""
 
 source:
-  type: email                        # email | meeting_transcript | slack | other
-  ref: ""                            # citazione/pointer al materiale in source/ (es. "source/email-2026-01-08.eml")
+  type: email                        # email | meeting_transcript | slack | jira_backfill | other
+  ref: ""                            # citazione/pointer al materiale in source/ (es. "source/email-2026-01-08.eml"); per jira_backfill: la chiave della card (es. "EPITA-317")
+  # jira_backfill: l'idea è stata creata da delivery-watch quando ha
+  # intercettato attività su una card del tracker non collegata a nessuna
+  # idea (lavoro andato dritto su Jira, fuori governance). Vedi
+  # backfill_review_needed più sotto e la skill delivery-watch.
 
 product_line: ""                     # deve corrispondere a un name in product/reference/product-lines.yaml — può restare "" se status è needs_clarification, o restare vuoto per classification: platform se non è legata a una Product Line specifica
 classification: idea                 # idea | bug | strategic_exception | mandate | platform — può restare provvisoria se status è needs_clarification
@@ -121,6 +125,16 @@ created_at: "2026-01-08"
 # dell'elemento nello strumento di provenienza, non la data dell'intake —
 # rice-watch/mandate-watch/measurement-watch contano il tempo trascorso
 # da qui.
+
+backfill_review_needed: false
+# true SOLO sulle idee create da delivery-watch per backfill (source.type:
+# jira_backfill): l'idea è nata da una card Jira intercettata fuori
+# governance, con classificazione/product_line/summary ABBOZZATI dalla
+# card, non confermati dal PM. delivery-watch (modalità triage) e
+# backlog-refinement la segnalano finché il PM non rivede quei campi (o
+# archivia l'idea come declined/aborted se è lavoro spurio) e azzera il
+# flag. Fatto di provenienza, scrittura diretta, non passa da
+# product/approvals/pending/ (stessa logica di rice_status).
 
 # --- Solo se status: needs_clarification (materiale arrivato in product/inbox/
 # troppo ambiguo per essere classificato senza altre informazioni) ---
