@@ -36,6 +36,21 @@ direttamente. Non ancora progettato né costruito.
   batch/email automatico, va ridiscussa esplicitamente, non ereditata
   per default.
 
+  **Parziale rediscussione: FATTA** per le transizioni di delivery. La
+  skill `delivery-watch` (playbook, "Transizioni di delivery rilevanti
+  per gli stakeholder") osserva il tracker di esecuzione e mette gli
+  eventi rilevanti (bug risolto, in sviluppo, bloccata, in produzione,
+  regressione) in una **coda di triage che sopravvive tra le sessioni**
+  (`product/reference/delivery-watch.yaml`), con un hook
+  (`check-delivery-queue.sh`) che ne ricorda il conteggio. Esito della
+  rediscussione: la *persistenza della coda* entra nel metodo (è
+  scrittura locale, come `requester_reply`); l'*auto-invio* resta fuori
+  (ogni mail è una bozza nella voce di coda che **il PM manda a mano**);
+  un cron opzionale (`/schedule`) può eseguire la sola modalità detect,
+  ma non fa triage e non spedisce nulla. Il livello *batch/email che
+  spedisce a persone senza un umano nel giro* resta fuori scope, come
+  qui sotto.
+
 ## Estensioni di `demo-capture`
 
 La skill `demo-capture` (evidenza visiva di delivery — playbook, "Product

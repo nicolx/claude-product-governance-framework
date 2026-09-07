@@ -106,6 +106,27 @@ per raccogliere:
    - **Nessun accesso programmatico** — `integration: manuale`:
      `jira-sync` preparerà i testi e il PM agirà a mano. Va bene per
      partire, si può aggiungere l'MCP in seguito.
+   - **`delivery-watch`** (blocco `delivery_watch:` nello stesso file) —
+     chiedi se il PM vuole attivare il monitoraggio delle transizioni di
+     delivery da comunicare agli stakeholder (bug risolto, in sviluppo,
+     bloccata, in produzione, regressione). Se sì (`enabled: true`):
+     - `board_jql` — una JQL della board/progetto per intercettare anche
+       le card **non** collegate a un'idea (lavoro andato dritto su Jira
+       → l'idea viene creata in automatico). `""` = solo idee con
+       `jira.card_id`;
+     - `default_product_line` — a quale product line assegnare le idee
+       create per backfill quando non è inferibile dalla card;
+     - `blocked_status_names` / `regression_labels` — se la board usa
+       stati/label specifici per "bloccata"/"regressione" oltre al flag
+       Impediment;
+     - `channel` — come il PM comunica di solito (informativo, non usato
+       per inviare);
+     - chiedi se vuole un **cron cloud agent** (`/schedule`) che esegua
+       `delivery-watch` in modalità detect senza sessione aperta — in tal
+       caso l'MCP Atlassian va connesso anche nell'ambiente cloud.
+     Nessun tool MCP nuovo da allowlistare: `delivery-watch` usa
+     `getJiraIssue` (con `expand:"changelog"`) e `searchJiraIssuesUsingJql`,
+     gli stessi già previsti per `jira-sync` (passo 7).
 7. **Fonte delle metriche** (blocco `metrics` in
    `framework/schema/governance-config.template.yaml`) — c'è un modo
    programmatico per leggere NSM e KPI dai dati di produzione (un MCP
@@ -178,7 +199,8 @@ che serve da lì e chiedi solo quello che manca.
    esiste) da `framework/schema/governance-config.template.yaml` —
    compila i campi noti dall'intervista: `project`, `initialized_at`,
    `pm_roster`, `framework.upstream_ref` (`git rev-parse upstream/main`
-   se disponibile, altrimenti `HEAD`), il blocco `jira` (passo 6), il
+   se disponibile, altrimenti `HEAD`), il blocco `jira` e — se il PM lo
+   attiva — il blocco `delivery_watch` (passo 6), il
    blocco `metrics` e la lista `connectors` (passo 7 — solo ciò che
    esiste; se non c'è una fonte metriche, `metrics.configured: false` e
    stop; se il PM ha dichiarato cartelle di contesto al passo 9, una o più

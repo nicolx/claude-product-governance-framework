@@ -107,6 +107,9 @@ agire da sola sulla priorità.
 - Non proporre comunicazioni di escalation (email, Slack) — per questo
   framework è deliberatamente fuori scope: la segnalazione forte in
   conversazione/log è sufficiente, l'escalation a stakeholder esterni
-  resta una scelta del PM.
+  resta una scelta del PM. (Le *notizie di delivery* a chi ha richiesto
+  un'iniziativa — è partita, è in produzione, si è bloccata — sono
+  competenza di `delivery-watch`, e anche lì mai auto-inviate: il PM
+  prepara la bozza e la manda a mano.)
 - Non silenziare un mandate `pending_review` solo perché è già stato
   segnalato in un run precedente.

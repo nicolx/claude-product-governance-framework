@@ -139,6 +139,16 @@ Planning).
 Da usare periodicamente (non in tempo reale) per aggiornare lo stato
 locale, tipicamente prima di generare uno `roadmap-snapshot`.
 
+> **Vedi anche.** Pull denormalizza lo **stato corrente** del ticket
+> sull'idea (`jira.status`). Non ha memoria del valore precedente e non
+> legge il `changelog`: per rilevare i **cambi** di stato rilevanti per
+> gli stakeholder (bug risolto, entrata in sviluppo, blocco, consegna,
+> regressione) e metterli in una coda di triage — e per creare l'idea di
+> una card lavorata fuori governance — c'è la skill `delivery-watch`
+> (playbook, "Transizioni di delivery rilevanti per gli stakeholder").
+> Se entrambe scrivono `jira.status`/`jira.last_polled_at` è lo stesso
+> fatto osservato: nessun conflitto.
+
 0. **Sincronizza da `origin`**: esegui
    `bash .claude/hooks/governance-sync.sh pull` prima di iniziare il
    polling, così non sovrascrivi con dati Jira uno stato locale già

@@ -1,0 +1,77 @@
+# Template per product/reference/delivery-watch.yaml
+#
+# Stato di osservazione del tracker di esecuzione (Jira o equivalente) per
+# le TRANSIZIONI di stato rilevanti per gli stakeholder sulle iniziative
+# collegate — vedi playbook, "Transizioni di delivery rilevanti per gli
+# stakeholder (delivery-watch)".
+#
+# Tracciato da git: id + stato-visto all'ultimo giro + esito di triage
+# (comprese le bozze di mail e la data di invio dichiarata dal PM). Un run
+# successivo di delivery-watch confronta con `tickets` e rileva solo i
+# CAMBIAMENTI, senza ri-accodare eventi già smarcati.
+#
+# Scritto SOLO da delivery-watch (poll+detect e triage). Non creato da
+# init-governance-project: lo scaffolda delivery-watch al primo run (stesso
+# principio di nsm-tracking.yaml). No-op se .governance/config.yaml non ha
+# jira.configured: true e delivery_watch.enabled: true.
+#
+# La CODA (queue) SOPRAVVIVE TRA LE SESSIONI: è il punto in cui il PM non
+# perde un evento di delivery anche se non lo smarca subito. L'hook
+# check-delivery-queue.sh (SessionStart + Stop) conta le voci con
+# triage_status: pending. Le bozze di mail vivono QUI (stessa logica di
+# requester_reply sull'idea): delivery-watch non invia nulla — le manda il
+# PM a mano; il testo inviato resta nella voce come trail.
+
+# Esito dell'ultimo giro — per il "controllato N giorni fa" dell'hook e per
+# sapere se il connettore o la board_jql non è stato possibile interrogarli.
+last_watch:
+  run_at: null            # data/ora ISO dell'ultimo giro di delivery-watch
+  tickets_polled: 0
+  connector_status: null  # reachable | unreachable | manual
+  board_jql_status: null  # null se delivery_watch.board_jql non è configurata | reachable | unreachable
+  note: null              # es. "OAuth Atlassian scaduto — reauth: /mcp"
+
+# Snapshot dell'ultimo giro: un'entry per ticket nel perimetro (idee con
+# jira.card_id + risultati di delivery_watch.board_jql). Il prossimo run
+# confronta con questo per rilevare i cambi. Prima vista di un ticket =
+# baseline, NON evento.
+tickets: []
+# Esempio di singola voce:
+# - card_id: ""             # chiave del ticket (es. "EPITA-317")
+#   url: ""
+#   idea_ref: ""            # short_ref se assegnato (PG-042), altrimenti lo slug della cartella idea — mai vuoto
+#   idea_slug: ""           # sempre lo slug della cartella (identificatore canonico)
+#   issuetype: ""           # Bug | Story | Task | ... (come esposto da Jira)
+#   last_seen_status: ""    # nome della colonna/stato Jira all'ultimo giro
+#   last_seen_category: ""  # new | indeterminate | done  (status.statusCategory.key — universale su ogni board)
+#   last_seen_assignee: null   # display name o accountId, null se non assegnata
+#   last_seen_flagged: false   # true se il flag "Impediment"/"Flagged" è impostato
+#   last_polled_at: ""      # ISO del giro in cui è stato letto
+
+# CODA DI TRIAGE — append quando si rileva un evento; si smarca voce per
+# voce nella modalità "delivery-watch triage". Una voce NON si cancella: si
+# porta triage_status a drafted/sent o dismissed (audit trail).
+queue: []
+# Esempio di singola voce:
+# - id: ""                  # slug stabile "{YYYY-MM-DD}-{card_id}-{event_type}" — identificatore in prima colonna
+#   detected_at: ""         # ISO — quando delivery-watch ha rilevato l'evento
+#   occurred_at: ""         # ISO — timestamp Jira della transizione (dal changelog); "" se non disponibile
+#   card_id: ""
+#   url: ""
+#   idea_ref: ""            # short_ref o slug (mai vuoto)
+#   idea_slug: ""
+#   event_type: ""          # entered_development | delivered | bug_resolved | blocked | regression
+#   from: ""                # stato/valore precedente (es. "In Progress", "—")
+#   to: ""                  # stato/valore nuovo (es. "Done"; per entered_development: nome dell'assegnatario)
+#   actor: null             # chi ha fatto la transizione in Jira (display name), se noto dal changelog
+#   backfilled_idea: false  # true se questo evento ha fatto creare l'idea (card intercettata da board_jql, non collegata)
+#   suggested_framing: ""   # update | reassurance | criticality
+#   suggested_audience: []  # nomi/ruoli: stakeholders della product_line (product-lines.yaml) + eventuale richiedente (idea.proposer)
+#   draft_headline: ""      # UNA riga PM-facing, es. "«Ricevute non riconosciute» è in produzione"
+#   triage_status: pending  # pending | drafted | sent | dismissed
+#   draft_subject: null     # compilato nel triage
+#   draft_body: null        # compilato nel triage (testo pronto da copiare — mai inviato in automatico)
+#   draft_recipients: []    # confermati/editati dal PM nel triage
+#   sent_at: null           # data dichiarata dal PM dopo l'invio manuale (triage_status: sent)
+#   dismiss_reason: null    # se dismissed: perché il PM non comunica questo evento
+#   notes: null

@@ -63,6 +63,25 @@ jira:
   reauth: ""                      # comando per rimetterlo su quando scade (es. "/mcp")
   note: ""                        # note libere (permessi, quirk, tracker non-Jira, ecc.)
 
+# --- Monitoraggio delle transizioni di delivery (lo usa delivery-watch) ---
+# Osserva il tracker per gli eventi rilevanti per gli stakeholder (entrata
+# in sviluppo, consegna in produzione, bug risolto, card bloccata,
+# regressione) e li mette in una coda di triage in
+# product/reference/delivery-watch.yaml. Richiede jira.configured: true e
+# usa lo stesso connettore (jira.integration/probe/reauth) — nessun tool
+# nuovo, il changelog è un `expand` di getJiraIssue. Vedi playbook,
+# "Transizioni di delivery rilevanti per gli stakeholder (delivery-watch)".
+delivery_watch:
+  enabled: false                  # true per attivare la watch
+  board_jql: ""                   # JQL della board/progetto per intercettare anche card NON collegate a un'idea
+                                  #   (→ backfill automatico dell'idea via idea-intake). "" = solo idee con jira.card_id
+  default_product_line: ""        # product line assegnata alle idee di backfill quando non inferibile dalla card
+  blocked_status_names: []        # nomi di stato che indicano "bloccata" oltre al flag Impediment (es. ["Blocked", "On Hold"])
+  regression_labels: []           # label Jira che indicano una regressione (es. ["regression", "reopened"])
+  channel: "email"                # informativo: come il PM comunica di solito — NON usato per inviare
+  fixture: ""                     # SOLO test: path a un file che emula l'output di getJiraIssue+changelog
+                                  #   (letto solo con jira.integration: manuale)
+
 # --- Fonte delle metriche (la usano nsm-watch e measurement-watch per
 # leggere NSM e KPI dai dati di produzione invece di chiederli al PM) ---
 # NB: qui c'è solo la DICHIARAZIONE del connettore. Il contratto di query

@@ -33,7 +33,7 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `context/` | Istanza, **tracciata da git** (a differenza di `product/inbox/`) | `context-intake` (drop manuale o pull da cartelle collegate) e `context-watch` (pull periodico). Due canali di ingresso: file grezzi droppati in `context/` (poi rimossi), e pull da cartelle documentali collegate (`.governance/config.yaml`, una o più voci `connectors:` con `folders:` — connettori in sola lettura). Regole di scrittura: un run avviato dal PM o dal drop chiede **sempre conferma in conversazione** (nessuna coda `pending/`); il pull periodico di `context-watch` **auto-applica** gli aggiornamenti di routine (recap al PM) e manda i **cambiamenti materiali** in `product/approvals/pending/` (`type: context_update`). Nessun file grezzo (PDF, slide, docx) vi persiste — vedi playbook, "Contesto aziendale", sottosezione "Aggiornamento di routine vs. cambiamento materiale" |
 | `context/.sources-seen.yaml` | Istanza, **tracciata da git** | `context-watch` (stato del giro: `last_watch`, `materiality`, `pending_ref`), `context-intake` (voce per documento trascritto), `pending-approval` (all'esito di un `context_update`). Fatti di sync osservati, non decisioni: scrittura diretta, nessuna approvazione a sé. Creato da `init-governance-project` se il PM dichiara cartelle di contesto, altrimenti lazy al primo pull |
 | `product/inbox/` | Istanza, NON tracciata da git | `inbox-triage` la svuota spostando ogni elemento altrove; nessuna approvazione richiesta per lo spostamento in sé |
-| `product/ideas/`, `product/prds/` (creazione) | Istanza | `idea-intake`, `inbox-triage`, `prd-draft` — creazione diretta, non passa da approvazione (non è ancora una decisione di priorità) |
+| `product/ideas/`, `product/prds/` (creazione) | Istanza | `idea-intake`, `inbox-triage`, `prd-draft` — creazione diretta, non passa da approvazione (non è ancora una decisione di priorità). **In più** `delivery-watch` crea idee di **backfill** (solo via `idea-intake` in modalità backfill, quando `delivery_watch.board_jql` intercetta attività su una card non collegata a nessuna idea): stessa logica — creazione diretta, non una decisione di priorità — con `source.type: jira_backfill` e `backfill_review_needed: true` finché il PM non conferma classificazione/product_line al triage |
 | `product/ceremonies/` (cartella cerimonia, `source/`, `decisions.yaml`, `.run-meta.yaml`) | Istanza | `backlog-refinement`, `iteration-planning`, `log-ceremony` — registrazione diretta di una riunione di team: trascrizione + esito qualitativo + metadati di esecuzione. Non passa da `pending/` (non è una decisione di priorità: gli impatti su RICE/roadmap che ne derivano, sì). `.run-meta.yaml` è metadato di esecuzione scritto dalla skill, mai a mano. `rollback-ceremony` può annullare un run (revert forward dei commit + cartella `-void` con la trascrizione), mai una decisione già approvata |
 | `product/ideas/*/delivery.estimated_effort_weeks` | Istanza | Solo `iteration-planning` — stima di tempo-calendario dal team tech per la contabilità di capacità d'iterazione, **non** un input del RICE. Scrittura diretta, nessuna approvazione (stessa logica di `deadline`/`rice_status`) |
 | `product/ideas/*/rice_history`, `product/ideas/*/strategic_exceptions`, `product/ideas/*/mandate` (dopo la creazione), `product/ideas/*/classification` (riclassificazione a `mandate`), `product/roadmap/`, comunicazioni in uscita | Istanza | Solo tramite `product/approvals/pending/` — vedi regola sotto |
@@ -42,7 +42,7 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `product/ideas/*/mandate.analysis_start_by`, `product/ideas/*/mandate.escalation_status` | Istanza | Solo `mandate-watch` — fatti calcolati, non decisioni, scrittura diretta senza approvazione (stesso principio di `jira.status`) |
 | `product/ideas/*/rice_status` (incluso `deep_dive`) | Istanza | `rice-watch` (e `idea-intake`/`inbox-triage` per `deep_dive.needed`/`requested_at` all'origine) — `flagged_since` è un fatto osservato; `blocked_reason`/`waiting_on`/`deep_dive.*` sono cattura di contesto (chiesti al PM, mai presunti), non decisioni di priorità: nessuna passa da approvazione |
 | `product/ideas/*/summary`, `product/ideas/*/notes` | Istanza | `idea-intake`/`inbox-triage` all'origine, poi qualunque skill/PM in conversazione — descrizione e note di contesto, non decisioni di priorità, scrittura diretta |
-| `product/ideas/*/jira.*` | Istanza | `jira-sync` (tutte le modalità) e `idea-intake`/`inbox-triage` per i bug all'intake — fatto osservato (il ticket esiste), scrittura diretta senza approvazione (stessa logica di `jira.status`). Per un `classification: bug` il filing è **immediato e obbligatorio** appena il PM conferma la classificazione: il ticket si apre subito (con impatto stimato), mai rimandato a un secondo assenso — vedi playbook, "Alimentazione del bucket delle idee", punto a. Se il connettore è `manuale`/irraggiungibile resta un'azione aperta esplicita, mai un filing silenziosamente saltato |
+| `product/ideas/*/jira.*` | Istanza | `jira-sync` (tutte le modalità), `idea-intake`/`inbox-triage` per i bug all'intake (e `idea-intake` in modalità backfill per una card intercettata da `delivery-watch`), e `delivery-watch` (rinfresco di `jira.status`/`jira.last_polled_at` al poll, stesso fatto osservato di `jira-sync` Pull) — fatto osservato (il ticket esiste / il suo stato), scrittura diretta senza approvazione (stessa logica di `jira.status`). Per un `classification: bug` il filing è **immediato e obbligatorio** appena il PM conferma la classificazione: il ticket si apre subito (con impatto stimato), mai rimandato a un secondo assenso — vedi playbook, "Alimentazione del bucket delle idee", punto a. Se il connettore è `manuale`/irraggiungibile resta un'azione aperta esplicita, mai un filing silenziosamente saltato |
 | `product/ideas/*/short_ref` | Istanza | Solo `backlog-refinement`, assegnato pigramente (`{prefisso}-{NNN}`, `next = max+1`) al primo refinement che incontra l'idea senza handle. Il refinement è un punto di serializzazione a scrittore singolo → niente collisioni offline; nessun file contatore. Fatto di housekeeping, scrittura diretta, non passa da `pending/`. Una volta assegnato non cambia. `id`/nome cartella restano l'identificatore canonico |
 | `product/ideas/*/requester_reply` | Istanza | `idea-intake`/`inbox-triage` — bozza di risposta al richiedente, **mai inviata in automatico** (la manda il PM). Cortesia 1:1 con l'idea, non una decisione applicata a un target file: nessuna approvazione via `pending/`, stessa logica di `clarification.draft_message` |
 | `product/ideas/*/status: declined`/`aborted`, `product/ideas/*/decline_reason` | Istanza | `idea-intake`/`inbox-triage` propongono lo scarto al triage, **oppure** `backlog-refinement` a un checkpoint della sweep di apertura quando il PM decide che un'idea non ha più motivo di esistere (`declined` se non è mai partita, `aborted` se era in lavorazione). Sempre su conferma **in conversazione** (è un giudizio) — non passa dalla coda `pending/`, ma non è mai deciso dalla sola skill; l'azione va registrata in `decisions.yaml` della cerimonia |
@@ -54,6 +54,8 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `product/demos/captures/*/manifest.yaml` | Istanza, **tracciata da git** | Solo `demo-capture` — record di audit di cosa è stato catturato, da quale commit, quando: fatto osservato, non decisione (stessa logica di `jira.card_id`), scrittura diretta senza approvazione |
 | `product/demos/captures/*/screenshots/` | Istanza, **NON tracciata da git** (`.gitignore` di root) | Solo `demo-capture` — artefatti binari, mai committati. `demo-capture` non fa **nessuna azione in uscita**: è il PM ad allegarli alla card del tracker di esecuzione / al deck per gli stakeholder, a mano (stessa logica di `requester_reply`) |
 | `product/reference/nsm-tracking.yaml` | Istanza | Solo `nsm-watch` — creato lazy al primo run (non da `init-governance-project`), scritto direttamente: `readings`/`trend_status`/`alert.status` sono fatti/calcoli osservati, `discovery_focus_confirmed`/`resolved_*` sono cattura di decisioni già espresse dal PM in conversazione. Nessuno di questi passa da approvazione |
+| `product/reference/delivery-watch.yaml` | Istanza, **tracciata da git** | Solo `delivery-watch` (poll+detect e triage) — creato lazy al primo run (non da `init-governance-project`, richiede `jira.configured: true` + `delivery_watch.enabled: true`). `last_watch`/`tickets` sono fatti osservati dal tracker; le voci `queue` (eventi rilevati) sono fatti osservati, le bozze di mail e il loro esito (`draft_*`, `sent_at`, `dismiss_reason`) sono cattura di decisioni già espresse dal PM al triage (mai presunte). Nessuno passa da approvazione. Le mail non partono mai in automatico: bozza nella voce di coda, la manda il PM (stessa logica di `requester_reply`); il testo inviato resta come trail |
+| `product/ideas/*/backfill_review_needed` | Istanza | `delivery-watch` lo mette a `true` alla creazione di un'idea di backfill; qualunque skill/PM lo azzera al triage dopo aver confermato classificazione/product_line (o archiviato l'idea). Fatto di provenienza, scrittura diretta, non passa da approvazione (stessa logica di `rice_status`) |
 | `product/reference/annual-target.yaml` | Istanza | Creato da `init-governance-project` (passo 4 intervista); aggiornato in seguito solo su richiesta esplicita dell'utente (nuovo Budget/BP, override per Product Line). È l'incremento atteso, mai il totale a budget — `rice-update` lo legge per calibrare l'Impact. Non passa da approvazione (è un dato di riferimento condiviso, come il denominatore Reach) |
 | `.governance/config.yaml` | Istanza | Solo `init-governance-project`, in scrittura successiva solo su richiesta esplicita dell'utente |
 | `.claude/settings.local.json` | Istanza, **NON tracciata da git** | Solo `init-governance-project` (allow entries dei tool del connettore dichiarato — ricerca/lettura + creazione ticket, così le skill non chiedono permesso per i passi che il metodo impone: probe, dedup, filing immediato di un bug; per un connettore sorgente di contesto, **solo** i tool di lettura/elenco) e richiesta esplicita dell'utente. La parte stack-agnostica dei permessi sta invece in `.claude/settings.json` (proprietà framework) |
@@ -138,6 +140,17 @@ l'evidenza esce verso gli stakeholder è sempre un atto manuale del PM
 (stessa logica di `requester_reply`): non c'è comunicazione in uscita da
 far passare da `pending/`.
 
+Corollario: `delivery-watch` non rientra nella regola. Osserva il tracker
+di esecuzione e mette gli eventi rilevanti (bug risolto, in sviluppo,
+bloccata, in produzione, regressione) in una coda di triage
+(`product/reference/delivery-watch.yaml`) — fatti osservati, scrittura
+diretta, come le altre watch. Non invia mai nulla: nel triage il PM
+prepara una **bozza di mail** dentro la voce di coda e la **manda a
+mano** (stessa logica di `requester_reply` — nessun `outbound_comm`,
+nessun gate `pending/`; il testo inviato resta nella voce come trail). Il
+**backfill** di un'idea da una card Jira non tracciata è creazione
+diretta (stessa logica di `idea-intake`), non una decisione di priorità.
+
 Corollario: l'apertura del ticket di un **bug confermato** sul tracker di
 esecuzione non passa da `pending/` — non è una decisione di priorità (un
 bug bypassa il RICE per disegno) e rimandarla a un secondo assenso
@@ -161,7 +174,7 @@ playbook, sezione "Sincronizzazione dell'istanza (`origin`)".
 
 Helper gemello per la **lettura in blocco**: `.claude/hooks/governance-dump.sh`
 (`sweep`|`backlog`|`ideas`|`measurements`|`iterations`|`pending`|
-`reference`) concatena in **una sola tool call** i file YAML rilevanti,
+`reference`|`delivery`) concatena in **una sola tool call** i file YAML rilevanti,
 così una skill non fa glob-e-leggi-ognuna N volte. Sola lettura, no-op sul
 canonico. La sweep di apertura del Backlog Refinement lo usa una volta e
 calcola tutte le watch inline; le scritture risultanti
@@ -175,9 +188,10 @@ metodo), non i dati.
 ## Connettori esterni
 
 `.governance/config.yaml` può dichiarare connettori a **qualunque** sistema
-esterno — il framework non fissa quali: `jira:` (il tracker, lo usa
-`jira-sync`; Jira o altro), `metrics:` (la fonte di NSM/KPI, la usano le
-watch di metriche), e `connectors:` (lista aperta per il resto). Stessa
+esterno — il framework non fissa quali: `jira:` (il tracker, lo usano
+`jira-sync` e `delivery-watch`; Jira o altro), `metrics:` (la fonte di
+NSM/KPI, la usano le watch di metriche), e `connectors:` (lista aperta
+per il resto). Stessa
 disciplina per tutti: dichiarati da `init-governance-project` (scrittura
 successiva solo su richiesta esplicita), campi comuni
 `integration`/`probe`/`reauth`, **verificati all'inizio dei processi

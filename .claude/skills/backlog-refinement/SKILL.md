@@ -19,7 +19,9 @@ rispecificare ogni volta e tiene insieme, in un unico posto, la sequenza
 > pulizie di scadenza, `closure` restano mostrate come testo), nessun
 > commit, chiusura con `🔍 DRY-RUN`. Vedi playbook, "Modalità dry-run
 > (simulazione)". `governance-dump.sh` gira comunque (è sola lettura), e
-> la riconciliazione Jira in background è comunque sola lettura. In
+> la riconciliazione Jira in background è comunque sola lettura;
+> `delivery-watch` in dry-run legge e classifica ma non scrive la coda né
+> crea idee di backfill. In
 > dry-run i checkpoint del passo 2 si eseguono comunque (mostri le
 > tabelle, raccogli i commenti del PM, dici cosa *scriveresti* al commit
 > unico di fine sweep). Al passo 3 elenca comunque cosa c'è in coda,
@@ -82,14 +84,17 @@ piano passa **sempre** da `product/approvals/pending/`
         "lettura automatica saltata" vanno nel riepilogo come
         **rimandati**.
       - **`jira`** (`atlassian-mcp`/`cli:*`): idem. Se risponde, **lancia
-        la riconciliazione Jira come task in background** (`jira-sync`
+        come task in background** (a) la riconciliazione Jira (`jira-sync`
         modalità Riconciliazione — idee mai passate dal RICE il cui lavoro
-        è già partito in Jira) e prosegui subito con la sweep locale: ne
-        raccogli l'esito al punto e. Se `jira.integration` è
-        `manuale`/vuoto, salta la riconciliazione **senza rumore** (scelta
-        di setup). Se dichiarato ma irraggiungibile e il PM sceglie di
-        proseguire, la riconciliazione resta **rimandata** nel riepilogo,
-        mai completata o non applicabile.
+        è già partito in Jira) e (b), se `delivery_watch.enabled`,
+        `delivery-watch` in modalità detect (transizioni di delivery da
+        comunicare agli stakeholder + backfill di card non collegate).
+        Prosegui subito con la sweep locale: ne raccogli l'esito al punto
+        e. Se `jira.integration` è `manuale`/vuoto, salta la
+        riconciliazione **senza rumore** (scelta di setup). Se dichiarato
+        ma irraggiungibile e il PM sceglie di proseguire, riconciliazione
+        e `delivery-watch` restano **rimandati** nel riepilogo, mai
+        completati o non applicabili.
 
    b. **Un solo** `bash .claude/hooks/governance-dump.sh sweep` → tutto lo
       stato rilevante (idee attive, misurazioni, NSM, denominatori,
@@ -137,7 +142,9 @@ piano passa **sempre** da `product/approvals/pending/`
       garantiste. Sono cattura di contesto che serve alla watch; il
       checkpoint è il momento uniforme *in più*.
 
-   e. **Raccogli** l'esito della riconciliazione Jira lanciata al punto a.
+   e. **Raccogli** l'esito dei task in background lanciati al punto a: la
+      riconciliazione Jira e, se attivo, `delivery-watch` (nuovi eventi
+      accodati, idee create per backfill, coda `pending` totale).
 
    f. **Una sola scrittura, un solo commit.** Applica *tutti* i valori
       calcolati (`escalation_status`, `rice_status.*`, `alert.*`,
@@ -159,10 +166,23 @@ piano passa **sempre** da `product/approvals/pending/`
       riepilogo della sweep. Se non ci sono connettori di contesto, salta
       senza rumore.
 
-   h. **Passa a `log-ceremony`** i riepiloghi consolidati (un blocco per
-      watch, **più** il recap di `context-watch`), le azioni di checkpoint
-      (una `decision` ciascuna, con `impacts.idea_ids`), e l'esito della
-      riconciliazione Jira.
+   h. **Delivery: `delivery-watch`.** Se `.governance/config.yaml` ha
+      `jira.configured: true` e `delivery_watch.enabled: true`, raccogli
+      il recap del task lanciato al punto a (eventi accodati, backfill,
+      coda). `delivery-watch` scrive `product/reference/delivery-watch.yaml`
+      e le eventuali idee di backfill, con un **commit distinto** (helper
+      con messaggio `delivery-watch: …`) — non lo si accorpa a quello
+      della sweep del punto f. Il recap (eventi nuovi / coda `pending` /
+      backfill da rivedere / rimandato) entra nel riepilogo. La
+      **camminata della coda di triage** non si fa qui: è un'azione
+      separata del PM dopo la cerimonia. Se `delivery_watch` non è
+      attivo, salta senza rumore.
+
+   i. **Passa a `log-ceremony`** i riepiloghi consolidati (un blocco per
+      watch, **più** il recap di `context-watch` e quello di
+      `delivery-watch`), le azioni di checkpoint (una `decision`
+      ciascuna, con `impacts.idea_ids`), e l'esito della riconciliazione
+      Jira.
 
 3. **Svuota la coda di approvazione — prima di guardare il backlog.**
    Elenca `product/approvals/pending/` (usa `pending-approval`, sezione
@@ -311,6 +331,11 @@ piano passa **sempre** da `product/approvals/pending/`
   esiste ancora. La camminata della cerimonia **non** l'ha approvata.
 - **`iteration-board`** per la vista "a colpo d'occhio" del piano (daily
   standup, mail settimanale, Confluence).
+- **`delivery-watch`** in modalità triage per smarcare la coda delle
+  transizioni di delivery accodate nella sweep: per ogni evento il PM
+  decide se preparare una mail agli stakeholder (che manda a mano) o
+  archiviarlo; e rivede le idee create per backfill
+  (`backfill_review_needed: true`).
 - Il passo naturale successivo è **`roadmap-snapshot`** — la proposta di
   snapshot settimanale della roadmap, che ora **referenzia** il Piano di
   Iterazione (`iteration_plan_ref`) invece di ricostruire una propria
