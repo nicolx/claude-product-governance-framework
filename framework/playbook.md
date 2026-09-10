@@ -1491,6 +1491,59 @@ approfondimento potrebbe cambiare il RICE Score.
 - [ ] L'How di alto livello è stato abbozzato con il team tech?
 - [ ] Il ROI atteso è ancora coerente col RICE originale? Se no, il ranking è stato aggiornato nella fonte di verità?
 
+## Team di sviluppo e staffing di un PRD (`team-fit`)
+
+Un PRD dice *cosa* fare e, nell'How, *quanto è intrecciato* col sistema.
+La domanda successiva — *chi, nel team, potrebbe prenderlo in carico?* —
+è una decisione di team, non di processo, ma il metodo può renderla più
+informata invece di lasciarla all'istinto.
+
+### L'anagrafica del team (`product/reference/team.yaml`)
+
+Un'istanza mantiene una mappa leggera di **chi c'è nel team di sviluppo,
+quali aree di `apps/` presidia, cosa sa fare, quanto è disponibile**. Per
+persona: nome (o handle), eventuale email, seniority, gli slug `apps/` che
+presidia, tag di competenza liberi (linguaggi, framework, aree),
+disponibilità in prosa, note di contesto.
+
+- **Chi la scrive.** `init-governance-project` la popola all'intervista
+  (passo "Team di sviluppo"); `team-roster` la fa evolvere quando il team
+  cambia (aggiungi / aggiorna / rimuovi un membro).
+- **Non passa da approvazione.** È un dato di riferimento condiviso, alla
+  pari di `product-lines.yaml`, `annual-target.yaml` e del denominatore
+  Reach: scrittura diretta, tracciata da git. Non è una decisione di
+  priorità né una comunicazione in uscita, quindi la regola del
+  `pending/` non la tocca.
+- **Descrittiva, non valutativa.** È una mappa di competenze e presidio
+  per instradare il lavoro — non uno strumento di valutazione delle
+  persone. Niente giudizi di performance, niente note sensibili:
+  `team-roster` riporta il focus se la conversazione va lì. Privacy: il
+  minimo che serve al matching.
+
+### La proposta di staffing (`team-fit`)
+
+`team-fit <prd-slug>` legge il PRD (l'How e i sistemi toccati, i rischi e
+le dipendenze aperte, il dominio dall'idea di origine) e lo incrocia con
+`team.yaml`, producendo una **shortlist ordinata di candidati** — ognuno
+con una motivazione puntuale: familiarità diretta con gli `apps/`
+toccati, tag di competenza che coprono un rischio specifico,
+disponibilità.
+
+È **advisory e a sola lettura**: non scrive nulla, non lascia una traccia
+su file, non assegna niente. L'assegnazione vera si decide in **Roadmap
+update & Iteration planning** (checklist: "i task sono caricati nel
+tracker e assegnati?") e vive nel tracker di esecuzione, che resta
+l'unica fonte di verità.
+
+`team-fit` è **onesta sui buchi**: se un rischio o un sistema toccato non
+è coperto da nessuno nel roster, lo dice — è un segnale (supporto
+esterno, upskilling, hiring), non un dettaglio da nascondere. Se il
+roster è vuoto o palesemente vecchio, rimanda a `team-roster` invece di
+tirare a indovinare.
+
+Quando usarla: durante o subito dopo `prd-draft` (che la suggerisce senza
+lanciarla), e all'Iteration Planning quando si confermano le assegnazioni.
+
 ## Roadmap update & Iteration planning
 
 *"You don't need to be perfect. You need to be fast and learning." —
@@ -1547,7 +1600,7 @@ pattern trascrizione + decisioni strutturate + `.run-meta.yaml`.
 **Checklist operativa**
 - [ ] Ogni User Story ha criterio di accettazione chiaro?
 - [ ] Il team tech ha fatto la valutazione 80/20 su ogni storia?
-- [ ] I task sono caricati nel tracker di esecuzione e assegnati?
+- [ ] I task sono caricati nel tracker di esecuzione e assegnati? (`team-fit <prd-slug>` propone una shortlist di candidati dal roster; l'assegnazione si decide qui e vive nel tracker)
 - [ ] L'agenda tiene conto del flusso di manutenzione ordinaria/debito tecnico?
 - [ ] Le date di rilascio stimate sono coerenti con quanto discusso?
 - [ ] Gli stakeholder chiave sono stati aggiornati sulle aspettative di delivery?

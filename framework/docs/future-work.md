@@ -188,3 +188,29 @@ uscita (mai righe grezze) — che qualunque connettore deve rispettare,
 indipendente dallo stack. La *dichiarazione* del connettore
 (`metrics.integration`) c'è già; manca la forma della richiesta e della
 risposta. Da decidere quando si affronta il lavoro attivo, non ora.
+
+## Arricchimento di `team-fit`
+
+**Roster + matching euristico: FATTO** (`product/reference/team.yaml`,
+skill `team-roster` per popolarlo, `team-fit` per proporre una shortlist
+di candidati su un PRD). Il matching incrocia `apps` presidiati e tag
+`skills` con i sistemi toccati e i rischi aperti del PRD — dati dichiarati
+a mano nel roster.
+
+Restano fuori scope, da rivedere se emerge la domanda:
+
+- **Segnali osservati invece che dichiarati.** Chi ha toccato di recente
+  un'area di `apps/` (git log/blame sui submodule), chi risulta assignee
+  ricorrente sulle card Jira di un componente — segnali che
+  raffinerebbero (o smentirebbero) il `presidio` dichiarato nel roster.
+  Richiede di leggere la history dei submodule e/o il tracker; da valutare
+  con la stessa cautela degli altri connettori (sola lettura, mirato).
+- **Carico corrente reale.** Oggi `availability` è una nota in prosa. Un
+  aggancio al numero di card aperte per persona sul tracker darebbe un
+  segnale di saturazione più oggettivo — stesso discorso del punto sopra.
+- **Traccia scritta della proposta.** `team-fit` è deliberatamente
+  advisory e non lascia file: la decisione di assegnazione è di Iteration
+  Planning e vive nel tracker. Se in futuro servisse un record auditabile
+  (revisione con stakeholder su "perché quella persona"), andrebbe
+  disegnato come artefatto di proposta accanto al PRD, non come scrittura
+  diretta di un'assegnazione.

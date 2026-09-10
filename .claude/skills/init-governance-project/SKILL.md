@@ -189,6 +189,23 @@ per raccogliere:
    playbook, "Contesto aziendale", sottosezione "Aggiornamento di routine
    vs. cambiamento materiale").
 
+10. **Team di sviluppo** — chi lo compone e cosa sa fare. Serve a
+    `team-fit`, che propone chi potrebbe prendere in carico un PRD
+    incrociando l'How con le competenze del team. Per ogni persona
+    raccogli, senza presumere: nome (o handle), email **solo se il team
+    la vuole tracciare** (default `""`, come per `pm_roster`), seniority,
+    gli slug delle voci `apps/` che presidia (quelle collegate al passo
+    5), tag di competenza liberi (linguaggi, framework, aree),
+    disponibilità in prosa, note di contesto. Se l'utente ha già una
+    tabella/export pronto, usalo direttamente. Popola
+    `product/reference/team.yaml` da `framework/schema/team.template.yaml`.
+    Se il PM non ha il dato pronto ora, va bene: crea lo scaffold vuoto
+    (solo header, `members: []`) e nota che `team-roster` lo popola in
+    seguito — **non bloccare l'inizializzazione**. Il roster è
+    **descrittivo, non valutativo**: competenze e presidio, non giudizi
+    di performance. Vedi playbook, "Team di sviluppo e staffing di un PRD
+    (`team-fit`)".
+
 Non forzare un ordine rigido se l'utente fornisce più informazioni insieme
 (es. incolla una trascrizione di un meeting di kickoff): estrai tutto ciò
 che serve da lì e chiedi solo quello che manca.
@@ -232,6 +249,10 @@ che serve da lì e chiedi solo quello che manca.
    raccolto al passo 4 dell'intervista, o `value: null` con nota se non
    ancora noto.
 4. `product/reference/friction-log.yaml` (da template, vuoto).
+   `product/reference/team.yaml` (da `framework/schema/team.template.yaml`)
+   — con i membri raccolti al passo 10 dell'intervista, o solo l'header
+   con `members: []` se il PM non aveva il dato pronto (lo popola
+   `team-roster` in seguito).
    Non creare qui `product/reference/nsm-tracking.yaml`: baseline e
    target delle NSM spesso richiedono un giro su DataBricks/analytics
    che non è pratico fare a metà di questa intervista — lo scaffolda la
@@ -308,7 +329,9 @@ che serve da lì e chiedi solo quello che manca.
   submodule non ancora collegati, denominatori Reach non ancora
   formalizzati, **target annuale di Impact non ancora dichiarato**
   (`product/reference/annual-target.yaml`, `value: null`), materiale di
-  contesto aziendale non ancora fornito se `context/` è rimasta vuota).
+  contesto aziendale non ancora fornito se `context/` è rimasta vuota,
+  **anagrafica del team non ancora popolata** se `team.yaml` ha
+  `members: []` — `team-roster` la riempie).
 - Ricorda che da questo momento in poi nessuna scrittura in `product/`
   deve avvenire senza passare da `product/approvals/pending/` — vedi
   `CLAUDE.md` e `framework/playbook.md`.

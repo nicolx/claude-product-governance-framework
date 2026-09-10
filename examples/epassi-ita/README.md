@@ -13,6 +13,9 @@ schema.
   da cui `framework/playbook.md` è stato genericizzato.
 - `product/reference/product-lines.yaml` — le 5 Product Line reali di
   Epassi ITA, popolate dalla tabella del playbook.
+- `product/reference/team.yaml` — anagrafica del team di sviluppo (nomi
+  illustrativi), per validare lo schema e mostrare cosa incrocia
+  `team-fit` quando propone chi potrebbe prendere in carico un PRD.
 - `product/ideas/2026-01-08-approvazione-ricevute-solo-totale/` — un'idea
   ricostruita dalle Cronache (Episodi 1-2: la segnalazione di Filiberto
   sul motore di approvazione ricevute), usata per validare che

@@ -88,6 +88,7 @@ inizializzata) e scaffolda `apps/` e `product/`.
     └── reference/
         ├── product-lines.yaml
         ├── friction-log.yaml
+        ├── team.yaml             ← anagrafica del team di sviluppo: presidio apps/, competenze, disponibilità (skill team-roster per popolarla, team-fit per proporre chi prende in carico un PRD)
         └── delivery-watch.yaml   ← coda di triage delle transizioni di delivery da comunicare (skill delivery-watch; lazy, richiede jira + delivery_watch.enabled)
 ```
 
