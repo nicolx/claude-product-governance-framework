@@ -44,11 +44,14 @@ non richiama skill di scrittura.
 2. **Rendi i quattro bucket**, in quest'ordine, come tabella o blocco
    compatto — una riga per voce:
    1. **Analisi da avviare** (`analysis_todo`) — `idea_ref`, `summary`,
-      `rice_score` (o "mandate"/"—" se senza RICE), `why_now`.
+      `rice_score` (o "mandate"/"—" se senza RICE), `why_now`,
+      `tech_reference` (referente tecnico, o "—" se non assegnato).
    2. **Analisi in corso** (`analysis_in_progress`) — `idea_ref`,
-      `summary`, `since`, `weeks_in_bucket` (evidenzia se ≥ 3), `note`.
+      `summary`, `tech_reference`, `since`, `weeks_in_bucket` (evidenzia
+      se ≥ 3), `note`.
    3. **In sviluppo** (`in_development`) — `idea_ref`, `summary`,
-      `jira_card_id`, `jira_status`, `completion_pct` se presente.
+      `tech_reference`, `jira_card_id`, `jira_status`, `completion_pct`
+      se presente.
    4. **Prioritizzate d'urgenza** (`urgent_priority`) — `idea_ref`,
       `kind`, `trigger`, `decided`; per `kind: strategic_exception`
       segnala `approved_by` (o "✋ bypass non ancora confermato" se

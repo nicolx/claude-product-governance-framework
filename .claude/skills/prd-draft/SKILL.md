@@ -133,13 +133,34 @@ scrive solo dopo conferma esplicita del PM.
    `product/approvals/pending/`; altrimenti applicalo direttamente e
    segnalalo chiaramente nel riepilogo finale.
 
-10. **Suggerisci `team-fit`** (non lanciarla). Se
-    `product/reference/team.yaml` esiste e ha membri, nel riepilogo finale
-    proponi di lanciare `team-fit {slug}` per una shortlist di chi
-    potrebbe prendere in carico il PRD — è advisory e la decisione di
-    assegnazione è di Iteration Planning, non va scritta nel PRD (stessa
-    logica con cui questa skill rimanda a `rice-update` senza toccare il
-    RICE). Se `team.yaml` non c'è, rimanda a `team-roster`.
+10. **Assegna il referente tecnico (`tech_reference`).** Se
+    `product/reference/team.yaml` esiste ed ha membri, esegui **dentro la
+    stesura** la logica di `team-fit` (leggi il playbook, "Team di
+    sviluppo, referente tecnico e staffing di un PRD"): incrocia i sistemi
+    toccati nell'How, i rischi aperti e il dominio dell'idea con `apps` e
+    `skills` di ogni membro, e produci la shortlist ordinata con
+    motivazione puntuale.
+    - Parti dall'eventuale `idea.tech_reference` (ipotesi posta
+      all'intake) come proposta di partenza, poi rivedila contro l'How
+      reale.
+    - **Proponi il candidato di testa come `tech_reference` e fallo
+      confermare al PM** — è una persona, si conferma in conversazione
+      (come `deadline`), non si scrive in silenzio; ma non è
+      un'assegnazione di implementazione (quella è di Iteration Planning).
+    - Alla conferma, scrivi:
+      1. `tech_reference` nel frontmatter del PRD (per un'iniziativa
+         spaccata in più PRD, uno per PRD — possono differire);
+      2. la riga di chiusura della sezione *How*: `_Validare l'How con:
+         {nome} ({motivo}). Shortlist completa: `team-fit {slug}`._`;
+      3. il denormalizzato `tech_reference` su `product/ideas/{slug}/idea.yaml`
+         (il PRD primario) — puntatore per viste e cerimonie, scrittura
+         diretta senza approvazione (stessa logica di `links.prd_ids`).
+    - Se `team.yaml` manca o è vuoto: lascia `tech_reference: ""` nel
+      frontmatter, scrivilo chiaramente nel riepilogo come gap, e rimanda
+      a `team-roster`.
+    - Se nessun membro copre bene i sistemi/rischi del PRD: dillo
+      esplicitamente (è un segnale — supporto esterno, upskilling), non
+      forzare un nome debole.
 
 11. **Sincronizza il repo**: esegui
     `bash .claude/hooks/governance-sync.sh push "prd-draft: PRD <slug>" product/prds/ product/ideas/`

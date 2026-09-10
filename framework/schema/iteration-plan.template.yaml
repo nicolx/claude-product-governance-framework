@@ -55,6 +55,7 @@ analysis_todo:
     why_now: ""                  # perché entra ORA (es. "1° per RICE, mai avviata" / "richiesto da stakeholder X per la finestra Q3")
     carried_from: null           # settimana ISO se era già in questo bucket nel piano based_on
     prd_id: null
+    tech_reference: null         # da idea.tech_reference — referente tecnico con cui validare l'How; denormalizzato come summary/rice_score
 
 analysis_in_progress:
 # Analisi già in corso — tipicamente carry-over dal piano precedente
@@ -65,6 +66,7 @@ analysis_in_progress:
     since: ""                    # settimana ISO in cui l'analisi è iniziata
     carried_from: null
     prd_id: null
+    tech_reference: null         # da idea.tech_reference — referente tecnico con cui validare l'How
     weeks_in_bucket: null        # da quante iterazioni è qui — se cresce senza avanzare è un segnale (vedi changes_since_last.slipped)
     note: ""
 
@@ -77,6 +79,7 @@ in_development:
     jira_status: ""              # stato reale letto da jira-sync (NON idea.status top-level)
     completion_pct: null
     carried_from: null
+    tech_reference: null         # da idea.tech_reference — referente tecnico con cui validare l'How
 
 urgent_priority:
 # Strategic Exception invocate in questa cerimonia + idee con

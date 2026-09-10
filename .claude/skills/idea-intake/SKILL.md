@@ -227,6 +227,15 @@ Fuori da questa modalità, la skill si comporta come descritto nei
    `deadline-watch`, la decisione se serve un bypass resta successiva e
    del PM.
 
+   **Referente tecnico (ipotesi).** Se `product/reference/team.yaml`
+   esiste ed è popolato **e** il materiale ha abbastanza segnale tecnico
+   da indicare un'area o una competenza, proponi un `tech_reference` dal
+   roster e **fallo confermare** — mai presunto, stessa disciplina di
+   `deadline`. È un'ipotesi preliminare: `prd-draft` la rifinirà contro
+   l'How reale (skill `team-fit`). Se il segnale non c'è o `team.yaml` è
+   vuoto/assente, lascia `tech_reference: null` — non forzarlo. Vedi
+   playbook, "Team di sviluppo, referente tecnico e staffing di un PRD".
+
 5. **Genera lo slug e crea la cartella**
    `product/ideas/{YYYY-MM-DD}-{slug-descrittivo}/` (data odierna o data
    del materiale di origine, a scelta più sensata per il caso). Lo slug è

@@ -191,11 +191,13 @@ risposta. Da decidere quando si affronta il lavoro attivo, non ora.
 
 ## Arricchimento di `team-fit`
 
-**Roster + matching euristico: FATTO** (`product/reference/team.yaml`,
-skill `team-roster` per popolarlo, `team-fit` per proporre una shortlist
-di candidati su un PRD). Il matching incrocia `apps` presidiati e tag
-`skills` con i sistemi toccati e i rischi aperti del PRD — dati dichiarati
-a mano nel roster.
+**Roster + matching euristico + referente tecnico: FATTO**
+(`product/reference/team.yaml`, skill `team-roster` per popolarlo,
+`team-fit` per la shortlist). Il matching incrocia `apps` presidiati e tag
+`skills` con i sistemi toccati e i rischi aperti del PRD. `prd-draft`
+esegue `team-fit` dentro la stesura e fissa il `tech_reference` (frontmatter
+del PRD + denormalizzato su `idea.yaml`), mostrato poi in `backlog-list` /
+`iteration-board` / Backlog Refinement / Iteration Planning.
 
 Restano fuori scope, da rivedere se emerge la domanda:
 
@@ -208,9 +210,10 @@ Restano fuori scope, da rivedere se emerge la domanda:
 - **Carico corrente reale.** Oggi `availability` è una nota in prosa. Un
   aggancio al numero di card aperte per persona sul tracker darebbe un
   segnale di saturazione più oggettivo — stesso discorso del punto sopra.
-- **Traccia scritta della proposta.** `team-fit` è deliberatamente
-  advisory e non lascia file: la decisione di assegnazione è di Iteration
-  Planning e vive nel tracker. Se in futuro servisse un record auditabile
-  (revisione con stakeholder su "perché quella persona"), andrebbe
-  disegnato come artefatto di proposta accanto al PRD, non come scrittura
-  diretta di un'assegnazione.
+- **Motivazione persistita del `tech_reference`.** Oggi si scrive il
+  *nome* (frontmatter del PRD + `idea.yaml`) e la *riga di motivazione*
+  nell'How, ma non la shortlist completa con lo scoring. Se una revisione
+  con gli stakeholder chiedesse "perché quella persona e non un'altra",
+  la si ricostruisce rilanciando `team-fit`. Un record strutturato della
+  shortlist (accanto al PRD) è possibile ma per ora non serve —
+  `tech_reference` non è un'assegnazione, è un puntatore modificabile.

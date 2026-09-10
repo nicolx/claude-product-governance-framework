@@ -56,6 +56,28 @@ proposer: ""                         # [NOME] di chi ha proposto l'idea
 # Scrittura diretta, non passa da approvazione.
 notes: ""
 
+# Referente tecnico: lo sviluppatore con cui il PM valida l'How e — di
+# norma — la prima scelta naturale quando l'iniziativa viene assegnata.
+# NON è l'assegnazione formale di implementazione: quella si decide in
+# Iteration Planning e vive nel tracker di esecuzione. Si può cambiare
+# liberamente, non è un impegno. Vedi playbook, "Team di sviluppo,
+# referente tecnico e staffing di un PRD (team-fit)".
+#
+# All'intake è un'IPOTESI preliminare — idea-intake/inbox-triage lo
+# propongono solo se il materiale ha segnale tecnico E c'è
+# product/reference/team.yaml popolato, sempre confermato dal PM, mai
+# presunto (stessa disciplina di deadline). Diventa solido con il PRD:
+# prd-draft esegue il matching di team-fit contro l'How reale e
+# denormalizza qui il valore. La fonte di verità per-PRD è il campo
+# tech_reference nel frontmatter del PRD; questo è il puntatore per le
+# viste e le cerimonie (stesso principio di iteration.current / jira.status).
+# Per un'iniziativa spaccata in più PRD è il referente del PRD primario.
+#
+# Scrittura diretta, mai da product/approvals/pending/ (non è una
+# decisione di priorità). Deve corrispondere a un members[].name di
+# product/reference/team.yaml.
+tech_reference: null
+
 source:
   type: email                        # email | meeting_transcript | slack | jira_backfill | other
   ref: ""                            # citazione/pointer al materiale in source/ (es. "source/email-2026-01-08.eml"); per jira_backfill: la chiave della card (es. "EPITA-317")

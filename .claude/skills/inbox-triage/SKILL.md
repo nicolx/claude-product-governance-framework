@@ -164,11 +164,13 @@ soli non coprono. In sintesi:
    - **Nuova idea** — segui gli stessi passi della skill `idea-intake`
      per struttura della cartella, naming dello slug, classificazione
      idea/bug/strategic_exception/mandate/platform, **il campo `summary`**
-     (una riga leggibile su cosa c'è da fare) e **la bozza di risposta al
-     richiedente** (`requester_reply` — vedi `idea-intake` passo 8 e
-     playbook, "Chiudere il loop col richiedente"). Materiale grezzo:
-     vedi la regola sul condiviso al passo 3 se questa unità è una tra
-     più generate dallo stesso elemento.
+     (una riga leggibile su cosa c'è da fare), l'eventuale
+     `deadline`/`tech_reference` (ipotesi, solo su segnale esplicito e con
+     `team.yaml` popolato — mai presunti, vedi `idea-intake` passo 4) e
+     **la bozza di risposta al richiedente** (`requester_reply` — vedi
+     `idea-intake` passo 8 e playbook, "Chiudere il loop col
+     richiedente"). Materiale grezzo: vedi la regola sul condiviso al
+     passo 3 se questa unità è una tra più generate dallo stesso elemento.
 
    - **Non è un'idea (scarto al triage)** — se l'elemento non è qualcosa
      su cui il team di prodotto può o deve lavorare (richiesta di

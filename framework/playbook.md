@@ -1489,14 +1489,16 @@ approfondimento potrebbe cambiare il RICE Score.
 - [ ] Il target della KPI è stato definito e condiviso con lo stakeholder?
 - [ ] La GTM strategy è stata discussa con chi presidia il marketing/comunicazione?
 - [ ] L'How di alto livello è stato abbozzato con il team tech?
+- [ ] Il PRD ha un `tech_reference` (il referente tecnico con cui validare l'How), proposto da `team-fit` e confermato dal PM?
 - [ ] Il ROI atteso è ancora coerente col RICE originale? Se no, il ranking è stato aggiornato nella fonte di verità?
 
-## Team di sviluppo e staffing di un PRD (`team-fit`)
+## Team di sviluppo, referente tecnico e staffing di un PRD (`team-fit`)
 
 Un PRD dice *cosa* fare e, nell'How, *quanto è intrecciato* col sistema.
-La domanda successiva — *chi, nel team, potrebbe prenderlo in carico?* —
-è una decisione di team, non di processo, ma il metodo può renderla più
-informata invece di lasciarla all'istinto.
+La domanda successiva — *chi, nel team, è la persona di riferimento per
+questo lavoro?* — non va lasciata all'istinto né rimandata a quando si
+apre il ticket: il metodo la fa emergere già durante la stesura dei
+documenti e la tiene visibile in tutte le viste e le cerimonie.
 
 ### L'anagrafica del team (`product/reference/team.yaml`)
 
@@ -1520,6 +1522,34 @@ disponibilità in prosa, note di contesto.
   `team-roster` riporta il focus se la conversazione va lì. Privacy: il
   minimo che serve al matching.
 
+### Il referente tecnico (`tech_reference`)
+
+Ogni iniziativa che arriva a un documento porta con sé un **referente
+tecnico**: lo sviluppatore con cui il PM valida l'How e — di norma — la
+prima scelta naturale quando l'iniziativa verrà assegnata.
+
+**Non è l'assegnazione formale di implementazione.** Quella si decide in
+Roadmap update & Iteration Planning e vive nel tracker di esecuzione (che
+resta l'unica fonte di verità per l'esecuzione). `tech_reference` è un
+puntatore leggero — chi è la persona giusta con cui ragionare del *come* —
+e si può cambiare liberamente, non è un impegno.
+
+**Ciclo di vita:**
+
+| Fase | Dove | Chi lo scrive | Solidità |
+|---|---|---|---|
+| Intake | `idea.yaml` `tech_reference` | `idea-intake` / `inbox-triage`, **solo** se il materiale ha segnale tecnico e `team.yaml` è popolato — confermato dal PM, mai presunto (come `deadline`) | Ipotesi preliminare |
+| PRD | frontmatter `tech_reference` del PRD + denormalizzato su `idea.yaml` | `prd-draft`, eseguendo il matching di `team-fit` contro l'How reale, su conferma del PM | Solido — è la fonte di verità per-PRD |
+| Cerimonie / viste | voci del Piano di Iterazione, `backlog-list`, `iteration-board` | denormalizzato da `backlog-refinement` (come `summary`/`rice_score`) | Sola lettura, riflette il PRD |
+
+Per un'iniziativa spaccata in più PRD, ogni PRD ha il suo
+`tech_reference`; il campo su `idea.yaml` è quello del PRD primario.
+
+Scrittura **diretta** ovunque — non è una decisione di priorità, non
+passa da `product/approvals/pending/` (stessa logica di `deadline`,
+`iteration.current`, `jira.status`). Il valore deve corrispondere a un
+`members[].name` di `team.yaml`.
+
 ### La proposta di staffing (`team-fit`)
 
 `team-fit <prd-slug>` legge il PRD (l'How e i sistemi toccati, i rischi e
@@ -1529,11 +1559,12 @@ con una motivazione puntuale: familiarità diretta con gli `apps/`
 toccati, tag di competenza che coprono un rischio specifico,
 disponibilità.
 
-È **advisory e a sola lettura**: non scrive nulla, non lascia una traccia
-su file, non assegna niente. L'assegnazione vera si decide in **Roadmap
-update & Iteration planning** (checklist: "i task sono caricati nel
-tracker e assegnati?") e vive nel tracker di esecuzione, che resta
-l'unica fonte di verità.
+È **advisory**: propone, non decide. Non tocca il tracker, non compie
+azioni in uscita, non crea voci in `pending/`. L'unica cosa che scrive —
+e **solo su conferma esplicita del PM** — è il `tech_reference` del PRD
+(e la sua copia denormalizzata sull'idea), quando il roster è cambiato o
+il PRD non ne aveva ancora uno. È la stessa scrittura diretta che fa
+`prd-draft` alla stesura, non un'eccezione alla regola del `pending/`.
 
 `team-fit` è **onesta sui buchi**: se un rischio o un sistema toccato non
 è coperto da nessuno nel roster, lo dice — è un segnale (supporto
@@ -1541,8 +1572,10 @@ esterno, upskilling, hiring), non un dettaglio da nascondere. Se il
 roster è vuoto o palesemente vecchio, rimanda a `team-roster` invece di
 tirare a indovinare.
 
-Quando usarla: durante o subito dopo `prd-draft` (che la suggerisce senza
-lanciarla), e all'Iteration Planning quando si confermano le assegnazioni.
+Quando usarla: `prd-draft` la esegue già dentro la stesura (non serve
+lanciarla a mano dopo un PRD appena scritto); a mano quando il roster
+cambia, il PRD evolve, o all'Iteration Planning si riconfermano i
+referenti.
 
 ## Roadmap update & Iteration planning
 
