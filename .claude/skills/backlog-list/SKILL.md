@@ -42,6 +42,10 @@ li mette tutti sulla stessa riga.
    - **note di prioritizzazione**: `notes`, più `rice_status.blocked_reason`/
      `waiting_on` se presenti (un'idea RICE-ranked di solito non ne ha,
      ma può capitare dopo una revisione)
+   - **referente tecnico**: se `tech_reference` è valorizzato, mostralo
+     (è chi valida l'How / prima scelta in assegnazione); se l'idea ha
+     già un PRD (`links.prd_ids` non vuoto) ma `tech_reference` è `null`,
+     segnalalo come gap
    - flag: `strategic_exceptions` non vuoto (è già passata avanti almeno
      una volta), `links.prd_ids` non vuoto (ha già un PRD), `status`
      corrente, e — se `iteration.current` è valorizzato — "in iterazione
@@ -99,8 +103,8 @@ li mette tutti sulla stessa riga.
 
 - Non scrivere su nessun file, non fare commit/push — è sola lettura.
 - Non ricalcolare score, `escalation_status`, `rice_status`,
-  `iteration.*`: leggi i valori già persistiti dalle skill che li
-  possiedono.
+  `iteration.*`, `tech_reference`: leggi i valori già persistiti dalle
+  skill che li possiedono.
 - Non inventare un `summary` mancante — segnalalo come gap.
 - Non fondere in un unico elenco le idee RICE-ranked e quelle fuori RICE:
   confrontarle per "posizione" non ha senso, il playbook lo dice

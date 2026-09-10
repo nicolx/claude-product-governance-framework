@@ -1,20 +1,34 @@
 ---
 name: team-fit
-description: Data una PRD già redatta, propone una shortlist ordinata di sviluppatori che potrebbero prenderla in carico — incrociando l'How (sistemi toccati, blast radius), gli apps/ coinvolti e i rischi aperti del PRD con l'anagrafica del team (product/reference/team.yaml). Sola lettura, advisory: non scrive nulla, non assegna niente. La decisione vera è di Iteration Planning e vive nel tracker di esecuzione. Usala durante o dopo prd-draft, e all'Iteration Planning quando si confermano le assegnazioni.
+description: Data una PRD già redatta, propone una shortlist ordinata di sviluppatori con cui validare l'How — incrociando i sistemi toccati, il blast radius e i rischi aperti del PRD con l'anagrafica del team (product/reference/team.yaml). Advisory: propone, non assegna. Su conferma esplicita del PM scrive il tech_reference del PRD (referente per la revisione, non l'assegnazione di implementazione — quella è di Iteration Planning e vive nel tracker). Usala quando il roster cambia o il PRD evolve; prd-draft la esegue già dentro la stesura.
 ---
 
 # team-fit
 
-Risponde a "**chi, nel team, potrebbe prendere in carico questo PRD?**"
-leggendo il PRD e incrociandolo con `product/reference/team.yaml`.
+Risponde a "**chi, nel team, è la persona di riferimento per questo
+PRD?**" leggendo il PRD e incrociandolo con `product/reference/team.yaml`.
 
-È **sola lettura e advisory**. Non scrive file, non fa commit, non crea
-voci in `product/approvals/pending/`, non tocca il tracker di esecuzione,
-non registra l'assegnazione da nessuna parte. La shortlist è un input per
-il PM e il tech lead: **l'assegnazione vera si decide in Iteration
-Planning e vive in Jira** (il tracker resta l'unica fonte di verità per
-l'esecuzione — vedi playbook, "Il tracker di esecuzione (Jira):
-collegamento, non duplicazione").
+`prd-draft` esegue già questa logica dentro la stesura e imposta il
+`tech_reference` del PRD — **non serve rilanciarla a mano subito dopo**.
+Usala quando: il roster è cambiato, il PRD è evoluto, o all'Iteration
+Planning si riconfermano i referenti.
+
+## Cosa scrive (e cosa no)
+
+È **advisory**: propone, non decide. Non tocca il tracker di esecuzione,
+non compie azioni in uscita, non crea voci in `product/approvals/pending/`.
+
+L'unica cosa che scrive — e **solo su conferma esplicita del PM** — è il
+`tech_reference`:
+- nel frontmatter del/dei `prd*.md`;
+- denormalizzato su `product/ideas/{slug}/idea.yaml` (PRD primario).
+
+È scrittura **diretta**, la stessa che fa `prd-draft` alla stesura: il
+`tech_reference` è il referente con cui validare l'How e la prima scelta
+naturale in assegnazione — **non** l'assegnazione formale di
+implementazione (quella si decide in Roadmap update & Iteration Planning e
+vive nel tracker, unica fonte di verità per l'esecuzione). Vedi playbook,
+"Team di sviluppo, referente tecnico e staffing di un PRD".
 
 ## Prerequisiti
 
@@ -25,17 +39,20 @@ collegamento, non duplicazione").
 
 ## Passi
 
-Questa skill non scrive stato tracciato, quindi non ha un contratto
-dry-run: è già priva di effetti collaterali per costruzione.
+> **Dry-run.** Se invocata con `dry-run` (o `dry_run: true` in
+> `.governance/config.yaml`): esegui letture e analisi, mostra la
+> shortlist e il `tech_reference` che *proporresti*, **non** scrivere il
+> frontmatter del PRD né `idea.yaml`, **non** fare commit/push, chiudi con
+> `🔍 DRY-RUN — nessun file scritto, nessun commit, nessun push.`
 
 1. **Sincronizza e leggi.** `bash .claude/hooks/governance-sync.sh pull`
    (una vista su un roster o un PRD vecchi è fuorviante). Poi:
    - risolvi il PRD target: se l'argomento è uno slug, apri
      `product/prds/{slug}/`; altrimenti chiedi quale. Leggi **tutti** i
      `prd*.md` della cartella (se l'iniziativa è spaccata in più
-     documenti, valuta ciascuno — possono servire competenze diverse) e
+     documenti, valuta ciascuno — possono servire referenti diversi) e
      l'`idea.yaml` collegata via `idea_id` (per `classification`,
-     `product_line`, dominio);
+     `product_line`, dominio, e l'eventuale `tech_reference` già posto);
    - `product/reference/team.yaml`;
    - `.governance/config.yaml` `apps[]` (per collegare gli slug del roster
      ai sistemi reali).
@@ -70,7 +87,9 @@ dry-run: è già priva di effetti collaterali per costruzione.
    >    sui rischi ma conosce il flusso end-to-end. `-20% questo mese`.
 
    Ogni riga è indirizzabile dal `name` del membro (playbook, "Ogni
-   elenco prodotto dal sistema è indirizzabile").
+   elenco prodotto dal sistema è indirizzabile"). Se il PRD ha già un
+   `tech_reference`, mostralo come "referente attuale" e posiziona la
+   shortlist come conferma o alternativa.
 
 5. **Dichiara i buchi, non nasconderli:**
    - rischi o sistemi toccati che **nessun** membro copre → dillo
@@ -83,16 +102,28 @@ dry-run: è già priva di effetti collaterali per costruzione.
    - se `apps/` è vuota nell'istanza → il match si è basato solo su
      `skills`, dillo.
 
-6. **Chiudi rimandando alla decisione vera.** La shortlist non è
-   un'assegnazione: va portata in Iteration Planning (checklist "i task
-   sono caricati nel tracker e assegnati?"), dove il team conferma e
-   l'assegnazione viene registrata in Jira.
+6. **Proponi il `tech_reference` e chiedi conferma.** Il candidato di
+   testa è la proposta. **Non scrivere in silenzio** — è una persona, la
+   conferma il PM in conversazione (come `deadline`). Alla conferma:
+   - scrivi `tech_reference` nel frontmatter del/dei PRD toccati (uno per
+     PRD se differiscono) e aggiorna la riga di chiusura della sezione
+     *How* (`_Validare l'How con: {nome} ({motivo})..._`);
+   - denormalizza `tech_reference` su `idea.yaml` (PRD primario);
+   - `bash .claude/hooks/governance-sync.sh push "team-fit: tech_reference <slug>" product/prds/ product/ideas/`.
+   Se il PM non conferma nessuno (nessun match convincente, vuole
+   deciderlo altrove), **non scrivere niente** — resta la shortlist come
+   input.
+
+7. **Chiudi.** Il `tech_reference` è il referente per validare l'How, non
+   l'assegnazione: quella si conferma in Iteration Planning e vive nel
+   tracker.
 
 ## Cosa NON fare
 
-- Non scrivere su nessun file, non fare commit/push, non creare voci in
-  `pending/`, non scrivere nel PRD, non toccare il tracker.
-- Non "assegnare" — proponi soltanto.
+- Non fare commit/push oltre a quello del passo 6, non creare voci in
+  `pending/`, non toccare il tracker, non compiere azioni in uscita.
+- Non scrivere `tech_reference` senza conferma esplicita del PM.
+- Non "assegnare" l'implementazione — proponi il referente soltanto.
 - Non valutare le persone su nulla che non sia in `team.yaml` (niente
   giudizi di performance, niente inferenze sul carattere).
 - Non inventare competenze o disponibilità non dichiarate: se un dato

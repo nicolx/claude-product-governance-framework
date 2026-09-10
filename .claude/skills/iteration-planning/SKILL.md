@@ -12,8 +12,9 @@ questa cerimonia (stime di delivery, 80/20, capacità platform).
 
 > **Dry-run.** Se l'utente chiede la simulazione (`dry-run`), propaga
 > l'argomento a `log-ceremony`: nessuna scrittura (né `decisions.yaml`,
-> né `.run-meta.yaml`, né `delivery.estimated_effort_weeks` sulle idee,
-> né la proposta `iteration_plan` aggiornata in `pending/`, né azioni di
+> né `.run-meta.yaml`, né `delivery.estimated_effort_weeks` o
+> `tech_reference` sulle idee/PRD, né la proposta `iteration_plan`
+> aggiornata in `pending/`, né azioni di
 > checkpoint applicate), nessun commit, chiusura con `🔍 DRY-RUN`. Vedi playbook, "Modalità dry-run
 > (simulazione)". In dry-run mostra comunque la board del Piano di
 > Iterazione rifinita che *avresti* proposto (stime di delivery inserite,
@@ -49,8 +50,11 @@ in aggiunta, i passi specifici sotto.
    piano, o è stato saltato), **segnalalo** e procedi sullo stato delle
    idee come prima — ma è un'anomalia da riferire, non la norma.
    **Checkpoint** (playbook, "Diritto di parola dopo ogni passo"): mostra
-   i quattro bucket con l'identificatore in prima colonna e apri il
-   diritto di parola prima di procedere alle stime.
+   i quattro bucket con l'identificatore in prima colonna e il
+   `tech_reference` (referente tecnico) accanto a ogni voce, e apri il
+   diritto di parola prima di procedere alle stime. Se una voce con un
+   PRD non ha `tech_reference`, segnalalo — il team può assegnarlo ora
+   (passo 4).
 
 3. **Stima di settimane di delivery.** Per ogni iniziativa
    `classification: idea` nei bucket `analysis_todo` / `in_development` /
@@ -80,7 +84,14 @@ in aggiunta, i passi specifici sotto.
 4. **Valutazione 80/20 (rischio-rendimento)** su ogni user story
    confermata: "se cambiamo questo requisito, anziché N giorni ne
    servono M — quella parte è davvero così importante?". Registra gli
-   esiti tra le `decisions` di `decisions.yaml`. Se una storia non ha un
+   esiti tra le `decisions` di `decisions.yaml`.
+   È anche il momento per **confermare o correggere il `tech_reference`**
+   di ogni PRD in iterazione: se il team decide che il referente è un
+   altro (roster cambiato, carico, competenza più adatta emersa nella
+   discussione 80/20), aggiorna il frontmatter `tech_reference` del PRD e
+   la copia denormalizzata su `idea.yaml` — scrittura diretta, non passa
+   da `pending/` (stessa logica di `delivery.estimated_effort_weeks`).
+   Sincronizza subito queste scritture come le stime del passo 3. Se una storia non ha un
    criterio di accettazione chiaro, va segnalato, non lasciato implicito.
    Se la valutazione porta il team a **spostare una voce tra bucket** del
    piano (es. un'iniziativa che non è pronta per lo sviluppo torna in

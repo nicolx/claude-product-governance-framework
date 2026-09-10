@@ -9,6 +9,12 @@ summary: "Escludere una regola-filtro nel motore di approvazione ricevute per ri
 proposer: "Filiberto (Head of Operations)"
 notes: "Quick win a footprint basso; Filiberto ci tiene. Impatto ~1/3 dell'incremento EBITDA atteso."
 
+# Referente tecnico: proposto all'intake da idea-intake sul segnale
+# "motore di approvazione ricevute" → Gastone lo presidia nel roster
+# (product/reference/team.yaml). Ipotesi preliminare finché prd-draft non
+# lo conferma contro l'How del PRD.
+tech_reference: "Gastone"
+
 source:
   type: email
   ref: "source/segnalazione-filiberto.md"

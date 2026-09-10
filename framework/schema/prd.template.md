@@ -11,6 +11,10 @@
 id: "slug-descrittivo"              # coincide col nome della cartella
 idea_id: ""                         # link all'idea di origine — il RICE NON si ripete qui, solo il link
 owner: ""
+tech_reference: ""                  # sviluppatore con cui validare l'How (skill team-fit, dal roster product/reference/team.yaml).
+                                    # È il referente per la revisione del documento e la prima scelta naturale in assegnazione —
+                                    # NON l'assegnazione formale di implementazione (quella si decide in Iteration Planning e vive
+                                    # nel tracker). "" se team.yaml non è ancora popolato. Scrittura diretta come owner/status.
 status: draft                       # draft | in_review | approved | superseded
 reading_sequence:
   position: 1
@@ -71,7 +75,13 @@ created_at: "2026-01-08"
      cambiamento (sistemi e componenti toccati, interfacce, blast radius) e
      stimare la delivery — non la specifica tecnica completa. È la fase in
      cui l'Entanglement del RICE, stimato all'intake come prima passata, si
-     può raffinare: se cambia, la revisione passa da rice-update. -->
+     può raffinare: se cambia, la revisione passa da rice-update.
+
+     Chiudi la sezione con una riga sul referente tecnico (frontmatter
+     tech_reference) e perché: chi conosce i sistemi toccati / copre i
+     rischi aperti. Es.:
+     _Validare l'How con: Gastone (owner approval-engine; copre il rischio
+     su Postgres). Shortlist completa: `team-fit {slug}`._ -->
 
 ## Rischi e dipendenze aperte
 

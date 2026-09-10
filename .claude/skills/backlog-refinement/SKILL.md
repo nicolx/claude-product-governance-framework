@@ -268,7 +268,10 @@ piano passa **sempre** da `product/approvals/pending/`
       - idea non più pertinente che il team decide di togliere →
         `dropped` con `reason`.
    3. **Presenta al PM la board carried-over** — i quattro bucket più il
-      diff — prima di chiedere le aggiunte.
+      diff — prima di chiedere le aggiunte. Per ogni voce mostra il
+      `tech_reference` (referente tecnico) accanto al `summary`; se una
+      voce con un PRD non ce l'ha, segnalalo come gap (rimanda a
+      `team-fit {slug}`).
    4. **Chiedi le aggiunte, bucket per bucket:**
       - `analysis_todo`: *dal ranking RICE del passo 5, quali idee
         `classification: idea` iniziano l'analisi questa settimana?* —
@@ -302,6 +305,12 @@ piano passa **sempre** da `product/approvals/pending/`
    5. **Chiedi il `iteration_goal`** — una frase: focus della settimana /
       iniziativa o metrica che si cerca di impattare.
    6. Il PM conferma la board finale.
+
+   Per ogni voce di `analysis_todo` / `analysis_in_progress` /
+   `in_development`, popola `tech_reference` denormalizzando da
+   `idea.tech_reference` (già letto nella sweep del passo 2) — stesso
+   trattamento di `summary`/`rice_score`, scrittura solo dentro il
+   `payload` della proposta, non su `idea.yaml`.
    7. **Genera la proposta** `type: iteration_plan` in
       `product/approvals/pending/{settimana}-iteration-plan.yaml`
       (`framework/schema/approval.template.yaml`, `payload` = piano
