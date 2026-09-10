@@ -133,7 +133,15 @@ scrive solo dopo conferma esplicita del PM.
    `product/approvals/pending/`; altrimenti applicalo direttamente e
    segnalalo chiaramente nel riepilogo finale.
 
-10. **Sincronizza il repo**: esegui
+10. **Suggerisci `team-fit`** (non lanciarla). Se
+    `product/reference/team.yaml` esiste e ha membri, nel riepilogo finale
+    proponi di lanciare `team-fit {slug}` per una shortlist di chi
+    potrebbe prendere in carico il PRD — è advisory e la decisione di
+    assegnazione è di Iteration Planning, non va scritta nel PRD (stessa
+    logica con cui questa skill rimanda a `rice-update` senza toccare il
+    RICE). Se `team.yaml` non c'è, rimanda a `team-roster`.
+
+11. **Sincronizza il repo**: esegui
     `bash .claude/hooks/governance-sync.sh push "prd-draft: PRD <slug>" product/prds/ product/ideas/`
     (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Se l'helper
     segnala un push fallito, riferiscilo nel riepilogo finale.

@@ -1,0 +1,32 @@
+# Template per product/reference/team.yaml
+#
+# Anagrafica del team di sviluppo di QUESTA istanza — chi c'è, cosa
+# presidia, cosa sa fare. Popolata durante l'inizializzazione (skill
+# init-governance-project, passo "Team di sviluppo") e mantenuta dalla
+# skill team-roster quando il team cambia. La legge team-fit, in sola
+# lettura, per proporre una shortlist di candidati su un PRD.
+#
+# Scrittura DIRETTA, come product-lines.yaml / annual-target.yaml: è un
+# dato di riferimento condiviso, non una decisione di priorità — NON passa
+# da product/approvals/pending/. Tracciata da git (a differenza di
+# product/inbox/): ogni collega che clona la vede.
+#
+# NON è uno strumento di valutazione delle persone. È una mappa di
+# competenze e presidio per instradare il lavoro: descrittiva, non
+# valutativa. Niente giudizi di performance, niente note sensibili qui —
+# team-roster reindirizza se la conversazione va in quella direzione.
+#
+# Privacy: il minimo che serve al matching. Nome (o handle) e, se il team
+# lo vuole, email come pm_roster (altrimenti "").
+
+updated_at: ""                    # data ISO dell'ultimo aggiornamento (team-roster la riscrive a ogni modifica)
+
+members:
+  - name: ""                      # nome o handle con cui il team lo chiama — identificatore della persona nelle liste di team-fit
+    email: ""                     # opzionale, come pm_roster — "" se non lo si vuole tracciare
+    seniority: ""                 # libero: "junior" | "mid" | "senior" | "staff" | "lead" — convenzione a scelta dell'istanza
+    apps: []                      # slug delle voci apps/ che la persona presidia — es. ["checkout-service", "employer/portal"].
+                                  #   Devono corrispondere agli slug in .governance/config.yaml (apps[].slug); team-roster avvisa se non combaciano.
+    skills: []                    # tag liberi: linguaggi, framework, aree — es. ["kafka", "go", "payments", "observability", "react"]
+    availability: ""              # nota in PROSA, non un valore calcolato: "pieno" | "-20% fino a fine mese" | "in ferie 12-19 set"
+    notes: ""                     # contesto extra utile al matching: "owner di fatto del checkout", "in onboarding su employer/", "preferisce back-end"

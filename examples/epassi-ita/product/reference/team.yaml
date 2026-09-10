@@ -1,0 +1,46 @@
+# Anagrafica del team di sviluppo — esempio di reference/team.yaml per
+# un'istanza reale. I nomi qui sono illustrativi (le Cronache non
+# dettagliano il team tech nominativamente): servono a validare che
+# framework/schema/team.template.yaml regga un caso realistico e a
+# mostrare come team-fit incrocia un PRD con le competenze.
+#
+# apps: [] per tutti perché questo esempio non ha submodule collegati —
+# in un'istanza viva ogni membro elencherebbe gli slug di apps/ che
+# presidia, e il matching di team-fit partirebbe da lì.
+#
+# Descrittivo, non valutativo: competenze e presidio, non giudizi.
+
+updated_at: "2026-01-10"
+
+members:
+  - name: "Gastone"
+    email: ""
+    seniority: "lead"
+    apps: []
+    skills: ["java", "spring", "postgres", "api-design", "approval-engine"]
+    availability: "pieno"
+    notes: "Owner di fatto del motore di approvazione ricevute; punto di riferimento sul backend transazionale."
+
+  - name: "Ludovica"
+    email: ""
+    seniority: "senior"
+    apps: []
+    skills: ["typescript", "react", "next", "design-system", "accessibility"]
+    availability: "-20% fino a fine gennaio (handover su un altro team)"
+    notes: "Presidia i frontend employee-facing (Conversion and engagement)."
+
+  - name: "Ademaro"
+    email: ""
+    seniority: "mid"
+    apps: []
+    skills: ["java", "kafka", "reporting", "etl", "databricks"]
+    availability: "pieno"
+    notes: "Pipeline di reporting e integrazione dati verso analytics; conosce i denominatori usati per il Reach."
+
+  - name: "Bice"
+    email: ""
+    seniority: "senior"
+    apps: []
+    skills: ["typescript", "node", "merchant-integrations", "payments", "webhooks"]
+    availability: "in ferie 20-27 gennaio"
+    notes: "Integrazioni merchant e flussi di fee (Merchant Success)."
