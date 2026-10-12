@@ -1,13 +1,21 @@
 ---
 name: prd-draft
-description: Redige un PRD "A3-sized" a partire da un'idea già prioritizzata, con visibilità sui submodule applicativi in apps/ quando presenti, e scaffolda measurement.yaml per le KPI dichiarate. Applica il vincolo dimensionale e il criterio di split del playbook — non duplica mai il RICE.
+description: Redige il brief d'iniziativa e i PRD "A3-sized" di un'idea già prioritizzata, scritti per il loro lettore (design, tech, Finance/Legal, stakeholder — persone o agenti senza il contesto della sessione). Parte dal registro dei punti chiave della fonte, intervista il PM sugli aspetti di prodotto, verifica la copertura (nessun punto perso in silenzio) e collauda i documenti con una lettura a freddo. Legge apps/ e context/, scaffolda measurement*.yaml, non duplica mai il RICE. Anche in modalità retrofit su PRD esistenti.
 ---
 
 # prd-draft
 
-Redige un PRD a partire da un'idea già passata da Ideas Prioritization,
-applicando il principio di A3 Thinking del playbook (sezione "Complete
-analysis" → "PRD sizing").
+Redige gli artefatti di specifica di un'idea già passata da Ideas Prioritization:
+il **brief d'iniziativa** (la storia, una volta sola, per tutti), uno o più **PRD**
+(ciascuno scritto per il suo lettore) e, per un PoC, un **allegato dati**. Applica
+l'A3 Thinking del playbook ("Complete analysis" → "PRD sizing") e i principi di
+"Scrivere per il lettore: dalla fonte all'artefatto" — **leggi quella sezione prima
+di iniziare**.
+
+Il criterio di successo non è "il PRD è completo", ma: **chi lo riceve, senza aver
+partecipato a nessuna conversazione, può lavorarci senza tornare a chiedere.** Il
+lettore può essere una persona o un agente (es. un Claude di design o di sviluppo)
+che non ha questa sessione, la memoria locale né l'accesso a `context/`.
 
 ## Prerequisiti
 
@@ -15,6 +23,10 @@ L'idea deve avere almeno una voce in `rice_history` (score approvato,
 quindi presente in `product/ideas/{slug}/idea.yaml`, non solo in
 `approvals/pending/`). Se non ce l'ha, segnalalo e proponi di passare
 prima da `rice-update`.
+
+Se non esiste ancora un brief (`product/prds/{slug}/README.md`), è normale: lo
+scrive questa skill (passo 5). Se la Preliminary analysis ne ha già prodotto una
+bozza (`stage: preliminary`), parti da quella.
 
 ## Il differenziale di questo framework: leggere la codebase reale (e il contesto aziendale)
 
@@ -28,54 +40,123 @@ normalmente senza bloccarti.
 
 Allo stesso modo, se `context/` (radice del repository, vedi playbook
 sezione "Contesto aziendale") ha file rilevanti per il Why/Who di questa
-idea — modello di business, dati di mercato, organizzazione — leggili
-prima di scrivere, invece di chiedere all'utente cose che sono già
-documentate. Se durante la lettura di `source/` o del codice emerge
-un'informazione di contesto aziendale (non di prodotto) che sembra nuova
-o in contrasto con `context/`, **non aggiornarlo da solo**: segnala il
-candidato e richiama `context-intake`, che propone la modifica e la
-scrive solo dopo conferma esplicita del PM.
+idea — modello di business, dati di mercato, organizzazione, normativa —
+leggili prima di scrivere, invece di chiedere all'utente cose che sono già
+documentate. **Nei documenti, i fatti presi da `context/` si riportano in
+sintesi, non si linkano** (il lettore non ha `context/`, principio P7). Se
+durante la lettura di `source/` o del codice emerge un'informazione di
+contesto aziendale (non di prodotto) che sembra nuova o in contrasto con
+`context/`, **non aggiornarlo da solo**: segnala il candidato e richiama
+`context-intake`, che propone la modifica e la scrive solo dopo conferma
+esplicita del PM.
+
+Cerca anche i **precedenti** dentro l'istanza: mockup, prototipi, PRD di
+iniziative vicine, materiale in `source/` di altre idee collegate. Un
+precedente non citato è il modo più rapido per far reinventare (male) qualcosa
+che esiste già. Se è visivo, copialo in `assets/` (passo 6).
 
 ## Passi
 
 > **Dry-run.** Se la skill è stata invocata in modalità simulazione
 > (argomento `dry-run`, o `dry_run: true` in `.governance/config.yaml`),
 > applica il contratto della sezione "Modalità dry-run (simulazione)" del
-> playbook: esegui letture e analisi normalmente, **non** creare file
-> sotto `product/prds/` (né il PRD né `measurement*.yaml`), **non**
-> invocare `governance-sync.sh push`, mostra come testo il contenuto
-> completo che avresti scritto, e chiudi con `🔍 DRY-RUN — nessun file
-> scritto, nessun commit, nessun push.`
+> playbook: esegui letture, analisi e anche la lettura a freddo
+> normalmente, **non** creare né modificare file sotto `product/` (brief,
+> PRD, allegati, `assets/`, `measurement*.yaml`, `.reviews/`, registro dei
+> punti chiave, glossario), **non** invocare `governance-sync.sh push`,
+> mostra come testo il contenuto completo che avresti scritto, e chiudi con
+> `🔍 DRY-RUN — nessun file scritto, nessun commit, nessun push.`
 
-1. Leggi `product/ideas/{slug}/idea.yaml` (Why implicito dal contesto
-   dell'idea, ultima voce di `rice_history` per capire cosa è stato
-   valutato), tutto il materiale in `source/`, e i file di `context/`
-   pertinenti al tema del PRD.
+> **Retrofit.** Con l'argomento `retrofit` la skill lavora su PRD già
+> esistenti: genera il registro dei punti chiave se manca (passo 2), scrive
+> il brief se manca, esegue copertura e lettura a freddo (passi 9-11) e
+> **propone** le correzioni ai PRD — le applica solo alla conferma del PM.
+> Non tocca PRD `approved`/`superseded` senza richiesta esplicita.
 
-2. Se esiste già una Preliminary/Complete Analysis registrata (es. in
-   `product/ceremonies/` o note fornite dall'utente), usala come base per
-   Why/What — non ripartire da zero se l'analisi è già stata fatta a
-   voce.
+1. **Leggi** `product/ideas/{slug}/idea.yaml` (contesto, `notes`, ultima voce
+   di `rice_history` per capire cosa è stato valutato), **tutto** il materiale
+   in `source/`, i file di `context/` pertinenti, ed eventuali analisi già
+   registrate (es. in `product/ceremonies/` o note fornite dall'utente) — non
+   ripartire da zero se l'analisi è già stata fatta a voce.
 
-3. Redigi seguendo `framework/schema/prd.template.md`: Why (poche righe),
-   What (elenco puntato), Who (solo se rilevante — ometti se ovvio),
-   Metriche con baseline e target **se l'iniziativa ne ha** (vedi passo 4
-   per il caso in cui non ne ha), How ad alto livello (informato dalla
-   lettura di `apps/` quando disponibile), Rischi e dipendenze aperte.
+2. **Registro dei punti chiave** (`product/ideas/{slug}/source/key-points.yaml`,
+   schema `framework/schema/key-points.template.yaml`). Se esiste, caricalo.
+   Se manca e la fonte è ricca (trascrizione, workshop, thread a più voci,
+   oltre ~400 parole), **generalo ora** con la stessa logica di `idea-intake`.
+   È la base delle verifiche dei passi 9 e 11: senza registro non si può
+   dimostrare che nessun punto è stato perso.
 
-4. **Scaffolda `measurement.yaml`** (o `measurement-N.yaml` se questo è
-   uno dei più PRD della cartella — stessa numerazione del file
-   `prd-N-*.md` corrispondente) a partire da
-   `framework/schema/measurement.template.yaml`.
-   - **Caso normale**: una voce in `kpis` per ciascuna metrica scritta
-     nella sezione Metriche del PRD (stesso `name`, `baseline`, `target`,
-     `unit`). Non è una duplicazione: la sezione Metriche del PRD resta
-     la fonte narrativa (perché quella metrica, il ragionamento),
-     `measurement.yaml` è solo la sua rappresentazione strutturata
-     perché `measurement-watch` possa leggerla senza fare parsing di
-     Markdown libero. Chiedi (non presumere) `measurement_window_weeks`
-     se l'utente/referente tecnico ha un'aspettativa diversa dal default
-     nel template.
+3. **Intervista di prodotto.** Accanto alle domande di governance (split,
+   `data_source`, finestre, `tech_reference`), chiedi al PM **solo ciò che non
+   è ricavabile** da fonte, registro, `context/` o `apps/`:
+   - **chi riceverà ciascun documento** (persone? agenti? con o senza accesso
+     al repository?) → `primary_reader` di ogni PRD;
+   - se si vuole **imparare** (PoC, prototipo → `prd_kind: discovery`) o
+     **rilasciare** (`delivery`);
+   - **scenario d'uso**: chi, in quale momento, cosa fa con il risultato, cosa
+     deve succedere dopo;
+   - **destinatari indiretti**: chi va convinto o riceve l'output senza usare
+     il prodotto;
+   - per un `discovery`: a chi verrà mostrato, e quale decisione deve
+     permettere.
+   Non presumere mai le risposte: il lettore cambia cosa va scritto.
+
+4. **Piano dei documenti, da far confermare al PM prima di scrivere:**
+   - **brief** (`README.md`): obbligatorio se i PRD saranno più di uno o se un
+     PRD ha `primary_reader` diverso da `pm`/`stakeholder`;
+   - **PRD**, uno per cucitura del problema: rischio tecnico, owner,
+     stakeholder **o lettore** distinti. Esempio tipico per un PoC: un PRD di
+     esperienza per il design e uno di costruzione per lo sviluppo. Motiva
+     esplicitamente il criterio di split;
+   - **allegato dati** (`allegato-{lettera}-{sub-slug}.md`, template
+     `framework/schema/prd-annex.template.md`): per ogni PRD `discovery` con
+     dati dimostrativi, comune ai PRD che lo usano;
+   - **`assets/`**: per i materiali visivi di riferimento.
+
+5. **Scrivi il brief** (`framework/schema/initiative-brief.template.md`): la
+   storia in un minuto, chi è coinvolto e quando, come produce valore, da dove
+   partiamo, esempi (marcati illustrativi), cosa sappiamo/ipotizziamo/non
+   sappiamo, **cosa chiediamo, a chi e quando**, vincoli, parole che usiamo,
+   mappa dei documenti. Gli esempi della fonte con numeri **si usano** come
+   narrativa, marcati "illustrativi" (P4) — non si scartano e non diventano
+   mai stime.
+
+6. **Scrivi i PRD** secondo `framework/schema/prd.template.md`:
+   - sezioni secondo `prd_kind`: `discovery` → *Cosa vogliamo imparare*
+     (ipotesi, segnali di conferma/smentita in forma di comportamenti, varianti,
+     protocollo di feedback, decisione attesa) al posto di *Metriche*;
+     `delivery` → *Metriche*;
+   - evidenza secondo `primary_reader` (tabella in fondo al template); per
+     `design` aggiungi *Vincoli di design*;
+   - **Scenario** sempre, **Provenienza** sempre (dalla fonte / aggiunto
+     dall'analisi / deciso dal PM, con data);
+   - **portabilità (P7)**: nessun "come detto in call", nessun percorso locale,
+     nessun id interno non spiegato (eccezione: codice e ticket nei PRD `tech`);
+   - **vincolo dimensionale attivo**: se un PRD supera ~2 facciate A4,
+     **fermati e proponi lo split** lungo le cuciture — non comprimere la prosa.
+     Il contesto in più va nel brief, i dati nell'allegato;
+   - allegato: definizioni prima dei dati, dati in unità assolute, parametri in
+     un posto solo, **risultati attesi espliciti** (diventano criteri di
+     accettazione), testi pronti, regole di arrotondamento. **Ricalcola tu
+     stesso ogni numero derivato** prima di scriverlo;
+   - copia in `assets/` i materiali visivi di riferimento trovati (mockup,
+     schermate); elenca come azione aperta del PM quelli che mancano;
+   - se più PRD: compila `reading_sequence` e `release_sequence`
+     **separatamente** — l'ordine di lettura non coincide per forza con quello
+     di rilascio.
+
+7. **Scaffolda `measurement-N.yaml`** per ogni PRD (stessa numerazione del
+   file `prd-N-*.md`), da `framework/schema/measurement.template.yaml`.
+   - **Caso normale** (`delivery` con KPI): una voce in `kpis` per ciascuna
+     metrica della sezione Metriche (stesso `name`, `baseline`, `target`,
+     `unit`). Non è una duplicazione: il PRD resta la fonte narrativa,
+     `measurement` la sua forma strutturata per `measurement-watch`. Chiedi
+     (non presumere) `measurement_window_weeks` se l'aspettativa è diversa dal
+     default. **KPI con finestre diverse** (es. metriche anticipatorie a poche
+     settimane e metrica principale a un anno): un file per finestra,
+     `measurement-N-{suffisso}.yaml` — `measurement-watch` li legge tutti; il
+     file senza suffisso è la valutazione complessiva, e la sua `closure`
+     chiude l'iniziativa.
    - **Per ciascuna KPI, chiedi esplicitamente `data_source`**: "come
      pensi di recuperare questo dato — lo controlli tu (manuale), o
      l'istanza ha un'integrazione che può leggerlo in autonomia
@@ -89,51 +170,58 @@ scrive solo dopo conferma esplicita del PM.
      come intento dichiarato: `measurement-watch` si comporterà come
      manuale finché quell'integrazione non esiste davvero, senza
      bloccare la stesura del PRD per questo.
-   - **Caso senza KPI di business** (tipico per iniziative di mera
-     compliance, spesso `classification: mandate`): se durante la
-     stesura emerge che non c'è un'ipotesi "questo migliorerà la metrica
-     X" — solo un obbligo da soddisfare — **non forzare una metrica
-     proxy per riempire la sezione**. Scrivi nella sezione Metriche del
-     PRD stesso qualcosa come "N/A — nessuna metrica di business attesa,
-     iniziativa di compliance" (motivandolo in una riga), e lascia
-     `kpis: []` in `measurement.yaml` compilando `not_applicable_reason`
-     con lo stesso motivo. Resta comunque un'iniziativa da chiudere
-     esplicitamente più avanti (skill `measurement-watch`, blocco
-     `closure`) — non sparisce dal framework solo perché non ha KPI.
+   - **Senza KPI di business** (compliance, oppure `discovery`, oppure un PRD
+     di costruzione o di modello che abilita le KPI di un altro PRD): **non
+     forzare una metrica proxy**. Scrivi il motivo nel PRD, lascia `kpis: []`
+     e compila `not_applicable_reason`. Resta comunque da chiudere
+     esplicitamente più avanti (`measurement-watch`, blocco `closure`).
 
-5. **Applica il vincolo dimensionale attivamente, non solo a
-   consuntivo**: se durante la stesura ti accorgi che il contenuto
-   necessario eccede ~2 facciate A4, **fermati e proponi lo split** lungo
-   le cuciture del problema (rischio tecnico, owner, o stakeholder
-   distinti) — non comprimere la prosa per farcelo stare. Motiva
-   esplicitamente il criterio di split scelto.
+8. **Non ripetere il RICE e non ridescrivere framework generali.** Nel PRD va
+   solo `idea_id`. Se emerge che il RICE andrebbe rivisto, segnalalo e proponi
+   `rice-update`. Il divieto riguarda i *framework* (Business Model Canvas,
+   GTM generico, glossario completo): **il contesto specifico dell'iniziativa
+   invece va raccontato**, nel brief.
 
-6. Se generi più PRD per la stessa idea, crea più file nella stessa
-   cartella `product/prds/{slug}/` (es. `prd-1-{sub-slug}.md`,
-   `prd-2-{sub-slug}.md`), con il rispettivo `measurement-1.yaml`/
-   `measurement-2.yaml`, e compila `reading_sequence` e
-   `release_sequence` in ciascun frontmatter **dichiarandole
-   separatamente** — non assumere che l'ordine di lettura coincida con
-   l'ordine di rilascio.
+9. **Copertura.** Per ogni punto `open` del registro:
+   - associalo a una sezione del brief, di un PRD o dell'allegato
+     (`status: covered`, `covered_by`);
+   - oppure proponi l'esclusione con un motivo e **fai confermare al PM in
+     conversazione** (`status: excluded`, `exclusion_reason`).
+   A fine stesura **nessun punto resta `open`**. Aggiungi al registro i punti
+   nati dall'analisi o dalle decisioni del PM, dichiarandone la provenienza.
+   Scrittura diretta (registro del lavoro fatto, non decisione di priorità).
 
-7. **Non ripetere il RICE**: nel PRD va solo `idea_id` che linka
-   all'idea. Se durante la stesura emerge che il RICE andrebbe rivisto
-   (ROI diverso da quanto stimato), non modificarlo qui — segnalalo
-   all'utente e proponi di lanciare `rice-update`.
+10. **Glossario.** Elenca i termini di dominio e le sigle usati nei documenti
+    che non sono né in `product/reference/glossary.yaml` né nella sezione
+    "Parole che usiamo" del brief. Proponi le definizioni al PM e, alla
+    conferma, scrivile in entrambi (scrittura diretta). Se il glossario non
+    esiste, crealo da `framework/schema/glossary.template.yaml`.
 
-8. **Non ridescrivere framework generali** (Business Model Canvas, GTM,
-   glossario di dominio) — cita solo la scelta specifica fatta per questo
-   caso, con link al documento canonico se l'istanza ne ha uno in
-   `product/reference/`.
+11. **Lettura a freddo** (prompt e procedura in
+    `framework/prompts/cold-read.md`). Lancia in parallelo lettori simulati a
+    contesto vergine, ciascuno con i soli documenti del suo ruolo, in un
+    pacchetto isolato fuori dal repository: almeno il `primary_reader` di
+    ogni PRD; per un'iniziativa con brief, anche uno *stakeholder* sul solo
+    brief; il lettore *tech* **ricalcola i numeri**. Poi:
+    - classifica i rilievi (lacuna, fraintendimento, incoerenza, **decisione
+      del PM**, ipotesi accettabile);
+    - **porta al PM le decisioni** prima di correggere — una lettura a freddo
+      fa emergere scelte che solo lui può fare (scope, termini di paragone,
+      liceità, date), non solo refusi;
+    - correggi, poi seconda iterazione (massimo 2);
+    - registra ogni iterazione in
+      `product/prds/{slug}/.reviews/cold-read-{YYYY-MM-DD}-iterazione-{N}.md`.
+    Se i subagent non sono disponibili, dillo e proponi una lettura a freddo
+    umana: **mai saltata in silenzio**. Lo `status: in_review` si raggiunge
+    solo dopo almeno una lettura a freddo e con la copertura completa.
 
-9. Aggiorna `idea.yaml`: aggiungi lo/gli slug del PRD a `links.prd_ids` e
-   valuta se `status` va portato a `in_prd` — questo è un aggiornamento di
-   metadato dell'idea, non un diff di RICE: se l'istanza tratta anche
-   questo come modifica soggetta ad approvazione, passa da
-   `product/approvals/pending/`; altrimenti applicalo direttamente e
-   segnalalo chiaramente nel riepilogo finale.
+12. **Aggiorna `idea.yaml`**: aggiungi lo slug della cartella PRD a
+    `links.prd_ids`, valuta `status: in_prd`, e aggiungi in `notes` una riga
+    su cosa è stato prodotto. È un aggiornamento di metadato, non un diff di
+    RICE: applicalo direttamente e segnalalo nel riepilogo (se l'istanza lo
+    tratta come soggetto ad approvazione, passa da `product/approvals/pending/`).
 
-10. **Assegna il referente tecnico (`tech_reference`).** Se
+13. **Assegna il referente tecnico (`tech_reference`).** Se
     `product/reference/team.yaml` esiste ed ha membri, esegui **dentro la
     stesura** la logica di `team-fit` (leggi il playbook, "Team di
     sviluppo, referente tecnico e staffing di un PRD"): incrocia i sistemi
@@ -162,7 +250,16 @@ scrive solo dopo conferma esplicita del PM.
       esplicitamente (è un segnale — supporto esterno, upskilling), non
       forzare un nome debole.
 
-11. **Sincronizza il repo**: esegui
-    `bash .claude/hooks/governance-sync.sh push "prd-draft: PRD <slug>" product/prds/ product/ideas/`
+14. **Riepilogo finale**, oltre alle scritture fatte:
+    - documenti prodotti, ciascuno con il suo lettore;
+    - copertura: N punti, X coperti, Y esclusi (con motivo);
+    - esito delle letture a freddo: lacune trovate e corrette, domande
+      residue accettate, "potrebbe iniziare domani?" per ciascun lettore;
+    - **cosa hai aggiunto rispetto alla fonte** (P5) e quali decisioni ha
+      preso il PM;
+    - **azioni aperte del PM** (materiali da allegare, date, verifiche).
+
+15. **Sincronizza il repo**: esegui
+    `bash .claude/hooks/governance-sync.sh push "prd-draft: PRD <slug>" product/prds/ product/ideas/ product/reference/glossary.yaml`
     (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Se l'helper
     segnala un push fallito, riferiscilo nel riepilogo finale.

@@ -34,6 +34,14 @@ per Product Line, per l'ipotesi che l'idea sia un duplicato di una già
 esistente, e per qualunque numero o affermazione non letteralmente
 presente nel materiale di origine.
 
+**Garantista non vuol dire buttare via.** Un esempio con numeri detto dal
+proponente ("il 5% dei dipendenti è stressato, il 3% ha trovato una
+soluzione") non è un dato da usare come stima — ma è materiale prezioso per
+chi scriverà e progetterà dopo. Non si scarta: si conserva marcato come
+**illustrativo** (`info_kind: illustrative` nel registro dei punti chiave),
+usabile come narrativa e mai come stima (RICE, baseline, target). Vedi
+playbook, "Scrivere per il lettore", tabella "Tipi d'informazione".
+
 ## Modalità backfill (invocata da `delivery-watch`, non interattiva)
 
 `delivery-watch` invoca questa skill in modalità **backfill** quando
@@ -253,6 +261,23 @@ Fuori da questa modalità, la skill si comporta come descritto nei
    In questo caso, aggiungi in cima al file copiato una riga tipo `<!--
    Questa fonte ha generato anche: {altri slug} -->` così chi la legge sa
    che esistono record collegati dalla stessa origine.
+
+   **Registro dei punti chiave.** Se la fonte è ricca — trascrizione,
+   workshop, thread con più interlocutori, o oltre ~400 parole — estrai
+   anche `source/key-points.yaml` (schema
+   `framework/schema/key-points.template.yaml`): problemi, scenari, attori
+   (compresi quelli **indiretti**: chi va convinto, chi riceve l'output),
+   catena di valore, esempi, ipotesi, decisioni, vincoli, domande aperte,
+   ciascuno con il riferimento nella fonte (timestamp/paragrafo) e il tipo
+   d'informazione (`fact`/`estimate`/`illustrative`/`intent`/`opinion`).
+   Se la trascrizione automatica ha errori ricorrenti (nomi di prodotto
+   storpiati), annotali in `transcription_notes`. Se l'unità è una tra più
+   generate dalla stessa fonte, il registro contiene i soli punti
+   pertinenti, e `other_units_from_same_source` dichiara gli altri slug:
+   **ogni punto della fonte deve finire in almeno un'unità**, oppure essere
+   dichiarato non pertinente con un motivo. Per una mail breve il registro è
+   facoltativo (dillo nel riepilogo). Serve a `prd-draft` per dimostrare che
+   nessun punto si è perso tra conversazione e specifica (playbook, P3).
 
 7. **Scrivi `idea.yaml`** a partire da
    `framework/schema/idea.template.yaml`, compilando i campi noti. **Non

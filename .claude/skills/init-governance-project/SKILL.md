@@ -253,6 +253,11 @@ che serve da lì e chiedi solo quello che manca.
    — con i membri raccolti al passo 10 dell'intervista, o solo l'header
    con `members: []` se il PM non aveva il dato pronto (lo popola
    `team-roster` in seguito).
+   `product/reference/glossary.yaml` (da
+   `framework/schema/glossary.template.yaml`, con `terms: []`) — il
+   vocabolario di dominio dell'istanza; lo popolano `prd-draft`,
+   `idea-intake` e `inbox-triage` man mano che gli artefatti usano termini
+   che un lettore esterno potrebbe non conoscere (alla conferma del PM).
    Non creare qui `product/reference/nsm-tracking.yaml`: baseline e
    target delle NSM spesso richiedono un giro su DataBricks/analytics
    che non è pratico fare a metà di questa intervista — lo scaffolda la

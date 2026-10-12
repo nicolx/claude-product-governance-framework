@@ -1,0 +1,55 @@
+# Template per product/ideas/{slug}/source/key-points.yaml
+#
+# Registro dei punti chiave di una fonte ricca (trascrizione, workshop, thread
+# con più interlocutori, materiale oltre ~400 parole). Serve a una cosa sola:
+# garantire che NESSUN punto della fonte sparisca in silenzio passando dalla
+# conversazione agli artefatti (idea, brief, PRD) — playbook, "Scrivere per il
+# lettore: dalla fonte all'artefatto", principio P3.
+#
+# Chi scrive:
+#   - idea-intake / inbox-triage all'origine (estrazione, status: open o
+#     covered se il punto finisce già nell'idea);
+#   - prd-draft durante la stesura (covered_by, status covered/excluded).
+#     Un'esclusione (status: excluded) è un giudizio: va confermata dal PM in
+#     conversazione, con exclusion_reason. Mai esclusioni silenziose.
+# Scrittura DIRETTA, nessuna approvazione: è il registro del lavoro fatto,
+# non una decisione di priorità (stessa logica di rice_status).
+#
+# Se una fonte genera più unità (più idee), ogni unità ha il suo registro con
+# i soli punti pertinenti; la fonte grezza resta copiata per intero (regola
+# invariata di idea-intake). I punti assegnati ad altre unità si dichiarano in
+# other_units_from_same_source, così nessuno cade tra due cartelle.
+#
+# Gli id (KP-01…) sono stabili: non si rinumerano quando si aggiungono punti.
+# Si possono aggiungere punti nati dall'analisi o da decisioni del PM in
+# conversazione: source_locator e speaker lo dichiarano (P5, arricchimento
+# visibile).
+
+source_ref: ""                         # file in source/ da cui sono estratti (es. "source/trascrizione-2026-01-08.vtt")
+extracted_at: ""                       # data ISO
+extracted_by: ""                       # skill che ha estratto (idea-intake | inbox-triage | prd-draft retrofit)
+transcription_notes: null              # opzionale: errori ricorrenti del riconoscimento vocale (es. "'acme pay' = AcmePay")
+other_units_from_same_source: []       # slug delle altre unità generate dalla stessa fonte (con i loro KP, in commento)
+
+points:
+  - id: "KP-01"
+    type: problem                      # problem | scenario | actor | value_chain | example | hypothesis |
+                                       # decision | constraint | open_question | metric_claim | vision | quote
+    text: ""                           # parafrasi fedele, 1-2 righe
+    quote: null                        # citazione testuale, se la formulazione conta (tono, metafora, slogan)
+    source_locator: ""                 # timestamp / paragrafo / riga — o "analisi — <fonte>" / "conversazione col PM, <data>"
+    speaker: ""                        # chi l'ha detto (ruolo se il nome non serve) — o "analisi (prd-draft)"
+    info_kind: fact                    # fact | estimate | illustrative | intent | opinion — vedi playbook, tabella "Tipi d'informazione"
+    usable_as: [narrative]             # narrative | estimate | requirement | none — dove è lecito usarlo
+    status: open                       # open | covered | excluded
+    covered_by: []                     # es. ["README.md#chi-e-coinvolto", "prd-1-poc-esperienza.md#scenario"]
+    exclusion_reason: null             # obbligatorio se status: excluded — confermato dal PM in conversazione
+    note: null                         # opzionale
+
+# Regole che contano più delle altre:
+# - Un esempio con numeri si registra come info_kind: illustrative,
+#   usable_as: [narrative]. NON si scarta: è il materiale più prezioso per chi
+#   progetta e scrive. Non diventa mai una stima (RICE, baseline, target).
+# - Chi non è il proponente ma conta (chi va convinto, chi riceve l'output, chi
+#   paga) si registra come type: actor. Sono i punti che si perdono più spesso.
+# - A fine prd-draft nessun punto resta open.
