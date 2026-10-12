@@ -137,6 +137,15 @@ soli non coprono. In sintesi:
    destinazione finale — se un'unica email genera 3 record, esce
    dall'inbox solo quando tutti e 3 esistono, non dopo il primo.
 
+   **Registro dei punti chiave**: per ogni elemento ricco (trascrizione,
+   workshop, thread a più voci, oltre ~400 parole) estrai
+   `source/key-points.yaml` in ciascuna destinazione generata, con la
+   stessa regola di `idea-intake` (passo "Salva il materiale grezzo"): punti
+   pertinenti a quell'unità, `other_units_from_same_source` per gli altri, e
+   **nessun punto della fonte orfano** — ogni punto finisce in almeno
+   un'unità o è dichiarato non pertinente con un motivo. Un esempio con
+   numeri si conserva come `illustrative` (narrativa), non si scarta.
+
 4. **Per ciascuna unità, prima di classificarla come "nuova idea", cerca
    se esiste già qualcosa di collegato**: leggi titoli/contesto di
    `product/ideas/*/idea.yaml` e frontmatter di `product/prds/*/prd.md`

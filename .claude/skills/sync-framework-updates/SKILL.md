@@ -102,6 +102,21 @@ segnalalo invece di procedere.
      tabella prima/dopo degli `score` così vede se qualche ranking si
      sposta ai confini di banda — è un effetto atteso, non un errore.
 
+   - "i PRD si scrivono per il loro lettore" (brief d'iniziativa,
+     `primary_reader`/`prd_kind`, registro dei punti chiave, allegato dati,
+     lettura a freddo, glossario — playbook, "Scrivere per il lettore:
+     dalla fonte all'artefatto") → **nessuna migrazione obbligatoria**: i
+     campi nuovi del frontmatter PRD sono opzionali e i PRD esistenti
+     restano validi. Spiega al PM cosa cambia nel modo di lavorare
+     (`prd-draft` ora intervista anche su lettore e scenario, scrive il
+     brief e collauda i documenti con una lettura a freddo) e:
+     - se manca `product/reference/glossary.yaml`, proponi di crearlo vuoto
+       dal template;
+     - per i PRD in `draft`/`in_review` che dovranno essere condivisi con
+       persone o agenti fuori dalla sessione, **proponi** `prd-draft {slug}
+       retrofit` (registro dei punti chiave, brief, lettura a freddo,
+       correzioni proposte). Non toccare i PRD `approved`/`superseded`.
+
    - "il framework ora vieta che `short_ref_prefix` coincida con
      `jira.project_key`" → **controllo di setup**: leggi
      `.governance/config.yaml`. Se `short_ref_prefix` (o il default `PG`

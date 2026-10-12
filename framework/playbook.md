@@ -1393,8 +1393,20 @@ con la strategia, va valutato l'abort dell'iniziativa.**
 > ipotizzato. Il PM porta la cosa a un referente strategico prima di
 > decidere se procedere. *(Versione completa: Cronache Episodio 4.)*
 
+**L'artefatto della Preliminary analysis: la bozza del brief.** Il Why
+non resta nella testa del PM né nelle note dell'idea: diventa la bozza del
+**brief d'iniziativa** (`product/prds/{slug}/README.md`, template
+`framework/schema/initiative-brief.template.md`, `stage: preliminary`) —
+"La storia in un minuto", "Chi è coinvolto e in quale momento", "Come
+produce valore", "Cosa sappiamo, cosa ipotizziamo, cosa non sappiamo". È il
+primo posto in cui la storia viene scritta *per qualcuno che non c'era*
+(vedi "Scrivere per il lettore", sotto). Se si arriva a `prd-draft` senza
+bozza (percorso rapido), la scrive `prd-draft`: la storia si scrive
+comunque prima dei PRD.
+
 **Checklist operativa**
 - [ ] Il Why è stato compilato: qual è il problema reale?
+- [ ] La bozza del brief è comprensibile da chi non ha partecipato alle conversazioni?
 - [ ] L'iniziativa è allineata alla strategia aziendale?
 - [ ] Ci sono segnali tecnici evidenti che potrebbero cambiare il ROI?
 - [ ] La decisione di procedere o abortire è stata registrata?
@@ -1409,6 +1421,104 @@ Analisi di dettaglio che completa il What e definisce una GTM Strategy
 (quando/come comunicarlo). Il go-to-market varia molto in base a portata
 della feature e utenti coinvolti — da "trasparente per l'utente" a
 "cambiamento epocale che richiede UAT, hype, comunicazioni strutturate".
+
+La Complete analysis **completa il brief** (`stage: complete`: esempi,
+cosa chiediamo a chi e quando, vincoli trasversali, parole che usiamo,
+mappa dei documenti) e poi produce i PRD, ciascuno scritto per il suo
+lettore.
+
+### Scrivere per il lettore: dalla fonte all'artefatto
+
+*"The single biggest problem in communication is the illusion that it has
+taken place." — attribuita a George Bernard Shaw*
+
+Un'idea nasce quasi sempre in una conversazione ricca: una call, un
+workshop, un thread. Passando agli artefatti (idea, brief, PRD) il rischio
+**non è perdere il materiale** — la fonte resta integra in `source/` — ma
+che **il contenuto non arrivi a chi legge**. Chi ha partecipato alla
+conversazione rilegge il PRD e lo trova completo, perché il contesto ce l'ha
+in testa; chi non c'era (un designer, uno sviluppatore, uno stakeholder, un
+agente come un Claude di design o di sviluppo senza la sessione in cui il
+PRD è stato scritto) costruisce la cosa sbagliata. È un difetto che chi
+scrive non vede, per costruzione.
+
+**Principi.**
+
+- **P1 — Il lettore prima del template.** Ogni artefatto ha un lettore
+  primario dichiarato (`primary_reader` nel PRD). Il template fissa le
+  sezioni minime; il lettore decide cosa va in evidenza e quanto contesto
+  serve. Un PoC disegnato da un designer e costruito da uno sviluppatore
+  merita due PRD: lettori diversi sono una cucitura del problema.
+- **P2 — L'artefatto si regge da solo.** Un PRD, insieme al brief, è
+  comprensibile da chi non ha partecipato a nessuna conversazione. Vietato
+  "come detto in call" al posto del contenuto.
+- **P3 — Nessun punto sparisce in silenzio.** Ogni punto chiave della fonte
+  finisce in un artefatto, oppure è escluso con un motivo confermato dal
+  PM. Lo strumento è il **registro dei punti chiave**
+  (`source/key-points.yaml`, template
+  `framework/schema/key-points.template.yaml`), estratto all'intake e
+  verificato da `prd-draft`.
+- **P4 — Narrativa ≠ stima.** Un esempio illustrativo si conserva e si
+  mostra, marcato come tale: è il materiale più prezioso per chi progetta.
+  Non diventa mai una stima (RICE, baseline, target). Il principio
+  garantista dice "non inventare numeri", non "butta via gli esempi".
+- **P5 — L'arricchimento è visibile.** Ciò che l'analisi aggiunge alla
+  fonte (vincoli normativi, riferimenti al codice, precedenti, benchmark) e
+  ciò che il PM decide in conversazione si dichiara nella sezione
+  *Provenienza* del PRD: il PM lo convalida invece di scoprirlo rileggendo.
+- **P6 — Ogni fase di analisi lascia un artefatto.** La Preliminary analysis
+  produce la bozza del brief, la Complete analysis lo completa; il PRD non è
+  il primo posto in cui la storia viene scritta.
+- **P7 — Portabilità.** Brief e PRD viaggiano senza il sistema che li ha
+  prodotti: senza la sessione, senza la memoria locale dell'agente, spesso
+  senza accesso al repository di governance. Nel corpo niente percorsi
+  locali, niente rimandi a `context/*.md` (i fatti si **riportano** in
+  sintesi), niente id interni non spiegati. I riferimenti a codice e ticket
+  sono ammessi solo nei PRD per lettori `tech`. I materiali visivi si
+  copiano in `assets/`.
+
+**Tipi d'informazione.** Ogni punto della fonte ha una natura, e la natura
+decide dove si può usare:
+
+| Tipo | Esempio | Dove è lecito usarlo |
+|---|---|---|
+| `fact` | "il budget lo decide il CFO al rinnovo annuale" (confermato) | ovunque |
+| `estimate` | "circa 20k €/anno di licenze", detto a voce | RICE e metriche **solo dopo verifica**; in narrativa come "stimato" |
+| `illustrative` | "il 5% è stressato, il 3% trova una soluzione" | **solo narrativa ed esempi** (brief, contenuti dimostrativi); mai RICE, baseline o target |
+| `intent` | "vogliamo un PoC da mostrare in giro" | requisiti, scenario |
+| `opinion` | "è la svolta per il prodotto" | contesto; come evidenza vale al più Confidence opinione (1-3) |
+
+**Gli artefatti di una specifica.**
+
+| Artefatto | Dove | Per chi | Cosa contiene |
+|---|---|---|---|
+| Registro dei punti chiave | `product/ideas/{slug}/source/key-points.yaml` | il PM e le skill (verifica) | i punti della fonte, la loro natura, dove sono finiti |
+| Brief d'iniziativa | `product/prds/{slug}/README.md` | tutti | la storia una volta sola, attori, valore, cosa chiediamo a chi e quando, vincoli, parole, mappa dei documenti |
+| PRD | `product/prds/{slug}/prd-N-*.md` | il suo `primary_reader` | Why, **Scenario**, What, (Vincoli di design), *Cosa vogliamo imparare* (discovery) o *Metriche* (delivery), How, Rischi, **Provenienza** |
+| Allegato dati | `product/prds/{slug}/allegato-*.md` | design e sviluppo di un PoC | definizioni, dati dimostrativi in unità assolute, parametri, testi, **risultati attesi** come criteri di accettazione |
+| Materiali visivi | `product/prds/{slug}/assets/` | design | mockup, schermate, precedenti |
+| Letture a freddo | `product/prds/{slug}/.reviews/` | audit | chi ha letto cosa, lacune → correzioni, domande residue |
+| Glossario | `product/reference/glossary.yaml` | tutti (via il brief) | il vocabolario di dominio dell'istanza |
+
+**La lettura a freddo.** Prima che un PRD passi da `draft` a `in_review`,
+`prd-draft` lo fa leggere a lettori simulati a contesto vergine, ciascuno
+con i soli documenti del suo ruolo (procedura e prompt in
+`framework/prompts/cold-read.md`). Non è un controllo di forma. Nel primo
+collaudo:
+- lo **stakeholder**, sul solo brief, ha trovato problemi di **sostanza**: la
+  liceità del racconto d'apertura, il termine di paragone di un ROI,
+  l'assenza di una richiesta e di un calendario;
+- lo **sviluppatore** ha trovato le **incoerenze numeriche** ricalcolando;
+- il **designer** ha trovato le ambiguità di **esperienza**.
+
+Una lettura a freddo fa emergere anche **decisioni che spettano al PM**, e
+vanno portate a lui prima di correggere. Al massimo due iterazioni. Mai
+saltata in silenzio: senza subagent, si fa con una persona del ruolo.
+
+**Gate di stato del PRD.** `draft` → `in_review`: almeno una lettura a
+freddo registrata e registro dei punti chiave senza punti `open`.
+`in_review` → `approved`: decisione umana — PM e `tech_reference`, più un
+rappresentante del lettore primario quando conta.
 
 ### PRD sizing: il principio dell'A3 Thinking
 
@@ -1426,8 +1536,8 @@ comprimere la prosa, ma **spaccare l'iniziativa in più PRD**.
 
 **Il criterio di split è il problema, non il conteggio delle pagine.** Un
 PRD si divide quando il What genera sotto-problemi con rischio tecnico,
-owner o stakeholder chiaramente distinti — non quando "è arrivato a
-pagina 3". Tagliare per lunghezza produce frammenti che non si capiscono
+owner, stakeholder **o lettore** chiaramente distinti — non quando "è
+arrivato a pagina 3". Tagliare per lunghezza produce frammenti che non si capiscono
 da soli; tagliare lungo le cuciture naturali del problema produce
 documenti verticali, ciascuno giudicabile senza dover leggere gli altri.
 
@@ -1442,8 +1552,13 @@ coincidono per definizione.
 - **Framework generali già formalizzati altrove** (Business Model Canvas,
   matrice GTM, glossario di dominio, Customer Personas). Il PRD cita la
   scelta specifica fatta per quel caso, con link al documento canonico.
+  Attenzione: il divieto riguarda i *framework*, **non il contesto
+  specifico dell'iniziativa**, che va raccontato — nel brief, una volta
+  sola, così i PRD restano A3 senza perdere la storia.
 
-Lo scheletro consigliato è in `framework/schema/prd.template.md`.
+Lo scheletro consigliato è in `framework/schema/prd.template.md`; il brief
+in `framework/schema/initiative-brief.template.md`; l'allegato dati in
+`framework/schema/prd-annex.template.md`.
 
 ---
 
@@ -1454,8 +1569,10 @@ importante, sia perché influenza come il team di tecnologia interpreta
 una parola chiave, sia perché quel termine diventa gergo aziendale. Non
 esiste un dizionario tecnico separato da quello di business: c'è un solo
 vocabolario condiviso. Il glossario di dominio di un'istanza specifica va
-mantenuto in `product/reference/` (locale, non nel framework — è
-specifico del business di quell'istanza).
+mantenuto in `product/reference/glossary.yaml` (locale, non nel framework
+— è specifico del business di quell'istanza; template
+`framework/schema/glossary.template.yaml`). Il brief riporta i termini che
+usa nella sezione "Parole che usiamo".
 
 Ultima parte dell'analisi: quali **metriche** impattare. Le KPI scelte
 hanno due funzioni: 1) stabilire qualcosa di misurabile fin da subito che,
@@ -1481,6 +1598,11 @@ approfondimento potrebbe cambiare il RICE Score.
 
 **Checklist operativa**
 - [ ] Il What è definito: quali sono le funzionalità o i cambiamenti attesi?
+- [ ] Il brief d'iniziativa è completo (anche "Cosa chiediamo, a chi, e quando")?
+- [ ] Ogni PRD dichiara il suo `primary_reader` e `prd_kind`, e ha uno Scenario?
+- [ ] Il registro dei punti chiave non ha punti `open` (ogni punto coperto o escluso con motivo confermato)?
+- [ ] La lettura a freddo è stata fatta e registrata in `.reviews/`, e le decisioni emerse sono state prese dal PM?
+- [ ] I documenti si reggono senza la sessione, la memoria locale e `context/` (P7)?
 - [ ] Il PRD rispetta il vincolo A3 (circa due facciate A4 in PDF)? Se no, è stato spaccato lungo le cuciture del problema?
 - [ ] Se il PRD fa parte di una sequenza: sono dichiarate separatamente sequenza di lettura e di rilascio?
 - [ ] Il RICE NON è ripetuto nel PRD, solo referenziato con link all'idea di origine?

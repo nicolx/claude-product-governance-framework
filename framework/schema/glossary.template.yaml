@@ -1,0 +1,27 @@
+# Template per product/reference/glossary.yaml
+#
+# Glossario di dominio di QUESTA istanza: un solo vocabolario condiviso tra
+# business e tecnologia (playbook, "Complete analysis" — Domain Driven Design:
+# dare nomi alle cose). Locale, non nel framework: è specifico del business.
+#
+# Chi scrive:
+#   - init-governance-project crea il file vuoto (terms: []);
+#   - prd-draft, idea-intake, inbox-triage propongono termini nuovi quando un
+#     artefatto li usa e un lettore esterno potrebbe non conoscerli, e li
+#     scrivono ALLA CONFERMA del PM in conversazione.
+# Scrittura DIRETTA, nessuna approvazione: dato di riferimento condiviso, come
+# product-lines.yaml.
+#
+# Il brief d'iniziativa riporta i termini che usa nella sua sezione "Parole che
+# usiamo" (il lettore del brief non apre questo file): il glossario è la fonte,
+# il brief la copia leggibile.
+
+terms: []
+# Esempio di voce:
+# - term: ""                  # nome interno
+#   definition: ""            # 1-2 righe comprensibili a un nuovo assunto
+#   external_name: null       # nome verso clienti/utenti, se diverso dall'interno — un PRD per il design usa QUESTO
+#   aliases: []               # altri nomi in uso in azienda (vecchi nomi di progetto, sigle)
+#   not_to_confuse_with: []   # termini simili con significato diverso
+#   source: ""                # dove è stato definito/deciso
+#   added_at: ""              # data ISO
