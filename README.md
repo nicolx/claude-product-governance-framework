@@ -79,6 +79,8 @@ inizializzata) e scaffolda `apps/` e `product/`.
     │   └── decisions.yaml      (esito strutturato, link a cosa ha impattato)
     ├── roadmap/iterations/{YYYY-Www}.yaml   ← Piano di Iterazione: board a 4 bucket, output primario del Backlog Refinement (skill iteration-board per la vista)
     ├── roadmap/snapshots/{YYYY-Www}.yaml     ← rollup strategico per MBR/MTR, referenzia il Piano di Iterazione
+    ├── reports/{vista}/{periodo}.md          ← viste per gli stakeholder (roadmap, scorecard metriche, aggiornamenti) generate da report-render
+    │                                           secondo i modelli dichiarati in reference/reporting-models.yaml — derivate, mai editate a mano
     ├── approvals/{pending,decided}/
     ├── demos/                    ← evidenza visiva di delivery (skill demo-capture)
     │   ├── recipes/{app-slug}.yaml        (come portare su ogni app in modalità demo — tracciato, NIENTE segreti)
@@ -88,6 +90,8 @@ inizializzata) e scaffolda `apps/` e `product/`.
     └── reference/
         ├── product-lines.yaml
         ├── friction-log.yaml
+        ├── reporting-models.yaml ← quali viste produce l'istanza, per chi, ogni quanto: modelli standard (framework/models/) o aziendali
+        ├── models/               ← formati aziendali trascritti (MBR, roadmap, KPI) con la mappatura campo → dato del framework
         ├── team.yaml             ← anagrafica del team di sviluppo: presidio apps/, competenze, disponibilità (skill team-roster per popolarla). team-fit la incrocia con un PRD e ne fissa il `tech_reference` — il referente tecnico, mostrato poi in backlog-list / iteration-board / cerimonie
         └── delivery-watch.yaml   ← coda di triage delle transizioni di delivery da comunicare (skill delivery-watch; lazy, richiede jira + delivery_watch.enabled)
 ```

@@ -1,0 +1,31 @@
+# Template per product/reference/reporting-models.yaml — le viste che
+# QUESTA istanza produce dai propri dati: quali roadmap, quali report di
+# metriche, quali aggiornamenti, per chi, ogni quanto, dove finiscono.
+# Vedi playbook, "Modelli di reporting".
+#
+# Creato da init-governance-project (passo "Modelli di reporting"
+# dell'intervista). In seguito si modifica su richiesta esplicita del PM,
+# tipicamente tramite report-render (modalità setup: aggiungi / modifica /
+# rimuovi una vista). Dato di riferimento condiviso come
+# product-lines.yaml: scrittura diretta, non passa da approvazione.
+#
+# Ogni vista punta a un MODELLO:
+# - "framework:<id>"  → un modello standard in framework/models/<id>.md
+#                        (progetti nascenti, o finché l'azienda non ne ha uno suo)
+# - "company:<id>"    → un modello aziendale trascritto in
+#                        product/reference/models/<id>.md (aziende strutturate)
+#
+# L'istanza può dichiarare più viste sullo stesso modello (es. la stessa
+# roadmap Now/Next/Later per due Product Line con pubblici diversi).
+
+views: []
+# - name: ""                      # slug della vista — è anche la cartella dei report: product/reports/<name>/
+#   model: "framework:roadmap-now-next-later"
+#   audience: ""                  # a chi va (es. "leadership", "stakeholder Product Line X", "team"). "team" = uso interno, nessuna proposta outbound_comm
+#   recipients: []                # opzionale: chi la riceve (nomi/ruoli/liste) — informativo, usato per la bozza di outbound_comm
+#   cadence: monthly              # weekly | monthly | quarterly | on_demand — sovrascrive cadence_default del modello
+#   destination: ""               # informativo: dove la pubblica il PM ("email", "Confluence: <spazio/pagina>", "deck MBR", "solo repo"). Il framework non pubblica mai da solo
+#   filters:                      # opzionale: restringe i dati
+#     product_lines: []           #   [] = tutte
+#   options: {}                   # opzionale: sovrascrive le options del modello (es. { show_scores: false, later_limit: 5 })
+#   note: ""

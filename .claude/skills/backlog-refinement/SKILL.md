@@ -124,13 +124,23 @@ piano passa **sempre** da `product/approvals/pending/`
          (`waived`) — e solo allora si scrive il cambio di stato
          corrispondente. Playbook, "Avvisare gli stakeholder della
          conclusione".
+      7. **Viste in scadenza** — dalle viste dichiarate in
+         `product/reference/reporting-models.yaml` e dall'indice
+         "ultimo report per vista" in fondo al dump: quelle con `cadence`
+         diversa da `on_demand` senza un report per il periodo corrente.
+         Colonne: `name`, modello, pubblico, ultimo periodo generato. Solo
+         segnalazione: la generazione è un passo separato **dopo** la
+         cerimonia (`report-render`, sui dati appena approvati), non qui.
+         Se il file non esiste, una riga: *"nessun modello di reporting
+         dichiarato — `report-render` in modalità setup"* (playbook,
+         "Modelli di reporting").
       Le **formule sono quelle documentate nelle rispettive skill**
       (`nsm-watch`, `measurement-watch`, `mandate-watch`, `deadline-watch`,
       `rice-watch`) — applicale, non reinventarle; se un caso è ambiguo
       apri quella skill.
 
    d. **Checkpoint dopo ogni blocco (diritto di parola).** Non calcolare
-      tutti e sei e poi chiedere: dopo *ciascuno*, prima del
+      tutti i blocchi e poi chiedere: dopo *ciascuno*, prima del
       successivo —
       1. mostra la sua tabella con l'**identificatore in prima colonna**
          (playbook, "Ogni elenco prodotto dal sistema è indirizzabile");
@@ -368,3 +378,8 @@ piano passa **sempre** da `product/approvals/pending/`
 - Qualche giorno dopo: **`iteration-planning`**, quando il team tech
   fissa l'agenda concreta di delivery e **conferma/aggiusta** il Piano di
   Iterazione (stime di delivery, valutazione 80/20).
+- Dopo l'approvazione del piano (e dello snapshot): **`report-render`**
+  per le viste segnalate in scadenza nella sweep (blocco 7) — roadmap,
+  scorecard, aggiornamento settimanale secondo i modelli dichiarati in
+  `product/reference/reporting-models.yaml`. Quelle per un pubblico fuori
+  dal team passano da `pending/` come `outbound_comm`.

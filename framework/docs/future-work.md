@@ -217,3 +217,28 @@ Restano fuori scope, da rivedere se emerge la domanda:
   la si ricostruisce rilanciando `team-fit`. Un record strutturato della
   shortlist (accanto al PRD) è possibile ma per ora non serve —
   `tech_reference` non è un'assegnazione, è un puntatore modificabile.
+
+## Estensioni dei modelli di reporting
+
+I modelli di reporting (playbook, "Modelli di reporting"; skill
+`report-render`) nascono deliberatamente ristretti: producono contenuto
+strutturato in Markdown, nell'ordine del modello, e il PM lo porta a mano
+dove serve. Fuori scope adesso:
+
+- **Rendering nel formato grafico aziendale.** Riempire direttamente il
+  deck .pptx di MBR, una pagina Confluence impaginata, un foglio Excel
+  con le sue formule. Richiede di tenere il file-template dell'azienda
+  (oggi il grezzo non persiste, come in `context/`) e uno strumento di
+  rendering per formato.
+- **Pubblicazione via connettore.** Aggiornare una pagina Confluence o
+  un Google Doc dopo l'approvazione dell'`outbound_comm`. È una
+  comunicazione in uscita automatica: la stessa rediscussione esplicita
+  fatta per `delivery-watch` (persistenza sì, invio automatico no) va
+  rifatta qui, non ereditata.
+- **Viste visuali.** Gantt, timeline grafica, grafici di trend delle NSM
+  — naturale nel "Livello web / DB derivato" sopra, rigenerati dagli
+  stessi modelli.
+- **Libreria di modelli condivisa tra istanze della stessa azienda.**
+  Oggi un modello aziendale vive in un'istanza; un'azienda con più
+  istanze lo trascrive in ognuna. Un pacchetto di modelli aziendali
+  importabile (come `upstream` per il metodo) eviterebbe le copie.

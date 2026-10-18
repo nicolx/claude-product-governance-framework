@@ -133,7 +133,12 @@ creato/aggiornato.
    skill**: prepara una proposta separata con `type: outbound_comm` nella
    coda di approvazione, così le due decisioni (pubblicare lo snapshot
    internamente / comunicarlo all'esterno) restano approvabili
-   indipendentemente.
+   indipendentemente. La forma di quella comunicazione la dà il modello
+   di reporting dichiarato in `product/reference/reporting-models.yaml`:
+   dopo l'approvazione dello snapshot, è **`report-render`** a generare le
+   viste (roadmap trimestrale, Now/Next/Later, aggiornamento settimanale o
+   un formato aziendale) e a preparare l'`outbound_comm` — non
+   improvvisarne il formato qui (playbook, "Modelli di reporting").
    Lo snapshot **non** riproduce gli eventi di delivery per-card (bug
    risolto, blocco, consegna): quelle sono comunicazioni verso
    stakeholder gestite da `delivery-watch`, non il rollup strategico. Al
