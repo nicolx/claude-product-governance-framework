@@ -65,10 +65,11 @@ jira:
   note: ""                        # note libere (permessi, quirk, tracker non-Jira, ecc.)
 
 # --- Monitoraggio delle transizioni di delivery (lo usa delivery-watch) ---
-# Osserva il tracker per gli eventi rilevanti per gli stakeholder (entrata
-# in sviluppo, consegna in produzione, bug risolto, card bloccata,
-# regressione) e li mette in una coda di triage in
-# product/reference/delivery-watch.yaml. Richiede jira.configured: true e
+# Osserva il tracker e rileva OGNI movimento di una card (entrata in
+# sviluppo, in review, ogni altro cambio di colonna, consegna in
+# produzione, bug risolto, card bloccata, regressione); li mette in una
+# coda in product/reference/delivery-watch.yaml con la bozza di mail agli
+# stakeholder già pronta (la manda il PM a mano). Richiede jira.configured: true e
 # usa lo stesso connettore (jira.integration/probe/reauth) — nessun tool
 # nuovo, il changelog è un `expand` di getJiraIssue. Vedi playbook,
 # "Transizioni di delivery rilevanti per gli stakeholder (delivery-watch)".
@@ -78,6 +79,7 @@ delivery_watch:
                                   #   (→ backfill automatico dell'idea via idea-intake). "" = solo idee con jira.card_id
   default_product_line: ""        # product line assegnata alle idee di backfill quando non inferibile dalla card
   blocked_status_names: []        # nomi di stato che indicano "bloccata" oltre al flag Impediment (es. ["Blocked", "On Hold"])
+  review_status_names: []         # nomi di stato che indicano "in review" (es. ["Code Review", "QA"]); [] = ogni stato il cui nome contiene "review"
   regression_labels: []           # label Jira che indicano una regressione (es. ["regression", "reopened"])
   channel: "email"                # informativo: come il PM comunica di solito — NON usato per inviare
   fixture: ""                     # SOLO test: path a un file che emula l'output di getJiraIssue+changelog

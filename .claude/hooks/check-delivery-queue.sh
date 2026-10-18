@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Promemoria (non bloccante): quante transizioni di delivery rilevate da
-# delivery-watch aspettano una decisione del PM (smarcare la coda di
-# triage), e da quanto tempo delivery-watch non gira.
+# delivery-watch aspettano il PM — bozze di mail pronte da mandare
+# (drafted) e voci da smarcare (pending) — e da quanto tempo
+# delivery-watch non gira.
 #
 # Perché serve. delivery-watch scrive gli eventi del tracker di esecuzione
 # (bug risolto, in sviluppo, bloccata, in produzione, regressione) in una
-# coda di triage in product/reference/delivery-watch.yaml che SOPRAVVIVE
+# coda in product/reference/delivery-watch.yaml che SOPRAVVIVE
 # tra le sessioni — così il PM non ne perde nessuno. Ma niente la rende
 # visibile: `git status` è pulito (il file È committato), e la coda si
 # guarda solo lanciando delivery-watch.
@@ -38,9 +39,16 @@ JIRA_ON="$(awk '
 STATE="product/reference/delivery-watch.yaml"
 [ -f "$STATE" ] || exit 0
 
-# Voci di coda ancora da smarcare.
-PENDING="$(grep -cE '^[[:space:]]*triage_status:[[:space:]]*pending[[:space:]]*$' "$STATE" 2>/dev/null || true)"
-case "$PENDING" in ''|*[!0-9]*) PENDING=0 ;; esac
+# Voci di coda ancora aperte: bozze pronte da mandare + voci da smarcare.
+count_status() {
+  local n
+  n="$(grep -cE "^[[:space:]]*(- )?triage_status:[[:space:]]*$1[[:space:]]*(#.*)?$" "$STATE" 2>/dev/null || true)"
+  case "$n" in ''|*[!0-9]*) n=0 ;; esac
+  printf '%s' "$n"
+}
+DRAFTED="$(count_status drafted)"
+PENDING="$(count_status pending)"
+OPEN=$(( DRAFTED + PENDING ))
 
 # Giorni dall'ultimo giro (last_watch.run_at, prime 10 cifre della data).
 RUN_AT="$(sed -n 's/^[[:space:]]*run_at:[[:space:]]*"\{0,1\}\([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\).*/\1/p' "$STATE" | head -n1)"
@@ -54,21 +62,28 @@ if [ -n "$RUN_AT" ]; then
 fi
 
 # Niente in coda e giro recente → silenzio.
-if [ "$PENDING" -eq 0 ] && { [ -z "$DAYS" ] || [ "$DAYS" -lt 7 ]; }; then
+if [ "$OPEN" -eq 0 ] && { [ -z "$DAYS" ] || [ "$DAYS" -lt 7 ]; }; then
   exit 0
 fi
 
 MSG="🚚 delivery-watch:"
-if [ "$PENDING" -gt 0 ]; then
-  if [ "$PENDING" -eq 1 ]; then N="transizione di delivery da smarcare"; else N="transizioni di delivery da smarcare"; fi
-  MSG="$MSG $PENDING $N in \`product/reference/delivery-watch.yaml\`"
+if [ "$OPEN" -gt 0 ]; then
+  PARTS=""
+  if [ "$DRAFTED" -gt 0 ]; then
+    if [ "$DRAFTED" -eq 1 ]; then PARTS="1 mail agli stakeholder pronta da mandare"; else PARTS="$DRAFTED mail agli stakeholder pronte da mandare"; fi
+  fi
+  if [ "$PENDING" -gt 0 ]; then
+    [ -n "$PARTS" ] && PARTS="$PARTS + "
+    if [ "$PENDING" -eq 1 ]; then PARTS="${PARTS}1 voce da smarcare"; else PARTS="${PARTS}$PENDING voci da smarcare"; fi
+  fi
+  MSG="$MSG $PARTS in \`product/reference/delivery-watch.yaml\`"
 else
   MSG="$MSG coda di triage vuota"
 fi
 [ -n "$DAYS" ] && MSG="$MSG · ultimo giro $DAYS gg fa ($RUN_AT)"
 
-if [ "$PENDING" -ge 5 ] || { [ -n "$DAYS" ] && [ "$DAYS" -ge 7 ]; }; then
-  MSG="$MSG · lancia \`delivery-watch\` per aggiornare, poi smarca la coda decidendo per ciascun evento se mandare una mail agli stakeholder (nessun invio automatico)."
+if [ "$OPEN" -ge 5 ] || { [ -n "$DAYS" ] && [ "$DAYS" -ge 7 ]; }; then
+  MSG="$MSG · lancia \`delivery-watch\` per aggiornare, poi smarca la coda: ogni movimento di una card ha la sua mail, la mandi tu (nessun invio automatico)."
 else
   MSG="$MSG · \`delivery-watch\` per rivedere."
 fi

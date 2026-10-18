@@ -424,9 +424,9 @@ piano passa **sempre** da `product/approvals/pending/`
 - **`iteration-board`** per la vista "a colpo d'occhio" del piano (daily
   standup, mail settimanale, Confluence).
 - **`delivery-watch`** in modalità triage per smarcare la coda delle
-  transizioni di delivery accodate nella sweep: per ogni evento il PM
-  decide se preparare una mail agli stakeholder (che manda a mano) o
-  archiviarlo; e rivede le idee create per backfill
+  transizioni di delivery accodate nella sweep: ogni movimento ha già la
+  sua bozza di mail agli stakeholder, il PM la rivede e la manda a mano
+  (o, per eccezione, la archivia con un motivo); e rivede le idee create per backfill
   (`backfill_review_needed: true`).
 - Il passo naturale successivo è **`roadmap-snapshot`** — la proposta di
   snapshot settimanale della roadmap, che ora **referenzia** il Piano di

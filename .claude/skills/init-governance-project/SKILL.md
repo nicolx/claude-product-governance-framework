@@ -107,9 +107,11 @@ per raccogliere:
      `jira-sync` preparerà i testi e il PM agirà a mano. Va bene per
      partire, si può aggiungere l'MCP in seguito.
    - **`delivery-watch`** (blocco `delivery_watch:` nello stesso file) —
-     chiedi se il PM vuole attivare il monitoraggio delle transizioni di
-     delivery da comunicare agli stakeholder (bug risolto, in sviluppo,
-     bloccata, in produzione, regressione). Se sì (`enabled: true`):
+     chiedi se il PM vuole attivare il monitoraggio dei movimenti delle
+     card da comunicare agli stakeholder (ogni cambio di stato: in
+     sviluppo, in review, bloccata, in produzione, bug risolto,
+     regressione — ciascuno con la bozza di mail già pronta). Se sì
+     (`enabled: true`):
      - `board_jql` — una JQL della board/progetto per intercettare anche
        le card **non** collegate a un'idea (lavoro andato dritto su Jira
        → l'idea viene creata in automatico). `""` = solo idee con
@@ -119,11 +121,16 @@ per raccogliere:
      - `blocked_status_names` / `regression_labels` — se la board usa
        stati/label specifici per "bloccata"/"regressione" oltre al flag
        Impediment;
+     - `review_status_names` — come si chiamano sulla board gli stati di
+       review (es. "Code Review", "QA"); vuoto = ogni stato il cui nome
+       contiene "review";
      - `channel` — come il PM comunica di solito (informativo, non usato
        per inviare);
      - chiedi se vuole un **cron cloud agent** (`/schedule`) che esegua
-       `delivery-watch` in modalità detect senza sessione aperta — in tal
-       caso l'MCP Atlassian va connesso anche nell'ambiente cloud.
+       `delivery-watch` in modalità detect senza sessione aperta
+       (giornaliero se vuole avvisare gli stakeholder appena una card si
+       muove) — in tal caso l'MCP Atlassian va connesso anche
+       nell'ambiente cloud.
      Nessun tool MCP nuovo da allowlistare: `delivery-watch` usa
      `getJiraIssue` (con `expand:"changelog"`) e `searchJiraIssuesUsingJql`,
      gli stessi già previsti per `jira-sync` (passo 7).

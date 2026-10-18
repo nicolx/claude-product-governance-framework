@@ -17,10 +17,13 @@
 #
 # La CODA (queue) SOPRAVVIVE TRA LE SESSIONI: è il punto in cui il PM non
 # perde un evento di delivery anche se non lo smarca subito. L'hook
-# check-delivery-queue.sh (SessionStart + Stop) conta le voci con
-# triage_status: pending. Le bozze di mail vivono QUI (stessa logica di
-# requester_reply sull'idea): delivery-watch non invia nulla — le manda il
-# PM a mano; il testo inviato resta nella voce come trail.
+# check-delivery-queue.sh (SessionStart + Stop) conta le voci aperte
+# (triage_status: pending o drafted). OGNI movimento di una card è un
+# evento, e per ciascuno delivery-watch prepara già la bozza di mail al
+# rilevamento (tranne le consegne, che passano dal giudizio DoD del PM nel
+# triage). Le bozze vivono QUI (stessa logica di requester_reply
+# sull'idea): delivery-watch non invia nulla — le manda il PM a mano; il
+# testo inviato resta nella voce come trail.
 
 # Esito dell'ultimo giro — per il "controllato N giorni fa" dell'hook e per
 # sapere se il connettore o la board_jql non è stato possibile interrogarli.
@@ -46,21 +49,22 @@ tickets: []
 #   last_seen_category: ""  # new | indeterminate | done  (status.statusCategory.key — universale su ogni board)
 #   last_seen_assignee: null   # display name o accountId, null se non assegnata
 #   last_seen_flagged: false   # true se il flag "Impediment"/"Flagged" è impostato
-#   last_polled_at: ""      # ISO del giro in cui è stato letto
+#   last_polled_at: ""      # ISO del giro in cui è stato letto — il prossimo giro classifica ogni riga del
+#                           #   changelog con created successivo a questo (un evento per riga di stato)
 
 # CODA DI TRIAGE — append quando si rileva un evento; si smarca voce per
 # voce nella modalità "delivery-watch triage". Una voce NON si cancella: si
 # porta triage_status a drafted/sent o dismissed (audit trail).
 queue: []
 # Esempio di singola voce:
-# - id: ""                  # slug stabile "{YYYY-MM-DD}-{card_id}-{event_type}" — identificatore in prima colonna
+# - id: ""                  # slug stabile "{YYYY-MM-DD}-{card_id}-{event_type}" (suffisso -2, -3… se ripetuto) — identificatore in prima colonna
 #   detected_at: ""         # ISO — quando delivery-watch ha rilevato l'evento
 #   occurred_at: ""         # ISO — timestamp Jira della transizione (dal changelog); "" se non disponibile
 #   card_id: ""
 #   url: ""
 #   idea_ref: ""            # short_ref o slug (mai vuoto)
 #   idea_slug: ""
-#   event_type: ""          # entered_development | delivered | bug_resolved | blocked | regression
+#   event_type: ""          # entered_development | in_review | status_changed | delivered | bug_resolved | blocked | regression
 #   from: ""                # stato/valore precedente (es. "In Progress", "—")
 #   to: ""                  # stato/valore nuovo (es. "Done"; per entered_development: nome dell'assegnatario)
 #   actor: null             # chi ha fatto la transizione in Jira (display name), se noto dal changelog
@@ -68,14 +72,18 @@ queue: []
 #   suggested_framing: ""   # update | reassurance | criticality
 #   suggested_audience: []  # nomi/ruoli: stakeholders della product_line (product-lines.yaml) + eventuale richiedente (idea.proposer)
 #   draft_headline: ""      # UNA riga PM-facing, es. "«Ricevute non riconosciute» è in produzione"
-#   triage_status: pending  # pending | drafted | sent | dismissed — per delivered/bug_resolved NIENTE dismiss
+#   triage_status: drafted  # drafted (bozza pronta, default al rilevamento) | pending (consegne: aspetta il
+#                           # giudizio DoD nel triage) | sent | dismissed (eccezione, con motivo).
+#                           # Per delivered/bug_resolved NIENTE dismiss
 #                           # libero: è l'avviso di conclusione obbligatorio, la bozza vive sull'idea
 #                           # (conclusion_notices, kind: delivered) e qui si rispecchia l'esito; dismissed
 #                           # solo se l'avviso è waived, con lo stesso motivo (playbook, "Avvisare gli
 #                           # stakeholder della conclusione")
-#   draft_subject: null     # compilato nel triage
-#   draft_body: null        # compilato nel triage (testo pronto da copiare — mai inviato in automatico)
-#   draft_recipients: []    # confermati/editati dal PM nel triage
+#   merged_into: null       # id della voce della stessa card in cui questa è confluita: una mail per card
+#                           #   racconta il percorso (es. in review → in produzione); ne segue l'esito
+#   draft_subject: null     # compilato al rilevamento (null per le consegne e le voci merged_into)
+#   draft_body: null        # compilato al rilevamento (testo pronto da copiare — mai inviato in automatico); il PM lo edita prima di mandare
+#   draft_recipients: []    # default suggested_audience; confermati/editati dal PM prima di mandare
 #   sent_at: null           # data dichiarata dal PM dopo l'invio manuale (triage_status: sent)
 #   dismiss_reason: null    # se dismissed: perché il PM non comunica questo evento
 #   notes: null

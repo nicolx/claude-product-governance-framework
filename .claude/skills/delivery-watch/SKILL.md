@@ -1,6 +1,6 @@
 ---
 name: delivery-watch
-description: Osserva il tracker di esecuzione per le transizioni di stato rilevanti per gli stakeholder (entrata in sviluppo, consegna in produzione, bug risolto, card bloccata, regressione) sulle iniziative con jira.card_id e su una board_jql configurata; annota ogni evento in una coda di triage in product/reference/delivery-watch.yaml che sopravvive tra le sessioni. Se trova attività su una card non collegata a un'idea, crea l'idea in automatico per recuperare il tracciamento. Nessun invio automatico — nel triage il PM decide per ciascun evento se preparare e mandare (a mano) una mail agli stakeholder; per le consegne (delivered/bug_resolved) l'avviso di conclusione è obbligatorio e condiziona il passaggio dell'idea a done. Usala periodicamente, come parte del Backlog Refinement, o via cron (/schedule).
+description: Osserva il tracker di esecuzione e rileva OGNI movimento di una card (entrata in sviluppo, in review, ogni altro cambio di colonna, consegna in produzione, bug risolto, card bloccata, regressione) sulle iniziative con jira.card_id e su una board_jql configurata; annota ogni evento in una coda in product/reference/delivery-watch.yaml che sopravvive tra le sessioni e per ciascuno prepara già la bozza di mail agli stakeholder. Se trova attività su una card non collegata a un'idea, crea l'idea in automatico per recuperare il tracciamento. Nessun invio automatico — le bozze le manda il PM a mano; per le consegne (delivered/bug_resolved) l'avviso di conclusione è obbligatorio e condiziona il passaggio dell'idea a done. Usala periodicamente, come parte del Backlog Refinement, o via cron (/schedule).
 ---
 
 # delivery-watch
@@ -8,14 +8,16 @@ description: Osserva il tracker di esecuzione per le transizioni di stato rileva
 `jira-sync` Pull risponde a "dov'è adesso questo ticket": denormalizza lo
 stato corrente sull'idea (`jira.status`), ma non tiene memoria del valore
 precedente e non legge il `changelog` della card. Tra una sessione e
-l'altra il PM perde il fatto che una card si è bloccata, è andata in
-produzione o è regredita — proprio l'informazione che serve per tenere
-gli stakeholder nel ciclo.
+l'altra il PM perde il fatto che una card è partita, è andata in review,
+si è bloccata, è andata in produzione o è regredita — proprio
+l'informazione che serve per tenere gli stakeholder nel ciclo.
 
 `delivery-watch` è la watch che rende quel monitoraggio periodico e
-**persistente**: rileva una tassonomia fissa di transizioni, le mette in
-una coda di triage che sopravvive tra le sessioni, e — nel triage — il PM
-decide per ciascuna se mandare una mail. Non invia mai nulla da sola.
+**persistente**: **ogni movimento di una card è un evento** (nessun
+cambio di stato si perde), finisce in una coda che sopravvive tra le
+sessioni, e per ciascuno la watch **prepara già la bozza di mail** agli
+stakeholder. Il default è comunicare: il PM manda la bozza (a mano) o,
+per eccezione, la archivia con un motivo. Non invia mai nulla da sola.
 Per le **consegne** (`delivered`, `bug_resolved`) la mail non è una
 scelta: è l'avviso di conclusione obbligatorio, e l'idea passa a
 `status: done` solo quando è `sent` o `waived` (playbook, "Avvisare gli
@@ -31,8 +33,8 @@ del confine "segnala, non comunica".
   novità sui ticket collegati?". Rileva i cambi dall'ultimo giro e li
   accoda; recap al PM.
 - **Standalone — TRIAGE**: "smarchiamo la coda di delivery" → cammina le
-  voci `pending` una per una, decidendo per ciascuna se preparare una
-  mail (che poi manda il PM), archiviarla, o lasciarla.
+  voci aperte (`drafted` e `pending`) una per una: il PM rivede la bozza
+  già pronta e la manda, la archivia con un motivo, o la lascia.
 - **Durante il Backlog Refinement**: `backlog-refinement` la lancia come
   **task in background** nella sweep di apertura (come la riconciliazione
   Jira — la sweep dev'essere calcolo, non attesa di I/O; vedi playbook,
@@ -41,7 +43,9 @@ del confine "segnala, non comunica".
   non scriverlo tu.
 - **Via cron**: il PM può creare un cloud agent con `/schedule` che
   esegue `delivery-watch` in modalità detect. Il cron **non fa triage e
-  non manda nulla**: rileva, accoda, committa. Il promemoria via hook
+  non manda nulla**: rileva, accoda con la bozza pronta, committa. La
+  cadenza decide quanto è tempestivo l'aggiornamento allo stakeholder
+  (giornaliera per un "appena si muove"). Il promemoria via hook
   (`check-delivery-queue.sh`) rende la coda visibile alla sessione
   interattiva successiva. Richiede l'MCP Atlassian connesso anche
   nell'ambiente cloud e `sync.auto_push` abilitato.
@@ -63,8 +67,10 @@ niente da controllare (non è un guasto).
   automatico** (passo 6).
 - Override per-istanza (opzionali) in `.governance/config.yaml`,
   `delivery_watch:`: `blocked_status_names`, `regression_labels`,
-  `default_product_line`. Se non dichiarati, la watch usa solo status
-  category + flag Impediment + issuetype.
+  `default_product_line`, `review_status_names`. Se non dichiarati, la
+  watch usa status category + flag Impediment + issuetype, e riconosce la
+  review dal nome dello stato (contiene "review", senza distinzione di
+  maiuscole).
 
 ## Tassonomia degli eventi
 
@@ -75,9 +81,21 @@ universale su ogni board), `fields.assignee`, `fields.labels`,
 `changelog.histories[]` con `{created, author, items:[{field, fromString,
 toString}]}`.
 
+**Ogni movimento è un evento.** Ogni riga di `changelog.histories[]`
+con un item `field:"status"` successiva all'ultimo giro (`created` >
+`tickets[].last_polled_at`) produce **esattamente un** evento — anche se
+tra due giri la card ha fatto più passi (In Progress → In Review → Done
+sono tre eventi, non solo l'ultimo stato). La riga si classifica con la
+**prima** regola che la descrive, in quest'ordine: `regression` →
+`delivered`/`bug_resolved` → `blocked` → `in_review` →
+`entered_development` → `status_changed`. Il flag Impediment, l'assegnatario
+e le label (item non di stato) producono gli eventi indicati sotto.
+
 | `event_type` | Rilevazione | `suggested_framing` | `suggested_audience` |
 |---|---|---|---|
-| **`entered_development`** | `changelog` item `field:"assignee"` con `fromString` vuoto → valorizzato, **e** categoria corrente `new`/`indeterminate`. `to` = nome assegnatario. | `update` | Stakeholders della `product_line`. |
+| **`entered_development`** | Cambio di stato da categoria `new` a `indeterminate` (inizio lavori). **In più**, per le board che non spostano la colonna: item `field:"assignee"` da vuoto → valorizzato con categoria corrente `new`/`indeterminate`, solo se la card non ha già un `entered_development` dopo l'ultimo `delivered`/`regression`. `to` = stato nuovo (o nome assegnatario). | `update` | Stakeholders della `product_line` + `idea.proposer` (se esterno). |
+| **`in_review`** | Stato entrato in uno di `delivery_watch.review_status_names` (confronto senza maiuscole); se la lista è vuota, un nome di stato che contiene "review". | `update` | Stakeholders della `product_line` + `idea.proposer` (se esterno). |
+| **`status_changed`** | Qualunque altro cambio di stato non coperto dalle righe sopra (es. In Review → In Progress, To Do → Ready for QA). `from`/`to` = nomi degli stati. | `update` | Stakeholders della `product_line` + `idea.proposer` (se esterno). |
 | **`delivered`** | `last_seen_category` ≠ `done` **e** categoria corrente = `done` **e** `issuetype` ≠ Bug. | `reassurance` | `idea.proposer` (se esterno) + stakeholders della `product_line`. Se UI visibile → suggerisci `demo-capture`. |
 | **`bug_resolved`** | come `delivered` ma `issuetype` = Bug. | `reassurance` | Chi ha segnalato il bug (`idea.proposer`) + stakeholders della `product_line`. |
 | **`blocked`** | custom field "Flagged" → `Impediment` (dal `changelog`), **oppure** status entrato in un nome di `delivery_watch.blocked_status_names`. | `criticality` | `idea.proposer` + stakeholders della `product_line`. |
@@ -87,9 +105,9 @@ toString}]}`.
   `tickets[]`).
 - `suggested_audience` si deriva **sempre** da
   `product/reference/product-lines.yaml` (voce con `name ==
-  idea.product_line` → `stakeholders: []`) + `idea.proposer` per i
-  framing `reassurance`/`criticality`. È un **default**: il PM
-  conferma/edita i destinatari nel triage.
+  idea.product_line` → `stakeholders: []`) + `idea.proposer` (se
+  esterno). È un **default**: il PM conferma/edita i destinatari prima
+  di mandare.
 - Dedup: `card_id` + `event_type` + `occurred_at`. Un evento già in
   `queue[]` (anche `sent`/`dismissed`) non si ri-accoda.
 
@@ -124,7 +142,7 @@ toString}]}`.
    `delivery-watch` quando il connettore torna su. Con `jira.integration:
    manuale` (o `delivery_watch.fixture` valorizzato per il test): chiedi
    al PM di incollare, per ogni card nel perimetro, lo stato corrente e
-   le transizioni dall'ultimo giro.
+   le transizioni dall'ultimo giro (tutte, non solo l'ultimo stato).
 
 2. **Scaffolda `product/reference/delivery-watch.yaml`** da
    `framework/schema/delivery-watch.template.yaml` se non esiste.
@@ -138,9 +156,10 @@ toString}]}`.
    `addCommentToJiraIssue`.
 
 5. **Confronta con l'entry in `tickets[]`** (assente = baseline, non
-   evento) e classifica gli eventi secondo la tassonomia. Prendi
-   `occurred_at` e `actor` dalla riga di `changelog.histories[]` che ha
-   prodotto la transizione.
+   evento) e classifica **ogni** riga del `changelog` successiva
+   all'ultimo giro secondo la tassonomia — una riga di stato, un evento.
+   Prendi `occurred_at` e `actor` dalla riga di `changelog.histories[]`
+   che ha prodotto la transizione.
 
 6. **Per ogni ticket di `board_jql` SENZA idea collegata su cui è
    scattato un evento**: invoca `idea-intake` in **modalità backfill**
@@ -157,8 +176,29 @@ toString}]}`.
 7. **Per ogni evento nuovo** (dedup su `card_id`+`event_type`+`occurred_at`,
    non già in `queue[]`): calcola `suggested_framing`,
    `suggested_audience`, `draft_headline` (una riga PM-facing). Append a
-   `queue[]` con `triage_status: pending`, `id` =
-   `{YYYY-MM-DD}-{card_id}-{event_type}`.
+   `queue[]` con `id` = `{YYYY-MM-DD}-{card_id}-{event_type}` (se lo
+   stesso `id` esiste già per un'altra transizione, suffisso `-2`, `-3`…).
+
+7b. **Prepara la bozza di mail — per ogni evento, senza aspettare il
+   triage.** Per gli eventi diversi da `delivered`/`bug_resolved`:
+   componi `draft_subject` e `draft_body` dal `suggested_framing`
+   (aggiornamento: dov'è adesso, cosa succede dopo, chi ci lavora;
+   criticità: cosa è successo, impatto atteso, quando ci sarà un
+   aggiornamento — mai un'ipotesi sui tempi non presente nella card),
+   `draft_recipients` = `suggested_audience`, `triage_status: drafted`.
+   Il corpo si regge da solo per chi lo riceve: nome leggibile
+   dell'iniziativa (`summary`, non lo slug), stato in parole semplici
+   (non il gergo della board), link alla card solo se il destinatario è
+   interno. **Una mail per card per giro:** se lo stesso giro rileva più
+   eventi sulla stessa card, la bozza sta sulla voce più recente e
+   racconta il percorso ("è passata in review e poi in produzione");
+   le altre voci hanno `merged_into` = `id` di quella voce e niente
+   `draft_*`. Se tra quegli eventi c'è un `delivered`/`bug_resolved`,
+   il percorso confluisce nell'avviso di conclusione (triage, ramo d) e
+   tutte le voci della card restano `pending`. Per
+   `delivered`/`bug_resolved` nessuna bozza qui: serve prima il giudizio
+   del PM sulla Definition of Done (triage, ramo d) → `triage_status:
+   pending`.
 
 8. **Aggiorna `tickets[]`** con lo snapshot corrente di ogni ticket
    letto, e `last_watch` (`run_at`, `tickets_polled`, `connector_status`,
@@ -172,15 +212,18 @@ toString}]}`.
    la valutazione è del PM.
 
 10. **Recap al PM — SEMPRE**, anche se non c'è nulla:
-    - **Eventi nuovi**: raggruppati per `event_type`, con l'`id` in
+    - **Eventi nuovi**: raggruppati per card nell'ordine in cui sono
+      avvenuti (il percorso della card), con l'`id` in
       **prima colonna** (playbook, "Ogni elenco prodotto dal sistema è
       indirizzabile"), `card_id`, `idea_ref` con `summary` e R · I · C ·
       E + RICE dell'idea ("—" e il motivo se senza RICE — playbook, "Ogni riga che parla di un'idea si capisce da sola"),
-      `from → to`, `suggested_framing`.
+      `from → to`, `suggested_framing`, e se la bozza è pronta
+      (`drafted`) o aspetta il triage (`pending`, consegne).
     - **Idee create per backfill**: slug, card, classificazione
       abbozzata — ricorda al PM di rivederle al triage.
-    - **Coda**: totale voci `pending` (comprese quelle dei run
-      precedenti).
+    - **Coda**: bozze pronte da mandare (`drafted`) e voci da smarcare
+      (`pending`), comprese quelle dei run precedenti — con l'invito a
+      mandarle: ogni movimento ha il suo aggiornamento.
     - **Invariato**: quanti ticket saltati perché non cambiati (una
       riga, non l'elenco).
     - **Rimandato**: connettore/`board_jql` irraggiungibile non
@@ -208,26 +251,37 @@ toString}]}`.
 0. `bash .claude/hooks/governance-sync.sh pull`; leggi
    `product/reference/delivery-watch.yaml`.
 
-1. **Elenca le voci `queue[]` con `triage_status: pending`**, ordinate
-   `criticality` > `reassurance` > `update`, poi per `occurred_at`.
+1. **Elenca le voci `queue[]` con `triage_status` `drafted` o `pending`**
+   (escluse quelle con `merged_into`, che viaggiano con la voce in cui
+   sono confluite), ordinate `criticality` > `reassurance` > `update`,
+   poi per `occurred_at`.
    Tabella con l'`id` in prima colonna, poi `idea_ref`, `summary` e
    R · I · C · E + RICE dell'idea collegata (playbook, "Ogni riga che parla di un'idea si capisce da sola"). Segnala **a parte** le idee con
    `backfill_review_needed: true`.
 
+   **Accorpa per card**: più voci aperte della stessa card (anche di giri
+   diversi, non ancora mandate) diventano **una sola mail** che racconta
+   il percorso — la bozza si riscrive sulla voce più recente, le altre
+   prendono `merged_into` e perdono i `draft_*`. Lo stakeholder riceve
+   un aggiornamento con lo stato vero di oggi, non tre mail in fila.
+
 2. **Cammina OGNI voce** con il PM. Per una voce `delivered` o
-   `bug_resolved` vale il ramo **(d)** al posto di (a)/(b); per le altre:
-   - **(a) BOZZA MAIL** → componi `draft_subject` e `draft_body` dal
-     `suggested_framing` della voce (aggiornamento / rassicurazione /
-     criticità); `draft_recipients` da `suggested_audience` (il PM
-     conferma/edita). Scrivi i tre campi nella voce di coda,
-     `triage_status: drafted`. **Mostra la bozza al PM pronta da
-     copiare — NON inviarla.** Quando il PM dice di averla mandata →
-     `triage_status: sent`, `sent_at` (data dichiarata dal PM). Il testo
-     resta nella voce come trail.
-   - **(b) DISMISS** → `triage_status: dismissed`, `dismiss_reason`
-     (chiedi il motivo, non lasciarlo vuoto — audit).
-   - **(c) SALTA** → lascia `pending` (resta in coda; l'hook continua a
-     ricordarla).
+   `bug_resolved` vale il ramo **(d)** al posto di (a)/(b); per le altre
+   la bozza è già pronta (passo 7b; se manca — voce di un run vecchio —
+   componila ora con le stesse regole):
+   - **(a) MANDA** → **mostra la bozza al PM pronta da copiare — NON
+     inviarla.** Il PM conferma/edita destinatari e testo (aggiorna i
+     `draft_*` con la versione finale). Quando il PM dice di averla
+     mandata → `triage_status: sent`, `sent_at` (data dichiarata dal
+     PM); stesso esito su tutte le voci con `merged_into` = questa. Il
+     testo resta nella voce come trail.
+   - **(b) DISMISS** — l'eccezione, non la regola: ogni movimento merita
+     un aggiornamento. → `triage_status: dismissed`, `dismiss_reason`
+     (chiedi il motivo, non lasciarlo vuoto — audit; es. "card spostata
+     per errore e tornata indietro"). Stesso esito sulle voci con
+     `merged_into` = questa.
+   - **(c) SALTA** → lascia la voce com'è (resta in coda; l'hook
+     continua a ricordarla).
    - **(d) AVVISO DI CONCLUSIONE** (solo `delivered`/`bug_resolved`) —
      **niente dismiss**: la consegna va comunicata (playbook, "Avvisare
      gli stakeholder della conclusione").
@@ -240,7 +294,10 @@ toString}]}`.
         screenshot da `demo-capture` se c'è UI — e quando se ne guarderà
         l'impatto) e `recipients` da `suggested_audience` (il PM
         conferma/edita). `notice_status: drafted`, e la voce di coda
-        `triage_status: drafted`. **Mostra la bozza — NON inviarla.**
+        `triage_status: drafted`. Se la card ha altre voci aperte
+        (es. un `in_review` non ancora mandato), il percorso entra
+        nell'avviso e quelle voci prendono `merged_into` = questa (ne
+        seguono l'esito). **Mostra la bozza — NON inviarla.**
         La bozza vive sull'idea, non nei `draft_*` della coda: non
         duplicarla.
      3. Quando il PM dice di averla mandata → `notice_status: sent`,
@@ -265,7 +322,8 @@ toString}]}`.
    `bash .claude/hooks/governance-sync.sh push "delivery-watch: triage — <k> bozze, <s> inviate, <j> dismiss, <d> idee done" product/reference/delivery-watch.yaml product/ideas/`.
 
 5. Ricorda al PM: le bozze **non partono da sole**. Le manda lui; il
-   testo inviato resta nella voce di coda.
+   testo inviato resta nella voce di coda. Le bozze `drafted` non ancora
+   mandate restano contate dall'hook finché non sono `sent`/`dismissed`.
 
 ## Relazione con jira-sync
 
@@ -286,9 +344,12 @@ verità per l'esecuzione.
 
 ## Cosa NON fare
 
-- **Mai inviare una comunicazione.** `delivery-watch` prepara bozze SOLO
-  nel triage, su richiesta del PM voce per voce; l'invio è sempre
-  manuale. Nessun percorso batch/cron che spedisce a persone.
+- **Mai inviare una comunicazione.** `delivery-watch` prepara la bozza
+  per ogni evento, ma l'invio è sempre manuale. Nessun percorso
+  batch/cron che spedisce a persone.
+- **Mai saltare un movimento.** Ogni riga di stato del `changelog` dopo
+  l'ultimo giro è un evento, anche se la card è già oltre: il percorso si
+  accorpa nella mail, non si perde.
 - **Mai decidere che un evento è "chiuso" o irrilevante** — accoda, il
   PM smarca (stesso principio di `nsm-watch`/`mandate-watch`: segnala,
   non decide).

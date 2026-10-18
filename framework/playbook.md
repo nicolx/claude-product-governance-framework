@@ -1466,7 +1466,7 @@ d'occhio" del piano si ottiene con la skill **`iteration-board`**.
 **Checklist operativa**
 - [ ] Dopo ogni watch della sweep di apertura c'è stato un checkpoint: tabella con `{ID}` in prima colonna e diritto di parola al PM prima di procedere? Le azioni concordate (archiviazioni, scadenze pulite, misurazioni chiuse) sono in `decisions.yaml`?
 - [ ] `context-watch` ha controllato le cartelle di contesto collegate? Gli aggiornamenti di routine sono stati applicati e messi nel recap; i cambiamenti materiali sono in `product/approvals/pending/` (`type: context_update`)?
-- [ ] `delivery-watch` ha girato (se `delivery_watch.enabled`) e la coda di triage è stata rivista? Ogni evento smarcato ha un esito esplicito — bozza di mail inviata a mano dal PM, o dismiss con motivo — e nessuna comunicazione è partita in automatico?
+- [ ] `delivery-watch` ha girato (se `delivery_watch.enabled`) e la coda di triage è stata rivista? Ogni movimento delle card ha un esito esplicito — mail inviata a mano dal PM, o (per eccezione) dismiss con motivo — e nessuna comunicazione è partita in automatico?
 - [ ] La coda `product/approvals/pending/` è stata camminata: ogni `rice_diff` approvato o rifiutato dal team? Quel che resta in coda è stato segnalato?
 - [ ] Il backlog ordinato (`backlog-list`) è stato mostrato al team prima di decidere cosa entra in iterazione?
 - [ ] Il Piano di Iterazione è stato generato **partendo da quello della settimana precedente** (`based_on`)?
@@ -2087,21 +2087,30 @@ sono fallback. Come l'istanza si connette è dichiarato in
 `jira-sync` Pull risponde a "dov'è adesso questo ticket". Non risponde a
 "cosa è appena cambiato": non tiene memoria del valore precedente e non
 legge il `changelog` della card. Tra una sessione e l'altra il PM perde
-il fatto che una card si è bloccata, è andata in produzione o è
-regredita — proprio l'informazione che serve per tenere gli stakeholder
-nel ciclo con un aggiornamento, una rassicurazione, o la segnalazione
-onesta di una criticità.
+il fatto che una card è partita, è andata in review, si è bloccata, è
+andata in produzione o è regredita — proprio l'informazione che serve per
+tenere gli stakeholder nel ciclo con un aggiornamento, una
+rassicurazione, o la segnalazione onesta di una criticità.
 
-`delivery-watch` è la watch che colma quel buco. Osserva il tracker di
-esecuzione per una **tassonomia fissa** di transizioni sulle iniziative
-collegate (le idee con `jira.card_id`), basata sulla **status *category*
-di Jira** — `new` / `indeterminate` / `done`, universale su ogni board,
-nessuna mappatura delle colonne per-istanza — più il flag "Impediment" e
-l'`issuetype`. Gli eventi:
+`delivery-watch` è la watch che colma quel buco. **Ogni movimento di una
+card collegata è un evento**: ogni cambio di stato nel `changelog` dopo
+l'ultimo giro, anche se tra due giri la card ha fatto più passi (In
+Progress → In Review → Done sono tre eventi). Lo stakeholder che ha
+chiesto una cosa vuole sapere quando parte, quando è quasi pronta e
+quando è fatta, non solo la fine. La classificazione si basa sulla
+**status *category* di Jira** — `new` / `indeterminate` / `done`,
+universale su ogni board — più il flag "Impediment", l'`issuetype` e, per
+la review, il nome dello stato (`delivery_watch.review_status_names`, o
+di default ogni stato il cui nome contiene "review"). Ogni riga di stato
+prende il primo tipo che la descrive, in quest'ordine: `regression`,
+`delivered`/`bug_resolved`, `blocked`, `in_review`,
+`entered_development`, e `status_changed` come rete finale:
 
 | `event_type` | Segnale | Framing suggerito |
 |---|---|---|
-| `entered_development` | assegnatario impostato da vuoto, categoria `new`/`indeterminate` | *aggiornamento* — "è partita, se ne occupa {nome}" |
+| `entered_development` | categoria `new` → `indeterminate`; per le board che non spostano la colonna, assegnatario impostato da vuoto | *aggiornamento* — "è partita, se ne occupa {nome}" |
+| `in_review` | stato entrato in uno di `delivery_watch.review_status_names` (default: nome che contiene "review") | *aggiornamento* — "è in revisione, il prossimo passo è il rilascio" |
+| `status_changed` | ogni altro cambio di stato (es. torna da review a sviluppo, passa in QA) | *aggiornamento* — "è passata da {da} a {a}" |
 | `delivered` | categoria → `done`, `issuetype` ≠ Bug | *rassicurazione* — "è in produzione" |
 | `bug_resolved` | categoria → `done`, `issuetype` = Bug | *rassicurazione* — "il problema segnalato è chiuso" |
 | `blocked` | flag "Impediment" aggiunto, o stato entrato in uno di `delivery_watch.blocked_status_names` | *criticità* — "lavorazione temporaneamente bloccata" |
@@ -2118,21 +2127,32 @@ rilevato. L'hook `check-delivery-queue.sh` (a inizio e fine sessione) ne
 mostra il conteggio, con lo stesso stile di sola-allerta di
 `check-pending-approvals.sh`.
 
-**`delivery-watch` non comunica.** Fa esattamente quello che fanno le
-altre watch — fatti osservati, un recap al PM, una coda — e nulla di
-più. È "solo segnalazione" nello stesso senso di `mandate-watch` e
+**`delivery-watch` non comunica, ma prepara la comunicazione.** Fa
+quello che fanno le altre watch — fatti osservati, un recap al PM, una
+coda — e in più, per ogni evento, scrive già la **bozza di mail** agli
+stakeholder nella voce di coda. Il default è che ogni movimento abbia il
+suo aggiornamento: al PM resta da rivederlo e mandarlo, non da decidere
+se scriverlo. È "solo segnalazione" nello stesso senso di `mandate-watch` e
 `deadline-watch`: la scrittura di `jira.status`/`jira.last_polled_at`
 sull'idea è lo stesso fatto osservato che scrive `jira-sync` (scrittura
 diretta, mai `pending/`).
 
-La comunicazione è un **atto separato e deliberato del PM**, in una
-sessione di triage dedicata. Per ogni evento in coda il PM sceglie:
-preparare una **bozza di mail** agli stakeholder — che poi **invia a
-mano**, stessa logica di `requester_reply` ("Chiudere il loop col
-richiedente"): nessun invio automatico, nessuna coda `pending/`; il testo
-inviato, i destinatari e la data restano nella voce di coda come trail —
-archiviare la voce con un motivo, o lasciarla per dopo. Non c'è nessun
-percorso non presidiato.
+L'invio è un **atto deliberato del PM**, nel triage. Per ogni voce il PM
+rivede la bozza (destinatari e testo) e la **invia a mano**, stessa
+logica di `requester_reply` ("Chiudere il loop col richiedente"):
+nessun invio automatico, nessuna coda `pending/`; il testo inviato, i
+destinatari e la data restano nella voce di coda come trail. In
+alternativa la lascia per dopo, o — per eccezione, con un motivo — la
+archivia (es. card spostata per errore e subito tornata indietro). Non
+c'è nessun percorso non presidiato.
+
+**Una mail per card, che racconta il percorso.** Se tra un invio e
+l'altro una card si è mossa più volte, le voci ancora aperte della
+stessa card confluiscono in un'unica bozza (`merged_into`) con lo stato
+vero di oggi e i passi fatti — lo stakeholder riceve un aggiornamento,
+non tre mail in fila, e nessun passo si perde. La tempestività dipende da
+quanto spesso gira la watch: per un aggiornamento "appena si muove" il
+cron di detect va schedulato giornaliero.
 
 **Le conclusioni non si archiviano.** Per `delivered` e `bug_resolved` la
 comunicazione non è una scelta: è l'avviso di conclusione obbligatorio
@@ -2140,8 +2160,10 @@ comunicazione non è una scelta: è l'avviso di conclusione obbligatorio
 bozza va nella voce `delivered` di `conclusion_notices` sull'idea, e il
 dismiss non esiste — l'unica alternativa all'invio è l'**esenzione**
 (`waived`) con un motivo dato dal PM. L'idea passa a `status: done` solo
-quando l'avviso è `sent` o `waived`. Per gli altri eventi (`entered_development`,
-`blocked`, `regression`) resta la scelta del PM.
+quando l'avviso è `sent` o `waived`. Per questi due eventi la bozza non
+si prepara al rilevamento ma nel triage, dopo che il PM ha confermato la
+Definition of Done; se la card ha altre voci aperte (es. un `in_review`
+non ancora mandato) il percorso entra nell'avviso.
 
 **Lavoro che bypassa la governance.** Se `delivery_watch.board_jql` è
 configurata, `delivery-watch` guarda anche le card della board non
@@ -2162,7 +2184,8 @@ automatica"). Questa sezione **è** quella rediscussione: l'esito è che la
 *persistenza della coda* entra nel metodo, mentre l'*auto-invio* e un
 livello *batch/cron che spedisce a persone* restano fuori. Un cron
 opzionale (`/schedule`) può eseguire `delivery-watch` in modalità detect
-— rileva, accoda, committa — ma non fa triage e non manda nulla; il
+— rileva, accoda con le bozze pronte, committa — ma non fa triage e non
+manda nulla; il
 promemoria via hook resta il canale con cui la coda arriva davanti al PM.
 
 **Relazione con `demo-capture`.** Per un evento `delivered` su

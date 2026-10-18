@@ -38,9 +38,10 @@ direttamente. Non ancora progettato né costruito.
 
   **Parziale rediscussione: FATTA** per le transizioni di delivery. La
   skill `delivery-watch` (playbook, "Transizioni di delivery rilevanti
-  per gli stakeholder") osserva il tracker di esecuzione e mette gli
-  eventi rilevanti (bug risolto, in sviluppo, bloccata, in produzione,
-  regressione) in una **coda di triage che sopravvive tra le sessioni**
+  per gli stakeholder") osserva il tracker di esecuzione e mette ogni
+  movimento delle card (in sviluppo, in review, ogni altro cambio di
+  stato, bloccata, in produzione, bug risolto, regressione), con la
+  bozza di mail già pronta, in una **coda di triage che sopravvive tra le sessioni**
   (`product/reference/delivery-watch.yaml`), con un hook
   (`check-delivery-queue.sh`) che ne ricorda il conteggio. Esito della
   rediscussione: la *persistenza della coda* entra nel metodo (è
