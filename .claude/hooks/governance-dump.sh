@@ -19,7 +19,7 @@
 #   governance-dump.sh pending       # contenuto di product/approvals/pending/*.yaml
 #   governance-dump.sh reference     # product/reference/*.yaml
 #   governance-dump.sh delivery      # delivery-watch.yaml + product-lines.yaml + le idea.yaml (per delivery-watch)
-#   governance-dump.sh reports       # viste dichiarate + ultimi report + tutte le fonti dei modelli (per report-render)
+#   governance-dump.sh reports       # viste dichiarate + ultimi report + tutte le fonti dei modelli + ultime cerimonie + indice pending (per report-render)
 #
 # SOLA LETTURA: non scrive niente, non fa commit, non tocca git. Stampa su
 # stdout. No-op (exit 0, nessun output) se non c'è una cartella product/
@@ -140,6 +140,25 @@ emit_reports_index() {
   done
 }
 
+emit_recent_ceremonies() {
+  # il registro (decisions.yaml) delle ultime 2 cerimonie per tipo, escluse
+  # quelle annullate (-void): fonte dei commenti delle viste di roadmap
+  local t f
+  [ -d "product/ceremonies" ] || return 0
+  find product/ceremonies -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort | while IFS= read -r t; do
+    find "$t" -mindepth 1 -maxdepth 1 -type d ! -name '*-void' 2>/dev/null | sort | tail -n 2 \
+      | while IFS= read -r f; do emit_file "$f/decisions.yaml"; done
+  done
+}
+
+emit_pending_index() {
+  # solo i nomi delle proposte in coda: una vista dichiara cosa è ancora in
+  # attesa, non ne legge il contenuto
+  [ -d "product/approvals/pending" ] || return 0
+  printf '\n━━━ product/approvals/pending (indice) ━━━\n'
+  find product/approvals/pending -maxdepth 1 -type f -name '*.yaml' 2>/dev/null | sort | sed 's#.*/##'
+}
+
 footer() {
   local ideas active done_ prds_m pend iters
   ideas="$(find product/ideas -mindepth 2 -maxdepth 2 -name idea.yaml 2>/dev/null | wc -l | tr -d ' ')"
@@ -210,6 +229,8 @@ case "$MODE" in
     emit_glob "product/prds" 'measurement*.yaml'
     emit_iterations
     emit_latest_snapshot
+    emit_recent_ceremonies
+    emit_pending_index
     footer
     ;;
   *)

@@ -17,13 +17,23 @@
 #
 # L'istanza può dichiarare più viste sullo stesso modello (es. la stessa
 # roadmap Now/Next/Later per due Product Line con pubblici diversi).
+#
+# La ROADMAP AGGIORNATA dell'istanza è la vista (o le viste) con
+# cadence: per_ceremony. Il default per un progetto nascente è
+# framework:roadmap-di-lavoro (scadenze, RICE e commenti di cerimonia per
+# ogni voce); un'azienda con un proprio formato di roadmap dichiara
+# quello (company:<id>) con la stessa cadenza — il meccanismo di
+# rigenerazione non dipende dal formato.
 
 views: []
 # - name: ""                      # slug della vista — è anche la cartella dei report: product/reports/<name>/
 #   model: "framework:roadmap-now-next-later"
 #   audience: ""                  # a chi va (es. "leadership", "stakeholder Product Line X", "team"). "team" = uso interno, nessuna proposta outbound_comm
 #   recipients: []                # opzionale: chi la riceve (nomi/ruoli/liste) — informativo, usato per la bozza di outbound_comm
-#   cadence: monthly              # weekly | monthly | quarterly | on_demand — sovrascrive cadence_default del modello
+#   cadence: monthly              # per_ceremony | weekly | monthly | quarterly | on_demand — sovrascrive cadence_default del modello.
+#                                 #   per_ceremony = rigenerata in automatico alla chiusura di ogni cerimonia e a ogni
+#                                 #   approvazione che tocca la roadmap (piano, RICE, SE, mandate). È la cadenza della
+#                                 #   "roadmap aggiornata" dell'istanza, qualunque sia il suo formato (framework: o company:)
 #   destination: ""               # informativo: dove la pubblica il PM ("email", "Confluence: <spazio/pagina>", "deck MBR", "solo repo"). Il framework non pubblica mai da solo
 #   filters:                      # opzionale: restringe i dati
 #     product_lines: []           #   [] = tutte

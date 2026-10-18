@@ -161,13 +161,17 @@ piano passa **sempre** da `product/approvals/pending/`
       9. **Viste in scadenza** — dalle viste dichiarate in
          `product/reference/reporting-models.yaml` e dall'indice
          "ultimo report per vista" in fondo al dump: quelle con `cadence`
-         diversa da `on_demand` senza un report per il periodo corrente.
-         Colonne: `name`, modello, pubblico, ultimo periodo generato. Solo
-         segnalazione: la generazione è un passo separato **dopo** la
-         cerimonia (`report-render`, sui dati appena approvati), non qui.
-         Se il file non esiste, una riga: *"nessun modello di reporting
-         dichiarato — `report-render` in modalità setup"* (playbook,
-         "Modelli di reporting").
+         diversa da `on_demand` e da `per_ceremony` senza un report per il
+         periodo corrente. Colonne: `name`, modello, pubblico, ultimo
+         periodo generato. Solo segnalazione: la generazione è un passo
+         separato **dopo** la cerimonia (`report-render`, sui dati appena
+         approvati), non qui. Le viste `per_ceremony` (la roadmap
+         aggiornata) non si elencano: le rigenera `log-ceremony` in
+         chiusura. Se nessuna vista è `per_ceremony`, una riga: *"la
+         roadmap non si aggiorna da sola a fine cerimonia — `report-render`
+         setup per dichiararne una"*. Se il file non esiste, una riga:
+         *"nessun modello di reporting dichiarato — `report-render` in
+         modalità setup"* (playbook, "Modelli di reporting").
       Le **formule sono quelle documentate nelle rispettive skill**
       (`nsm-watch`, `measurement-watch`, `mandate-watch`, `deadline-watch`,
       `rice-watch`, `path-watch`) — applicale, non reinventarle; se un caso
@@ -431,8 +435,12 @@ piano passa **sempre** da `product/approvals/pending/`
 - Qualche giorno dopo: **`iteration-planning`**, quando il team tech
   fissa l'agenda concreta di delivery e **conferma/aggiusta** il Piano di
   Iterazione (stime di delivery, valutazione 80/20).
+- La **roadmap aggiornata** (viste `per_ceremony`) esce già alla
+  chiusura della cerimonia (`log-ceremony`, passo 7), con il banner "in
+  attesa di approvazione" finché il piano è in `pending/`; si rigenera da
+  sola quando `pending-approval` approva il piano o i RICE.
 - Dopo l'approvazione del piano (e dello snapshot): **`report-render`**
-  per le viste segnalate in scadenza nella sweep (blocco 7) — roadmap,
+  per le altre viste segnalate in scadenza nella sweep (blocco 9) — roadmap,
   scorecard, aggiornamento settimanale secondo i modelli dichiarati in
   `product/reference/reporting-models.yaml`. Quelle per un pubblico fuori
   dal team passano da `pending/` come `outbound_comm`.

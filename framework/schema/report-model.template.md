@@ -24,7 +24,7 @@ origin: framework           # framework | company
 original_ref: null          # SOLO company: dove vive il formato originale (URL Confluence/Drive, nome del deck) — il file grezzo NON si copia nel repo
 extends: null               # SOLO company, opzionale: "framework:<id>" se il modello aziendale è un modello standard con varianti
 audience_default: ""        # per chi è pensato (es. "leadership", "stakeholder di business", "team")
-cadence_default: monthly    # weekly | monthly | quarterly | on_demand
+cadence_default: monthly    # per_ceremony | weekly | monthly | quarterly | on_demand — per_ceremony = rigenerata in automatico a fine di ogni cerimonia (playbook, "Modelli di reporting", "La roadmap si aggiorna da sola")
 period_format: "YYYY-MM"    # come si chiama il periodo del report: "YYYY-Www" | "YYYY-MM" | "YYYY-Qn"
 horizon: ""                 # cosa copre nel tempo (es. "trimestre corrente + successivo")
 

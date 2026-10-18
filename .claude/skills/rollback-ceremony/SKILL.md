@@ -98,6 +98,11 @@ o intervento git esplicito dell'utente).
      Una proposta `iteration_plan` **ancora in `pending/`** (non
      approvata — il caso normale subito dopo la cerimonia) fa invece
      parte dei commit del run e viene revertata come gli altri.
+     I report rigenerati in chiusura del run (`product/reports/`, nel
+     commit di `log-ceremony`) appartengono al run: il revert riporta la
+     roadmap alla versione precedente. Quelli rigenerati da
+     `pending-approval` dopo un'approvazione seguono la decisione
+     approvata e restano fuori scope come lei.
 
 4. **Componi e mostra il piano di rollback**, esplicito, prima di
    toccare qualunque cosa:

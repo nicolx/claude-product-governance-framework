@@ -80,7 +80,8 @@ inizializzata) e scaffolda `apps/` e `product/`.
     ├── roadmap/iterations/{YYYY-Www}.yaml   ← Piano di Iterazione: board a 4 bucket, output primario del Backlog Refinement (skill iteration-board per la vista)
     ├── roadmap/snapshots/{YYYY-Www}.yaml     ← rollup strategico per MBR/MTR, referenzia il Piano di Iterazione
     ├── reports/{vista}/{periodo}.md          ← viste per gli stakeholder (roadmap, scorecard metriche, aggiornamenti) generate da report-render
-    │                                           secondo i modelli dichiarati in reference/reporting-models.yaml — derivate, mai editate a mano
+    │                                           secondo i modelli dichiarati in reference/reporting-models.yaml — derivate, mai editate a mano.
+    │                                           La roadmap (vista per_ceremony, formato standard o aziendale) si rigenera da sola a fine di ogni cerimonia
     ├── approvals/{pending,decided}/
     ├── demos/                    ← evidenza visiva di delivery (skill demo-capture)
     │   ├── recipes/{app-slug}.yaml        (come portare su ogni app in modalità demo — tracciato, NIENTE segreti)

@@ -234,9 +234,18 @@ per raccogliere:
     *"L'azienda ha già formati che dovete rispettare — una roadmap per la
     leadership, un deck di MBR, una pagina Confluence, un foglio di
     KPI?"*
+    - **La roadmap aggiornata a ogni cerimonia.** Qualunque sia il caso
+      sotto, una vista di roadmap va dichiarata con `cadence:
+      per_ceremony`: è quella che `log-ceremony` rigenera da sola alla
+      chiusura di ogni cerimonia (e `pending-approval` a ogni
+      approvazione che tocca piano o RICE), con scadenze, RICE e commenti
+      di cerimonia — playbook, "Modelli di reporting", "La roadmap si
+      aggiorna da sola". Default `framework:roadmap-di-lavoro`; se
+      l'azienda ha il suo formato di roadmap, è quello.
     - **Progetto nascente, nessun formato**: proponi il set minimo
-      standard — `roadmap-now-next-later` + `metriche-scorecard` — e
-      mostra il resto del catalogo (`framework/models/README.md`:
+      standard — `roadmap-di-lavoro` (`per_ceremony`) +
+      `metriche-scorecard` — e mostra il resto del catalogo
+      (`framework/models/README.md`: `roadmap-now-next-later`,
       `roadmap-trimestrale`, `aggiornamento-settimanale`). Per ogni
       vista scelta chiedi pubblico, destinatari, cadenza, destinazione
       (dove la pubblicherà il PM) e Product Line.
@@ -246,14 +255,17 @@ per raccogliere:
       `product/reference/models/<id>.md` seguendo la modalità setup di
       `report-render` ("Trascrivi un modello aziendale"): sezioni e
       ordine del formato, mappatura di ogni campo sui dati del framework,
-      campi senza fonte in `gaps` con la gestione scelta dal PM. Se il
+      campi senza fonte in `gaps` con la gestione scelta dal PM. Il
+      formato di roadmap aziendale prende `cadence: per_ceremony` al
+      posto di `roadmap-di-lavoro`, se il PM lo conferma. Se il
       formato è lungo o il PM non lo ha a portata di mano, dichiara la
       vista su un modello standard come ponte e annota in `note` che va
       sostituita dal modello aziendale — **non bloccare
       l'inizializzazione**.
     - I due casi convivono (formato aziendale per la leadership, modello
       standard per la mail settimanale).
-    Obiettivo minimo: almeno una vista di roadmap e una di metriche. Se
+    Obiettivo minimo: almeno una vista di roadmap `per_ceremony` e una
+    di metriche. Se
     il PM non ne vuole nessuna, scrivi il file con `views: []` e il
     motivo in un commento: è una scelta, non una dimenticanza.
 
@@ -314,8 +326,9 @@ che serve da lì e chiedi solo quello che manca.
    dichiarate al passo 11, e i modelli aziendali trascritti in
    `product/reference/models/<id>.md` (da
    `framework/schema/report-model.template.md`). Nessun report si genera
-   all'init: i dati ancora non ci sono; il primo lo produce
-   `report-render` dopo il primo Backlog Refinement.
+   all'init: i dati ancora non ci sono; la prima roadmap aggiornata esce
+   da sola alla chiusura del primo Backlog Refinement, le altre viste le
+   produce `report-render`.
    Non creare qui `product/reference/nsm-tracking.yaml`: baseline e
    target delle NSM spesso richiedono un giro su DataBricks/analytics
    che non è pratico fare a metà di questa intervista — lo scaffolda la
@@ -410,8 +423,9 @@ che serve da lì e chiedi solo quello che manca.
   `members: []` — `team-roster` la riempie; **modelli di reporting**
   dichiarati come ponte su un modello standard in attesa del formato
   aziendale, o `views: []` — `report-render` in modalità setup li
-  completa). Indica quali viste sono state dichiarate e quando uscirà il
-  primo report (dopo il primo Backlog Refinement, con `report-render`).
+  completa). Indica quali viste sono state dichiarate, quale è la roadmap
+  che si rigenera a ogni cerimonia, e quando uscirà il primo report (alla
+  chiusura del primo Backlog Refinement).
 - Ricorda che da questo momento in poi nessuna scrittura in `product/`
   deve avvenire senza passare da `product/approvals/pending/` — vedi
   `CLAUDE.md` e `framework/playbook.md`.

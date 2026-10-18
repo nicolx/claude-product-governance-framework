@@ -1951,7 +1951,59 @@ pubblica mai da solo.
 Momenti naturali: dopo l'approvazione del Piano di Iterazione (aggiornamento
 settimanale), dopo lo snapshot (roadmap), a fine mese/trimestre. La
 sweep di apertura del Backlog Refinement segnala le viste in scadenza;
-la generazione resta un passo separato, dopo la cerimonia.
+la generazione resta un passo separato, dopo la cerimonia — tranne per
+la roadmap aggiornata, sotto.
+
+### La roadmap si aggiorna da sola (cadenza `per_ceremony`)
+
+Ogni cerimonia cambia qualcosa della roadmap: un'idea entra in analisi,
+un RICE viene rivisto, una scadenza diventa urgente, il team spiega
+perché una voce slitta. Se la roadmap che leggono gli altri si aggiorna
+solo quando il PM se ne ricorda, per giorni mostra la settimana prima —
+e i commenti che spiegano le scelte restano in un verbale che nessuno
+apre. Per questo **la roadmap si rigenera da sola alla fine di ogni
+cerimonia**.
+
+- **Quale roadmap.** Quella che l'istanza dichiara con `cadence:
+  per_ceremony` in `reporting-models.yaml`. Il framework **non
+  presuppone un formato**: il default è il modello standard
+  `roadmap-di-lavoro` (per ogni voce: stato, scadenza, stima, R·I·C·E e
+  score, commenti di cerimonia); un'azienda che ha già il suo formato di
+  roadmap lo trascrive come modello aziendale e gli dà quella cadenza. Si
+  possono dichiarare più viste `per_ceremony` (es. la roadmap di lavoro
+  per il team e il formato aziendale per la leadership): si rigenerano
+  tutte.
+- **Quando.** Alla chiusura di **ogni** cerimonia registrata —
+  `log-ceremony`, quindi Backlog Refinement, Iteration Planning e le
+  ad-hoc — e a ogni giro di `pending-approval` che approva un piano, un
+  RICE, una Strategic Exception, un aggiornamento di mandate o uno
+  snapshot. Nessuna conferma: il report è derivato e si sovrascrive; al PM
+  arriva nel riepilogo cosa è cambiato.
+- **Solo approvato, e lo dice.** Anche qui la roadmap si compone dai soli
+  dati approvati. Alla chiusura del Backlog Refinement il nuovo piano è
+  ancora in `pending/`: la roadmap esce comunque, con un banner che
+  elenca le proposte in attesa ("questa versione mostra ancora l'ultimo
+  stato approvato"), e si rigenera all'approvazione. Mai una roadmap che
+  mostri come deciso ciò che è solo proposto.
+- **I commenti si citano, non si scrivono.** Vengono dal registro delle
+  cerimonie (`decisions.yaml`: decisioni con l'idea in
+  `impacts.idea_ids`, motivi delle reprioritizzazioni, note sulle
+  proposte rinviate o rifiutate) e dal piano (`why_now`, `note`,
+  `trigger`), ciascuno con la cerimonia da cui viene. Una voce senza
+  commenti in cerimonia ha la cella vuota. È anche un incentivo: se la
+  ragione di una scelta non è stata detta in cerimonia, la roadmap non la
+  mostra.
+- **Distribuzione invariata.** Una vista `per_ceremony` con pubblico
+  diverso da `team` prepara un `outbound_comm` come le altre, una sola
+  per vista e periodo (aggiornata, non accodata di nuovo). Rigenerare non
+  è pubblicare.
+- **Annullabile.** Il report rigenerato in chiusura entra nel commit del
+  run: `rollback-ceremony` lo riporta alla versione precedente insieme al
+  resto.
+
+Un'istanza senza nessuna vista `per_ceremony` non ha la roadmap
+automatica: la cerimonia lo dice in una riga e rimanda a `report-render`
+setup — non inventa una vista.
 
 **Principi delle viste standard** (valgono anche come buona pratica per
 i modelli aziendali):
@@ -1967,6 +2019,7 @@ i modelli aziendali):
 
 **Checklist operativa**
 - [ ] All'attivazione l'istanza ha dichiarato almeno una vista di roadmap e una di metriche (o ha detto esplicitamente perché no)?
+- [ ] Una vista di roadmap ha `cadence: per_ceremony` — nel formato standard o in quello aziendale — così si aggiorna da sola a fine cerimonia?
 - [ ] Ogni modello aziendale ha tutti i campi mappati su un dato del framework o dichiarati in `gaps`?
 - [ ] I report distribuiti sono passati da `pending/` come `outbound_comm`?
 - [ ] Le viste in scadenza segnalate dal Backlog Refinement sono state generate?

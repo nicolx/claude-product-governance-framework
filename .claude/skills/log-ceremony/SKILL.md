@@ -1,6 +1,6 @@
 ---
 name: log-ceremony
-description: Registra una cerimonia collettiva a partire dalla sua trascrizione grezza, producendo un record strutturato di decisioni (decisions.yaml) e i metadati di esecuzione (.run-meta.yaml) collegati a idee/roadmap impattati. Motore comune usato dalle skill di cerimonia dedicate (backlog-refinement, iteration-planning); usala direttamente per cerimonie ad-hoc o ricorrenti diverse dalle due settimanali (measurement-retro, strategic-exception-review, altro).
+description: Registra una cerimonia collettiva a partire dalla sua trascrizione grezza, producendo un record strutturato di decisioni (decisions.yaml) e i metadati di esecuzione (.run-meta.yaml) collegati a idee/roadmap impattati, e chiude rigenerando la roadmap aggiornata dell'istanza (le viste per_ceremony, nel loro formato). Motore comune usato dalle skill di cerimonia dedicate (backlog-refinement, iteration-planning); usala direttamente per cerimonie ad-hoc o ricorrenti diverse dalle due settimanali (measurement-retro, strategic-exception-review, altro).
 ---
 
 # log-ceremony
@@ -8,8 +8,9 @@ description: Registra una cerimonia collettiva a partire dalla sua trascrizione 
 Registra una cerimonia collettiva del playbook a partire dalla sua
 trascrizione o dagli appunti grezzi. È il **motore comune** della
 registrazione di una cerimonia: crea la cartella, salva il materiale
-grezzo, struttura le decisioni, scrive i metadati di esecuzione,
-sincronizza — senza mai applicare da sé gli impatti su RICE/roadmap.
+grezzo, struttura le decisioni, rigenera la roadmap aggiornata, scrive
+i metadati di esecuzione, sincronizza — senza mai applicare da sé gli
+impatti su RICE/roadmap.
 
 ## Quando usarla e quando no
 
@@ -123,15 +124,33 @@ direttamente, questi passi sono tutto ciò che serve.
    più strategico della cerimonia, per playbook), seguiti dalle scadenze
    `overdue`/`due_soon` di `mandate-watch` e `deadline-watch`.
 
-7. **Chiudi `.run-meta.yaml` e sincronizza il repo.** Imposta in
+7. **Rigenera la roadmap aggiornata.** Richiama `report-render` in
+   modalità ceremony (`trigger: ceremony`, `ceremony_ref` = la cartella
+   di questo run): rigenera tutte le viste `cadence: per_ceremony` di
+   `product/reference/reporting-models.yaml`, nel formato che l'istanza
+   ha dichiarato (`framework:roadmap-di-lavoro` di default, o il formato
+   aziendale) — con scadenze, RICE e i commenti appena registrati in
+   `decisions.yaml`. Vale per **ogni** cerimonia, ad-hoc comprese:
+   anche una cerimonia che non ha cambiato il piano può aver aggiunto
+   commenti o reso visibile una scadenza. Non chiedere se farlo: è il
+   comportamento previsto (playbook, "Modelli di reporting", "La roadmap
+   si aggiorna da sola"). Accoda al riepilogo del passo 6 quello che
+   `report-render` restituisce (report rigenerati e cosa è cambiato,
+   banner "in attesa di approvazione" se il piano o i RICE della
+   cerimonia sono ancora in `pending/`, `outbound_comm` create, o la
+   riga "nessuna roadmap a rigenerazione automatica dichiarata").
+   `report-render` non fa push: i report entrano nel commit del passo 8.
+
+8. **Chiudi `.run-meta.yaml` e sincronizza il repo.** Imposta in
    `.run-meta.yaml` `status: completed` e `completed_at` (ora corrente),
    poi esegui
-   `bash .claude/hooks/governance-sync.sh push "log-ceremony: <ceremony_type> <periodo>" product/ceremonies/ product/approvals/pending/`
+   `bash .claude/hooks/governance-sync.sh push "log-ceremony: <ceremony_type> <periodo>" product/ceremonies/ product/approvals/pending/ product/reports/`
    (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). La skill
    chiamante e le watch che ha richiamato hanno già sincronizzato le
    proprie scritture su `idea.yaml`/`nsm-tracking.yaml` con un commit
    dedicato ciascuna; questo passo cattura i file della cerimonia
-   (inclusi `.run-meta.yaml`) e le eventuali proposte in `pending/`. Se
+   (inclusi `.run-meta.yaml`), le eventuali proposte in `pending/` e i
+   report rigenerati al passo 7. Se
    l'helper segnala un push fallito, riferiscilo nel riepilogo —
    `status: completed` resta comunque scritto in locale, il commit è
    già stato fatto.

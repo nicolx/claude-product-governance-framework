@@ -73,6 +73,16 @@ segnalalo invece di procedere.
      vanno chieste al PM (inviata a voce/fuori traccia → `sent` o
      `waived`, altrimenti `drafted`), mai presunte — è ciò che
      l'hook `check-requester-replies.sh` conta.
+   - "un nuovo **comportamento automatico** che si attiva da una
+     dichiarazione di istanza" (es. la roadmap rigenerata a fine
+     cerimonia, che vale solo per le viste `cadence: per_ceremony` di
+     `reporting-models.yaml`) → nessuna migrazione: senza la
+     dichiarazione l'istanza si comporta come prima, e la cerimonia lo
+     ricorda in una riga. Spiega cosa si guadagna e proponi (senza
+     applicarlo) di dichiararla con `report-render` setup — dando
+     `per_ceremony` alla vista di roadmap che l'istanza già ha, se c'è (il
+     suo formato resta il suo), o aggiungendo
+     `framework:roadmap-di-lavoro`.
    - "un nuovo **gate** su una transizione di stato" (es.
      `conclusion_notices`: `status: done`/`aborted` e `closure.closed`
      solo con l'avviso agli stakeholder `sent`/`waived`) → il gate vale

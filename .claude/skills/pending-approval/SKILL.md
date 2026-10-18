@@ -1,6 +1,6 @@
 ---
 name: pending-approval
-description: Elenca, spiega e applica (o rifiuta) le proposte in product/approvals/pending/ — l'unico punto in cui un diff di RICE, uno snapshot di roadmap, un Piano di Iterazione, una Strategic Exception rilevata in Backlog Refinement, un aggiornamento a un'iniziativa mandataria, un cambiamento materiale del contesto aziendale (context_update, da context-watch), o una comunicazione in uscita passano da proposti ad effettivi. Usala per rivedere la coda.
+description: Elenca, spiega e applica (o rifiuta) le proposte in product/approvals/pending/ — l'unico punto in cui un diff di RICE, uno snapshot di roadmap, un Piano di Iterazione, una Strategic Exception rilevata in Backlog Refinement, un aggiornamento a un'iniziativa mandataria, un cambiamento materiale del contesto aziendale (context_update, da context-watch), o una comunicazione in uscita passano da proposti ad effettivi. Dopo un giro di approvazioni che tocca la roadmap la rigenera (viste per_ceremony). Usala per rivedere la coda.
 ---
 
 # pending-approval
@@ -171,6 +171,18 @@ Quando l'utente approva una voce specifica (per nome file o descrizione):
    `.sources-seen.yaml` viaggiano nello stesso commit.
 6. Conferma all'utente cosa è stato effettivamente scritto/cambiato; se
    l'helper ha segnalato un push fallito, dillo.
+7. **Rigenera la roadmap aggiornata**, una volta sola alla fine del giro
+   di approvazioni (non dopo ogni voce: un batch di 12 `rice_diff`
+   produce una rigenerazione, non 12). Se nel giro è stato approvato
+   almeno un `iteration_plan`, `rice_diff`, `strategic_exception_flag`,
+   `mandate_update`, `mandate_reclassification` o `roadmap_snapshot`,
+   richiama `report-render` in modalità ceremony con `trigger: approval`
+   e l'elenco delle voci approvate: le viste `cadence: per_ceremony`
+   escono con il piano e i RICE appena approvati, e il banner "in attesa
+   di approvazione" lasciato dalla cerimonia sparisce. Non chiedere se
+   farlo; riporta in una riga cosa è cambiato nella roadmap. Un rifiuto
+   non la rigenera (la roadmap mostrava già l'approvato), un
+   `outbound_comm` o un `context_update` nemmeno.
 
 ## Rifiuto
 

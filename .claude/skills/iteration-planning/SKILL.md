@@ -136,6 +136,10 @@ in aggiunta, i passi specifici sotto.
 
 - **`pending-approval`** se il passo 5 ha generato una proposta di Piano
   di Iterazione rifinita: va approvata come quella del Backlog Refinement.
+- La roadmap aggiornata (viste `per_ceremony`) l'ha già rigenerata
+  `log-ceremony` in chiusura, con le stime di delivery e i commenti della
+  valutazione 80/20; all'approvazione del piano rifinito
+  `pending-approval` la rigenera di nuovo.
 - Il passo naturale successivo è un nuovo **`roadmap-snapshot`** che tiene
   conto del Piano di Iterazione rifinito, delle stime di delivery
   raccolte e della capacità platform dichiarata.
