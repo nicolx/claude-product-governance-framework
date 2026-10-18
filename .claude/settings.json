@@ -10,6 +10,7 @@
       "Bash(bash .claude/hooks/check-delivery-queue.sh:*)",
       "Bash(bash .claude/hooks/check-conclusion-notices.sh:*)",
       "Bash(bash .claude/hooks/check-requester-replies.sh:*)",
+      "Bash(bash .claude/hooks/copy-to-clipboard.sh:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",

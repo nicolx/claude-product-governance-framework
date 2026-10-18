@@ -366,7 +366,8 @@ soli non coprono. In sintesi:
    elemento, la sua bozza di risposta** (`requester_reply` o
    `followup_replies`, qualunque esito: idea, bug, SE, mandate, platform,
    decline, clarification, aggiornamento) pronta per la revisione e
-   l'invio manuale del PM, con i destinatari — oppure il motivo esplicito
+   l'invio manuale del PM, con i destinatari, mostrata **per intero** in
+   testo semplice pronto da incollare nel client di posta (playbook, "Testi che il PM manda a mano: visibili e pronti da copiare") — oppure il motivo esplicito
    per cui non c'è nessuno da avvisare, o "canale da trovare". Nessun
    elemento senza né l'una né l'altro. Non inviarne nessuna in
    automatico. Riporta il recap dei **path da

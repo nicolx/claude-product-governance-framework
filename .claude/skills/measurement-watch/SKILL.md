@@ -154,8 +154,9 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
    percorso del `measurement*.yaml`) con una bozza di avviso agli
    stakeholder: l'esito (`outcome`/`note` nelle parole del PM), cosa
    significa, l'eventuale follow-up. `recipients` = stakeholders della
-   `product_line` + `proposer` (il PM conferma/edita). **Mostrala, non
-   inviarla.** `closure` si scrive **nello stesso passo** in cui il PM
+   `product_line` + `proposer` (il PM conferma/edita). **Mostrala per
+   intero, non inviarla** — testo semplice pronto da copiare nel client
+   di posta (playbook, "Testi che il PM manda a mano: visibili e pronti da copiare"). `closure` si scrive **nello stesso passo** in cui il PM
    dichiara l'avviso inviato (`notice_status: sent` + `sent_at`) o lo
    esenta con un motivo suo (`waived` + `waived_reason`). Se il PM
    rimanda l'invio, la voce resta `drafted` e `closure.closed` resta

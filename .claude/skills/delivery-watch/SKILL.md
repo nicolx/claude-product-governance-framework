@@ -189,7 +189,11 @@ e le label (item non di stato) producono gli eventi indicati sotto.
    Il corpo si regge da solo per chi lo riceve: nome leggibile
    dell'iniziativa (`summary`, non lo slug), stato in parole semplici
    (non il gergo della board), link alla card solo se il destinatario è
-   interno. **Una mail per card per giro:** se lo stesso giro rileva più
+   interno. **Testo semplice pronto per il client di posta** (playbook,
+   "Testi che il PM manda a mano: visibili e pronti da copiare"):
+   niente Markdown, un paragrafo per riga, nessun simbolo grafico,
+   nessuna firma, `[DA COMPLETARE: …]` per un dato mancante. Nel YAML
+   `draft_body` è un blocco letterale `|` con la stessa struttura. **Una mail per card per giro:** se lo stesso giro rileva più
    eventi sulla stessa card, la bozza sta sulla voce più recente e
    racconta il percorso ("è passata in review e poi in produzione");
    le altre voci hanno `merged_into` = `id` di quella voce e niente
@@ -219,6 +223,13 @@ e le label (item non di stato) producono gli eventi indicati sotto.
       E + RICE dell'idea ("—" e il motivo se senza RICE — playbook, "Ogni riga che parla di un'idea si capisce da sola"),
       `from → to`, `suggested_framing`, e se la bozza è pronta
       (`drafted`) o aspetta il triage (`pending`, consegne).
+    - **Le bozze, per intero** — subito sotto, una per voce `drafted`
+      di questo run: intestazione con `id` e `draft_headline`, poi tre
+      blocchi di codice `text` separati — **A** (`draft_recipients`
+      separati da `; `), **Oggetto**, **Testo** — senza altro dentro, così
+      il PM le legge senza aprire file e le incolla nel client di posta.
+      Non copiarle negli appunti qui (sono più d'una): lo si fa nel
+      triage, una alla volta.
     - **Idee create per backfill**: slug, card, classificazione
       abbozzata — ricorda al PM di rivederle al triage.
     - **Coda**: bozze pronte da mandare (`drafted`) e voci da smarcare
@@ -270,8 +281,11 @@ e le label (item non di stato) producono gli eventi indicati sotto.
    la bozza è già pronta (passo 7b; se manca — voce di un run vecchio —
    componila ora con le stesse regole):
    - **(a) MANDA** → **mostra la bozza al PM pronta da copiare — NON
-     inviarla.** Il PM conferma/edita destinatari e testo (aggiorna i
-     `draft_*` con la versione finale). Quando il PM dice di averla
+     inviarla**: tre blocchi `text` (A, Oggetto, Testo), e copia il Testo
+     negli appunti con `bash .claude/hooks/copy-to-clipboard.sh` (dillo
+     al PM; Oggetto e A su richiesta, stesso helper). Il PM conferma/edita
+     destinatari e testo (se dà la versione finale, aggiorna i `draft_*`
+     e ricopiala). Quando il PM dice di averla
      mandata → `triage_status: sent`, `sent_at` (data dichiarata dal
      PM); stesso esito su tutte le voci con `merged_into` = questa. Il
      testo resta nella voce come trail.
@@ -293,7 +307,8 @@ e le label (item non di stato) producono gli eventi indicati sotto.
         *rassicurazione*: cosa è cambiato, da quando, come si vede —
         screenshot da `demo-capture` se c'è UI — e quando se ne guarderà
         l'impatto) e `recipients` da `suggested_audience` (il PM
-        conferma/edita). `notice_status: drafted`, e la voce di coda
+        conferma/edita), in testo semplice pronto da copiare, mostrata
+        e copiata negli appunti come al ramo (a). `notice_status: drafted`, e la voce di coda
         `triage_status: drafted`. Se la card ha altre voci aperte
         (es. un `in_review` non ancora mandato), il percorso entra
         nell'avviso e quelle voci prendono `merged_into` = questa (ne

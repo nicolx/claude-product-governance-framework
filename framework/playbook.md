@@ -863,6 +863,70 @@ Il loop si chiude anche **all'uscita**: consegna, interruzione e chiusura
 della misurazione generano un avviso obbligatorio agli stakeholder — vedi
 "Avvisare gli stakeholder della conclusione".
 
+### Testi che il PM manda a mano: visibili e pronti da copiare
+
+Ogni bozza che il framework prepara perché il PM la mandi dal **suo**
+client di posta — `requester_reply`, `followup_replies`,
+`clarification.draft_message`, le mail di `delivery-watch`, gli avvisi
+di `conclusion_notices` — deve arrivare al PM **già leggibile** e
+passare nel client con **un solo copia-incolla**, senza ritocchi di
+formato. Il PM rivede e adatta il contenuto; non deve ripulire il testo.
+
+**Visibile subito.** La bozza si mostra **per intero** nella
+conversazione nel momento in cui viene scritta — nel recap del run, non
+solo come titolo o conteggio. Se è stata scritta da un run non
+presidiato (cron), la prima sessione la mostra per intero quando il PM
+apre la coda (l'hook ne ricorda il conteggio). Il formato di
+presentazione è sempre lo stesso, in tre blocchi separati, ciascuno in un
+blocco di codice `text` senza altro dentro:
+
+- **A** — i destinatari, separati da `; ` (accettato da Outlook e
+  Gmail): indirizzi se noti, altrimenti nome e ruolo da completare;
+- **Oggetto** — una riga (assente se la bozza è una risposta in un
+  thread esistente, come di solito `requester_reply`);
+- **Testo** — il corpo.
+
+**Testo semplice, non Markdown.** Il corpo si incolla in un client di
+posta, che non interpreta il Markdown e trasforma in rumore tutto ciò
+che non è testo:
+
+- niente `**grassetto**`, `_corsivo_`, `#` titoli, backtick, tabelle,
+  link `[testo](url)` — un URL si scrive in chiaro su una riga sua;
+- **un paragrafo = una riga**: nessun a-capo dentro un paragrafo (lo
+  spezzarsi della riga nel terminale non è un a-capo del testo);
+  paragrafi separati da una riga vuota;
+- nessuna indentazione a inizio riga; un elenco, se serve davvero, con
+  righe che iniziano con `- ` e senza sotto-livelli;
+- solo lettere (accentate comprese), cifre e punteggiatura comune:
+  niente emoji, frecce, spunte, pallini tipografici o altri simboli
+  grafici — "dalla review alla produzione", non "review → prod";
+- niente gergo del framework o della board nel testo per lo stakeholder:
+  né slug, né `short_ref`, né nomi di campo o di stato tecnici, se non
+  servono a lui;
+- **niente firma**: la aggiunge il client del PM. Il saluto finale sì;
+- un dato mancante non si inventa e non resta come segnaposto di
+  sistema (`{nome}`): si scrive `[DA COMPLETARE: cosa manca]`, ben
+  visibile, così il PM lo vede prima di mandare.
+
+**Negli appunti, su un tasto.** Selezionare un testo lungo dal terminale
+può portarsi dietro a-capo e spazi del layout. Quando il PM rivede una
+bozza per mandarla, la skill copia il **Testo** negli appunti con
+`bash .claude/hooks/copy-to-clipboard.sh` (strumento locale, non invia
+nulla; macOS, Linux, Windows/WSL) e lo dice; l'Oggetto o i destinatari
+si copiano allo stesso modo se il PM lo chiede. Se lo strumento manca,
+resta il testo mostrato in conversazione. Il testo copiato è lo stesso
+salvato nella voce: se il PM lo modifica nel client, nella voce resta
+quello proposto, a meno che il PM non dia la versione finale.
+
+**Salvato com'è.** Nel file YAML il corpo è un blocco letterale (`|`)
+con la stessa struttura: un paragrafo per riga, righe vuote tra i
+paragrafi. Il file è il trail, non la sorgente del copia-incolla.
+
+**Checklist operativa**
+- [ ] Ogni bozza è stata mostrata per intero al PM, in tre blocchi (A, Oggetto, Testo), appena scritta o all'apertura della coda?
+- [ ] Il Testo è testo semplice: niente Markdown, un paragrafo per riga, nessun simbolo grafico, nessuna firma?
+- [ ] I dati mancanti sono segnati `[DA COMPLETARE: …]`, non inventati?
+
 ## Intake storico e roadmap pre-esistente
 
 *"You can't cross the sea merely by standing and staring at the water." —
@@ -2137,8 +2201,11 @@ se scriverlo. È "solo segnalazione" nello stesso senso di `mandate-watch` e
 sull'idea è lo stesso fatto osservato che scrive `jira-sync` (scrittura
 diretta, mai `pending/`).
 
-L'invio è un **atto deliberato del PM**, nel triage. Per ogni voce il PM
-rivede la bozza (destinatari e testo) e la **invia a mano**, stessa
+L'invio è un **atto deliberato del PM**, nel triage. Ogni bozza è
+mostrata per intero già nel recap del rilevamento, in testo semplice
+pronto da incollare nel client di posta (sezione "Testi che il PM manda
+a mano: visibili e pronti da copiare"). Per ogni voce il PM rivede la
+bozza (destinatari e testo) e la **invia a mano**, stessa
 logica di `requester_reply` ("Chiudere il loop col richiedente"):
 nessun invio automatico, nessuna coda `pending/`; il testo inviato, i
 destinatari e la data restano nella voce di coda come trail. In
@@ -2493,7 +2560,9 @@ misurazione non si sposta perché l'avviso è partito in ritardo.
 **Mai inviato in automatico.** Come `requester_reply`: la skill scrive la
 bozza (`subject`, `body`, `recipients` proposti da `proposer` +
 stakeholders della `product_line` in `product-lines.yaml`), il PM la
-rivede e la manda a mano. Non passa da `product/approvals/pending/`: è
+rivede e la manda a mano dal suo client di posta — mostrata per intero
+e pronta da copiare, vedi "Testi che il PM manda a mano: visibili e
+pronti da copiare". Non passa da `product/approvals/pending/`: è
 comunicazione 1:1 con l'iniziativa, non una decisione di priorità, e
 rimandarla a un secondo assenso significherebbe perderla — la stessa
 ragione per cui il ticket di un bug confermato si apre subito. Il gate

@@ -231,7 +231,8 @@ requester_reply:
   reply_status: not_needed      # not_needed | drafted | consolidated | sent | waived
   kind: null                    # acknowledgement | clarification_request | decline | strategic_exception_ack | bug_ack | mandate_ack | platform_ack
   recipients: []                # il proponente + chi nel materiale ha posto una domanda diretta (thread a più voci) — confermati dal PM
-  draft: null                   # testo pronto per l'invio manuale — mai inviato in automatico
+  draft: null                   # testo pronto per l'invio manuale — mai inviato in automatico. Testo semplice, blocco letterale |:
+                                #   un paragrafo per riga, niente Markdown/simboli/firma (playbook, "Testi che il PM manda a mano")
   consolidated_in: null         # solo se reply_status: consolidated — slug dell'unità che contiene la bozza unica
   deep_dive_meeting_needed: false
   sent_at: null                 # data dichiarata dal PM dopo l'invio manuale
@@ -303,7 +304,8 @@ conclusion_notices: []
 #   notice_status: pending      # pending | drafted | sent | waived
 #   recipients: []              # proposer (se esterno) + stakeholders della product_line (product-lines.yaml) — confermati dal PM
 #   subject: null
-#   body: null                  # testo pronto da copiare — mai inviato in automatico
+#   body: null                  # testo pronto da copiare — mai inviato in automatico. Testo semplice, blocco letterale |
+#                               #   (playbook, "Testi che il PM manda a mano: visibili e pronti da copiare")
 #   sent_at: null               # data dichiarata dal PM dopo l'invio manuale
 #   waived_reason: null         # solo se waived: perché non c'è nessuno da avvisare (es. "idea interna del PM, product line senza stakeholder esterni") — dato dal PM
 

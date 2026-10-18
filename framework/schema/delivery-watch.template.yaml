@@ -82,7 +82,9 @@ queue: []
 #   merged_into: null       # id della voce della stessa card in cui questa è confluita: una mail per card
 #                           #   racconta il percorso (es. in review → in produzione); ne segue l'esito
 #   draft_subject: null     # compilato al rilevamento (null per le consegne e le voci merged_into)
-#   draft_body: null        # compilato al rilevamento (testo pronto da copiare — mai inviato in automatico); il PM lo edita prima di mandare
+#   draft_body: null        # compilato al rilevamento — TESTO SEMPLICE pronto per il client di posta, blocco letterale |:
+#                           #   un paragrafo per riga, riga vuota tra i paragrafi, niente Markdown/simboli/firma (playbook,
+#                           #   "Testi che il PM manda a mano: visibili e pronti da copiare"). Mai inviato in automatico
 #   draft_recipients: []    # default suggested_audience; confermati/editati dal PM prima di mandare
 #   sent_at: null           # data dichiarata dal PM dopo l'invio manuale (triage_status: sent)
 #   dismiss_reason: null    # se dismissed: perché il PM non comunica questo evento

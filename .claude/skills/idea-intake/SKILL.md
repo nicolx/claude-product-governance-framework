@@ -326,6 +326,14 @@ Fuori da questa modalità, la skill si comporta come descritto nei
    trovato. Materiale inoltrato dal PM per conto di qualcuno: il
    richiedente è quel qualcuno.
 
+   **Pronta da incollare nel client di posta** (playbook, "Testi che il PM manda a mano: visibili e pronti da copiare"):
+   testo semplice (niente Markdown, un paragrafo per riga, nessun
+   simbolo grafico, nessuna firma, `[DA COMPLETARE: …]` per un dato
+   mancante), mostrata **per intero** nel riepilogo in blocchi `text`
+   separati (A, eventuale Oggetto, Testo). Quando il PM la rivede per
+   mandarla, copia il Testo negli appunti con `bash
+   .claude/hooks/copy-to-clipboard.sh`.
+
    **Un mittente, una risposta.** Se il passo 2 ha decomposto il
    materiale in più unità dallo stesso mittente, scrivi **una sola bozza**
    che copre tutti gli esiti (es. "delle tre richieste: la prima è presa
