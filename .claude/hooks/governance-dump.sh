@@ -11,7 +11,7 @@
 # Refinement".
 #
 # Uso:
-#   governance-dump.sh sweep         # tutto il quadro per il Backlog Refinement (default)
+#   governance-dump.sh sweep         # tutto il quadro per il Backlog Refinement (default; + scarti con risposta non inviata)
 #   governance-dump.sh backlog       # idee + coda di approvazione (per backlog-list)
 #   governance-dump.sh ideas [--all] # le idea.yaml (attive; --all include declined/aborted)
 #   governance-dump.sh measurements  # product/prds/*/measurement*.yaml
@@ -73,6 +73,24 @@ emit_ideas() {
         declined|aborted) continue ;;
       esac
     fi
+    emit_file "$d"
+  done
+}
+
+emit_closed_with_drafted_replies() {
+  # idee declined/aborted (escluse da emit_ideas) con una risposta al
+  # richiedente ancora da inviare: uno scarto non comunicato lascia il
+  # richiedente appeso (playbook, "Chiudere il loop col richiedente")
+  local d st
+  [ -d "product/ideas" ] || return 0
+  [ "$INCLUDE_ALL" -eq 1 ] && return 0
+  find product/ideas -mindepth 2 -maxdepth 2 -name idea.yaml 2>/dev/null | sort | while IFS= read -r d; do
+    st="$(idea_status "$d")"
+    case "$st" in
+      declined|aborted) ;;
+      *) continue ;;
+    esac
+    grep -qE '^[[:space:]-]*reply_status:[[:space:]]*"?drafted"?[[:space:]]*(#.*)?$' "$d" 2>/dev/null || continue
     emit_file "$d"
   done
 }
@@ -140,6 +158,7 @@ case "$MODE" in
     printf '# governance-dump: sweep (Backlog Refinement) — SOLA LETTURA\n'
     emit_reference
     emit_ideas
+    emit_closed_with_drafted_replies
     emit_glob "product/prds" 'measurement*.yaml'
     emit_iterations
     emit_pending

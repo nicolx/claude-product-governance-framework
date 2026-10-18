@@ -170,6 +170,8 @@ Fuori da questa modalità, la skill si comporta come descritto nei
        comando `jira.reauth` e il promemoria di rilanciare `jira-sync`
        standalone appena il connettore torna su. Mai chiudere il punto come
        se il bug fosse stato filato.
+     - Prepara al passo 8 una bozza di risposta al richiedente
+       (`requester_reply`, `kind: bug_ack`).
    - **Strategic Exception** — se il proponente è a un livello che nel
      `product/reference/` (o dichiarato dall'utente) qualifica per bypass
      del RICE. Crea comunque la cartella idea (serve comunque traccia),
@@ -197,7 +199,8 @@ Fuori da questa modalità, la skill si comporta come descritto nei
      tecnico appena possibile — se non disponibile subito, lascia `null`
      con una nota, non bloccare la creazione). Non compilare mai
      `analysis_start_by`/`escalation_status` — sono calcolati dalla
-     skill `mandate-watch`, non a mano.
+     skill `mandate-watch`, non a mano. Prepara al passo 8 una bozza di
+     risposta al richiedente (`requester_reply`, `kind: mandate_ack`).
    - **Platform (debito tecnico/devops puro)** — non è un bug (non
      produce un output sbagliato) né un'idea di business: è manutenzione,
      upgrade, gestione del debito tecnico o attività devops che il team
@@ -214,6 +217,8 @@ Fuori da questa modalità, la skill si comporta come descritto nei
      mai). Come `mandate`, **non salta l'analisi**: le iniziative
      importanti seguono comunque `in_analysis`/`in_prd`; quelle piccole
      possono saltare direttamente a `in_jira`, a giudizio del team tech.
+     Se la propone qualcuno che non è il PM, prepara al passo 8 una bozza
+     di risposta (`requester_reply`, `kind: platform_ack`).
    - **Non è un'idea (scarto al triage)** — se il materiale non descrive
      qualcosa su cui il team di prodotto può o deve lavorare: una
      richiesta di supporto tecnico, un tema fuori dal perimetro del team,
@@ -310,11 +315,26 @@ Fuori da questa modalità, la skill si comporta come descritto nei
    per evitare collisioni).
 
 8. **Bozza di risposta al richiedente (chiudere il loop).** Vedi
-   playbook, "Chiudere il loop col richiedente". Compila `requester_reply`
-   **solo se c'è un richiedente esterno identificabile e raggiungibile**
-   (`proposer` non è il PM stesso, non è un'idea nata da un brainstorm
-   interno) — altrimenti `requester_reply.needed: false` e salta. Il
-   `kind` dipende dalla classificazione:
+   playbook, "Chiudere il loop col richiedente". **Ogni unità con un
+   richiedente che non è il PM stesso riceve una bozza**, qualunque sia
+   la classificazione: `requester_reply.needed: true`, `reply_status:
+   drafted`, `recipients` (il proponente + chi nel materiale ha posto una
+   domanda diretta — conferma col PM). `needed: false` / `reply_status:
+   not_needed` **solo** se non c'è nessuno da avvisare (idea del PM
+   stesso, brainstorm interno). Un canale non noto non è un motivo per
+   saltare: scrivi la bozza e segnala nel riepilogo che il canale va
+   trovato. Materiale inoltrato dal PM per conto di qualcuno: il
+   richiedente è quel qualcuno.
+
+   **Un mittente, una risposta.** Se il passo 2 ha decomposto il
+   materiale in più unità dallo stesso mittente, scrivi **una sola bozza**
+   che copre tutti gli esiti (es. "delle tre richieste: la prima è presa
+   in carico…, la seconda è un bug già in agenda…, la terza…") nella prima
+   unità creata; nelle altre `reply_status: consolidated` e
+   `consolidated_in: <slug della prima>`, `draft: null` — `kind` resta
+   quello della singola unità.
+
+   Il `kind` dipende dalla classificazione:
    - **`acknowledgement`** (idea normale): la bozza copre tre cose —
      (a) presa in carico; (b) **serve un meeting di approfondimento col
      richiedente per fare un RICE serio?** (dato che solo lui ha,
@@ -334,9 +354,27 @@ Fuori da questa modalità, la skill si comporta come descritto nei
    - **`strategic_exception_ack`**: accolta su canale privilegiato, **in
      attesa di conferma** da {autorità} — non "approvata" — + impegno a
      restituire feedback sull'esito.
+   - **`bug_ack`**: confermato come bug, entra nell'agenda del team di
+     sviluppo senza passare dalla prioritizzazione; riferimento al ticket
+     (`jira.card_id`, o "in apertura" se il connettore era giù — aggiorna
+     la bozza quando `jira-sync` lo apre) e impatto stimato; **mai una
+     data di risoluzione**; verrà avvisato alla chiusura. Se la verifica
+     nel codice (passo 3) ha mostrato che il "bug" è il comportamento
+     voluto e l'unità è diventata un'idea, il `kind` è `acknowledgement`
+     ma la bozza lo spiega con rispetto (com'è pensato oggi, e che la
+     richiesta di cambiarlo entra nel backlog come miglioria).
+   - **`mandate_ack`**: presa in carico come iniziativa mandataria (salta
+     la prioritizzazione, non l'analisi); scadenza registrata e
+     monitorata; quando partirà l'analisi come forbice dal
+     `lead_time_weeks`, se noto — mai una promessa.
+   - **`platform_ack`**: presa in carico, rientra nella capacità protetta
+     per il debito tecnico, se ne parla in Iteration Planning.
    **Non inviare mai la bozza in automatico.** Mostrala all'utente nel
    riepilogo; se c'è un'integrazione (email) chiedi conferma esplicita
-   per ogni singolo invio.
+   per ogni singolo invio. Quando il PM dichiara di averla mandata,
+   `reply_status: sent` + `sent_at`; se decide che non serve (es. ha già
+   risposto a voce), `reply_status: waived` + `waived_reason` dato da
+   lui.
 
 8b. **Path da monitorare.** Se `.governance/config.yaml` ha
    `metrics.configured: true` (integrazione non `manuale`) e
@@ -356,7 +394,9 @@ Fuori da questa modalità, la skill si comporta come descritto nei
    contenuto creato — **se sono state create più unità dalla stessa
    fonte, elencale tutte insieme nel riepilogo finale**, non una alla
    volta senza collegarle — prima di considerare il passo concluso.
-   Includi nel riepilogo le bozze di `requester_reply` generate e il recap
+   Includi nel riepilogo **ogni unità con la sua bozza di
+   `requester_reply`** (o il motivo per cui non c'è nessuno da avvisare,
+   o "canale da trovare") — mai un'unità senza nessuna delle due — e il recap
    dei path applicati al passo 8b (attivi con baseline, da strumentare,
    rimandati). **Per ogni
    bug**, di' esplicitamente se il ticket è stato aperto (con `card_id`/URL)

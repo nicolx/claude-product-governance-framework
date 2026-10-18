@@ -62,11 +62,17 @@ segnalalo invece di procedere.
      campo, e proponi (senza applicarlo da solo) un piano di migrazione
      minimo. Non modificare in massa i file di istanza senza che
      l'utente lo chieda esplicitamente. Se i campi nuovi sono opzionali
-     (es. `summary`, `notes`, `requester_reply`, `rice_status.deep_dive`,
-     `status: declined`): le idee vecchie restano valide senza; l'unico
-     con valore a essere backfillato è `summary` (una riga per idea
-     ancora attiva), perché `backlog-list` lo mostra — proponilo come
-     lavoretto incrementale, non un blocco.
+     (es. `summary`, `notes`, `requester_reply`, `followup_replies`,
+     `rice_status.deep_dive`, `status: declined`): le idee vecchie restano
+     valide senza; l'unico con valore a essere backfillato è `summary` (una
+     riga per idea ancora attiva), perché `backlog-list` lo mostra —
+     proponilo come lavoretto incrementale, non un blocco. Eccezione
+     meccanica: `requester_reply.reply_status` — per le idee con
+     `needed: true` e `sent_at` valorizzato vale `sent`, con `needed:
+     false` vale `not_needed`; quelle con `needed: true` e `sent_at: null`
+     vanno chieste al PM (inviata a voce/fuori traccia → `sent` o
+     `waived`, altrimenti `drafted`), mai presunte — è ciò che
+     l'hook `check-requester-replies.sh` conta.
    - "un nuovo **gate** su una transizione di stato" (es.
      `conclusion_notices`: `status: done`/`aborted` e `closure.closed`
      solo con l'avviso agli stakeholder `sent`/`waived`) → il gate vale

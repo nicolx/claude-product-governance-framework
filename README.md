@@ -103,10 +103,14 @@ pre-classificare. La skill **`inbox-triage`** la analizza e decide, per
 ciascun elemento: nuova idea, aggiornamento di un'idea/PRD già
 esistente, bug, Strategic Exception, scarto al triage (`status: declined`
 — non è roba da fare), o — se è troppo ambiguo — un'idea con
-`status: needs_clarification`. In ogni caso, quando c'è un richiedente
-esterno, prepara una **bozza di risposta** (presa in carico, eccezione in
-attesa di conferma, scarto motivato, o domande di chiarimento) da rivedere
-e inviare a mano. Alla fine del run, `product/inbox/` resta vuota: tutto
+`status: needs_clarification`. In ogni caso — anche per bug, iniziative
+mandatarie, debito tecnico e materiale che aggiorna un'idea o un PRD
+esistente — prepara una **bozza di risposta** per chi l'ha mandato
+(presa in carico, bug in agenda, eccezione in attesa di conferma, scarto
+motivato, domande di chiarimento, aggiornamento ricevuto), una sola per
+mittente, da rivedere e inviare a mano: nessuno stakeholder resta appeso.
+Le bozze non ancora inviate le ricordano un hook di sessione e il Backlog
+Refinement. Alla fine del run, `product/inbox/` resta vuota: tutto
 quello che deve sopravvivere è già stato spostato in una cartella
 tracciata.
 

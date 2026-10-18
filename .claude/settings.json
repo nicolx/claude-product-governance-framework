@@ -9,6 +9,7 @@
       "Bash(bash .claude/hooks/check-unpushed.sh:*)",
       "Bash(bash .claude/hooks/check-delivery-queue.sh:*)",
       "Bash(bash .claude/hooks/check-conclusion-notices.sh:*)",
+      "Bash(bash .claude/hooks/check-requester-replies.sh:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
@@ -52,6 +53,12 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-conclusion-notices.sh\"",
             "timeout": 10,
             "statusMessage": "Verifica avvisi di conclusione agli stakeholder…"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-requester-replies.sh\"",
+            "timeout": 10,
+            "statusMessage": "Verifica risposte ai richiedenti non inviate…"
           }
         ]
       }
@@ -88,6 +95,12 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-conclusion-notices.sh\"",
             "timeout": 10,
             "statusMessage": "Verifica avvisi di conclusione agli stakeholder…"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-requester-replies.sh\"",
+            "timeout": 10,
+            "statusMessage": "Verifica risposte ai richiedenti non inviate…"
           }
         ]
       }

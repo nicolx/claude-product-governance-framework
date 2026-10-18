@@ -747,7 +747,7 @@ Strategic Exception si verifica ogni settimana, non è più un'eccezione.
 - [ ] Se è una Strategic Exception: è stata approvata al livello richiesto (o è chiaro che è ancora in attesa di conferma)?
 - [ ] Se non è un'idea: è stata scartata come `declined` con `decline_reason`, non cancellata né lasciata in inbox?
 - [ ] L'idea è stata categorizzata per Product Line?
-- [ ] È stata preparata (e mostrata al PM) una bozza di risposta al richiedente, quando c'è un richiedente esterno?
+- [ ] È stata preparata (e mostrata al PM) una bozza di risposta per chi ha mandato il materiale, qualunque sia la classificazione — o è esplicito che non c'è nessuno da avvisare?
 - [ ] Se arriva via canale informale (chat, voce): è stata trasferita nell'archivio prima di qualsiasi altra azione?
 
 ## Chiudere il loop col richiedente
@@ -761,13 +761,24 @@ richiedente al buio: non sa se è stata vista, se serve altro, quando
 succederà qualcosa. La delusione (e la frizione) nasce lì, non dal RICE
 score.
 
-Per questo **ogni intake con un richiedente esterno identificabile
-produce una bozza di risposta** — scritta dall'automazione, rivista e
-inviata *a mano* dal PM (mai invio automatico), salvata sull'idea in
-`requester_reply`. Non passa da `product/approvals/pending/`: è una
-cortesia 1:1 con l'idea, non una decisione. Se l'idea nasce dal PM stesso
-o da un brainstorm interno, non c'è nessuno da avvisare e la bozza si
-salta.
+Per questo **nessun elemento esce dall'intake senza una bozza di
+risposta per chi l'ha mandato** — qualunque sia l'esito del triage (idea,
+bug, Strategic Exception, mandate, platform, scarto, chiarimento) e anche
+quando il materiale non crea niente di nuovo ma aggiorna un'idea o un PRD
+esistente. La bozza è scritta dall'automazione, rivista e inviata *a
+mano* dal PM (mai invio automatico), salvata sull'idea in
+`requester_reply` (o, per un aggiornamento, in `followup_replies`). Non
+passa da `product/approvals/pending/`: è una cortesia 1:1 con l'idea, non
+una decisione.
+
+L'unica eccezione è quando **non c'è nessuno da avvisare**: l'idea nasce
+dal PM stesso, da un brainstorm interno, o da un backfill del tracker. Non
+sono eccezioni: un canale di risposta non noto (la bozza si scrive
+comunque, il recap dice che il canale va trovato), un mittente senior
+(gli si risponde lo stesso), un materiale inoltrato dal PM per conto di
+uno stakeholder (il richiedente è lo stakeholder). Il recap dell'intake
+elenca **ogni** elemento processato con la sua bozza o con il motivo
+esplicito per cui non ce n'è una — mai un'assenza silenziosa.
 
 Il contenuto dipende da come è stata classificata:
 
@@ -792,6 +803,46 @@ Il contenuto dipende da come è stata classificata:
   silenzio che il richiedente interpreta come "ci stanno lavorando".
 - **`needs_clarification`** — la bozza pone le domande precise che
   servono a sbloccare la classificazione (è già `clarification.draft_message`).
+- **Bug** — confermato come bug: entra nell'agenda del team di sviluppo
+  senza passare dalla prioritizzazione. La bozza dà il riferimento al
+  ticket (o dice che è in apertura, se il connettore era giù) e l'impatto
+  stimato, **mai una data di risoluzione**, e anticipa che verrà avvisato
+  alla chiusura. Se la verifica nel codice dice che il "bug" è il
+  comportamento voluto, l'unità diventa un'idea e la bozza lo spiega con
+  rispetto (com'è pensato oggi, e che la richiesta di cambiarlo entra nel
+  backlog come miglioria).
+- **Mandate** — presa in carico come iniziativa mandataria: salta la
+  prioritizzazione, non l'analisi. La scadenza è registrata e monitorata;
+  quando partirà l'analisi è una forbice dal lead time, mai una promessa.
+- **Platform** proposta da qualcuno che non è il PM (tipicamente il team
+  tech) — presa in carico, rientra nella capacità protetta per il debito
+  tecnico, se ne parla in Iteration Planning.
+- **Aggiornamento di un'idea o di un PRD esistente** — chi manda un dato,
+  un'obiezione, una precisazione o un sollecito su qualcosa che c'è già
+  resta appeso quanto chi propone una cosa nuova. La bozza (`kind:
+  update_ack`, voce di `followup_replies` sull'idea — per un PRD, sull'idea
+  del suo `idea_id`) dice: ricevuto e collegato a {ID/titolo}; dov'è oggi
+  l'iniziativa in linguaggio piano; cosa succede al materiale ("verrà
+  valutato se cambia la stima" — mai anticipare l'esito di un
+  `rice-update`; "confluirà nella prossima revisione del PRD"). Nessuna
+  data, nessuna promessa.
+
+**Un mittente, una risposta.** Se lo stesso elemento genera più unità
+(una mail con tre richieste, un thread che crea un'idea e aggiorna un
+PRD), il mittente riceve **un solo messaggio** che copre tutti gli esiti,
+non tre. La bozza vive nella prima unità creata (o, se non ne nasce
+nessuna nuova, nella voce `followup_replies` della prima idea
+aggiornata); le altre portano `reply_status: consolidated` e
+`consolidated_in` verso quella. In un thread a più voci, i destinatari
+sono il proponente più chi ha posto una domanda diretta.
+
+**Una bozza non inviata lascia appeso quanto nessuna bozza.** Ogni bozza
+ha un `reply_status` (`drafted` → `sent` quando il PM dichiara di
+averla mandata, o `waived` con un motivo dato da lui, es. "risposto a
+voce"). Le bozze ancora `drafted` le ricorda l'hook
+`check-requester-replies.sh` a inizio e fine sessione, e le elenca la
+sweep di apertura del Backlog Refinement con il diritto di parola per
+dichiararle inviate o esentarle.
 
 *Principi Agile da incarnare in questa fase:*
 - *Una conversazione faccia a faccia (o almeno una risposta) è il modo
@@ -800,7 +851,9 @@ Il contenuto dipende da come è stata classificata:
   ciclo, non lasciato fuori.*
 
 **Checklist operativa**
-- [ ] Ogni idea con un richiedente esterno ha una `requester_reply.draft` pronta?
+- [ ] Ogni elemento processato all'intake ha una bozza di risposta per chi l'ha mandato (anche bug, mandate, platform e aggiornamenti di idee/PRD esistenti), oppure un motivo esplicito per cui non c'è nessuno da avvisare?
+- [ ] Un mittente che ha generato più unità riceve un solo messaggio consolidato?
+- [ ] Le bozze ancora `drafted` dalle settimane precedenti sono state inviate o esentate con motivo?
 - [ ] Nessuna bozza è stata inviata in automatico — tutte mostrate al PM per revisione?
 - [ ] Per le idee normali: la bozza dice se serve un meeting di approfondimento, e in tal caso `rice_status.deep_dive` è compilato?
 - [ ] Per le idee normali: la prima ipotesi di timing è una forbice onesta, non una data né una promessa?
@@ -2594,12 +2647,14 @@ il primo non è mai entrato nel processo, il secondo sì. Vedi
 richiedente".
 
 **Requester reply (bozza di risposta al richiedente)** — Ad ogni intake
-con un richiedente esterno identificabile, il framework prepara una bozza
-di risposta (presa in carico / eccezione in attesa di conferma / scarto
-motivato / richiesta di chiarimento), salvata sull'idea in
-`requester_reply` e **mai inviata in automatico**: la rivede e la manda
-il PM. Serve a chiudere il loop con chi ha scritto, che altrimenti resta
-al buio. Vedi "Chiudere il loop col richiedente".
+con un richiedente che non è il PM stesso, qualunque sia l'esito, il
+framework prepara una bozza di risposta (presa in carico / bug in agenda /
+mandate o platform presi in carico / eccezione in attesa di conferma /
+scarto motivato / richiesta di chiarimento), salvata sull'idea in
+`requester_reply` — o in `followup_replies` quando il materiale aggiorna
+un'idea o un PRD esistente — e **mai inviata in automatico**: la rivede e
+la manda il PM. Serve a chiudere il loop con chi ha scritto, che
+altrimenti resta al buio. Vedi "Chiudere il loop col richiedente".
 
 **Deep dive (meeting di approfondimento)** — Riunione col richiedente
 necessaria per inquadrare un'idea abbastanza da farne un RICE serio.

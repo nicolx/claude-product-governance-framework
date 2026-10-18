@@ -1,6 +1,6 @@
 ---
 name: inbox-triage
-description: Svuota product/inbox/ classificando ogni elemento grezzo che il PM ci ha buttato dentro (email, thread, trascrizioni, allegati, immagini) — idea nuova, aggiornamento di un'idea/PRD esistente, bug, strategic exception, mandate/iniziativa mandataria, platform/debito tecnico, scarto al triage (declined) se non è roba da fare, o materiale troppo ambiguo da richiedere un chiarimento al mittente. Prepara una bozza di risposta al richiedente per ogni elemento con un mittente esterno. È il punto d'ingresso raccomandato per il materiale grezzo non ancora ordinato.
+description: Svuota product/inbox/ classificando ogni elemento grezzo che il PM ci ha buttato dentro (email, thread, trascrizioni, allegati, immagini) — idea nuova, aggiornamento di un'idea/PRD esistente, bug, strategic exception, mandate/iniziativa mandataria, platform/debito tecnico, scarto al triage (declined) se non è roba da fare, o materiale troppo ambiguo da richiedere un chiarimento al mittente. Prepara una bozza di risposta per ogni elemento con un mittente che non è il PM — qualunque esito, anche bug, mandate, platform e aggiornamenti di idee/PRD esistenti — così nessuno stakeholder resta appeso. È il punto d'ingresso raccomandato per il materiale grezzo non ancora ordinato.
 ---
 
 # inbox-triage
@@ -237,13 +237,25 @@ soli non coprono. In sintesi:
      al PM e compila il blocco `deadline` (`due_date`/`note`) — è cattura
      di un fatto dichiarato, non una decisione di priorità, quindi
      scrittura diretta (vedi playbook, "Scadenze su idee normali").
+     **Bozza di risposta al mittente**: aggiungi una voce a
+     `followup_replies` sull'idea (`kind: update_ack`, `reply_status:
+     drafted`, `about: idea`, `source_file`, `from`, `received_at`) —
+     ricevuto e collegato a {ID/titolo}, dov'è oggi l'iniziativa in
+     linguaggio piano, cosa succede al materiale ("verrà valutato se
+     cambia la stima" — mai anticipare l'esito di un `rice-update`).
+     Nessuna data, nessuna promessa. Salta solo se il mittente è il PM
+     stesso (`reply_status: not_needed`).
 
    - **Aggiornamento/integrazione di un PRD esistente** — sposta il
      materiale in `product/prds/{slug}/source/` (nome file che non
      collida con quelli già presenti). **Non riscrivere il PRD da solo**
      — l'authoring del PRD resta un atto deliberato (skill `prd-draft`).
      Segnala che è arrivato nuovo materiale rilevante e in cosa potrebbe
-     impattare (Why/What/Metriche/Rischi).
+     impattare (Why/What/Metriche/Rischi). **Bozza di risposta al
+     mittente**: come per l'aggiornamento di un'idea, una voce di
+     `followup_replies` sull'idea indicata dall'`idea_id` del PRD, con
+     `about: prd:<slug>` — "confluirà nella prossima revisione del PRD",
+     senza anticipare cosa cambierà.
 
    - **Bug** — stessa regola di `idea-intake`: **crea comunque la cartella
      idea** (`classification: bug`, `rice_history` che resta `[]` per
@@ -260,7 +272,8 @@ soli non coprono. In sintesi:
      (fatto, scrittura diretta, niente `pending/`). Se il connettore è
      `manuale` o non risponde, consegna il testo pronto e riportalo nel
      riepilogo (passo 7) come **AZIONE NON COMPLETATA** con il promemoria
-     di rilanciare `jira-sync` — mai come "fatto".
+     di rilanciare `jira-sync` — mai come "fatto". Prepara
+     `requester_reply` con `kind: bug_ack` (vedi `idea-intake` passo 8).
 
    - **Strategic Exception** — crea comunque la cartella idea (per
      traccia), `classification: strategic_exception`, e aggiungi una voce
@@ -287,7 +300,8 @@ soli non coprono. In sintesi:
      chiedi anche una prima stima di `lead_time_weeks` (da validare poi
      con un referente tecnico — se non disponibile, lascia `null` con
      nota, non bloccare). Mai compilare `analysis_start_by`/
-     `escalation_status` — li calcola `mandate-watch`.
+     `escalation_status` — li calcola `mandate-watch`. Prepara
+     `requester_reply` con `kind: mandate_ack`.
 
    - **Platform (debito tecnico/devops puro)** — stessa regola di
      `idea-intake`: non è un bug né un'idea di business, è manutenzione o
@@ -295,7 +309,9 @@ soli non coprono. In sintesi:
      platform` — salta solo il RICE, non necessariamente l'analisi (le
      iniziative importanti sì, quelle piccole possono saltare
      direttamente a `in_jira`). `rationale` sempre chiesto
-     esplicitamente, mai presunto solo perché arriva dal team tech.
+     esplicitamente, mai presunto solo perché arriva dal team tech. Se la
+     propone qualcuno che non è il PM, prepara `requester_reply` con
+     `kind: platform_ack`.
 
    - **Troppo ambiguo per classificare (dubbio di livello 2)** — **non
      forzare una classificazione indovinando**. Crea comunque
@@ -311,8 +327,8 @@ soli non coprono. In sintesi:
      - `clarification.draft_message`: una bozza di messaggio pronta,
        nel tono giusto per essere rispedita a chi ha mandato il
        materiale originale, che ponga quelle domande
-     - `requester_reply.needed: true`, `requester_reply.kind:
-       clarification_request` (il testo è già in
+     - `requester_reply.needed: true`, `reply_status: drafted`,
+       `requester_reply.kind: clarification_request` (il testo è già in
        `clarification.draft_message` — non duplicarlo)
      Il materiale grezzo si sposta comunque in `source/` — non resta in
      `product/inbox/`, e non va perso.
@@ -320,6 +336,19 @@ soli non coprono. In sintesi:
      Mostralo all'utente e chiedi se vuole inviarlo lui, o se c'è
      un'integrazione disponibile (es. email) chiedi esplicitamente
      conferma prima di usarla.
+
+5b. **Nessun mittente resta appeso.** Vale per tutti gli esiti sopra:
+   ogni elemento con un mittente che non è il PM stesso produce una bozza
+   di risposta — `requester_reply` sulle unità nuove, `followup_replies`
+   sugli aggiornamenti — secondo le regole di `idea-intake` passo 8
+   (`kind` per classificazione, `reply_status: drafted`, `recipients`,
+   canale non noto = bozza comunque). **Un mittente, una risposta**: se
+   un elemento ha generato più unità (anche miste, nuova idea +
+   aggiornamento), il mittente riceve un solo messaggio che copre tutti
+   gli esiti; la bozza vive nella prima unità creata (o, se non ne nasce
+   nessuna nuova, nella voce `followup_replies` della prima idea
+   aggiornata), le altre portano `reply_status: consolidated` +
+   `consolidated_in`. Playbook, "Chiudere il loop col richiedente".
 
 6. **Se un elemento rivela contesto aziendale rilevante (non di
    prodotto)** — un dato finanziario, una riorganizzazione, un cambio di
@@ -333,10 +362,14 @@ soli non coprono. In sintesi:
    nuove idee / aggiornamenti / bug / strategic exception / mandate /
    platform / needs_clarification / **scartati (declined)** ne sono
    derivati — **raggruppa nel riepilogo le unità nate dallo stesso
-   elemento**, non elencarle come se fossero scollegate. **Elenca tutte
-   le bozze di `requester_reply` generate** (idea normale, SE, decline,
-   clarification), pronte per la revisione e l'invio manuale del PM — non
-   inviarne nessuna in automatico. Riporta il recap dei **path da
+   elemento**, non elencarle come se fossero scollegate. **Per ogni
+   elemento, la sua bozza di risposta** (`requester_reply` o
+   `followup_replies`, qualunque esito: idea, bug, SE, mandate, platform,
+   decline, clarification, aggiornamento) pronta per la revisione e
+   l'invio manuale del PM, con i destinatari — oppure il motivo esplicito
+   per cui non c'è nessuno da avvisare, o "canale da trovare". Nessun
+   elemento senza né l'una né l'altro. Non inviarne nessuna in
+   automatico. Riporta il recap dei **path da
    monitorare** applicati alle nuove idee (attivi con baseline, da
    strumentare, rimandati se il connettore metriche era giù). **Per ogni bug**, di' se il ticket è
    stato aperto (con `card_id`/URL) o se resta un'**AZIONE NON COMPLETATA**

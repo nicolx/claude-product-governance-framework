@@ -169,16 +169,31 @@ clarification:
 
 # --- Bozza di risposta al richiedente (chiudere il loop) ---
 #
-# Ogni intake con un richiedente esterno identificabile (un proposer che
-# non è il PM stesso, con un canale raggiungibile) produce una bozza di
-# risposta — mai inviata in automatico, il PM la rivede e la manda lui.
-# Vedi playbook, "Chiudere il loop col richiedente". Scrittura diretta
+# Nessun richiedente resta appeso: OGNI intake con un richiedente che non
+# è il PM stesso produce una bozza di risposta, qualunque sia l'esito del
+# triage (idea, bug, strategic exception, mandate, platform, scarto,
+# chiarimento) — mai inviata in automatico, il PM la rivede e la manda
+# lui. Vedi playbook, "Chiudere il loop col richiedente". Scrittura diretta
 # sull'idea (come clarification.draft_message), NON passa da
 # product/approvals/pending/: è una cortesia 1:1 con l'idea, non una
 # decisione applicata a un target file.
 #
-# needed: false quando l'idea nasce dal PM stesso o da un brainstorm
-# interno senza un richiedente esterno da avvisare.
+# needed: false SOLO quando non c'è nessuno da avvisare: l'idea nasce dal
+# PM stesso, da un brainstorm interno, o da un backfill di delivery-watch.
+# Un canale non noto NON è un motivo per saltare: la bozza si scrive
+# comunque e il recap segnala che il canale va trovato. Materiale
+# inoltrato dal PM per conto di uno stakeholder: il richiedente è lo
+# stakeholder, needed: true.
+#
+# reply_status (è la chiave che l'hook check-requester-replies.sh conta):
+#   - not_needed   -> needed: false
+#   - drafted      -> bozza pronta, non ancora inviata
+#   - consolidated -> lo stesso mittente ha generato più unità: la bozza è
+#     UNA sola (copre tutti gli esiti) e vive nell'unità indicata da
+#     consolidated_in — qui draft resta null
+#   - sent         -> il PM dichiara di averla inviata (sent_at)
+#   - waived       -> il PM decide che non serve (es. ha già risposto a
+#     voce) — waived_reason dato da lui, mai presunto
 #
 # kind:
 #   - acknowledgement       -> idea normale: presa in carico + (se serve)
@@ -193,6 +208,18 @@ clarification:
 #     CONFERMA dall'autorità richiesta (CEO/CPO-CTO) — non dire "approvata"
 #     finché non lo è — + impegno a restituire feedback sull'esito
 #     (playbook, "Alimentazione del bucket delle idee", punto b)
+#   - bug_ack              -> classification bug: confermato come bug, entra
+#     nell'agenda del team di sviluppo senza passare dalla prioritizzazione;
+#     riferimento al ticket (o "in apertura" se il connettore era giù) e
+#     impatto stimato; mai una data di risoluzione; verrà avvisato alla
+#     chiusura (conclusion_notices)
+#   - mandate_ack          -> classification mandate: presa in carico come
+#     iniziativa mandataria (salta la prioritizzazione, non l'analisi);
+#     scadenza registrata e monitorata; quando partirà l'analisi come
+#     forbice, mai una promessa
+#   - platform_ack         -> classification platform proposta da qualcuno
+#     che non è il PM: presa in carico, rientra nella capacità protetta per
+#     il debito tecnico, se ne parla in Iteration Planning
 #
 # deep_dive_meeting_needed: true se per fare un RICE serio serve una
 # riunione col richiedente (dato mancante che solo lui ha, problema da
@@ -201,10 +228,43 @@ clarification:
 # finché il meeting non avviene.
 requester_reply:
   needed: false
-  kind: null                    # acknowledgement | clarification_request | decline | strategic_exception_ack
+  reply_status: not_needed      # not_needed | drafted | consolidated | sent | waived
+  kind: null                    # acknowledgement | clarification_request | decline | strategic_exception_ack | bug_ack | mandate_ack | platform_ack
+  recipients: []                # il proponente + chi nel materiale ha posto una domanda diretta (thread a più voci) — confermati dal PM
   draft: null                   # testo pronto per l'invio manuale — mai inviato in automatico
+  consolidated_in: null         # solo se reply_status: consolidated — slug dell'unità che contiene la bozza unica
   deep_dive_meeting_needed: false
-  sent_at: null
+  sent_at: null                 # data dichiarata dal PM dopo l'invio manuale
+  waived_reason: null           # solo se waived — dato dal PM
+
+# --- Risposte a materiale arrivato DOPO l'intake (aggiornamenti) ---
+#
+# Chi manda materiale nuovo su un'idea o su un PRD già esistente (un dato,
+# un'obiezione, una precisazione, un sollecito) è un richiedente come gli
+# altri: inbox-triage prepara una bozza anche per lui. Il materiale va in
+# source/ dell'idea o del PRD; la bozza vive QUI, sull'idea (per un PRD:
+# sull'idea indicata dal suo idea_id). APPEND-ONLY: una voce per
+# materiale ricevuto, mai cancellata. Stessi reply_status/consolidated_in/
+# sent_at/waived_reason di requester_reply, stesso hook.
+#
+# kind: update_ack — ricevuto, collegato a {short_ref/titolo}; dov'è oggi
+# l'iniziativa in linguaggio piano (backlog, analisi, sviluppo…); cosa
+# succede al materiale (se può cambiare la stima: "verrà valutato" — mai
+# anticipare l'esito di un rice-update; se tocca un PRD: "confluirà nella
+# prossima revisione"). Nessuna data, nessuna promessa.
+followup_replies: []
+# Esempio di singola voce:
+# - received_at: ""             # ISO
+#   from: ""                    # chi ha mandato il materiale
+#   about: idea                 # idea | prd:<slug>
+#   source_file: ""             # percorso del materiale in source/ (dell'idea o del PRD)
+#   kind: update_ack
+#   reply_status: drafted       # not_needed | drafted | consolidated | sent | waived
+#   recipients: []
+#   draft: null
+#   consolidated_in: null       # slug dell'idea che contiene la bozza unica (stesso mittente, più unità)
+#   sent_at: null
+#   waived_reason: null
 
 # --- Avviso di conclusione agli stakeholder (chiudere il loop alla fine) ---
 #

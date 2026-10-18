@@ -131,7 +131,18 @@ piano passa **sempre** da `product/approvals/pending/`
          (`waived`) — e solo allora si scrive il cambio di stato
          corrispondente. Playbook, "Avvisare gli stakeholder della
          conclusione".
-      7. **Path da monitorare** (solo se il task `path-watch` del punto a
+      7. **Risposte ai richiedenti in sospeso** — voci di
+         `requester_reply` e `followup_replies` con `reply_status:
+         drafted` (dal dump: idee attive + scarti `declined`/`aborted`
+         con una risposta non inviata): bozze preparate all'intake e mai
+         mandate, il richiedente è ancora al buio. Colonne: ID, `kind`,
+         destinatari, da quanti giorni (`created_at` o `received_at`).
+         Al checkpoint il PM le dichiara inviate (`reply_status: sent` +
+         `sent_at`) o esentate con un motivo suo (`waived` +
+         `waived_reason`). Se una bozza è invecchiata (lo stato dell'idea
+         è cambiato da allora), proponi di aggiornarne il testo prima
+         dell'invio. Playbook, "Chiudere il loop col richiedente".
+      8. **Path da monitorare** (solo se il task `path-watch` del punto a
          è partito; lo raccogli qui, non al punto e) — il recap di
          `path-watch` passo 6: idee senza path, path applicati in questo
          giro con la baseline, **da strumentare** (in evidenza quelli su
@@ -147,7 +158,7 @@ piano passa **sempre** da `product/approvals/pending/`
          confermare una per una le modifiche irreversibili** proposte
          (cosa cambia, cosa si perde, chi ne è toccato) — quelle non
          confermate non si eseguono al punto f.
-      8. **Viste in scadenza** — dalle viste dichiarate in
+      9. **Viste in scadenza** — dalle viste dichiarate in
          `product/reference/reporting-models.yaml` e dall'indice
          "ultimo report per vista" in fondo al dump: quelle con `cadence`
          diversa da `on_demand` senza un report per il periodo corrente.
@@ -184,6 +195,8 @@ piano passa **sempre** da `product/approvals/pending/`
          conclusione"); svuotare una `deadline`
          non più rilevante; chiudere una misurazione (`closure`) o un
          allarme NSM (`alert.status: resolved`); annotare `notes`;
+         dichiarare inviata o esentare una risposta a un richiedente
+         (`reply_status: sent`/`waived`);
          rimandare una revisione di RICE a `rice-update` (che passa da
          `pending/`). Se non c'è nulla, un "procedi" e si va avanti;
       3. **accumula** le azioni concordate — non scrivere ancora: la
@@ -209,7 +222,7 @@ piano passa **sempre** da `product/approvals/pending/`
       `analytics_dashboard.changes`; la dashboard si riallinea **dopo**
       i path di quella linea, sui path finali: le **reversibili**
       direttamente, le **irreversibili** solo quelle che il PM ha
-      confermato una per una al checkpoint del blocco 7 (le altre restano
+      confermato una per una al checkpoint del blocco 8 (le altre restano
       proposte nel recap); quelle fallite restano nel recap. Poi:
       `bash .claude/hooks/governance-sync.sh push "backlog-refinement: sweep di apertura <settimana>" product/`.
       Un commit per l'intera sweep, non uno per watch né uno per
