@@ -115,15 +115,20 @@ o intervento git esplicito dell'utente).
      `product/ceremonies/{tipo}/{periodo}-void-{n}/` (con un
      `.run-meta.yaml` minimale `status: rolled_back`) — è costosa da
      ricreare. Default: **sì, conservala**;
-   - gli **oggetti creati nello strumento di analytics** dal run (nei
-     commit del run: path con `analytics_owned: true` e `applied_at`
-     nella finestra del run — skill `path-watch`, passo 6). Il revert li
-     toglie da `idea.yaml` ma **non** dallo strumento: elencali (nome +
-     link) e chiedi per ciascuno se eliminarlo. Elimina solo su conferma
-     esplicita e solo se l'oggetto non è stato toccato da nessuno dopo la
-     creazione (altrimenti è adottato: si lascia, e lo si dice). Default:
-     **lasciarli** — un run rilanciato li riconosce per nome e li riusa
-     invece di duplicarli.
+   - le **scritture nello strumento di analytics** fatte dal run: le voci
+     `analytics_changes` aggiunte dai commit del run (skill `path-watch`,
+     passo 6). Il revert le toglie da `idea.yaml` ma **non** dallo
+     strumento. Elencale e per ciascuna proponi:
+     - `update_definition`/`move`/simili (reversibili) → **ripristino**
+       dello stato `before` (versione del tool o definizione salvata) —
+       a sua volta reversibile, si fa con la conferma del piano;
+     - `create` → eliminazione dell'oggetto: è irreversibile, chiedi per
+       ciascuno a parte. Default: **lasciarlo** — un run rilanciato lo
+       riconosce per nome e lo riusa;
+     - azioni irreversibili già confermate → non si annullano, si
+       elencano.
+     Se un oggetto è stato modificato da qualcuno dopo il run, ripristinare
+     cancellerebbe il suo lavoro: segnalalo e chiedi.
 
    **Fermati e chiedi conferma esplicita.** Non procedere su un "ok"
    implicito o perché l'utente sembrava d'accordo prima.

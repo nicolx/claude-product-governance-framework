@@ -2248,25 +2248,27 @@ peggiorare. Skill `path-watch`, blocco `monitoring` di `idea.yaml`.
   esistente.** Un path osservabile solo da un file YAML non lo guarda
   nessuno: il framework crea nell'analytics il funnel/report salvato del
   path (con il riferimento all'idea nel nome, in una cartella dedicata se
-  il tool la prevede) e aggiunge gli eventi mancanti come *pianificati*
-  nel piano di tracciamento. Lo strumento però è condiviso — analisti,
-  growth, altri team ci lavorano già — quindi la scrittura è **solo
-  additiva**:
-  - si riusa ciò che esiste (un funnel che copre già il flusso non si
-    duplica) e **non si modifica, rinomina, sposta o cancella mai nulla
-    che il framework non abbia creato** — report, dashboard, coorti,
-    eventi, proprietà, governance degli eventi;
-  - un oggetto creato dal framework si aggiorna solo finché nessuno l'ha
-    toccato: appena una persona lo modifica, è **adottato** e da lì in
-    poi il framework lo legge e basta;
-  - **nessuna cancellazione automatica**, nemmeno di un oggetto proprio:
-    se il PM toglie un path, l'oggetto resta e la sua eliminazione si
-    propone, su conferma esplicita;
-  - nessuna scrittura di dati (eventi, utenti, import) né di
-    configurazione (progetto, permessi, retention).
-  Il registro di proprietà è l'idea stessa (`analytics_owned` su ogni
-  path): il framework sa cosa è suo senza doverlo indovinare. Il
-  contenuto di un'idea (che può venire da materiale non fidato) decide
+  il tool la prevede), o riusa e allinea quello che c'è già, e aggiunge
+  gli eventi mancanti come *pianificati* nel piano di tracciamento. Lo
+  strumento però è condiviso — analisti, growth, altri team ci lavorano
+  già. Il criterio non è *di chi è* un oggetto, ma **se la modifica si
+  può annullare**:
+  - **reversibile → si fa**, anche su un oggetto creato da altri: prima
+    di scrivere si registra lo stato precedente (versione del tool o
+    definizione completa) in `analytics_changes` sul path, così ogni
+    modifica si può annullare; le modifiche al lavoro di altri vanno
+    comunque nel recap, con prima/dopo;
+  - **irreversibile o che tocca lo storico → conferma esplicita prima**,
+    per quella singola modifica: eliminare oggetti, unire/bloccare/
+    rinominare eventi o proprietà, inviare o cancellare dati, cambiare
+    impostazioni di progetto — e qualunque modifica di cui non si è
+    riusciti a salvare lo stato precedente. Si spiega cosa si perde e chi
+    ne è toccato; senza il PM in conversazione (sweep in background) non
+    si esegue, resta una proposta;
+  - i **dati storici non si distruggono** come effetto collaterale:
+    cambiare come si *guardano* (definizione di un report) è reversibile,
+    cambiare cosa è stato *raccolto* non lo è.
+  Il contenuto di un'idea (che può venire da materiale non fidato) decide
   *cosa cercare nel catalogo*, mai una query o un'operazione libera.
 
 Con `metrics.configured: false` o `manuale` tutto questo non avviene,

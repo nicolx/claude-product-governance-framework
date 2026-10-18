@@ -136,11 +136,15 @@ piano passa **sempre** da `product/approvals/pending/`
          `path-watch` passo 6: idee senza path, path applicati in questo
          giro con la baseline, **da strumentare** (in evidenza quelli su
          idee `in_development`: gli eventi vanno aggiunti in questa
-         iterazione), promossi, **rotti**, KPI collegabili a un path. I
-         path si applicano senza conferma (playbook, "Path da
-         monitorare"): al checkpoint il PM può solo toglierne uno
-         ("togli il path {id} da {ID}" → `status: removed` +
-         `removed_reason` chiesto a lui).
+         iterazione), promossi, **rotti**, KPI collegabili a un path,
+         modifiche previste nello strumento (in evidenza quelle su
+         oggetti creati da altri). I path e le modifiche reversibili si
+         applicano senza conferma (playbook, "Path da monitorare"): al
+         checkpoint il PM può toglierne uno ("togli il path {id} da {ID}"
+         → `status: removed` + `removed_reason` chiesto a lui) e **deve
+         confermare una per una le modifiche irreversibili** proposte
+         (cosa cambia, cosa si perde, chi ne è toccato) — quelle non
+         confermate non si eseguono al punto f.
       8. **Viste in scadenza** — dalle viste dichiarate in
          `product/reference/reporting-models.yaml` e dall'indice
          "ultimo report per vista" in fondo al dump: quelle con `cadence`
@@ -196,10 +200,12 @@ piano passa **sempre** da `product/approvals/pending/`
       calcolati (`escalation_status`, `rice_status.*`, `alert.*`,
       `closure`, i blocchi `monitoring` restituiti da `path-watch`) e
       *tutte* le azioni di checkpoint concordate. Le scritture di
-      `path-watch` **nello strumento di analytics** (creazioni additive,
-      `path-watch` passo 6) si eseguono qui, *prima* di scrivere le
-      `idea.yaml`, perché gli id restituiti finiscono in
-      `analytics_ref`; quelle fallite restano nel recap. Poi:
+      `path-watch` **nello strumento di analytics** si eseguono qui,
+      *prima* di scrivere le `idea.yaml`, perché id e stato precedente
+      finiscono in `analytics_ref`/`analytics_changes`: le **reversibili**
+      direttamente, le **irreversibili** solo quelle che il PM ha
+      confermato una per una al checkpoint del blocco 7 (le altre restano
+      proposte nel recap); quelle fallite restano nel recap. Poi:
       `bash .claude/hooks/governance-sync.sh push "backlog-refinement: sweep di apertura <settimana>" product/`.
       Un commit per l'intera sweep, non uno per watch né uno per
       checkpoint.

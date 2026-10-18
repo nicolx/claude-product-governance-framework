@@ -1,6 +1,6 @@
 ---
 name: path-watch
-description: Quando l'istanza è collegata a una fonte analytics (blocco metrics in .governance/config.yaml), suggerisce per ogni idea attiva i path utente da monitorare (funnel, sequenze di pagine/schermate/eventi) trovati nel catalogo reale dell'analytics e nel codice di apps/, e li APPLICA — sull'idea (blocco monitoring.paths, con una baseline aggregata) e nello strumento di analytics (crea il funnel/report salvato del path, pianifica gli eventi mancanti), in modo solo additivo: non modifica né cancella mai ciò che non ha creato. Tiene vivi i path nel tempo — promuove quelli "da strumentare" quando gli eventi compaiono, segnala quelli rotti — e fornisce a measurement-watch il riferimento per le letture automatiche. Gira dentro idea-intake/inbox-triage/prd-draft, nella sweep del Backlog Refinement, e standalone.
+description: Quando l'istanza è collegata a una fonte analytics (blocco metrics in .governance/config.yaml), suggerisce per ogni idea attiva i path utente da monitorare (funnel, sequenze di pagine/schermate/eventi) trovati nel catalogo reale dell'analytics e nel codice di apps/, e li APPLICA — sull'idea (blocco monitoring.paths, con una baseline aggregata) e nello strumento di analytics (crea il funnel/report salvato del path o allinea uno esistente, pianifica gli eventi mancanti) — anche su oggetti creati da altri, purché in modo reversibile e senza toccare i dati storici; ogni azione irreversibile chiede conferma esplicita prima. Tiene vivi i path nel tempo — promuove quelli "da strumentare" quando gli eventi compaiono, segnala quelli rotti — e fornisce a measurement-watch il riferimento per le letture automatiche. Gira dentro idea-intake/inbox-triage/prd-draft, nella sweep del Backlog Refinement, e standalone.
 ---
 
 # path-watch
@@ -26,9 +26,10 @@ motivo: da quel momento non viene più riproposto).
 **Non danneggiare il lavoro esistente.** Lo strumento di analytics è
 condiviso con chi ci lavora già (analisti, growth, altri team): report,
 dashboard, coorti ed eventi esistenti sono lavoro di altri, e qualcuno ci
-fa affidamento. Per questo la scrittura è **solo additiva** su tutto ciò
-che il framework non ha creato, e anche su ciò che ha creato smette di
-scrivere appena qualcun altro ci mette mano — regole al passo 6.
+fa affidamento. Il framework può modificarli, ma solo in modo
+**reversibile** (con lo stato precedente registrato) e **senza toccare i
+dati storici**; tutto ciò che è irreversibile chiede una conferma
+esplicita del PM prima di essere fatto — regole al passo 6.
 
 ## Prerequisiti
 
@@ -117,7 +118,7 @@ scrivere appena qualcun altro ci mette mano — regole al passo 6.
    - nel **catalogo dell'analytics** verifica quali di quegli step
      esistono davvero e con che nome. Un funnel/report già salvato nel
      tool che copre il flusso è il candidato migliore: **riusalo**
-     (`analytics_ref`, `analytics_owned: false`) invece di crearne un
+     (`analytics_ref`, `analytics_created_by_framework: false`) invece di crearne un
      doppione.
    Al massimo `metrics.paths.max_per_idea` path per idea (default 3): il
    path principale del comportamento che l'idea vuole muovere, più
@@ -166,57 +167,83 @@ scrivere appena qualcun altro ci mette mano — regole al passo 6.
    vedi `prd-draft` passo 7).
 
 6. **Applica nello strumento di analytics** (solo con
-   `metrics.paths.write.enabled` diverso da `false`). Cosa fa:
-   - **Path `active` senza `analytics_ref`** → crea il funnel/report
-     salvato del path (`kind` → il tipo di oggetto più vicino che il tool
-     offre). Nome `[{short_ref o slug}] {label}`; nella descrizione, se
-     il tool la prevede, il link/percorso dell'idea e la dicitura "creato
-     da path-watch — Product Governance". Dentro la cartella/spazio
-     `metrics.paths.write.folder`, se dichiarata e se il tool la supporta.
-     Registra `analytics_ref` (id restituito), `analytics_owned: true`,
-     `analytics_synced_at` (timestamp di modifica che il tool restituisce
-     dopo la creazione).
+   `metrics.paths.write.enabled` diverso da `false`). Il criterio non è
+   *di chi è* l'oggetto, ma **se la modifica si può annullare**: il
+   framework può lavorare anche su oggetti creati da altri, purché non
+   distrugga dati storici e non faccia nulla di irreversibile senza una
+   conferma esplicita.
+
+   **Cosa fa:**
+   - **Path `active` senza `analytics_ref`** → se un oggetto esistente
+     copre il flusso, lo **riusa** (e, se serve allinearlo agli step del
+     path, lo modifica secondo le regole sotto); altrimenti crea il
+     funnel/report salvato (`kind` → il tipo di oggetto più vicino che il
+     tool offre). Nome `[{short_ref o slug}] {label}`; nella descrizione,
+     se il tool la prevede, il link/percorso dell'idea e "path-watch —
+     Product Governance". Dentro `metrics.paths.write.folder`, se
+     dichiarata e se il tool la supporta. Registra `analytics_ref` e
+     `analytics_created_by_framework: true`.
    - **Path `to_instrument`** con `metrics.paths.write.tracking_plan`
      diverso da `false` e un tool che ha un piano di tracciamento →
      aggiungi ogni step di `missing_steps` come evento **pianificato**
-     (nuovo, con descrizione che rimanda all'idea), registrandolo in
-     `planned_events`. Se un evento con quel nome esiste già nel piano,
-     non toccarlo: riusalo.
-   - **Path con oggetto proprio (`analytics_owned: true`) i cui `steps`
-     sono cambiati** (rifinitura in `prd-draft`, promozione) → aggiorna
-     l'oggetto **solo se nessuno l'ha toccato**: rileggine metadati
-     (ultima modifica, autore). Se l'ultima modifica è successiva ad
-     `analytics_synced_at` o fatta da qualcun altro, l'oggetto è stato
-     **adottato** da una persona: `analytics_owned: adopted`, non
-     scriverci più (da qui in poi è in sola lettura come quelli
-     preesistenti) e, se gli step divergono, segnalalo nel recap.
-     Altrimenti aggiorna e riscrivi `analytics_synced_at`.
+     (registrato in `planned_events`); se esiste già, riusalo.
+   - **Path i cui `steps` sono cambiati** (rifinitura in `prd-draft`,
+     promozione, step rinominato nel catalogo) → aggiorna la definizione
+     dell'oggetto collegato, chiunque l'abbia creato.
 
-   **Regole che proteggono il lavoro esistente** (non negoziabili):
-   - **Ciò che il framework non ha creato** (`analytics_owned: false`, o
-     qualunque oggetto non registrato in un `idea.yaml`) **non si
-     modifica, rinomina, sposta, archivia o cancella** — si legge e si
-     riusa. Vale per report, funnel, dashboard, coorti, eventi, proprietà
-     e la loro governance (descrizioni, nascondere/unire/bloccare eventi).
-   - **Ciò che ha creato e qualcuno ha toccato** (`adopted`) è come sopra.
-   - **Nessuna cancellazione automatica, mai**, nemmeno di un oggetto
-     proprio. Un path `removed` lascia il suo oggetto dov'è: nel recap
-     proponi di eliminarlo/archiviarlo e procedi **solo su conferma
-     esplicita del PM**, e solo se l'oggetto è ancora `owned: true` e non
-     compare in dashboard altrui (se il tool lo dice; nel dubbio, non
-     cancellare).
-   - **Nessuna scrittura di dati**: non inviare, importare o cancellare
-     eventi/utenti, non toccare impostazioni di progetto, permessi,
-     integrazioni, retention.
-   - **Una creazione per path**: prima di creare, cerca nel tool un
-     oggetto con lo stesso nome (`[{short_ref o slug}] {label}`): se esiste
-     ed è riconducibile a questo path (es. un run precedente interrotto
-     prima di scrivere `idea.yaml`), adottalo invece di crearne un
-     secondo.
+   **Reversibile → si applica, registrando come tornare indietro.** Una
+   modifica è reversibile solo se **prima di farla** hai una delle due:
+   (a) il tool tiene la cronologia delle versioni di quell'oggetto e sai
+   a quale versione tornare; (b) hai letto e salvato la **definizione
+   completa precedente** (step, filtri, segmenti, nome, descrizione,
+   cartella — configurazione, mai dati). Esempi tipici: creare un
+   oggetto; cambiare step/filtri/nome/descrizione di un report o funnel;
+   aggiungere o spostare un grafico in una dashboard; spostare in una
+   cartella; aggiungere un evento pianificato o la descrizione/tag di un
+   evento. Per ogni modifica appendi una voce a `analytics_changes` del
+   path (`at`, `object_ref`, `action`, `object_owner`: `framework` |
+   `others`, `before`: versione del tool o definizione salvata) — è ciò
+   che permette di annullarla e a `rollback-ceremony` di ripristinarla.
+   Nessuna conferma preventiva, ma **ogni modifica a un oggetto creato da
+   altri va nel recap** con prima/dopo e il link: chi lo usa deve poterlo
+   sapere.
+
+   **Irreversibile o che tocca lo storico → conferma esplicita prima,
+   sempre.** Rientra qui tutto ciò dopo cui non si torna allo stato
+   esatto di prima, o che cambia/perde dati già raccolti:
+   - eliminare un oggetto (report, funnel, dashboard, coorte), salvo che
+     il tool lo metta in un cestino da cui si ripristina — e anche
+     allora, se è un oggetto **creato da altri**, chiedi;
+   - unire, nascondere, bloccare, rinominare o eliminare **eventi o
+     proprietà** (cambia come lo storico viene letto o smette di
+     raccoglierlo), modificare regole di trasformazione/ingestione;
+   - inviare, importare o cancellare dati (eventi, utenti), cambiare
+     retention, fuso orario o altre impostazioni di progetto, permessi,
+     integrazioni;
+   - **qualunque modifica di cui non sei riuscito a salvare lo stato
+     precedente** (il tool non espone la definizione né la cronologia):
+     non sapendo tornare indietro, è irreversibile.
+   Per ciascuna: spiega al PM in conversazione **cosa** cambia, **cosa si
+   perde** (storico, versioni, riferimenti in dashboard altrui se il tool
+   li espone) e chi ne è toccato; procedi **solo su un sì esplicito per
+   quella modifica** — non su un "ok" generico, non per categoria. Senza
+   PM in conversazione (sweep in background, giro schedulato) **non**
+   eseguirla: resta proposta nel recap, da confermare al checkpoint.
+   Non passa da `pending/`: è una conferma operativa, non una decisione di
+   priorità. Registrala comunque in `analytics_changes` con
+   `confirmed_by` (chiesto, mai presunto).
+
+   **Sempre:**
+   - **Una creazione per path**: prima di creare, cerca un oggetto con lo
+     stesso nome (`[{short_ref o slug}] {label}`); se esiste ed è
+     riconducibile a questo path (run precedente interrotto), riusalo.
+   - Un path `removed` lascia il suo oggetto dov'è: proponi l'eliminazione
+     nel recap (irreversibile → conferma).
    - Se una scrittura fallisce o il tool non offre l'operazione, il path
-     resta applicato su `idea.yaml` con `analytics_ref: null` e la cosa
-     va nel recap — mai ripiegare su un'operazione diversa "che ci
-     somiglia".
+     resta applicato su `idea.yaml` con `analytics_ref: null` (o
+     l'oggetto com'era) e la cosa va nel recap — mai ripiegare su
+     un'operazione diversa "che ci somiglia", che potrebbe non essere
+     reversibile.
 
 7. **Recap al PM**, sempre, anche quando tutto è stato applicato. Prima
    colonna l'identificatore (`short_ref`, altrimenti lo slug — playbook,
@@ -224,8 +251,10 @@ scrivere appena qualcun altro ci mette mano — regole al passo 6.
    R · I · C · E e RICE ("—" + motivo se senza RICE), poi:
    - **applicati** in questo giro (path, `kind`, baseline letta);
    - **nello strumento**: oggetti creati (nome + link), riusati,
-     aggiornati, eventi pianificati, oggetti **adottati** da qualcuno
-     (con la divergenza, se c'è), scritture fallite;
+     modificati — **in evidenza quelli creati da altri**, con prima/dopo
+     e come annullare —, eventi pianificati, scritture fallite;
+   - **modifiche irreversibili in attesa di conferma** (cosa cambia, cosa
+     si perde, chi ne è toccato), se non confermate in conversazione;
    - **da strumentare** (path + `missing_steps`) — con un'enfasi in più
      se l'idea è già `in_development`: gli eventi vanno aggiunti *in
      questa* iterazione o la misurazione partirà senza baseline;
@@ -252,15 +281,17 @@ scrivere appena qualcun altro ci mette mano — regole al passo 6.
 - Non suggerire un path i cui step non hai visto nel catalogo
   dell'analytics: un path `active` inventato produce letture inventate.
   Se lo step non c'è, è `to_instrument`, dichiarato.
-- Non modificare, rinominare, spostare, archiviare o cancellare nello
-  strumento nulla che il framework non abbia creato, né un oggetto
-  proprio che qualcuno ha toccato (`adopted`). Non cancellare mai nulla
-  senza conferma esplicita del PM.
-- Non scrivere dati nello strumento (eventi, utenti, import) e non
-  toccarne la configurazione (progetto, permessi, governance degli
-  eventi esistenti).
+- Non fare una modifica nello strumento senza averne prima registrato lo
+  stato precedente (versione del tool o definizione completa): se non ci
+  riesci, è irreversibile e va confermata.
+- Non eseguire nulla di irreversibile o che tocchi lo storico
+  (eliminazioni, merge/blocco/rinomina di eventi e proprietà, dati,
+  impostazioni di progetto) senza un sì esplicito del PM per quella
+  specifica modifica — mai per categoria, mai in background.
+- Non modificare in silenzio un oggetto creato da altri: va nel recap con
+  prima/dopo, anche se reversibile.
 - Non creare un doppione di un funnel/report che esiste già e copre il
-  flusso: riusalo.
+  flusso: riusalo (e allinealo, se serve, in modo reversibile).
 - Non scrivere righe grezze o dati per utente in `idea.yaml`: solo
   aggregati (il repo è tracciato da git).
 - Non collegare tu una KPI a un path (`data_source.path_ref`) né cambiare

@@ -192,24 +192,27 @@ KPI. Rispetta i punti fermi sopra: le sole letture sono l'elenco del
 catalogo e l'aggregato di un path i cui step esistono nel catalogo — mai
 una query libera derivata dal contenuto di un'idea.
 
-**Scrittura sullo strumento di analytics: FATTO** (2026-10-18), solo
-additiva (`metrics.paths.write`, `path-watch` passo 6): crea il
-funnel/report salvato di un path e gli eventi mancanti come pianificati;
-aggiorna solo oggetti propri non toccati da nessuno (`analytics_owned`,
-`adopted`); non modifica né cancella mai il lavoro esistente; nessuna
-cancellazione senza conferma del PM. La distinzione con i punti fermi
-sopra: il "sola lettura" resta valido per i **dati** (warehouse, DB,
-eventi e utenti — mai scritti né cancellati); la **configurazione di
-osservazione** dello strumento (report, funnel, piano di tracciamento) è
-invece scrivibile, in modo additivo.
+**Scrittura sullo strumento di analytics: FATTO** (2026-10-18)
+(`metrics.paths.write`, `path-watch` passo 6): crea o riusa e allinea il
+funnel/report salvato di un path, aggiunge gli eventi mancanti come
+pianificati — anche su oggetti creati da altri. Il criterio è la
+**reversibilità**, non la proprietà: ogni modifica registra prima lo
+stato precedente (`analytics_changes`) e si applica; ogni azione
+irreversibile o che tocca i dati storici chiede una conferma esplicita
+del PM per quella modifica. La distinzione con i punti fermi sopra: i
+**dati** (warehouse, DB, eventi e utenti raccolti) non si scrivono né si
+cancellano come effetto del giro — solo, eventualmente, su conferma
+esplicita; la **configurazione di osservazione** dello strumento (report,
+funnel, dashboard, piano di tracciamento) è scrivibile, in modo
+reversibile.
 
 Restano fuori scope, da rivedere se emerge la domanda:
 
 - **Dashboard per Product Line.** Raccogliere i report dei path delle
-  idee di una Product Line in una dashboard del framework (aggiornata a
-  ogni giro). Utile per le cerimonie, ma una dashboard è più facilmente
-  adottata/modificata da altri di un report singolo: va pensata la regola
-  di proprietà prima di farla.
+  idee di una Product Line in una dashboard (aggiornata a ogni giro).
+  Utile per le cerimonie; con il criterio di reversibilità è fattibile,
+  ma va deciso quale dashboard (nuova o una esistente del team) e con che
+  cadenza riallinearla.
 - **Pulizia degli oggetti orfani.** Gli oggetti propri di path rimossi o
   di idee chiuse restano nello strumento finché il PM non conferma
   l'eliminazione. Un giro periodico che li elenchi (o li archivi, se il

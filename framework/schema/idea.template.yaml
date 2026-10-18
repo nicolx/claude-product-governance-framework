@@ -499,11 +499,14 @@ links:
 # removed non viene più riproposto.
 #
 # Applicati anche NELLO STRUMENTO di analytics (metrics.paths.write):
-# funnel/report salvato del path, eventi mancanti come pianificati. Solo
-# additivo — ciò che il framework non ha creato (analytics_owned: false)
-# o che una persona ha poi modificato (adopted) non si tocca mai; nessuna
-# cancellazione senza conferma del PM. Questo blocco è il registro di
-# proprietà: è da qui che path-watch sa cosa è suo.
+# funnel/report salvato del path (creato, o uno esistente riusato e
+# allineato), eventi mancanti come pianificati. Anche su oggetti creati
+# da altri, ma solo con modifiche REVERSIBILI e senza toccare i dati
+# storici: ogni modifica registra in analytics_changes come tornare
+# indietro; ogni azione irreversibile (eliminazioni, merge/blocco/rinomina
+# di eventi, dati, impostazioni, o una modifica di cui non si è potuto
+# salvare lo stato precedente) chiede conferma esplicita del PM prima.
+# Vedi skill path-watch, passo 6.
 #
 # baseline è sempre un AGGREGATO (numero + unità + finestra), mai righe
 # grezze né dati per utente: questo file è tracciato da git.
@@ -519,9 +522,17 @@ monitoring:
   #   kind: funnel                    # funnel | page_path | screen_flow | event
   #   steps: []                       # nomi ESATTI come compaiono nel catalogo analytics, in ordine
   #   analytics_ref: null             # id del funnel/report salvato nel tool per questo path — riusato se esisteva, altrimenti creato da path-watch
-  #   analytics_owned: false          # false (esisteva già: solo lettura) | true (creato da path-watch) | adopted (creato da path-watch, poi modificato da una persona: da allora solo lettura)
-  #   analytics_synced_at: null       # timestamp di ultima modifica dell'oggetto dopo l'ultima scrittura di path-watch — se il tool ne riporta uno più recente, qualcuno l'ha toccato → adopted
-  #   planned_events: []              # eventi aggiunti come "pianificati" al tracking plan del tool per i missing_steps (solo nuovi, mai modifiche a eventi esistenti)
+  #   analytics_created_by_framework: false  # true se l'oggetto l'ha creato path-watch, false se esisteva (di altri) ed è stato riusato
+  #   planned_events: []              # eventi aggiunti come "pianificati" al tracking plan del tool per i missing_steps
+  #   analytics_changes: []           # APPEND-ONLY: ogni scrittura fatta nello strumento per questo path, con come annullarla
+  #   # - at: "2026-10-18T10:00:00"
+  #   #   object_ref: ""              # id dell'oggetto toccato
+  #   #   action: ""                  # create | update_definition | add_to_dashboard | move | plan_event | delete | ... (descrittivo)
+  #   #   object_owner: framework     # framework | others — chi aveva creato l'oggetto
+  #   #   reversible: true
+  #   #   before: null                # id di versione del tool, oppure la DEFINIZIONE completa precedente (step, filtri, nome, cartella) — solo configurazione, mai dati. null solo per create
+  #   #   confirmed_by: null          # obbligatorio se reversible: false — chi ha detto sì a QUESTA modifica (chiesto, mai presunto)
+  #   #   reverted_at: null           # se annullata (es. da rollback-ceremony)
   #   rationale: ""                   # perché questo path c'entra con l'idea: comportamento da muovere, o guardia
   #   evidence: ""                    # dove è stato trovato: voce di catalogo + file/rotta in apps/
   #   status: active                  # active | to_instrument | broken | removed

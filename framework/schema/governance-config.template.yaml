@@ -103,9 +103,10 @@ metrics:
     max_per_idea: 3               # path principale + eventuali guardie: meglio uno giusto che tre di contorno
     baseline_window_days: 28      # finestra dell'aggregato di baseline letto all'applicazione
     recheck_days: 28              # ogni quanto ricontrollare un path anche se nulla sembra cambiato
-    # Scrittura nello strumento di analytics. SOLO ADDITIVA: crea oggetti
-    # nuovi, aggiorna solo quelli che ha creato e che nessuno ha toccato,
-    # non modifica/cancella mai il lavoro esistente — vedi skill path-watch, passo 6.
+    # Scrittura nello strumento di analytics. Anche su oggetti di altri,
+    # ma solo modifiche REVERSIBILI (stato precedente registrato) e senza
+    # toccare i dati storici; ogni azione irreversibile chiede conferma
+    # esplicita del PM prima — vedi skill path-watch, passo 6.
     write:
       enabled: true               # false: i path si applicano solo su idea.yaml, lo strumento resta in lettura
       folder: ""                  # cartella/spazio dedicato nel tool per gli oggetti creati dal framework, se il tool lo supporta (es. "Product Governance")

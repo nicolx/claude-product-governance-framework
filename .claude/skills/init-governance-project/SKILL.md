@@ -146,10 +146,12 @@ per raccogliere:
    attiva di default** (sottoblocco `metrics.paths`): a ogni intake, PRD
    e Backlog Refinement suggerirà **e applicherà** alle idee i path utente
    da monitorare, trovati nel catalogo dell'analytics, leggendone una
-   baseline aggregata, e li creerà anche **nello strumento** (funnel/report
-   salvato, eventi mancanti come pianificati) — in modo solo additivo, mai
-   toccando il lavoro esistente (`metrics.paths.write`, skill
-   `path-watch` passo 6). Chiedi se tenerlo attivo (`enabled: false` per
+   baseline aggregata, e li applicherà anche **nello strumento**
+   (funnel/report salvato creato o riusato e allineato, eventi mancanti
+   come pianificati), anche su oggetti creati da altri ma solo con
+   modifiche reversibili, chiedendo conferma esplicita prima di ogni
+   azione irreversibile (`metrics.paths.write`, skill `path-watch`
+   passo 6). Chiedi se tenerlo attivo (`enabled: false` per
    spegnerlo), se lo strumento va lasciato in sola lettura
    (`write.enabled: false`) e se c'è una **cartella/spazio dedicato** dove
    mettere gli oggetti creati (`write.folder` — consigliato: tiene il
@@ -361,13 +363,15 @@ che serve da lì e chiedi solo quello che manca.
    - **fonte metriche** (`metrics.integration` `mcp:*`/`cli:*`) → i tool
      di **lettura** (elenco del catalogo: eventi, pagine/schermate, funnel
      o report salvati; metadati di un oggetto; query di aggregati) e, se
-     `metrics.paths.write.enabled` non è `false`, **solo** quelli di
-     **creazione** di funnel/report salvati e di eventi pianificati nel
-     tracking plan — le scritture additive di `path-watch`. **Non**
-     allowlistare i tool di modifica, cancellazione, archiviazione o di
-     configurazione (progetto, permessi, governance degli eventi): quando
-     `path-watch` aggiorna un oggetto suo o ne elimina uno su conferma del
-     PM, il prompt di permesso è una seconda rete di sicurezza voluta.
+     `metrics.paths.write.enabled` non è `false`, quelli delle scritture
+     **reversibili** di `path-watch`: creare e aggiornare la definizione
+     di funnel/report/dashboard, spostare in una cartella, aggiungere
+     eventi pianificati o descrizioni al tracking plan. **Non**
+     allowlistare i tool delle azioni irreversibili (eliminazione,
+     merge/blocco/rinomina di eventi e proprietà, invio o cancellazione di
+     dati, impostazioni di progetto, permessi): la skill chiede già
+     conferma esplicita prima di usarli, e il prompt di permesso di Claude
+     Code è una seconda rete di sicurezza voluta.
    - **connettori sorgente di contesto** (ogni voce `connectors:` con
      `folders:`, passo 9 — possono essere più d'uno: Drive **e**
      SharePoint) → per **ciascuno** allowlista **solo** i suoi tool di
