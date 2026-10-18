@@ -28,7 +28,11 @@ proposed_by: ""                     # nome della skill che ha generato la propos
 #   iteration.current/iteration.bucket sul suo idea.yaml (azzerandolo per
 #   le idee che erano nel piano based_on e non compaiono più). target_file
 #   punta al file di iterazione.
-# - outbound_comm: oggetto + corpo della comunicazione, e a chi
+# - outbound_comm: oggetto + corpo della comunicazione, e a chi. Se nasce
+#   da una vista di report-render: anche report_ref (il path in
+#   product/reports/{vista}/{periodo}.md) e destination (dove il PM la
+#   pubblica). Il framework non invia né pubblica: dopo l'approvazione lo
+#   fa il PM (playbook, "Modelli di reporting")
 # - strategic_exception_flag: la nuova voce da appendere a
 #   strategic_exceptions di un'idea (es. invoked_at_stage:
 #   backlog_refinement, rilevata da backlog-refinement durante il Backlog

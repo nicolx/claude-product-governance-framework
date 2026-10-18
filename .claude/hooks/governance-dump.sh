@@ -19,6 +19,7 @@
 #   governance-dump.sh pending       # contenuto di product/approvals/pending/*.yaml
 #   governance-dump.sh reference     # product/reference/*.yaml
 #   governance-dump.sh delivery      # delivery-watch.yaml + product-lines.yaml + le idea.yaml (per delivery-watch)
+#   governance-dump.sh reports       # viste dichiarate + ultimi report + tutte le fonti dei modelli (per report-render)
 #
 # SOLA LETTURA: non scrive niente, non fa commit, non tocca git. Stampa su
 # stdout. No-op (exit 0, nessun output) se non c'è una cartella product/
@@ -98,6 +99,27 @@ emit_reference() {
   emit_file "product/reference/product-lines.yaml"
   emit_file "product/reference/friction-log.yaml"
   emit_file "product/reference/delivery-watch.yaml"
+  emit_file "product/reference/reporting-models.yaml"
+}
+
+emit_latest_snapshot() {
+  # l'ultimo snapshot di roadmap approvato
+  local f
+  [ -d "product/roadmap/snapshots" ] || return 0
+  f="$(find product/roadmap/snapshots -maxdepth 1 -type f -name '*.yaml' 2>/dev/null | sort | tail -n 1)"
+  [ -n "$f" ] && emit_file "$f"
+}
+
+emit_reports_index() {
+  # per ogni vista in product/reports/, il periodo dell'ultimo report generato
+  # (serve a capire quali viste sono in scadenza — non il contenuto)
+  local d last
+  [ -d "product/reports" ] || return 0
+  printf '\n━━━ product/reports (ultimo report per vista) ━━━\n'
+  find product/reports -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort | while IFS= read -r d; do
+    last="$(find "$d" -maxdepth 1 -type f -name '*.md' 2>/dev/null | sort | tail -n 1)"
+    printf '%s: %s\n' "${d#product/reports/}" "${last:+$(basename "$last" .md)}"
+  done
 }
 
 footer() {
@@ -121,6 +143,7 @@ case "$MODE" in
     emit_glob "product/prds" 'measurement*.yaml'
     emit_iterations
     emit_pending
+    emit_reports_index
     footer
     ;;
   backlog)
@@ -160,8 +183,18 @@ case "$MODE" in
     emit_ideas
     footer
     ;;
+  reports)
+    printf '# governance-dump: reports (report-render) — SOLA LETTURA\n'
+    emit_reference
+    emit_reports_index
+    emit_ideas
+    emit_glob "product/prds" 'measurement*.yaml'
+    emit_iterations
+    emit_latest_snapshot
+    footer
+    ;;
   *)
-    echo "Uso: governance-dump.sh sweep|backlog|ideas [--all]|measurements|iterations|pending|reference|delivery" >&2
+    echo "Uso: governance-dump.sh sweep|backlog|ideas [--all]|measurements|iterations|pending|reference|delivery|reports" >&2
     exit 2
     ;;
 esac

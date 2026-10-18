@@ -186,7 +186,7 @@ Tre macro fasi di lavoro per ogni prodotto:
 | Product Backlog Refinement | Settimanale | PM, IT | Piano di Iterazione (4 bucket, diff dalla settimana prima) |
 | Preliminary analysis | ASAP dopo il Refinement | PM, IT, Domain expert | Why chiaro; decisione di procedere o abort |
 | Complete analysis | ASAP dopo la Preliminary | PM, Domain expert, Leaders | What/GTM, metriche, PRD; decisione di procedere (+ROI) |
-| Roadmap update | Settimanale | PM | Report su cosa conta per Prodotto e IT; snapshot roadmap |
+| Roadmap update | Settimanale | PM | Report su cosa conta per Prodotto e IT; snapshot roadmap; viste per gli stakeholder dai modelli di reporting dichiarati |
 | Iteration planning | Settimanale | PM, Design, IT | User stories, valutazione 80/20, Piano di Iterazione confermato/aggiustato |
 | Product Design | ASAP se necessario | Designer | Design pronto per l'implementazione |
 | Development | ASAP | PM, IT | Deliverable testato |
@@ -1765,6 +1765,95 @@ pattern trascrizione + decisioni strutturate + `.run-meta.yaml`.
 - [ ] Gli stakeholder chiave sono stati aggiornati sulle aspettative di delivery?
 - [ ] Le iniziative `idea` in iterazione hanno una stima `delivery.estimated_effort_weeks` per la contabilità di capacità?
 - [ ] La capacità dedicata a platform (debito tecnico/devops) questa iterazione è stata dichiarata esplicitamente, non lasciata implicita?
+
+## Modelli di reporting (roadmap, metriche, aggiornamenti)
+
+*"The single biggest problem in communication is the illusion that it has
+taken place." — George Bernard Shaw*
+
+Il framework produce dati affidabili — Piano di Iterazione, snapshot,
+RICE, NSM, misurazioni — ma gli stakeholder non leggono YAML. Leggono una
+roadmap, una scorecard, una mail del lunedì. Se l'istanza non dichiara
+**in che forma** quei dati arrivano a chi decide, succede una di due
+cose: nessuno li vede, oppure il PM continua a compilare a mano le slide
+e i fogli di prima, in parallelo al framework. Il doppio binario è il
+modo più rapido per far divergere ciò che si comunica da ciò che si è
+deciso. Per questo i modelli di reporting sono una scelta da fare
+**all'attivazione** dell'istanza, non un'aggiunta successiva.
+
+**Un modello è un contratto di presentazione, non una fonte di dati.**
+Ogni campo di un modello punta a un dato che il framework già tiene
+(`fields`), oppure è dichiarato come lacuna (`gaps`). Un report non si
+corregge a mano: se è sbagliato, si corregge la fonte (con la skill che
+la possiede) e si rigenera. Struttura comune:
+`framework/schema/report-model.template.md`.
+
+**Due livelli.**
+
+| Situazione | Modelli | Dove vivono |
+|---|---|---|
+| **Progetto nascente** — nessun formato aziendale da rispettare | I modelli standard del framework: Now/Next/Later, roadmap trimestrale, scorecard metriche, aggiornamento settimanale. Set minimo: Now/Next/Later + scorecard | `framework/models/` (proprietà framework, catalogo nel suo `README.md`) |
+| **Azienda strutturata** — ha già un formato di MBR, una pagina di roadmap, un foglio di KPI | I formati dell'azienda, **trascritti** come modelli aziendali con la mappatura di ogni campo sui dati del framework. Possono estendere un modello standard (`extends: framework:<id>`) | `product/reference/models/` (istanza) |
+
+I due livelli convivono: un'azienda può usare il proprio formato per la
+leadership e un modello standard per la mail settimanale.
+
+**Trascrivere un formato aziendale.** Come per il contesto aziendale,
+il file grezzo (deck, docx) non resta nel repo: il modello ne riproduce
+**sezioni e ordine**, non lo stile grafico, e tiene un puntatore
+all'originale (`original_ref`). Ogni campo si mappa su un dato del
+framework; quelli che il framework non tiene (budget speso, RAG di
+progetto, owner commerciale…) vanno in `gaps` con una gestione scelta
+dal PM — chiederlo al render, lasciarlo visibilmente vuoto, ometterlo.
+Mai un valore dedotto per riempire una casella. Se più di un terzo dei
+campi finisce in `gaps`, il formato chiede dati che il processo non
+produce: è una conversazione da fare con chi lo ha imposto, non un buco
+da tappare a ogni report.
+
+**Dichiarare le viste.** `product/reference/reporting-models.yaml`
+(template `framework/schema/reporting-models.template.yaml`) elenca le
+viste dell'istanza: per ciascuna il modello, il pubblico, i destinatari,
+la cadenza (`weekly`/`monthly`/`quarterly`/`on_demand`), la destinazione
+(dove la pubblica il PM: mail, Confluence, deck) e i filtri per Product
+Line. La crea `init-governance-project`; dopo si modifica con
+`report-render` in modalità setup, su richiesta esplicita. Un'istanza
+inizializzata prima di questa sezione non ha il file: `report-render`
+propone di crearlo, non inventa viste.
+
+**Generare e distribuire.** `report-render` compone la vista dai soli
+dati **approvati** (mai da proposte in `pending/`), verifica prima che
+le fonti non siano vecchie (piano, snapshot, ultime letture delle
+metriche) e scrive il report in `product/reports/{vista}/{periodo}.md`.
+Il report è **derivato**: scrittura diretta, rigenerabile, mai editato
+a mano. Portarlo fuori dal team è invece una comunicazione in uscita:
+per ogni vista con pubblico diverso da `team`, la skill prepara una
+proposta `outbound_comm` in `product/approvals/pending/`, e dopo
+l'approvazione è il PM a inviarla o pubblicarla. Il framework non
+pubblica mai da solo.
+
+Momenti naturali: dopo l'approvazione del Piano di Iterazione (aggiornamento
+settimanale), dopo lo snapshot (roadmap), a fine mese/trimestre. La
+sweep di apertura del Backlog Refinement segnala le viste in scadenza;
+la generazione resta un passo separato, dopo la cerimonia.
+
+**Principi delle viste standard** (valgono anche come buona pratica per
+i modelli aziendali):
+- **Nessuna data inventata.** Le uniche date esatte sono le scadenze
+  dichiarate (`mandate.due_date`, `deadline.due_date`). Una collocazione
+  in un mese si basa solo su `delivery.estimated_effort_weeks` e porta la
+  dicitura "stima"; le iniziative non dimensionate si elencano a parte.
+- **L'ordine è quello del RICE e del Piano**, non quello di chi chiede
+  più forte: Next e Later si leggono dal Piano di Iterazione e dal
+  backlog ordinato.
+- **Una metrica senza lettura recente si dichiara vecchia**, non si
+  presenta come attuale.
+
+**Checklist operativa**
+- [ ] All'attivazione l'istanza ha dichiarato almeno una vista di roadmap e una di metriche (o ha detto esplicitamente perché no)?
+- [ ] Ogni modello aziendale ha tutti i campi mappati su un dato del framework o dichiarati in `gaps`?
+- [ ] I report distribuiti sono passati da `pending/` come `outbound_comm`?
+- [ ] Le viste in scadenza segnalate dal Backlog Refinement sono state generate?
+- [ ] Nessuno compila più a mano, in parallelo, la roadmap o la scorecard che il framework genera?
 
 ## Product Design, development and rollout
 

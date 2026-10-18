@@ -206,6 +206,37 @@ per raccogliere:
     di performance. Vedi playbook, "Team di sviluppo e staffing di un PRD
     (`team-fit`)".
 
+11. **Modelli di reporting** — in che forma i dati del framework
+    arrivano a chi decide (roadmap, metriche, aggiornamenti). **Non
+    saltare questo passo**: senza viste dichiarate il framework produce
+    dati che nessuno vede, e il PM finisce a compilare a mano le slide di
+    prima in parallelo (playbook, "Modelli di reporting"). Chiedi prima:
+    *"L'azienda ha già formati che dovete rispettare — una roadmap per la
+    leadership, un deck di MBR, una pagina Confluence, un foglio di
+    KPI?"*
+    - **Progetto nascente, nessun formato**: proponi il set minimo
+      standard — `roadmap-now-next-later` + `metriche-scorecard` — e
+      mostra il resto del catalogo (`framework/models/README.md`:
+      `roadmap-trimestrale`, `aggiornamento-settimanale`). Per ogni
+      vista scelta chiedi pubblico, destinatari, cadenza, destinazione
+      (dove la pubblicherà il PM) e Product Line.
+    - **Azienda strutturata, formati esistenti**: per ciascun formato
+      fatti dare il file (droppato in conversazione) o il link, poi
+      trascrivilo come modello aziendale in
+      `product/reference/models/<id>.md` seguendo la modalità setup di
+      `report-render` ("Trascrivi un modello aziendale"): sezioni e
+      ordine del formato, mappatura di ogni campo sui dati del framework,
+      campi senza fonte in `gaps` con la gestione scelta dal PM. Se il
+      formato è lungo o il PM non lo ha a portata di mano, dichiara la
+      vista su un modello standard come ponte e annota in `note` che va
+      sostituita dal modello aziendale — **non bloccare
+      l'inizializzazione**.
+    - I due casi convivono (formato aziendale per la leadership, modello
+      standard per la mail settimanale).
+    Obiettivo minimo: almeno una vista di roadmap e una di metriche. Se
+    il PM non ne vuole nessuna, scrivi il file con `views: []` e il
+    motivo in un commento: è una scelta, non una dimenticanza.
+
 Non forzare un ordine rigido se l'utente fornisce più informazioni insieme
 (es. incolla una trascrizione di un meeting di kickoff): estrai tutto ciò
 che serve da lì e chiedi solo quello che manca.
@@ -258,6 +289,13 @@ che serve da lì e chiedi solo quello che manca.
    vocabolario di dominio dell'istanza; lo popolano `prd-draft`,
    `idea-intake` e `inbox-triage` man mano che gli artefatti usano termini
    che un lettore esterno potrebbe non conoscere (alla conferma del PM).
+   `product/reference/reporting-models.yaml` (da
+   `framework/schema/reporting-models.template.yaml`) — le viste
+   dichiarate al passo 11, e i modelli aziendali trascritti in
+   `product/reference/models/<id>.md` (da
+   `framework/schema/report-model.template.md`). Nessun report si genera
+   all'init: i dati ancora non ci sono; il primo lo produce
+   `report-render` dopo il primo Backlog Refinement.
    Non creare qui `product/reference/nsm-tracking.yaml`: baseline e
    target delle NSM spesso richiedono un giro su DataBricks/analytics
    che non è pratico fare a metà di questa intervista — lo scaffolda la
@@ -265,6 +303,7 @@ che serve da lì e chiedi solo quello che manca.
    recuperare i valori con calma.
 5. Scaffold vuoto: `product/ideas/`, `product/prds/`,
    `product/roadmap/snapshots/`, `product/roadmap/iterations/`,
+   `product/reports/`,
    `product/ceremonies/`,
    `product/approvals/pending/`, `product/approvals/decided/`,
    `product/demos/recipes/`, `product/demos/captures/`,
@@ -336,7 +375,11 @@ che serve da lì e chiedi solo quello che manca.
   (`product/reference/annual-target.yaml`, `value: null`), materiale di
   contesto aziendale non ancora fornito se `context/` è rimasta vuota,
   **anagrafica del team non ancora popolata** se `team.yaml` ha
-  `members: []` — `team-roster` la riempie).
+  `members: []` — `team-roster` la riempie; **modelli di reporting**
+  dichiarati come ponte su un modello standard in attesa del formato
+  aziendale, o `views: []` — `report-render` in modalità setup li
+  completa). Indica quali viste sono state dichiarate e quando uscirà il
+  primo report (dopo il primo Backlog Refinement, con `report-render`).
 - Ricorda che da questo momento in poi nessuna scrittura in `product/`
   deve avvenire senza passare da `product/approvals/pending/` — vedi
   `CLAUDE.md` e `framework/playbook.md`.
