@@ -88,10 +88,15 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
      - `automated` — dipende da `metrics` in `.governance/config.yaml`
        (verificato al passo 0):
        - **`metrics.configured: true` e connettore raggiungibile** →
-         tenta la lettura dal connettore. Il *contratto di query* vero non
-         esiste ancora nel framework di base (`framework/docs/future-work.md`):
-         finché non c'è, questo caso si riduce a "chiedi al PM il valore
-         letto dal connettore".
+         se la KPI ha `data_source.path_ref`, leggi dal connettore
+         l'**aggregato** del path con quell'`id` in `monitoring.paths`
+         dell'idea (stessa forma della sua `baseline`: valore, unità,
+         finestra) — è una query mirata a un path dichiarato e verificato,
+         non una query libera (skill `path-watch`). Se il path è
+         `broken`/`to_instrument`/`removed`, non leggere: segnalalo e
+         chiedi al PM. Senza `path_ref` il *contratto di query* generale
+         non esiste ancora (`framework/docs/future-work.md`): questo caso
+         si riduce a "chiedi al PM il valore letto dal connettore".
        - **`metrics.configured: true` ma connettore irraggiungibile** →
          **non** è come `manual`: è il caso "dichiarato ma irraggiungibile"
          (playbook, "Connettori esterni…"). Segnalato già al passo 0; qui

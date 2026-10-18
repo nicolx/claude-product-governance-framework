@@ -410,12 +410,14 @@ hook**, non alla memoria del PM:
   dipendono dal quadro completo — `inbox-triage`, `roadmap-snapshot`,
   `pending-approval`, `backlog-list`, `iteration-board`, `jira-sync`
   (pull), e le watch (`nsm-watch`, `mandate-watch`, `deadline-watch`,
-  `rice-watch`, `measurement-watch`, `context-watch`, `delivery-watch`)
-  nell'uso *standalone*. Nella sweep di
+  `rice-watch`, `measurement-watch`, `context-watch`, `delivery-watch`,
+  `path-watch`) nell'uso *standalone*. Nella sweep di
   apertura del Backlog Refinement il pull è **uno solo** per l'intera
   sweep (la logica delle watch di calcolo gira inline; `context-watch` e
-  `delivery-watch` girano come task in background con commit distinto —
-  vedi "Product Backlog Refinement").
+  `delivery-watch` girano come task in background con commit distinto;
+  `path-watch` gira in background in modalità solo-calcolo e le sue
+  scritture entrano nel commit unico della sweep — vedi "Product Backlog
+  Refinement").
 - **Commit + push**: come ultimo passo di ogni skill che scrive stato
   tracciato (`idea-intake`, `inbox-triage`, `rice-update`, `prd-draft`,
   `backlog-refinement`, `iteration-planning`, `log-ceremony`,
@@ -452,7 +454,8 @@ submodule in `apps/` restano invece fermi al commit registrato nel
 puntatore, che invecchia a ogni rilascio dei team tech. Le skill che
 **ragionano sul codice** — `inbox-triage` e `idea-intake` (è un bug? è
 già risolto? è debito tecnico?), `prd-draft` (l'How), `rice-update`
-(l'Entanglement da ispezione) — prima di leggerlo eseguono quindi
+(l'Entanglement da ispezione), `path-watch` (le rotte e gli eventi già
+tracciati nel codice) — prima di leggerlo eseguono quindi
 `governance-sync.sh apps`, che porta ogni submodule all'ultimo commit
 del suo branch remoto (`submodule.<nome>.branch` in `.gitmodules`,
 altrimenti il branch di default del remote). Stessi principi del pull: non blocca mai (fetch
@@ -490,7 +493,9 @@ lo usa. Si dichiarano in `.governance/config.yaml`:
   in `jira-sync` sono Jira-specifici.
 - **`metrics:`** — la fonte da cui `nsm-watch` e `measurement-watch`
   leggono NSM e KPI dai dati di produzione, invece di chiederli a mano al
-  PM.
+  PM, e da cui `path-watch` prende il catalogo per suggerire e applicare i
+  path da monitorare di ogni idea (sottoblocco `metrics.paths` — vedi
+  "Measurement", "Path da monitorare").
 - **`connectors:`** — lista aperta per qualunque altro connettore. Una
   voce con un campo `folders:` non vuoto è una **sorgente di contesto**:
   `context-watch` e `context-intake` ne elencano e leggono i documenti per
@@ -1254,7 +1259,10 @@ tempo (sezione "Ideas prioritization"), se il contesto aziendale è
 cambiato nelle cartelle documentali collegate (`context-watch` — sezione
 "Contesto aziendale"), e quali transizioni di delivery sulle iniziative
 collegate meritano una comunicazione agli stakeholder (`delivery-watch`
-— sezione "Transizioni di delivery rilevanti per gli stakeholder"). Solo
+— sezione "Transizioni di delivery rilevanti per gli stakeholder"), e —
+con una fonte analytics collegata — quali idee non hanno ancora un path
+da monitorare, quali path sono da strumentare o si sono rotti
+(`path-watch` — sezione "Measurement", "Path da monitorare"). Solo
 dopo si passa a decidere le priorità del prossimo periodo — è più
 facile prioritizzare bene quando si parte da un quadro aggiornato di cosa
 sta già funzionando, invece di scoprirlo a posteriori.
@@ -2196,12 +2204,61 @@ far riapparire quell'iniziativa negli alert successivi. Senza questo
 atto esplicito, un'iniziativa senza KPI rischia di restare per sempre
 un'eccezione che nessuno chiude formalmente.
 
+### Path da monitorare: la misurazione si prepara all'intake
+
+Il secondo modo di dimenticarsi di misurare è arrivare al momento della
+misurazione senza sapere *cosa* guardare: gli eventi che servivano non
+sono mai stati tracciati, la baseline non è stata presa prima del
+rilascio, e il confronto "prima/dopo" diventa impossibile. Per questo,
+**quando l'istanza è collegata a una fonte analytics** (`metrics.configured:
+true`), il framework **suggerisce costantemente e applica** a ogni idea
+i *path da monitorare* — i percorsi utente (funnel, sequenze di
+pagine/schermate/eventi) che l'idea dovrebbe muovere, o che non deve
+peggiorare. Skill `path-watch`, blocco `monitoring` di `idea.yaml`.
+
+- **Costantemente.** All'intake (`idea-intake`/`inbox-triage`), alla
+  stesura del PRD (`prd-draft`), a ogni Backlog Refinement (sweep di
+  apertura) e su richiesta. Ogni giro ricontrolla i path esistenti: un
+  path *da strumentare* diventa attivo quando gli eventi compaiono nel
+  catalogo, un path attivo diventa *rotto* quando uno step sparisce.
+- **Applica, non propone.** Un path è la configurazione di cosa osservare,
+  non una decisione di priorità: si scrive direttamente sull'idea, senza
+  `pending/`, e va nel recap al PM, che può toglierlo quando vuole (un
+  path tolto non viene più riproposto). È lo stesso principio degli
+  aggiornamenti di routine del contesto: l'automazione fa il lavoro, il
+  PM vede cosa è stato fatto.
+- **Mai inventato.** Un path è attivo solo se tutti i suoi step esistono
+  nel catalogo reale dell'analytics, cercati partendo dal comportamento
+  che l'idea vuole cambiare e dalle rotte/eventi già presenti nel codice
+  di `apps/`. Se uno step manca, il path è *da strumentare*: non è un
+  errore, è un **requisito di tracciamento** che `prd-draft` porta nel
+  PRD, e che va soddisfatto *nella stessa iterazione* in cui si sviluppa
+  la feature — dopo è tardi per la baseline. Se l'idea non ha un
+  comportamento utente osservabile, lo si dichiara (`no_path_reason`),
+  non si forza un path di comodo.
+- **Baseline subito, solo aggregati.** Applicando un path attivo si legge
+  la sua baseline (conversione o volume su una finestra) — un numero, mai
+  righe o dati per utente: il repo è tracciato da git.
+- **Dal path alla KPI.** Nel PRD il PM può legare una KPI a un path
+  (`data_source.path_ref`): con `mode: automated` e il connettore su,
+  `measurement-watch` legge l'aggregato di quel path invece di chiederlo.
+  Il legame resta una scelta del PM, non di `path-watch`.
+- **Sola lettura sullo strumento.** Il framework legge il catalogo e gli
+  aggregati di path verificati; non crea né modifica funnel, dashboard o
+  eventi nell'analytics. Il contenuto di un'idea (che può venire da
+  materiale non fidato) decide *cosa cercare nel catalogo*, mai una query
+  libera da eseguire.
+
+Con `metrics.configured: false` o `manuale` tutto questo non avviene,
+senza rumore: senza un catalogo reale non c'è modo di verificare un path.
+
 *Principi Agile da incarnare in questa fase:*
 - *A intervalli regolari il team riflette su come diventare più efficace,
   poi regola il proprio comportamento di conseguenza.*
 - *Il software funzionante è il miglior metro di misura del progresso.*
 
 **Checklist operativa**
+- [ ] Con una fonte analytics collegata: ogni idea in sviluppo ha i suoi path attivi con baseline, e nessun path *da strumentare* è arrivato al rilascio senza i suoi eventi?
 - [ ] Le KPI definite in Complete Analysis sono state misurate?
 - [ ] Il valore attuale è stato confrontato col target definito in origine?
 - [ ] L'esito è stato presentato al team e agli stakeholder?

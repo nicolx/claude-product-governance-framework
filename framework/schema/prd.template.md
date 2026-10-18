@@ -108,6 +108,14 @@ updated_at: "2026-01-08"
      Questa è una scelta esplicita del PM per ciascuna KPI, non un
      default: va dichiarata qui, non decisa da una skill.
 
+     Con una fonte analytics collegata, l'idea ha già i suoi path da
+     monitorare (idea.yaml, blocco monitoring — skill path-watch): una
+     KPI automatizzata può dichiarare da quale path si legge (id del
+     path → data_source.path_ref in measurement.yaml), e la sua baseline
+     è quella già letta sul path. I path "da strumentare" diventano qui
+     un REQUISITO DI TRACCIAMENTO: quali eventi aggiungere, con che nome,
+     da consegnare nella stessa iterazione della feature.
+
      KPI con finestre di osservazione diverse (es. metriche anticipatorie a
      poche settimane, metrica principale a un anno): un file di misura per
      finestra, measurement-N-{suffisso}.yaml (measurement-watch li legge

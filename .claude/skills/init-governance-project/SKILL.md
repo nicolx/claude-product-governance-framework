@@ -142,7 +142,13 @@ per raccogliere:
    ad-hoc…): vanno nella lista `connectors` con gli stessi campi. Se non
    c'è nulla: `metrics.configured: false`, non scrivere il resto del
    blocco — `nsm-watch`/`measurement-watch` chiederanno i valori
-   al PM. **Nessuna credenziale nel config** (né altrove nel repo
+   al PM. Se c'è una fonte collegata, spiega che **`path-watch` si
+   attiva di default** (sottoblocco `metrics.paths`): a ogni intake, PRD
+   e Backlog Refinement suggerirà **e applicherà** alle idee i path utente
+   da monitorare, trovati nel catalogo dell'analytics, leggendone una
+   baseline aggregata — mai scritture sullo strumento. Chiedi se tenerlo
+   attivo (`enabled: false` per spegnerlo) e lascia i default degli altri
+   campi salvo indicazioni. **Nessuna credenziale nel config** (né altrove nel repo
    tracciato) — solo il *nome* e i *comandi*.
 8. **Eventuali altre configurazioni rilevanti** — canale Slack/Teams per
    comunicazioni, altro che l'utente ritenga utile avere a portata di
@@ -346,6 +352,11 @@ che serve da lì e chiedi solo quello che manca.
    - connettore `cli:<nome>` → `Bash(<nome> <sottocomando>:*)` per i
      sottocomandi di ricerca/lettura e creazione ticket.
    - connettore `manuale` o assente → non scrivere nulla qui.
+   - **fonte metriche** (`metrics.integration` `mcp:*`/`cli:*`) → **solo**
+     i tool di lettura: elenco del catalogo (eventi, pagine/schermate,
+     funnel o report salvati) e query di aggregati. **Mai** quelli che
+     creano/modificano funnel, dashboard, eventi o coorti: `path-watch`,
+     `nsm-watch` e `measurement-watch` leggono e basta.
    - **connettori sorgente di contesto** (ogni voce `connectors:` con
      `folders:`, passo 9 — possono essere più d'uno: Drive **e**
      SharePoint) → per **ciascuno** allowlista **solo** i suoi tool di

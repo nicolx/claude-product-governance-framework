@@ -180,6 +180,23 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
      come intento dichiarato: `measurement-watch` si comporterà come
      manuale finché quell'integrazione non esiste davvero, senza
      bloccare la stesura del PRD per questo.
+   - **Path da monitorare** (solo con `metrics.configured: true`, non
+     `manuale`, e `metrics.paths.enabled` non `false`). Prima di scrivere la
+     sezione *Metriche*, riesegui inline la logica di `path-watch` (passi
+     1-5) sull'idea, questa volta contro l'How reale del PRD: i path già
+     applicati all'intake si rifiniscono, quelli nuovi si **applicano
+     direttamente** su `idea.yaml` (nessuna conferma — playbook,
+     "Measurement", "Path da monitorare"). Poi:
+     - per ogni KPI, **proponi** il path `active` che la misura (e la sua
+       baseline come `baseline` della KPI); se il PM conferma, scrivi
+       `data_source.path_ref` e dichiaralo nella sezione *Metriche* — il
+       legame KPI→path resta una scelta sua, come `mode`;
+     - ogni path `to_instrument` diventa un **requisito di tracciamento**
+       nel PRD (eventi mancanti, nome atteso, dove nel codice), da
+       consegnare con la feature: senza, la misurazione partirà senza
+       baseline. Mettilo anche tra le azioni aperte del riepilogo;
+     - se il connettore è giù, i path restano quelli dell'intake e il
+       giro è **rimandato** nel riepilogo — non bloccare la stesura.
    - **Senza KPI di business** (compliance, oppure `discovery`, oppure un PRD
      di costruzione o di modello che abilita le KPI di un altro PRD): **non
      forzare una metrica proxy**. Scrivi il motivo nel PRD, lascia `kpis: []`
@@ -267,7 +284,9 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
       residue accettate, "potrebbe iniziare domani?" per ciascun lettore;
     - **cosa hai aggiunto rispetto alla fonte** (P5) e quali decisioni ha
       preso il PM;
-    - **azioni aperte del PM** (materiali da allegare, date, verifiche);
+    - **azioni aperte del PM** (materiali da allegare, date, verifiche,
+      eventi da strumentare per i path `to_instrument`);
+    - path da monitorare applicati/rifiniti e KPI legate a un path;
     - su quale commit di ogni app pertinente si basa l'How, e le app che
       `governance-sync.sh apps` non è riuscito ad aggiornare.
 

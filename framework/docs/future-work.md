@@ -182,6 +182,29 @@ agnostico. Punti fermi già decisi (da rispettare quando si progetta):
   chiesto di non depotenziare l'automazione con un controllo ridondante
   per ogni singola lettura).
 
+**Primo pezzo del contratto: i path da monitorare — FATTO** (2026-10-18).
+Skill `path-watch`, blocco `monitoring` di `idea.yaml`, `metrics.paths`
+in config, `data_source.path_ref` in `measurement.yaml`. Con la fonte
+collegata, ogni idea riceve (applicati senza conferma, recap al PM) i
+path utente verificati nel catalogo dell'analytics, con una baseline
+aggregata; `measurement-watch` legge l'aggregato del path legato a una
+KPI. Rispetta i punti fermi sopra: le sole letture sono l'elenco del
+catalogo e l'aggregato di un path i cui step esistono nel catalogo — mai
+una query libera derivata dal contenuto di un'idea.
+
+Restano fuori scope, da rivedere se emerge la domanda:
+
+- **Scrittura sullo strumento di analytics.** Creare il funnel/report
+  salvato per un path nuovo, o la definizione degli eventi mancanti nel
+  piano di tracciamento del tool. Oggi il connettore metriche è in sola
+  lettura e `path-watch` riusa solo ciò che esiste (`analytics_ref`); una
+  scrittura verso il tool cambierebbe la superficie di rischio del
+  connettore e andrebbe decisa esplicitamente (permessi dedicati, forse
+  passaggio da `pending/`).
+- **Strumentazione nel codice.** Un path `to_instrument` diventa un
+  requisito di tracciamento nel PRD; aprire la card dedicata sul tracker o
+  proporre la patch in `apps/` è lavoro del team, non del framework.
+
 **Ancora da capire (la "giusta astrazione"):** il *contratto* — query in
 ingresso (mirata a una KPI/NSM dichiarata, mai libera), aggregato in
 uscita (mai righe grezze) — che qualunque connettore deve rispettare,

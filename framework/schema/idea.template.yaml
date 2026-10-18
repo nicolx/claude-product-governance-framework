@@ -481,3 +481,48 @@ links:
   # alert.discovery_focus_confirmed), per poter verificare più avanti se
   # il focus ha davvero funzionato. Vuoto per la stragrande maggioranza
   # delle idee — non forzarlo.
+
+# --- Path da monitorare (skill path-watch) ---
+#
+# Solo se l'istanza ha una fonte analytics collegata (metrics.configured:
+# true in .governance/config.yaml, metrics.paths.enabled non false). I
+# percorsi utente — funnel, sequenze di pagine/schermate/eventi — che
+# l'idea dovrebbe muovere (o non deve peggiorare), trovati nel CATALOGO
+# REALE dell'analytics e nel codice di apps/, mai inventati. Vedi
+# playbook, "Measurement", sottosezione "Path da monitorare".
+#
+# Suggeriti E APPLICATI da path-watch (all'intake, in prd-draft, a ogni
+# sweep del Backlog Refinement, standalone): configurazione di cosa
+# osservare, non una decisione di priorità — scrittura diretta, mai da
+# product/approvals/pending/, recap al PM. Il PM ne toglie uno con
+# status: removed + removed_reason (chiesto, mai presunto): un path
+# removed non viene più riproposto.
+#
+# baseline è sempre un AGGREGATO (numero + unità + finestra), mai righe
+# grezze né dati per utente: questo file è tracciato da git.
+# Una KPI di measurement*.yaml può puntare a un path con
+# data_source.path_ref = id — scelta del PM nel PRD, non di path-watch.
+monitoring:
+  paths: []
+  no_path_reason: null              # perché non c'è un path osservabile, se paths è vuoto dopo un giro (es. "back-office senza telemetria") — mai un path di comodo
+  last_checked_at: null             # ultimo giro di path-watch su questa idea
+  # Esempio di singolo path:
+  # - id: "caricamento-ricevuta"     # slug stabile, unico nell'idea — è ciò che path_ref referenzia
+  #   label: ""                       # in linguaggio piano: "dall'apertura della fotocamera alla ricevuta salvata"
+  #   kind: funnel                    # funnel | page_path | screen_flow | event
+  #   steps: []                       # nomi ESATTI come compaiono nel catalogo analytics, in ordine
+  #   analytics_ref: null             # id/nome del funnel o report già salvato nel tool, se esiste (riusato, mai creato)
+  #   rationale: ""                   # perché questo path c'entra con l'idea: comportamento da muovere, o guardia
+  #   evidence: ""                    # dove è stato trovato: voce di catalogo + file/rotta in apps/
+  #   status: active                  # active | to_instrument | broken | removed
+  #   # active        -> tutti gli step esistono nel catalogo
+  #   # to_instrument -> almeno uno step manca: requisito di tracciamento per il PRD, ricontrollato a ogni giro
+  #   # broken        -> era active, uno step è sparito dal catalogo (rinominato/rimosso) — da sistemare prima della misurazione
+  #   # removed       -> tolto dal PM, non più riproposto
+  #   missing_steps: []               # per to_instrument/broken
+  #   broken_since: null
+  #   baseline: null                  # {value, unit, window_days, read_at} — aggregato, oppure null se il connettore non lo calcola
+  #   applied_by: path-watch          # path-watch | pm
+  #   applied_at: null
+  #   last_checked_at: null
+  #   removed_reason: null

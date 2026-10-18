@@ -338,6 +338,17 @@ Fuori da questa modalità, la skill si comporta come descritto nei
    riepilogo; se c'è un'integrazione (email) chiedi conferma esplicita
    per ogni singolo invio.
 
+8b. **Path da monitorare.** Se `.governance/config.yaml` ha
+   `metrics.configured: true` (integrazione non `manuale`) e
+   `metrics.paths.enabled` non è `false`, esegui **inline** la logica di
+   `path-watch` (passi 2-5) su ogni unità appena creata — tranne
+   `declined`/`needs_clarification` — e scrivi il blocco `monitoring` su
+   `idea.yaml` **senza chiedere conferma**: i path si applicano, non si
+   propongono (playbook, "Measurement", "Path da monitorare"). Verifica
+   prima il connettore con `metrics.probe`; se è giù, il giro di path è
+   **rimandato** (dillo nel riepilogo), l'intake procede. Con
+   `configured: false`/`manuale`, salta senza rumore.
+
 9. **Non serve passare da `product/approvals/pending/` per la creazione
    di una nuova idea** (a differenza degli aggiornamenti a idee/roadmap
    già esistenti): l'intake è la prima cattura, non ancora una decisione
@@ -345,7 +356,9 @@ Fuori da questa modalità, la skill si comporta come descritto nei
    contenuto creato — **se sono state create più unità dalla stessa
    fonte, elencale tutte insieme nel riepilogo finale**, non una alla
    volta senza collegarle — prima di considerare il passo concluso.
-   Includi nel riepilogo le bozze di `requester_reply` generate. **Per ogni
+   Includi nel riepilogo le bozze di `requester_reply` generate e il recap
+   dei path applicati al passo 8b (attivi con baseline, da strumentare,
+   rimandati). **Per ogni
    bug**, di' esplicitamente se il ticket è stato aperto (con `card_id`/URL)
    o se resta un'**AZIONE NON COMPLETATA** perché il connettore era
    giù/`manuale` — in quel caso metti in evidenza il testo pronto e il

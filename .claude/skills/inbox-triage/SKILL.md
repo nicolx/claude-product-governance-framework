@@ -209,7 +209,9 @@ soli non coprono. In sintesi:
      `team.yaml` popolato — mai presunti, vedi `idea-intake` passo 4) e
      **la bozza di risposta al richiedente** (`requester_reply` — vedi
      `idea-intake` passo 8 e playbook, "Chiudere il loop col
-     richiedente"). Materiale grezzo: vedi la regola sul condiviso al
+     richiedente") e **i path da monitorare** applicati senza conferma
+     se c'è una fonte analytics collegata (`idea-intake` passo 8b, skill
+     `path-watch`). Materiale grezzo: vedi la regola sul condiviso al
      passo 3 se questa unità è una tra più generate dallo stesso elemento.
 
    - **Non è un'idea (scarto al triage)** — se l'elemento non è qualcosa
@@ -334,7 +336,9 @@ soli non coprono. In sintesi:
    elemento**, non elencarle come se fossero scollegate. **Elenca tutte
    le bozze di `requester_reply` generate** (idea normale, SE, decline,
    clarification), pronte per la revisione e l'invio manuale del PM — non
-   inviarne nessuna in automatico. **Per ogni bug**, di' se il ticket è
+   inviarne nessuna in automatico. Riporta il recap dei **path da
+   monitorare** applicati alle nuove idee (attivi con baseline, da
+   strumentare, rimandati se il connettore metriche era giù). **Per ogni bug**, di' se il ticket è
    stato aperto (con `card_id`/URL) o se resta un'**AZIONE NON COMPLETATA**
    (connettore giù/`manuale`): in quel caso metti in evidenza il testo
    pronto e il promemoria di rilanciare `jira-sync`. Indica su quale

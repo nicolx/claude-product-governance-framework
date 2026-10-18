@@ -94,6 +94,15 @@ metrics:
   probe: ""                       # come verificarla (prefisso tool MCP, o un comando/chiamata read-only rapida)
   reauth: ""                      # comando per rimetterla su quando scade. Alcuni connettori (login OAuth interattivo) scadono a OGNI sessione: check-connectors.sh mostra questo comando all'avvio.
   note: ""                        # scope: quali metriche/dataset copre, owner del dato, quirk
+  # Path da monitorare (skill path-watch): con configured: true il framework
+  # suggerisce E applica a ogni idea i percorsi utente da osservare, presi
+  # dal catalogo reale dell'analytics — vedi playbook, "Measurement",
+  # sottosezione "Path da monitorare". Sempre in sola lettura sul tool.
+  paths:
+    enabled: true                 # false per spegnerlo pur avendo la fonte metriche collegata
+    max_per_idea: 3               # path principale + eventuali guardie: meglio uno giusto che tre di contorno
+    baseline_window_days: 28      # finestra dell'aggregato di baseline letto all'applicazione
+    recheck_days: 28              # ogni quanto ricontrollare un path anche se nulla sembra cambiato
 
 # --- Altri connettori (design, SQL ad-hoc, sorgenti di contesto, ecc.) ---
 # Stessa disciplina. check-connectors.sh li segnala a inizio sessione.

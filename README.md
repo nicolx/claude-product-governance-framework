@@ -69,7 +69,7 @@ inizializzata) e scaffolda `apps/` e `product/`.
     │                              allegati, immagini) si butta qui; la skill inbox-triage la
     │                              analizza, classifica e smista, poi la svuota
     ├── ideas/{YYYY-MM-DD}-{slug}/
-    │   ├── idea.yaml
+    │   ├── idea.yaml           (con analytics collegato: blocco monitoring — i path utente da monitorare, suggeriti e applicati da path-watch)
     │   └── source/            (email, trascrizioni, allegati — arrivati via inbox-triage o diretti)
     ├── prds/{slug}/
     │   ├── prd.md              (o prd-1-*.md, prd-2-*.md se spaccato)

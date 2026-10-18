@@ -38,6 +38,9 @@ not_applicable_reason: null        # perché non c'è una KPI di business, se kp
 #   data_source:
 #     mode: manual                   # manual | automated — scelta esplicita del PM, dichiarata nel PRD stesso (sezione Metriche), mai presunta da questa skill
 #     description: ""                 # come si recupera il dato — es. "DataBricks, query conversion funnel" o "report manuale mensile da Sales"
+#     path_ref: null                  # opzionale: id di un path in monitoring.paths dell'idea (skill path-watch) da cui la KPI si legge.
+#                                     # Con mode: automated e connettore raggiungibile, measurement-watch legge l'aggregato di quel path
+#                                     # invece di chiedere il valore al PM. Scelto dal PM nel PRD, mai collegato da path-watch da solo.
 #     # Se mode: manual, la KPI non entra mai nell'osservazione
 #     # automatica: measurement-watch chiede sempre il valore al PM (comportamento di oggi).
 #     # Se mode: automated, dipende dal blocco `metrics` in .governance/config.yaml

@@ -82,7 +82,14 @@ piano passa **sempre** da `product/approvals/pending/`
         `metrics.reauth` dichiarato in config, chiedi al PM. Se si
         procede, le letture NSM/KPI del run le dà il PM a mano e i punti
         "lettura automatica saltata" vanno nel riepilogo come
-        **rimandati**.
+        **rimandati** (insieme al giro di `path-watch`). Se risponde e
+        `metrics.paths.enabled` non è `false`, **lancia come task in
+        background** `path-watch` in modalità **solo-calcolo** sulle idee
+        attive (catalogo analytics + `apps/` → path da applicare,
+        promuovere, segnalare rotti, con le baseline): restituisce le
+        scritture proposte e **non tocca i file** — le applica il punto f,
+        nel commit unico. `manuale`/`configured: false` → nessun giro di
+        path, senza rumore.
       - **`jira`** (`atlassian-mcp`/`cli:*`): idem. Se risponde, **lancia
         come task in background** (a) la riconciliazione Jira (`jira-sync`
         modalità Riconciliazione — idee mai passate dal RICE il cui lavoro
@@ -124,7 +131,17 @@ piano passa **sempre** da `product/approvals/pending/`
          (`waived`) — e solo allora si scrive il cambio di stato
          corrispondente. Playbook, "Avvisare gli stakeholder della
          conclusione".
-      7. **Viste in scadenza** — dalle viste dichiarate in
+      7. **Path da monitorare** (solo se il task `path-watch` del punto a
+         è partito; lo raccogli qui, non al punto e) — il recap di
+         `path-watch` passo 6: idee senza path, path applicati in questo
+         giro con la baseline, **da strumentare** (in evidenza quelli su
+         idee `in_development`: gli eventi vanno aggiunti in questa
+         iterazione), promossi, **rotti**, KPI collegabili a un path. I
+         path si applicano senza conferma (playbook, "Path da
+         monitorare"): al checkpoint il PM può solo toglierne uno
+         ("togli il path {id} da {ID}" → `status: removed` +
+         `removed_reason` chiesto a lui).
+      8. **Viste in scadenza** — dalle viste dichiarate in
          `product/reference/reporting-models.yaml` e dall'indice
          "ultimo report per vista" in fondo al dump: quelle con `cadence`
          diversa da `on_demand` senza un report per il periodo corrente.
@@ -136,8 +153,8 @@ piano passa **sempre** da `product/approvals/pending/`
          "Modelli di reporting").
       Le **formule sono quelle documentate nelle rispettive skill**
       (`nsm-watch`, `measurement-watch`, `mandate-watch`, `deadline-watch`,
-      `rice-watch`) — applicale, non reinventarle; se un caso è ambiguo
-      apri quella skill.
+      `rice-watch`, `path-watch`) — applicale, non reinventarle; se un caso
+      è ambiguo apri quella skill.
 
    d. **Checkpoint dopo ogni blocco (diritto di parola).** Non calcolare
       tutti i blocchi e poi chiedere: dopo *ciascuno*, prima del
@@ -177,7 +194,8 @@ piano passa **sempre** da `product/approvals/pending/`
 
    f. **Una sola scrittura, un solo commit.** Applica *tutti* i valori
       calcolati (`escalation_status`, `rice_status.*`, `alert.*`,
-      `closure`) e *tutte* le azioni di checkpoint concordate, poi:
+      `closure`, i blocchi `monitoring` restituiti da `path-watch`) e
+      *tutte* le azioni di checkpoint concordate, poi:
       `bash .claude/hooks/governance-sync.sh push "backlog-refinement: sweep di apertura <settimana>" product/`.
       Un commit per l'intera sweep, non uno per watch né uno per
       checkpoint.
@@ -208,8 +226,8 @@ piano passa **sempre** da `product/approvals/pending/`
       attivo, salta senza rumore.
 
    i. **Passa a `log-ceremony`** i riepiloghi consolidati (un blocco per
-      watch, **più** il recap di `context-watch` e quello di
-      `delivery-watch`), le azioni di checkpoint (una `decision`
+      watch, **più** il recap di `context-watch`, quello di
+      `delivery-watch` e quello di `path-watch`), le azioni di checkpoint (una `decision`
       ciascuna, con `impacts.idea_ids`), e l'esito della riconciliazione
       Jira.
 
