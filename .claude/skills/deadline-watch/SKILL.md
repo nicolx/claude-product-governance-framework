@@ -103,7 +103,8 @@ skill esiste per evitare.
    colonna: l'identificatore** — `short_ref` se assegnato, altrimenti lo
    slug `idea_id` (mai vuoto — vedi playbook, "Ogni elenco prodotto dal
    sistema è indirizzabile"), così il PM può riferirsi a una riga con
-   "{ID}". Poi `title`, `due_date`, `escalation_status`.
+   "{ID}". Poi `summary`, R · I · C · E e RICE ("—" e il motivo se senza
+   RICE — playbook, "Ogni riga che parla di un'idea si capisce da sola"), `due_date`, `escalation_status`.
 
 6. Se chiamata da `backlog-refinement`, restituisci il riepilogo perché venga
    incluso nel log della cerimonia — non scrivere tu stessa in

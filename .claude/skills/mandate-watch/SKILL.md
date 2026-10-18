@@ -82,7 +82,8 @@ agire da sola sulla priorità.
    rilevante). **Prima colonna: l'identificatore** — `short_ref` se
    assegnato, altrimenti lo slug `idea_id` (mai vuoto — vedi playbook,
    "Ogni elenco prodotto dal sistema è indirizzabile"), così il PM può
-   riferirsi a una riga con "{ID}". Poi `mandated_by`, `due_date`,
+   riferirsi a una riga con "{ID}". Poi `summary`, R · I · C · E e RICE
+   ("—" / `mandate` se senza RICE — playbook, "Ogni riga che parla di un'idea si capisce da sola"), `mandated_by`, `due_date`,
    `analysis_start_by`, lo `status` corrente dell'idea. **Solo
    segnalazione — nessuna azione automatica**: non proporre né inviare
    comunicazioni di escalation da questa skill, la decisione su come/se

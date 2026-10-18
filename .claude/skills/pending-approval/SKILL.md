@@ -42,10 +42,15 @@ tabella** con una riga per voce e queste colonne:
   elenco prodotto dal sistema è indirizzabile".
 - **`summary`** dell'idea — se vuoto, "⚠ summary mancante", non il
   `title`.
+- **R · I · C · E** e **RICE** *correnti* — dall'ultima voce approvata
+  di `rice_history`; "—" e il motivo (`mandate`/`platform`/`bug`/`SE`/
+  `senza RICE`) se non c'è (playbook, "Ogni riga che parla di un'idea si capisce da sola").
 - **Tipo** di proposta (`rice_diff`, `strategic_exception_flag`, …).
-- **Score proposto** — per `rice_diff`: lo score del `payload` e, se
-  l'idea ha già una voce in `rice_history`, il delta vs. lo score
-  corrente (es. `480 (+120)`). Per gli altri tipi: "—".
+- **Proposto** — per `rice_diff`: i quattro parametri e lo score del
+  `payload` nella stessa forma compatta (`R4 I6 C8 E2 → 96`), col delta
+  dello score vs. quello corrente (es. `480 (+120)`); marcato come
+  proposto, mai mescolato nelle colonne correnti. Per gli altri tipi:
+  "—".
 - **Scadenza** — se l'idea ha `deadline.due_date` (o, per un `mandate`,
   `mandate.due_date`), mostrala con il suo `escalation_status`
   (`due_soon`/`overdue` in evidenza). "—" se non c'è.

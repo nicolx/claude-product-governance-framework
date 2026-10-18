@@ -52,6 +52,7 @@ analysis_todo:
     idea_id: ""                  # slug/id canonico della cartella idea
     summary: ""                  # da idea.summary — cosa c'è da fare, in chiaro
     rice_score: null             # dall'ultima voce di rice_history; null se senza RICE (caso riconciliazione Jira)
+    rice_components: null        # { reach: , impact: , confidence: , entanglement: } dall'ultima voce approvata di rice_history (reach_points/impact_points/confidence_score/entanglement_score); null se senza RICE. Le viste mostrano sempre R·I·C·E + score accanto a summary (playbook, "Ogni riga che parla di un'idea si capisce da sola")
     why_now: ""                  # perché entra ORA (es. "1° per RICE, mai avviata" / "richiesto da stakeholder X per la finestra Q3")
     carried_from: null           # settimana ISO se era già in questo bucket nel piano based_on
     prd_id: null
@@ -63,6 +64,8 @@ analysis_in_progress:
   - idea_ref: ""
     idea_id: ""
     summary: ""
+    rice_score: null
+    rice_components: null
     since: ""                    # settimana ISO in cui l'analisi è iniziata
     carried_from: null
     prd_id: null
@@ -75,6 +78,9 @@ in_development:
 # card nuove emerse nella riconciliazione Jira del passo 2.6.
   - idea_ref: ""
     idea_id: ""
+    summary: ""
+    rice_score: null
+    rice_components: null
     jira_card_id: ""
     jira_status: ""              # stato reale letto da jira-sync (NON idea.status top-level)
     completion_pct: null
@@ -88,6 +94,9 @@ urgent_priority:
 # "rilevamento reprioritizzazioni fuori-RICE" del Backlog Refinement.
   - idea_ref: ""
     idea_id: ""
+    summary: ""
+    rice_score: null             # spesso null (mandate / SE senza RICE): le viste mostrano "—" + kind, non nascondono la colonna
+    rice_components: null
     kind: ""                     # deadline | strategic_exception | mandate
     trigger: ""                  # es. "deadline 2026-09-30 due_soon, non ancora in Jira"
     decided: ""                  # cosa il team ha deciso di farne (es. "entra in analisi d'urgenza questa settimana")

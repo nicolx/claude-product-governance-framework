@@ -212,7 +212,8 @@ rimanda la riconciliazione se il PM sceglie di proseguire.
 3. **Segnala i match plausibili con status Jira "attivo"** (Ready for
    dev / In corso / In review / Deploy / Completata — adatta ai nomi
    colonna del progetto): per ciascuno, `short_ref`/`idea_id` locale +
-   `summary`, chiave e status del ticket Jira. Ordina mettendo per primi
+   `summary` + R·I·C·E/RICE (qui "—" / `senza RICE` per definizione —
+   playbook, "Ogni riga che parla di un'idea si capisce da sola"), chiave e status del ticket Jira. Ordina mettendo per primi
    i ticket più avanti nel workflow — sono i più costosi da aver perso.
    **Solo segnalazione**: non linkare né cambiare stato di iniziativa
    propria.

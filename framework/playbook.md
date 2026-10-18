@@ -250,6 +250,43 @@ vista e per i riepiloghi delle watch (`backlog-list`, `pending-approval`,
 `iteration-board`, `mandate-watch`, `deadline-watch`, `rice-watch`,
 `measurement-watch`, `nsm-watch`, `delivery-watch`).
 
+**Ogni riga che parla di un'idea si capisce da sola.** Un identificatore
+dice *quale* riga, non *di cosa* si parla: `PG-042` da solo costringe il
+PM ad aprire lo YAML o a ricordarsi a memoria cosa sia. Per questo ogni
+tabella o elenco che mostra idee — o voci che puntano a un'idea: voci del
+Piano di Iterazione, proposte in coda di approvazione, righe delle watch,
+eventi di delivery con `idea_ref` — porta **sempre**, in quest'ordine e
+prima delle colonne specifiche della vista:
+
+| Colonna | Fonte | Se il dato manca |
+|---|---|---|
+| **ID** | `short_ref`, altrimenti slug (sopra) | mai vuoto |
+| **Summary** | `summary` dell'idea | "⚠ summary mancante" — mai il `title` al suo posto, mai inventato |
+| **R · I · C · E** | ultima voce *approvata* di `rice_history`: `reach_points`, `impact_points`, `confidence_score`, `entanglement_score` | "—" in ciascuna |
+| **RICE** | `score` della stessa voce | il motivo per cui non c'è: `mandate`, `platform`, `bug`, `SE` (strategic exception senza RICE), `senza RICE` |
+
+Regole:
+
+- **Le colonne non si tolgono** perché una riga non ha il RICE (una watch
+  di mandate, `rice-watch`, un bug): si riempiono con "—" e il motivo.
+  Vedere *che* manca il RICE è un'informazione, non un buco da
+  nascondere.
+- **Solo valori approvati.** Un RICE proposto in `pending/` non entra
+  nelle colonne R·I·C·E/RICE: se la vista lo deve mostrare (es.
+  `pending-approval`, `backlog-list` sezione proposte), va in una colonna
+  a parte marcata come **proposto**, accanto a quello corrente.
+- **Mai ricalcolato.** Lo score si legge dalla voce di `rice_history` (o
+  dal valore denormalizzato nel Piano di Iterazione), non si rifà la
+  moltiplicazione in vista.
+- **Forma compatta** quando la vista è un elenco a righe e non una
+  tabella: `PG-042 · {summary} · R4 I5 C8 E2 → 80`.
+- **Ambito.** Vale per le viste rivolte al PM e al team (skill di vista,
+  checkpoint delle cerimonie, riepiloghi delle watch). I report per gli
+  stakeholder generati da `report-render` seguono invece il proprio
+  modello (`framework/models/`), che decide se esporre i punteggi (es.
+  `show_scores` in `roadmap-now-next-later`): identificatore e summary ci
+  sono sempre, il dettaglio RICE è una scelta del modello.
+
 ## Contesto aziendale (`context/`)
 
 Il paragrafo precedente dice che "ogni membro dell'organizzazione di
@@ -994,6 +1031,7 @@ scadenza e stato.
 - [ ] Per le idee senza RICE da più di qualche settimana: è chiaro cosa manca e a chi è stato chiesto?
 - [ ] Per le idee che richiedono un meeting di approfondimento col richiedente: il meeting è stato fissato, o è chiaro perché non ancora?
 - [ ] Quando si guarda il backlog ordinato, si vedono anche summary, scadenza e note — non solo lo score?
+- [ ] Ogni tabella di idee mostra ID, summary, R·I·C·E e RICE totale (con "—" e il motivo dove il RICE manca)?
 
 ## Scadenze su idee normali (`deadline`)
 
@@ -1684,7 +1722,7 @@ e si può cambiare liberamente, non è un impegno.
 |---|---|---|---|
 | Intake | `idea.yaml` `tech_reference` | `idea-intake` / `inbox-triage`, **solo** se il materiale ha segnale tecnico e `team.yaml` è popolato — confermato dal PM, mai presunto (come `deadline`) | Ipotesi preliminare |
 | PRD | frontmatter `tech_reference` del PRD + denormalizzato su `idea.yaml` | `prd-draft`, eseguendo il matching di `team-fit` contro l'How reale, su conferma del PM | Solido — è la fonte di verità per-PRD |
-| Cerimonie / viste | voci del Piano di Iterazione, `backlog-list`, `iteration-board` | denormalizzato da `backlog-refinement` (come `summary`/`rice_score`) | Sola lettura, riflette il PRD |
+| Cerimonie / viste | voci del Piano di Iterazione, `backlog-list`, `iteration-board` | denormalizzato da `backlog-refinement` (come `summary`/`rice_score`/`rice_components`) | Sola lettura, riflette il PRD |
 
 Per un'iniziativa spaccata in più PRD, ogni PRD ha il suo
 `tech_reference`; il campo su `idea.yaml` è quello del PRD primario.

@@ -33,7 +33,11 @@ li mette tutti sulla stessa riga.
      inventarne uno, lo assegna `backlog-refinement`. Mai vuoto (playbook,
      "Ogni elenco prodotto dal sistema è indirizzabile"). Vale per
      **tutte** le sezioni sotto, non solo questa.
-   - `score` (dall'ultima voce di `rice_history`)
+   - `reach_points` · `impact_points` · `confidence_score` ·
+     `entanglement_score` e `score` (dall'ultima voce di `rice_history`),
+     subito dopo `summary` — playbook, "Ogni riga che parla di un'idea si capisce da sola". Nelle sezioni senza RICE
+     (bypass, idee non quotate, scarti) le colonne restano, con "—" e il
+     motivo, non spariscono
    - `summary` — se vuoto, segnalalo esplicitamente ("⚠ summary
      mancante") invece di inventarlo o di ripetere il `title`
    - **scadenza**: se `deadline.due_date` è valorizzato, mostrala con il
@@ -58,7 +62,8 @@ li mette tutti sulla stessa riga.
 2. **Proposte RICE non ancora approvate.** Sezione separata, **subito
    dopo il ranking ufficiale**. Leggi `product/approvals/pending/` per le
    voci `type: rice_diff`: per ciascuna, `short_ref`/slug dell'idea
-   (`target_file`), lo `score` **proposto** dal `payload`, da quanto è in
+   (`target_file`), `summary`, R·I·C·E e score correnti (o "—"), i
+   parametri e lo `score` **proposti** dal `payload`, da quanto è in
    coda, e — se l'idea è già nel ranking del passo 1 — la differenza
    rispetto allo score attuale. Mostra come si inserirebbero nel ranking
    ("PG-042, proposto 480 → salirebbe al 2° posto"). Se l'idea ha una

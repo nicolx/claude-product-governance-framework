@@ -97,7 +97,8 @@ silenzio.
    **Prima colonna: l'identificatore** — `short_ref` se assegnato,
    altrimenti lo slug `idea_id` (mai vuoto — vedi playbook, "Ogni elenco
    prodotto dal sistema è indirizzabile"), così il PM può riferirsi a una
-   riga con "{ID}". Poi `title`, giorni fermi,
+   riga con "{ID}". Poi `summary`, R · I · C · E e RICE — qui per
+   definizione "—" / `senza RICE`, ma le colonne restano (playbook, "Ogni riga che parla di un'idea si capisce da sola"); poi `title`, giorni fermi,
    `blocked_reason`/`waiting_on`, e per le `needs_deep_dive` chi è il
    richiedente da coinvolgere e da quanto il meeting è in sospeso. **Solo
    segnalazione — nessuna azione automatica**: non lanciare tu stessa

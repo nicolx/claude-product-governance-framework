@@ -174,8 +174,9 @@ toString}]}`.
 10. **Recap al PM — SEMPRE**, anche se non c'è nulla:
     - **Eventi nuovi**: raggruppati per `event_type`, con l'`id` in
       **prima colonna** (playbook, "Ogni elenco prodotto dal sistema è
-      indirizzabile"), `card_id`, `idea_ref`, `from → to`,
-      `suggested_framing`.
+      indirizzabile"), `card_id`, `idea_ref` con `summary` e R · I · C ·
+      E + RICE dell'idea ("—" e il motivo se senza RICE — playbook, "Ogni riga che parla di un'idea si capisce da sola"),
+      `from → to`, `suggested_framing`.
     - **Idee create per backfill**: slug, card, classificazione
       abbozzata — ricorda al PM di rivederle al triage.
     - **Coda**: totale voci `pending` (comprese quelle dei run
@@ -209,7 +210,8 @@ toString}]}`.
 
 1. **Elenca le voci `queue[]` con `triage_status: pending`**, ordinate
    `criticality` > `reassurance` > `update`, poi per `occurred_at`.
-   Tabella con l'`id` in prima colonna. Segnala **a parte** le idee con
+   Tabella con l'`id` in prima colonna, poi `idea_ref`, `summary` e
+   R · I · C · E + RICE dell'idea collegata (playbook, "Ogni riga che parla di un'idea si capisce da sola"). Segnala **a parte** le idee con
    `backfill_review_needed: true`.
 
 2. **Cammina OGNI voce** con il PM. Per una voce `delivered` o

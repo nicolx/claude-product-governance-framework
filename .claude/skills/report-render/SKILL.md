@@ -64,7 +64,11 @@ Due modalità:
    - `omit` → togli il campo.
    Mai un valore stimato o dedotto per riempire una lacuna. Ogni elenco
    porta l'identificatore in prima colonna (`short_ref` o slug — playbook,
-   "Ogni elenco prodotto dal sistema è indirizzabile").
+   "Ogni elenco prodotto dal sistema è indirizzabile") seguito dal
+   `summary`. Il dettaglio R·I·C·E/RICE in un report per gli stakeholder
+   lo decide il modello (es. `show_scores`), non la regola delle viste
+   interne (playbook, "Ogni riga che parla di un'idea si capisce da
+   sola", Ambito).
 
 5. **Scrivi il report** in `product/reports/<name>/<periodo>.md`
    (`periodo` nel `period_format` del modello). In testa, un blocco di

@@ -143,7 +143,10 @@ piano passa **sempre** da `product/approvals/pending/`
       tutti i blocchi e poi chiedere: dopo *ciascuno*, prima del
       successivo —
       1. mostra la sua tabella con l'**identificatore in prima colonna**
-         (playbook, "Ogni elenco prodotto dal sistema è indirizzabile");
+         (playbook, "Ogni elenco prodotto dal sistema è indirizzabile") e,
+         per ogni riga che riguarda un'idea, subito dopo `summary`,
+         R · I · C · E e RICE totale ("—" + motivo se senza RICE —
+         playbook, "Ogni riga che parla di un'idea si capisce da sola");
       2. chiedi esplicitamente: *"Prima di procedere — vuoi commentare o
          agire su una di queste voci? Puoi riferirti a {ID}."* Azioni
          tipiche (playbook, "Diritto di parola dopo ogni passo"):
@@ -332,11 +335,15 @@ piano passa **sempre** da `product/approvals/pending/`
       iniziativa o metrica che si cerca di impattare.
    6. Il PM conferma la board finale.
 
-   Per ogni voce di `analysis_todo` / `analysis_in_progress` /
-   `in_development`, popola `tech_reference` denormalizzando da
-   `idea.tech_reference` (già letto nella sweep del passo 2) — stesso
-   trattamento di `summary`/`rice_score`, scrittura solo dentro il
-   `payload` della proposta, non su `idea.yaml`.
+   Per ogni voce di **tutti e quattro** i bucket, popola `summary`,
+   `rice_score` e `rice_components` (`reach`/`impact`/`confidence`/
+   `entanglement` dall'ultima voce approvata di `rice_history`; `null` se
+   senza RICE) denormalizzando da `idea.yaml` (già letto nella sweep del
+   passo 2) — così `iteration-board` mostra ogni riga con summary e RICE
+   senza riaprire le idee (playbook, "Ogni riga che parla di un'idea si capisce da sola"). Per le voci di
+   `analysis_todo` / `analysis_in_progress` / `in_development` popola
+   allo stesso modo `tech_reference` da `idea.tech_reference`. Scrittura
+   solo dentro il `payload` della proposta, non su `idea.yaml`.
    7. **Genera la proposta** `type: iteration_plan` in
       `product/approvals/pending/{settimana}-iteration-plan.yaml`
       (`framework/schema/approval.template.yaml`, `payload` = piano

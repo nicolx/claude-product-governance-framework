@@ -170,7 +170,8 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
    l'identificatore** — `short_ref` se assegnato, altrimenti lo slug
    `idea_id` (mai vuoto — vedi playbook, "Ogni elenco prodotto dal sistema
    è indirizzabile"), così il PM può riferirsi a una riga con "{ID}";
-   per le righe di KPI, `{prd_id} · {kpi_name}`. Poi nome della KPI (o
+   per le righe di KPI, `{prd_id} · {kpi_name}`. Poi `summary`, R · I · C
+   · E e RICE dell'idea ("—" e il motivo se senza RICE — playbook, "Ogni riga che parla di un'idea si capisce da sola"), nome della KPI (o
    "nessuna KPI" per il caso compliance), settimane da `done_at`, ultimo
    valore noto vs. baseline/target. **Solo segnalazione** per ciò che
    resta aperto — nessuna comunicazione o escalation automatica, stesso

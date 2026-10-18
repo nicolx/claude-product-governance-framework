@@ -42,20 +42,26 @@ non richiama skill di scrittura.
      avvenuto, non un errore.
 
 2. **Rendi i quattro bucket**, in quest'ordine, come tabella o blocco
-   compatto — una riga per voce:
-   1. **Analisi da avviare** (`analysis_todo`) — `idea_ref`, `summary`,
-      `rice_score` (o "mandate"/"—" se senza RICE), `why_now`,
+   compatto — una riga per voce. **Ogni bucket apre con le stesse
+   colonne**: `idea_ref` · `summary` · R · I · C · E (da
+   `rice_components`) · RICE (`rice_score`; "—" in R·I·C·E e il motivo
+   nella colonna RICE — `mandate`/`SE`/`senza RICE` — se `null`) —
+   playbook, "Ogni riga che parla di un'idea si capisce da sola". Poi le colonne specifiche:
+   1. **Analisi da avviare** (`analysis_todo`) — `why_now`,
       `tech_reference` (referente tecnico, o "—" se non assegnato).
-   2. **Analisi in corso** (`analysis_in_progress`) — `idea_ref`,
-      `summary`, `tech_reference`, `since`, `weeks_in_bucket` (evidenzia
-      se ≥ 3), `note`.
-   3. **In sviluppo** (`in_development`) — `idea_ref`, `summary`,
-      `tech_reference`, `jira_card_id`, `jira_status`, `completion_pct`
-      se presente.
-   4. **Prioritizzate d'urgenza** (`urgent_priority`) — `idea_ref`,
-      `kind`, `trigger`, `decided`; per `kind: strategic_exception`
-      segnala `approved_by` (o "✋ bypass non ancora confermato" se
-      `null`).
+   2. **Analisi in corso** (`analysis_in_progress`) — `tech_reference`,
+      `since`, `weeks_in_bucket` (evidenzia se ≥ 3), `note`.
+   3. **In sviluppo** (`in_development`) — `tech_reference`,
+      `jira_card_id`, `jira_status`, `completion_pct` se presente.
+   4. **Prioritizzate d'urgenza** (`urgent_priority`) — `kind`,
+      `trigger`, `decided`; per `kind: strategic_exception` segnala
+      `approved_by` (o "✋ bypass non ancora confermato" se `null`).
+   **Piani precedenti allo schema attuale** (voci senza `summary` o
+   `rice_components`): completa quei campi leggendo le idee
+   (`governance-dump.sh ideas`, una tool call) dall'ultima voce
+   *approvata* di `rice_history`, e dillo in una riga in testa ("summary/
+   RICE letti dalle idee, non dal piano") — non lasciare le colonne
+   vuote.
    Apri con `iteration_goal` in testa e la settimana. **Prima colonna:
    l'identificatore** `idea_ref` (short_ref); se una voce non ce l'ha, lo
    slug — mai vuoto (playbook, "Ogni elenco prodotto dal sistema è
@@ -82,7 +88,8 @@ non richiama skill di scrittura.
 ## Cosa NON fare
 
 - Non scrivere su nessun file, non fare commit/push — è sola lettura.
-- Non ricalcolare `changes_since_last`, `weeks_in_bucket`, `rice_score`:
+- Non ricalcolare `changes_since_last`, `weeks_in_bucket`, `rice_score`,
+  `rice_components`:
   leggi i valori già persistiti nel file di iterazione (li calcola
   `backlog-refinement` al passo 6).
 - Non fondere i quattro bucket in un unico elenco ordinato per "priorità":

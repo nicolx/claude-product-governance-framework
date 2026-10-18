@@ -50,7 +50,8 @@ in aggiunta, i passi specifici sotto.
    piano, o è stato saltato), **segnalalo** e procedi sullo stato delle
    idee come prima — ma è un'anomalia da riferire, non la norma.
    **Checkpoint** (playbook, "Diritto di parola dopo ogni passo"): mostra
-   i quattro bucket con l'identificatore in prima colonna e il
+   i quattro bucket con l'identificatore in prima colonna, `summary` e
+   R · I · C · E + RICE totale (playbook, "Ogni riga che parla di un'idea si capisce da sola"), il
    `tech_reference` (referente tecnico) accanto a ogni voce, e apri il
    diritto di parola prima di procedere alle stime. Se una voce con un
    PRD non ha `tech_reference`, segnalalo — il team può assegnarlo ora
@@ -108,7 +109,10 @@ in aggiunta, i passi specifici sotto.
    (o sovrascrivi quella del Backlog Refinement se è ancora in `pending/`
    e non approvata) con:
    - `refined_by_iteration_planning: true`, `generated_at` aggiornato;
-   - i bucket riorganizzati dalla valutazione 80/20;
+   - i bucket riorganizzati dalla valutazione 80/20 — una voce che
+     entra in un bucket nuovo porta `summary`/`rice_score`/
+     `rice_components` denormalizzati dall'idea come nel Backlog
+     Refinement;
    - `changes_since_last` ricalcolato rispetto allo stesso `based_on`.
    Passa **sempre** da `pending/`, non applicare — `iteration-planning`
    non scrive mai `product/roadmap/iterations/` direttamente (stessa
