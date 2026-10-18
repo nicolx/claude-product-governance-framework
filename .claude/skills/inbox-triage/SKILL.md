@@ -79,6 +79,11 @@ soli non coprono. In sintesi:
   `classification: mandate`.
 - **POSTPONED** → idea normale in bucket, RICE ancora da fare.
 - **NO GO** → `classification: idea`, `status: aborted` (record storico).
+  Il gate dell'avviso di conclusione vale anche qui: chiedi al PM se
+  l'esito era stato comunicato a suo tempo — se sì, voce
+  `conclusion_notices` `kind: aborted` `waived` con il suo motivo; se no,
+  bozza `drafted` e l'idea resta in bucket finché non è `sent`
+  (playbook, "Avvisare gli stakeholder della conclusione").
 - Dopo il run, esegui una volta `rice-watch` e `mandate-watch` per
   fotografare lo stato di partenza.
 

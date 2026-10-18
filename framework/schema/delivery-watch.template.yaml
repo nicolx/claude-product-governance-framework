@@ -68,7 +68,11 @@ queue: []
 #   suggested_framing: ""   # update | reassurance | criticality
 #   suggested_audience: []  # nomi/ruoli: stakeholders della product_line (product-lines.yaml) + eventuale richiedente (idea.proposer)
 #   draft_headline: ""      # UNA riga PM-facing, es. "«Ricevute non riconosciute» è in produzione"
-#   triage_status: pending  # pending | drafted | sent | dismissed
+#   triage_status: pending  # pending | drafted | sent | dismissed — per delivered/bug_resolved NIENTE dismiss
+#                           # libero: è l'avviso di conclusione obbligatorio, la bozza vive sull'idea
+#                           # (conclusion_notices, kind: delivered) e qui si rispecchia l'esito; dismissed
+#                           # solo se l'avviso è waived, con lo stesso motivo (playbook, "Avvisare gli
+#                           # stakeholder della conclusione")
 #   draft_subject: null     # compilato nel triage
 #   draft_body: null        # compilato nel triage (testo pronto da copiare — mai inviato in automatico)
 #   draft_recipients: []    # confermati/editati dal PM nel triage

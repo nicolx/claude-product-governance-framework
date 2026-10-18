@@ -1,6 +1,6 @@
 ---
 name: delivery-watch
-description: Osserva il tracker di esecuzione per le transizioni di stato rilevanti per gli stakeholder (entrata in sviluppo, consegna in produzione, bug risolto, card bloccata, regressione) sulle iniziative con jira.card_id e su una board_jql configurata; annota ogni evento in una coda di triage in product/reference/delivery-watch.yaml che sopravvive tra le sessioni. Se trova attività su una card non collegata a un'idea, crea l'idea in automatico per recuperare il tracciamento. Nessun invio automatico — nel triage il PM decide per ciascun evento se preparare e mandare (a mano) una mail agli stakeholder. Usala periodicamente, come parte del Backlog Refinement, o via cron (/schedule).
+description: Osserva il tracker di esecuzione per le transizioni di stato rilevanti per gli stakeholder (entrata in sviluppo, consegna in produzione, bug risolto, card bloccata, regressione) sulle iniziative con jira.card_id e su una board_jql configurata; annota ogni evento in una coda di triage in product/reference/delivery-watch.yaml che sopravvive tra le sessioni. Se trova attività su una card non collegata a un'idea, crea l'idea in automatico per recuperare il tracciamento. Nessun invio automatico — nel triage il PM decide per ciascun evento se preparare e mandare (a mano) una mail agli stakeholder; per le consegne (delivered/bug_resolved) l'avviso di conclusione è obbligatorio e condiziona il passaggio dell'idea a done. Usala periodicamente, come parte del Backlog Refinement, o via cron (/schedule).
 ---
 
 # delivery-watch
@@ -16,6 +16,10 @@ gli stakeholder nel ciclo.
 **persistente**: rileva una tassonomia fissa di transizioni, le mette in
 una coda di triage che sopravvive tra le sessioni, e — nel triage — il PM
 decide per ciascuna se mandare una mail. Non invia mai nulla da sola.
+Per le **consegne** (`delivered`, `bug_resolved`) la mail non è una
+scelta: è l'avviso di conclusione obbligatorio, e l'idea passa a
+`status: done` solo quando è `sent` o `waived` (playbook, "Avvisare gli
+stakeholder della conclusione").
 
 Vedi playbook, sezione "Transizioni di delivery rilevanti per gli
 stakeholder (`delivery-watch`)": è la fonte normativa della tassonomia e
@@ -208,7 +212,8 @@ toString}]}`.
    Tabella con l'`id` in prima colonna. Segnala **a parte** le idee con
    `backfill_review_needed: true`.
 
-2. **Cammina OGNI voce** con il PM:
+2. **Cammina OGNI voce** con il PM. Per una voce `delivered` o
+   `bug_resolved` vale il ramo **(d)** al posto di (a)/(b); per le altre:
    - **(a) BOZZA MAIL** → componi `draft_subject` e `draft_body` dal
      `suggested_framing` della voce (aggiornamento / rassicurazione /
      criticità); `draft_recipients` da `suggested_audience` (il PM
@@ -221,6 +226,33 @@ toString}]}`.
      (chiedi il motivo, non lasciarlo vuoto — audit).
    - **(c) SALTA** → lascia `pending` (resta in coda; l'hook continua a
      ricordarla).
+   - **(d) AVVISO DI CONCLUSIONE** (solo `delivered`/`bug_resolved`) —
+     **niente dismiss**: la consegna va comunicata (playbook, "Avvisare
+     gli stakeholder della conclusione").
+     1. Chiedi al PM se il "Done per Jira" è Done per la Definition of
+        Done dell'istanza (mai presunto). Se no → (c), resta `pending`.
+     2. Apri sull'idea una voce `conclusion_notices` (`kind: delivered`,
+        `detected_by: delivery-watch`, `source_ref` = `id` della voce di
+        coda) se non c'è già; componi `subject`/`body` (framing
+        *rassicurazione*: cosa è cambiato, da quando, come si vede —
+        screenshot da `demo-capture` se c'è UI — e quando se ne guarderà
+        l'impatto) e `recipients` da `suggested_audience` (il PM
+        conferma/edita). `notice_status: drafted`, e la voce di coda
+        `triage_status: drafted`. **Mostra la bozza — NON inviarla.**
+        La bozza vive sull'idea, non nei `draft_*` della coda: non
+        duplicarla.
+     3. Quando il PM dice di averla mandata → `notice_status: sent`,
+        `sent_at` (data dichiarata dal PM); **nello stesso passo**
+        `status: done` e `done_at` = data della transizione Jira
+        (`occurred_at`; se vuota, chiedila — mai "oggi" per default);
+        voce di coda `triage_status: sent`, `sent_at`.
+     4. Se il PM dichiara che non c'è nessuno da avvisare →
+        `notice_status: waived` + `waived_reason` (dato dal PM, mai
+        presunto); nello stesso passo `status: done`/`done_at`; voce di
+        coda `triage_status: dismissed`, `dismiss_reason` = lo stesso
+        motivo.
+     Se il PM rimanda, la voce resta `drafted`/`pending` e l'idea **non**
+     passa a `done`: l'hook `check-conclusion-notices.sh` la ricorda.
 
 3. **Per ogni idea con `backfill_review_needed: true`** → il PM
    conferma/corregge `classification`, `product_line`, `summary`; se è
@@ -228,7 +260,7 @@ toString}]}`.
    ogni caso azzera `backfill_review_needed`.
 
 4. **Sincronizza il repo**:
-   `bash .claude/hooks/governance-sync.sh push "delivery-watch: triage — <k> bozze, <s> inviate, <j> dismiss" product/reference/delivery-watch.yaml product/ideas/`.
+   `bash .claude/hooks/governance-sync.sh push "delivery-watch: triage — <k> bozze, <s> inviate, <j> dismiss, <d> idee done" product/reference/delivery-watch.yaml product/ideas/`.
 
 5. Ricorda al PM: le bozze **non partono da sole**. Le manda lui; il
    testo inviato resta nella voce di coda.
@@ -261,8 +293,12 @@ verità per l'esecuzione.
 - **Mai silenziare una voce `pending`** solo perché è vecchia — resta in
   coda finché il PM non le dà un esito.
 - **Mai scrivere in `product/ideas/`** oltre a
-  `jira.status`/`jira.last_polled_at` e alla creazione di backfill (via
-  `idea-intake`).
+  `jira.status`/`jira.last_polled_at`, alla creazione di backfill (via
+  `idea-intake`) e — **solo nel triage, ramo (d)** — a
+  `conclusion_notices`, `status: done`/`done_at`.
+- **Mai archiviare (dismiss) un `delivered`/`bug_resolved`** e mai
+  scrivere `status: done` senza una voce `conclusion_notices` `sent` o
+  `waived` — e mai un `waived` senza motivo dato dal PM.
 - **Mai dedurre la Definition of Done** — "in produzione per Jira" si
   segnala; la valutazione DoD è del PM.
 - **Mai bloccare la sweep del Backlog Refinement** — connettore giù =

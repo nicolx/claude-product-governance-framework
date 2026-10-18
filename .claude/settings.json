@@ -8,6 +8,7 @@
       "Bash(bash .claude/hooks/check-inbox.sh:*)",
       "Bash(bash .claude/hooks/check-unpushed.sh:*)",
       "Bash(bash .claude/hooks/check-delivery-queue.sh:*)",
+      "Bash(bash .claude/hooks/check-conclusion-notices.sh:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
@@ -45,6 +46,12 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-delivery-queue.sh\"",
             "timeout": 10,
             "statusMessage": "Verifica coda transizioni di delivery…"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-conclusion-notices.sh\"",
+            "timeout": 10,
+            "statusMessage": "Verifica avvisi di conclusione agli stakeholder…"
           }
         ]
       }
@@ -75,6 +82,12 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-delivery-queue.sh\"",
             "timeout": 10,
             "statusMessage": "Verifica coda transizioni di delivery…"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-conclusion-notices.sh\"",
+            "timeout": 10,
+            "statusMessage": "Verifica avvisi di conclusione agli stakeholder…"
           }
         ]
       }

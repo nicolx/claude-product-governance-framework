@@ -46,6 +46,7 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `product/ideas/*/jira.*` | Istanza | `jira-sync` (tutte le modalità), `idea-intake`/`inbox-triage` per i bug all'intake (e `idea-intake` in modalità backfill per una card intercettata da `delivery-watch`), e `delivery-watch` (rinfresco di `jira.status`/`jira.last_polled_at` al poll, stesso fatto osservato di `jira-sync` Pull) — fatto osservato (il ticket esiste / il suo stato), scrittura diretta senza approvazione (stessa logica di `jira.status`). Per un `classification: bug` il filing è **immediato e obbligatorio** appena il PM conferma la classificazione: il ticket si apre subito (con impatto stimato), mai rimandato a un secondo assenso — vedi playbook, "Alimentazione del bucket delle idee", punto a. Se il connettore è `manuale`/irraggiungibile resta un'azione aperta esplicita, mai un filing silenziosamente saltato |
 | `product/ideas/*/short_ref` | Istanza | Solo `backlog-refinement`, assegnato pigramente (`{prefisso}-{NNN}`, `next = max+1`) al primo refinement che incontra l'idea senza handle. Il refinement è un punto di serializzazione a scrittore singolo → niente collisioni offline; nessun file contatore. Fatto di housekeeping, scrittura diretta, non passa da `pending/`. Una volta assegnato non cambia. `id`/nome cartella restano l'identificatore canonico |
 | `product/ideas/*/requester_reply` | Istanza | `idea-intake`/`inbox-triage` — bozza di risposta al richiedente, **mai inviata in automatico** (la manda il PM). Cortesia 1:1 con l'idea, non una decisione applicata a un target file: nessuna approvazione via `pending/`, stessa logica di `clarification.draft_message` |
+| `product/ideas/*/conclusion_notices` | Istanza | Chi rileva la conclusione: `delivery-watch` (triage di un `delivered`/`bug_resolved`), `jira-sync` (Pull/Riconciliazione, Done confermato dal PM), `measurement-watch` (atto di chiusura), `backlog-refinement`/qualunque skill o PM in conversazione (interruzione, o consegna dichiarata a mano). Bozza di avviso di conclusione agli stakeholder, **mai inviata in automatico** (la manda il PM) — stessa logica di `requester_reply`, scrittura diretta, append-only, non passa da `pending/`. È il **gate** di `status: done`/`aborted` e di `closure.closed: true`: quei valori si scrivono solo nello stesso passo in cui la voce arriva a `sent` o `waived` (motivo dato dal PM, mai presunto) — vedi playbook, "Avvisare gli stakeholder della conclusione" |
 | `product/ideas/*/status: declined`/`aborted`, `product/ideas/*/decline_reason` | Istanza | `idea-intake`/`inbox-triage` propongono lo scarto al triage, **oppure** `backlog-refinement` a un checkpoint della sweep di apertura quando il PM decide che un'idea non ha più motivo di esistere (`declined` se non è mai partita, `aborted` se era in lavorazione). Sempre su conferma **in conversazione** (è un giudizio) — non passa dalla coda `pending/`, ma non è mai deciso dalla sola skill; l'azione va registrata in `decisions.yaml` della cerimonia |
 | `product/ideas/*/deadline.due_date`, `product/ideas/*/deadline.note` | Istanza | Qualunque skill che la incontra in conversazione (tipicamente `idea-intake`/`inbox-triage` all'origine) — cattura di un fatto dichiarato dal PM, mai presunto; impostarlo non cambia la priorità, stessa logica di `rice_status`, nessuna approvazione |
 | `product/ideas/*/deadline.escalation_status` | Istanza | Solo `deadline-watch` — fatto calcolato, scrittura diretta senza approvazione (stesso principio di `mandate.escalation_status`) |
@@ -156,6 +157,16 @@ mano** (stessa logica di `requester_reply` — nessun `outbound_comm`,
 nessun gate `pending/`; il testo inviato resta nella voce come trail). Il
 **backfill** di un'idea da una card Jira non tracciata è creazione
 diretta (stessa logica di `idea-intake`), non una decisione di priorità.
+
+Corollario: l'**avviso di conclusione** agli stakeholder (consegna in
+produzione, chiusura della misurazione, interruzione —
+`conclusion_notices` sull'idea) non passa da `pending/`, ma è
+**obbligatorio**: è il gate del cambio di stato (`status: done`/
+`aborted`, `closure.closed: true`), che si scrive solo quando l'avviso è
+`sent` (inviato a mano dal PM) o `waived` (esente, con motivo del PM).
+Nessun invio automatico; nessun secondo assenso, perché rimandarlo
+significa perderlo — vedi playbook, "Avvisare gli stakeholder della
+conclusione".
 
 Corollario: l'apertura del ticket di un **bug confermato** sul tracker di
 esecuzione non passa da `pending/` — non è una decisione di priorità (un

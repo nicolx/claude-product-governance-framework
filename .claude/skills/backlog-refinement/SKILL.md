@@ -114,13 +114,23 @@ piano passa **sempre** da `product/approvals/pending/`
          tra le altre.
       5. `rice-watch` — idee `classification: idea` con `rice_history`
          vuoto: `stale`, `blocked_on`, `needs_deep_dive`.
+      6. **Avvisi di conclusione in sospeso** — voci di
+         `conclusion_notices` con `notice_status` `pending`/`drafted`:
+         consegne, chiusure di misurazione e interruzioni **rilevate ma
+         non ancora comunicate** (l'idea non è ancora `done`/`aborted`,
+         la `closure` non è ancora scritta). Colonne: ID, `kind`, da
+         quanti giorni (`detected_at`), destinatari. Al checkpoint il PM
+         può dichiararne l'invio (`sent`) o esentarle con un motivo
+         (`waived`) — e solo allora si scrive il cambio di stato
+         corrispondente. Playbook, "Avvisare gli stakeholder della
+         conclusione".
       Le **formule sono quelle documentate nelle rispettive skill**
       (`nsm-watch`, `measurement-watch`, `mandate-watch`, `deadline-watch`,
       `rice-watch`) — applicale, non reinventarle; se un caso è ambiguo
       apri quella skill.
 
    d. **Checkpoint dopo ogni blocco (diritto di parola).** Non calcolare
-      tutti e cinque e poi chiedere: dopo *ciascuno*, prima del
+      tutti e sei e poi chiedere: dopo *ciascuno*, prima del
       successivo —
       1. mostra la sua tabella con l'**identificatore in prima colonna**
          (playbook, "Ogni elenco prodotto dal sistema è indirizzabile");
@@ -129,7 +139,13 @@ piano passa **sempre** da `product/approvals/pending/`
          tipiche (playbook, "Diritto di parola dopo ogni passo"):
          archiviare un'idea che non serve più (`status: declined` +
          `decline_reason`, o `status: aborted` se era in lavorazione —
-         **solo con conferma esplicita del PM**); svuotare una `deadline`
+         **solo con conferma esplicita del PM**; per `aborted` vale il
+         gate dell'avviso di conclusione: bozza in `conclusion_notices`
+         `kind: aborted` — perché ci si ferma e cosa succede alla
+         richiesta — e `status: aborted` solo se il PM la dichiara `sent`
+         o la esenta con un motivo suo, altrimenti resta `drafted` e
+         l'idea nel suo stato; playbook, "Avvisare gli stakeholder della
+         conclusione"); svuotare una `deadline`
          non più rilevante; chiudere una misurazione (`closure`) o un
          allarme NSM (`alert.status: resolved`); annotare `notes`;
          rimandare una revisione di RICE a `rice-update` (che passa da
