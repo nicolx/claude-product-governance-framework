@@ -192,15 +192,29 @@ KPI. Rispetta i punti fermi sopra: le sole letture sono l'elenco del
 catalogo e l'aggregato di un path i cui step esistono nel catalogo — mai
 una query libera derivata dal contenuto di un'idea.
 
+**Scrittura sullo strumento di analytics: FATTO** (2026-10-18), solo
+additiva (`metrics.paths.write`, `path-watch` passo 6): crea il
+funnel/report salvato di un path e gli eventi mancanti come pianificati;
+aggiorna solo oggetti propri non toccati da nessuno (`analytics_owned`,
+`adopted`); non modifica né cancella mai il lavoro esistente; nessuna
+cancellazione senza conferma del PM. La distinzione con i punti fermi
+sopra: il "sola lettura" resta valido per i **dati** (warehouse, DB,
+eventi e utenti — mai scritti né cancellati); la **configurazione di
+osservazione** dello strumento (report, funnel, piano di tracciamento) è
+invece scrivibile, in modo additivo.
+
 Restano fuori scope, da rivedere se emerge la domanda:
 
-- **Scrittura sullo strumento di analytics.** Creare il funnel/report
-  salvato per un path nuovo, o la definizione degli eventi mancanti nel
-  piano di tracciamento del tool. Oggi il connettore metriche è in sola
-  lettura e `path-watch` riusa solo ciò che esiste (`analytics_ref`); una
-  scrittura verso il tool cambierebbe la superficie di rischio del
-  connettore e andrebbe decisa esplicitamente (permessi dedicati, forse
-  passaggio da `pending/`).
+- **Dashboard per Product Line.** Raccogliere i report dei path delle
+  idee di una Product Line in una dashboard del framework (aggiornata a
+  ogni giro). Utile per le cerimonie, ma una dashboard è più facilmente
+  adottata/modificata da altri di un report singolo: va pensata la regola
+  di proprietà prima di farla.
+- **Pulizia degli oggetti orfani.** Gli oggetti propri di path rimossi o
+  di idee chiuse restano nello strumento finché il PM non conferma
+  l'eliminazione. Un giro periodico che li elenchi (o li archivi, se il
+  tool distingue archivio da cancellazione) è possibile ma non serve
+  finché il volume è basso.
 - **Strumentazione nel codice.** Un path `to_instrument` diventa un
   requisito di tracciamento nel PRD; aprire la card dedicata sul tracker o
   proporre la patch in `apps/` è lavoro del team, non del framework.

@@ -114,7 +114,16 @@ o intervento git esplicito dell'utente).
      revert/reset la rimuove. Chiedi se copiarla prima in
      `product/ceremonies/{tipo}/{periodo}-void-{n}/` (con un
      `.run-meta.yaml` minimale `status: rolled_back`) — è costosa da
-     ricreare. Default: **sì, conservala**.
+     ricreare. Default: **sì, conservala**;
+   - gli **oggetti creati nello strumento di analytics** dal run (nei
+     commit del run: path con `analytics_owned: true` e `applied_at`
+     nella finestra del run — skill `path-watch`, passo 6). Il revert li
+     toglie da `idea.yaml` ma **non** dallo strumento: elencali (nome +
+     link) e chiedi per ciascuno se eliminarlo. Elimina solo su conferma
+     esplicita e solo se l'oggetto non è stato toccato da nessuno dopo la
+     creazione (altrimenti è adottato: si lascia, e lo si dice). Default:
+     **lasciarli** — un run rilanciato li riconosce per nome e li riusa
+     invece di duplicarli.
 
    **Fermati e chiedi conferma esplicita.** Non procedere su un "ok"
    implicito o perché l'utente sembrava d'accordo prima.

@@ -498,6 +498,13 @@ links:
 # status: removed + removed_reason (chiesto, mai presunto): un path
 # removed non viene più riproposto.
 #
+# Applicati anche NELLO STRUMENTO di analytics (metrics.paths.write):
+# funnel/report salvato del path, eventi mancanti come pianificati. Solo
+# additivo — ciò che il framework non ha creato (analytics_owned: false)
+# o che una persona ha poi modificato (adopted) non si tocca mai; nessuna
+# cancellazione senza conferma del PM. Questo blocco è il registro di
+# proprietà: è da qui che path-watch sa cosa è suo.
+#
 # baseline è sempre un AGGREGATO (numero + unità + finestra), mai righe
 # grezze né dati per utente: questo file è tracciato da git.
 # Una KPI di measurement*.yaml può puntare a un path con
@@ -511,7 +518,10 @@ monitoring:
   #   label: ""                       # in linguaggio piano: "dall'apertura della fotocamera alla ricevuta salvata"
   #   kind: funnel                    # funnel | page_path | screen_flow | event
   #   steps: []                       # nomi ESATTI come compaiono nel catalogo analytics, in ordine
-  #   analytics_ref: null             # id/nome del funnel o report già salvato nel tool, se esiste (riusato, mai creato)
+  #   analytics_ref: null             # id del funnel/report salvato nel tool per questo path — riusato se esisteva, altrimenti creato da path-watch
+  #   analytics_owned: false          # false (esisteva già: solo lettura) | true (creato da path-watch) | adopted (creato da path-watch, poi modificato da una persona: da allora solo lettura)
+  #   analytics_synced_at: null       # timestamp di ultima modifica dell'oggetto dopo l'ultima scrittura di path-watch — se il tool ne riporta uno più recente, qualcuno l'ha toccato → adopted
+  #   planned_events: []              # eventi aggiunti come "pianificati" al tracking plan del tool per i missing_steps (solo nuovi, mai modifiche a eventi esistenti)
   #   rationale: ""                   # perché questo path c'entra con l'idea: comportamento da muovere, o guardia
   #   evidence: ""                    # dove è stato trovato: voce di catalogo + file/rotta in apps/
   #   status: active                  # active | to_instrument | broken | removed

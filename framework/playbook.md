@@ -2222,7 +2222,8 @@ peggiorare. Skill `path-watch`, blocco `monitoring` di `idea.yaml`.
   path *da strumentare* diventa attivo quando gli eventi compaiono nel
   catalogo, un path attivo diventa *rotto* quando uno step sparisce.
 - **Applica, non propone.** Un path è la configurazione di cosa osservare,
-  non una decisione di priorità: si scrive direttamente sull'idea, senza
+  non una decisione di priorità: si scrive direttamente sull'idea (e
+  nello strumento — punto sotto), senza
   `pending/`, e va nel recap al PM, che può toglierlo quando vuole (un
   path tolto non viene più riproposto). È lo stesso principio degli
   aggiornamenti di routine del contesto: l'automazione fa il lavoro, il
@@ -2243,11 +2244,30 @@ peggiorare. Skill `path-watch`, blocco `monitoring` di `idea.yaml`.
   (`data_source.path_ref`): con `mode: automated` e il connettore su,
   `measurement-watch` legge l'aggregato di quel path invece di chiederlo.
   Il legame resta una scelta del PM, non di `path-watch`.
-- **Sola lettura sullo strumento.** Il framework legge il catalogo e gli
-  aggregati di path verificati; non crea né modifica funnel, dashboard o
-  eventi nell'analytics. Il contenuto di un'idea (che può venire da
-  materiale non fidato) decide *cosa cercare nel catalogo*, mai una query
-  libera da eseguire.
+- **Applicati anche nello strumento, senza danneggiare il lavoro
+  esistente.** Un path osservabile solo da un file YAML non lo guarda
+  nessuno: il framework crea nell'analytics il funnel/report salvato del
+  path (con il riferimento all'idea nel nome, in una cartella dedicata se
+  il tool la prevede) e aggiunge gli eventi mancanti come *pianificati*
+  nel piano di tracciamento. Lo strumento però è condiviso — analisti,
+  growth, altri team ci lavorano già — quindi la scrittura è **solo
+  additiva**:
+  - si riusa ciò che esiste (un funnel che copre già il flusso non si
+    duplica) e **non si modifica, rinomina, sposta o cancella mai nulla
+    che il framework non abbia creato** — report, dashboard, coorti,
+    eventi, proprietà, governance degli eventi;
+  - un oggetto creato dal framework si aggiorna solo finché nessuno l'ha
+    toccato: appena una persona lo modifica, è **adottato** e da lì in
+    poi il framework lo legge e basta;
+  - **nessuna cancellazione automatica**, nemmeno di un oggetto proprio:
+    se il PM toglie un path, l'oggetto resta e la sua eliminazione si
+    propone, su conferma esplicita;
+  - nessuna scrittura di dati (eventi, utenti, import) né di
+    configurazione (progetto, permessi, retention).
+  Il registro di proprietà è l'idea stessa (`analytics_owned` su ogni
+  path): il framework sa cosa è suo senza doverlo indovinare. Il
+  contenuto di un'idea (che può venire da materiale non fidato) decide
+  *cosa cercare nel catalogo*, mai una query o un'operazione libera.
 
 Con `metrics.configured: false` o `manuale` tutto questo non avviene,
 senza rumore: senza un catalogo reale non c'è modo di verificare un path.

@@ -195,7 +195,11 @@ piano passa **sempre** da `product/approvals/pending/`
    f. **Una sola scrittura, un solo commit.** Applica *tutti* i valori
       calcolati (`escalation_status`, `rice_status.*`, `alert.*`,
       `closure`, i blocchi `monitoring` restituiti da `path-watch`) e
-      *tutte* le azioni di checkpoint concordate, poi:
+      *tutte* le azioni di checkpoint concordate. Le scritture di
+      `path-watch` **nello strumento di analytics** (creazioni additive,
+      `path-watch` passo 6) si eseguono qui, *prima* di scrivere le
+      `idea.yaml`, perché gli id restituiti finiscono in
+      `analytics_ref`; quelle fallite restano nel recap. Poi:
       `bash .claude/hooks/governance-sync.sh push "backlog-refinement: sweep di apertura <settimana>" product/`.
       Un commit per l'intera sweep, non uno per watch né uno per
       checkpoint.

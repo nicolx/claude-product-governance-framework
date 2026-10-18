@@ -146,9 +146,15 @@ per raccogliere:
    attiva di default** (sottoblocco `metrics.paths`): a ogni intake, PRD
    e Backlog Refinement suggerirà **e applicherà** alle idee i path utente
    da monitorare, trovati nel catalogo dell'analytics, leggendone una
-   baseline aggregata — mai scritture sullo strumento. Chiedi se tenerlo
-   attivo (`enabled: false` per spegnerlo) e lascia i default degli altri
-   campi salvo indicazioni. **Nessuna credenziale nel config** (né altrove nel repo
+   baseline aggregata, e li creerà anche **nello strumento** (funnel/report
+   salvato, eventi mancanti come pianificati) — in modo solo additivo, mai
+   toccando il lavoro esistente (`metrics.paths.write`, skill
+   `path-watch` passo 6). Chiedi se tenerlo attivo (`enabled: false` per
+   spegnerlo), se lo strumento va lasciato in sola lettura
+   (`write.enabled: false`) e se c'è una **cartella/spazio dedicato** dove
+   mettere gli oggetti creati (`write.folder` — consigliato: tiene il
+   lavoro del framework separato da quello degli analisti). Lascia i
+   default degli altri campi salvo indicazioni. **Nessuna credenziale nel config** (né altrove nel repo
    tracciato) — solo il *nome* e i *comandi*.
 8. **Eventuali altre configurazioni rilevanti** — canale Slack/Teams per
    comunicazioni, altro che l'utente ritenga utile avere a portata di
@@ -352,11 +358,16 @@ che serve da lì e chiedi solo quello che manca.
    - connettore `cli:<nome>` → `Bash(<nome> <sottocomando>:*)` per i
      sottocomandi di ricerca/lettura e creazione ticket.
    - connettore `manuale` o assente → non scrivere nulla qui.
-   - **fonte metriche** (`metrics.integration` `mcp:*`/`cli:*`) → **solo**
-     i tool di lettura: elenco del catalogo (eventi, pagine/schermate,
-     funnel o report salvati) e query di aggregati. **Mai** quelli che
-     creano/modificano funnel, dashboard, eventi o coorti: `path-watch`,
-     `nsm-watch` e `measurement-watch` leggono e basta.
+   - **fonte metriche** (`metrics.integration` `mcp:*`/`cli:*`) → i tool
+     di **lettura** (elenco del catalogo: eventi, pagine/schermate, funnel
+     o report salvati; metadati di un oggetto; query di aggregati) e, se
+     `metrics.paths.write.enabled` non è `false`, **solo** quelli di
+     **creazione** di funnel/report salvati e di eventi pianificati nel
+     tracking plan — le scritture additive di `path-watch`. **Non**
+     allowlistare i tool di modifica, cancellazione, archiviazione o di
+     configurazione (progetto, permessi, governance degli eventi): quando
+     `path-watch` aggiorna un oggetto suo o ne elimina uno su conferma del
+     PM, il prompt di permesso è una seconda rete di sicurezza voluta.
    - **connettori sorgente di contesto** (ogni voce `connectors:` con
      `folders:`, passo 9 — possono essere più d'uno: Drive **e**
      SharePoint) → per **ciascuno** allowlista **solo** i suoi tool di

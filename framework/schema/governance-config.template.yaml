@@ -97,12 +97,19 @@ metrics:
   # Path da monitorare (skill path-watch): con configured: true il framework
   # suggerisce E applica a ogni idea i percorsi utente da osservare, presi
   # dal catalogo reale dell'analytics — vedi playbook, "Measurement",
-  # sottosezione "Path da monitorare". Sempre in sola lettura sul tool.
+  # sottosezione "Path da monitorare".
   paths:
     enabled: true                 # false per spegnerlo pur avendo la fonte metriche collegata
     max_per_idea: 3               # path principale + eventuali guardie: meglio uno giusto che tre di contorno
     baseline_window_days: 28      # finestra dell'aggregato di baseline letto all'applicazione
     recheck_days: 28              # ogni quanto ricontrollare un path anche se nulla sembra cambiato
+    # Scrittura nello strumento di analytics. SOLO ADDITIVA: crea oggetti
+    # nuovi, aggiorna solo quelli che ha creato e che nessuno ha toccato,
+    # non modifica/cancella mai il lavoro esistente — vedi skill path-watch, passo 6.
+    write:
+      enabled: true               # false: i path si applicano solo su idea.yaml, lo strumento resta in lettura
+      folder: ""                  # cartella/spazio dedicato nel tool per gli oggetti creati dal framework, se il tool lo supporta (es. "Product Governance")
+      tracking_plan: true         # aggiunge gli eventi mancanti dei path to_instrument come "pianificati", se il tool ha un piano di tracciamento
 
 # --- Altri connettori (design, SQL ad-hoc, sorgenti di contesto, ecc.) ---
 # Stessa disciplina. check-connectors.sh li segnala a inizio sessione.
