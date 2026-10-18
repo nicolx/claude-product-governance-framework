@@ -17,6 +17,7 @@ framework:
 sync:
   auto_pull: true                 # default true — una chiave a false spegne quel lato
   auto_push: true
+  apps_pull: true                 # inbox-triage/idea-intake/prd-draft/rice-update portano i submodule di apps/ all'ultimo commit remoto prima di leggerli
 
 # --- Opzionali ---
 # dry_run: true                   # istanza di training/demo: OGNI skill gira in simulazione (playbook, "Modalità dry-run"). Non metterla su un'istanza operativa.

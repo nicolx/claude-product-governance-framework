@@ -68,13 +68,20 @@ umana esplicita (skill `pending-approval`) la voce viene appesa a
      sistemi e team toccati, superficie di regressione, complessità di
      review/rollout, più eventuali costi esterni hard (legale, licenze,
      UAT estesa).
-     - **Se i repository sono montati in `apps/`**: ispezionali per
-       collocare l'ordine di grandezza — quali moduli/sistemi tocca
-       l'iniziativa, che interfacce e consumer sono coinvolti, quanto è
-       accoppiato ciò che cambia. È una passata leggera, non una Complete
-       Analysis. Registra `entanglement_basis: code_inspection` e
-       riassumi in `entanglement_note` cosa hai visto (sistemi,
-       interfacce, consumer). Se l'iniziativa è un primo scoring di un
+     - **Se i repository sono montati in `apps/`**: prima portali
+       all'ultima versione con `bash .claude/hooks/governance-sync.sh apps`
+       (playbook, "Sincronizzazione dell'istanza (`origin`)",
+       sottosezione "Codice applicativo (`apps/`)") — il footprint va
+       misurato sul codice corrente, non su quello fermo all'init. Poi
+       ispezionali per collocare l'ordine di grandezza — quali
+       moduli/sistemi tocca l'iniziativa, che interfacce e consumer sono
+       coinvolti, quanto è accoppiato ciò che cambia. È una passata
+       leggera, non una Complete Analysis. Registra `entanglement_basis:
+       code_inspection` e riassumi in `entanglement_note` cosa hai visto
+       (sistemi, interfacce, consumer) con il commit letto (`apps/<slug>`
+       @ commit). Se l'helper non è riuscito ad aggiornare un'app
+       pertinente, dillo nella nota: la stima poggia su codice
+       potenzialmente vecchio. Se l'iniziativa è un primo scoring di un
        intake storico bulk (playbook, "Intake storico e roadmap
        pre-esistente"), salta l'ispezione e metti un valore grezzo con
        `entanglement_basis: structured_estimate` e una nota.

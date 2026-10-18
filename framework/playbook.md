@@ -407,8 +407,26 @@ Vincoli non negoziabili del meccanismo:
   setup git particolare).
 
 Implementazione: helper unico `.claude/hooks/governance-sync.sh`
-(`pull` | `push "<messaggio>" [path...]`), richiamato dagli hook e come
-passo esplicito delle skill.
+(`pull` | `push "<messaggio>" [path...]` | `apps`), richiamato dagli hook
+e come passo esplicito delle skill.
+
+**Codice applicativo (`apps/`).** Il `pull` riallinea i *dati*; i
+submodule in `apps/` restano invece fermi al commit registrato nel
+puntatore, che invecchia a ogni rilascio dei team tech. Le skill che
+**ragionano sul codice** — `inbox-triage` e `idea-intake` (è un bug? è
+già risolto? è debito tecnico?), `prd-draft` (l'How), `rice-update`
+(l'Entanglement da ispezione) — prima di leggerlo eseguono quindi
+`governance-sync.sh apps`, che porta ogni submodule all'ultimo commit
+del suo branch remoto (`submodule.<nome>.branch` in `.gitmodules`,
+altrimenti il branch di default del remote). Stessi principi del pull: non blocca mai (fetch
+fallito, accesso negato → avviso e si legge lo stato locale), non
+sovrascrive mai modifiche locali (submodule con modifiche → saltato e
+segnalato), e stampa per ogni app il commit letto, così la diagnosi
+riporta un riferimento verificabile. **Non committa il puntatore
+aggiornato**: `apps/` resta di proprietà di `init-governance-project`, e il
+codice "corrente" è quello del remote, non quello registrato
+nell'istanza (`check-unpushed.sh` ignora quindi i puntatori dei submodule
+spostati). Disattivabile con `sync.apps_pull: false`.
 
 **Cosa fare quando vedi l'avviso "impossibile allineare in fast-forward".**
 Hai commit locali che il team non ha ancora, e `origin` è andato avanti:

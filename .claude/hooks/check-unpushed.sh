@@ -14,7 +14,7 @@ REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 cd "$REPO_ROOT" || exit 0
 
 DIRTY=0
-if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+if [ -n "$(git status --porcelain --ignore-submodules=all 2>/dev/null)" ]; then
   DIRTY=1
 fi
 

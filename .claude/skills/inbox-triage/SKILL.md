@@ -108,6 +108,19 @@ soli non coprono. In sintesi:
    non-fast-forward, **fermati e riferiscilo all'utente** prima di
    processare l'inbox.
 
+   Subito dopo, **porta il codice di `apps/` all'ultima versione**:
+   `bash .claude/hooks/governance-sync.sh apps` (ogni submodule all'ultimo
+   commit del suo branch remoto; vedi playbook, "Sincronizzazione
+   dell'istanza (`origin`)", sottosezione "Codice applicativo (`apps/`)").
+   La diagnosi del passo 5 — è davvero un bug? è già stato risolto? è
+   debito tecnico o una feature mancante? quale area tocca? — vale solo se
+   legge il codice corrente, non quello fermo al puntatore registrato
+   all'init. L'helper non blocca mai: per ogni submodule non aggiornato
+   (modifiche locali, fetch fallito, accesso negato) **riportalo nel
+   riepilogo** (passo 7) e tieni conto che le diagnosi su quell'app si
+   basano su codice potenzialmente vecchio. Vale anche in dry-run: non
+   scrive sotto `product/`/`context/`/`.governance/`.
+
 1. **Elenca tutto ciò che c'è in `product/inbox/`.** Non assumere che sia
    un solo elemento: possono esserci più file/oggetti scollegati tra loro
    in un colpo solo (es. tre email diverse buttate lì nello stesso
@@ -174,6 +187,19 @@ soli non coprono. In sintesi:
    Se anche una sola di queste tre resta senza risposta dopo aver provato
    il livello 1, non forzare la classificazione: vai su
    `needs_clarification` (livello 2, sotto).
+
+   **Verifica nel codice prima di classificare.** Se l'unità riguarda il
+   comportamento di un'applicazione collegata in `apps/` (un
+   malfunzionamento, un limite, una richiesta che presuppone come funziona
+   oggi il sistema), leggi il codice pertinente — aggiornato al passo 0 —
+   invece di classificare dal solo testo del mittente: un "bug" può essere
+   il comportamento voluto (→ idea), una richiesta può essere già
+   implementata (→ scarto o risposta al richiedente), un problema può
+   essere debito tecnico (→ platform). Riporta l'esito nelle `notes`
+   dell'idea con il riferimento verificabile (`apps/<slug>` @ commit,
+   file/percorso), e proponilo al PM come ipotesi insieme alla
+   classificazione — il codice informa la diagnosi, non sostituisce la
+   conferma del PM. Se `apps/` è vuota o non pertinente, procedi senza.
 
    - **Nuova idea** — segui gli stessi passi della skill `idea-intake`
      per struttura della cartella, naming dello slug, classificazione
@@ -311,7 +337,9 @@ soli non coprono. In sintesi:
    inviarne nessuna in automatico. **Per ogni bug**, di' se il ticket è
    stato aperto (con `card_id`/URL) o se resta un'**AZIONE NON COMPLETATA**
    (connettore giù/`manuale`): in quel caso metti in evidenza il testo
-   pronto e il promemoria di rilanciare `jira-sync`. Se qualcosa non è
+   pronto e il promemoria di rilanciare `jira-sync`. Indica su quale
+   commit di ogni app pertinente si sono basate le diagnosi, e segnala le
+   app che il passo 0 non è riuscito ad aggiornare. Se qualcosa non è
    stato processato per un problema tecnico (file illeggibile, formato non
    gestito) dillo esplicitamente e lascialo in `product/inbox/` piuttosto
    che farlo sparire silenziosamente.

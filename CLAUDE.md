@@ -188,8 +188,11 @@ l'helper `.claude/hooks/governance-sync.sh` (richiamato anche dall'hook
 `SessionStart`). Solo fast-forward, mai un merge automatico, non blocca
 mai, no-op sul canonico. Ogni skill che scrive in `product/`/`context/`
 deve chiudere con `governance-sync.sh push`; quelle elencate nel playbook
-come "read-critical" devono aprire con `governance-sync.sh pull`. Vedi
-playbook, sezione "Sincronizzazione dell'istanza (`origin`)".
+come "read-critical" devono aprire con `governance-sync.sh pull`. Le skill
+che ragionano sul codice (`inbox-triage`, `idea-intake`, `prd-draft`,
+`rice-update`) eseguono `governance-sync.sh apps` prima di leggerlo, che porta i submodule di `apps/` all'ultimo
+commit remoto senza committare il puntatore. Vedi playbook, sezione
+"Sincronizzazione dell'istanza (`origin`)".
 
 Helper gemello per la **lettura in blocco**: `.claude/hooks/governance-dump.sh`
 (`sweep`|`backlog`|`ideas`|`measurements`|`iterations`|`pending`|

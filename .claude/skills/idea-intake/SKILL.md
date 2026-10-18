@@ -102,6 +102,16 @@ Fuori da questa modalità, la skill si comporta come descritto nei
 1. **Leggi il materiale grezzo** fornito dall'utente (allegato, testo
    incollato, o riferimento a un file).
 
+   Se l'istanza ha app collegate in `apps/`, **porta il codice
+   all'ultima versione** prima di classificare:
+   `bash .claude/hooks/governance-sync.sh apps` (vedi playbook,
+   "Sincronizzazione dell'istanza (`origin`)", sottosezione "Codice
+   applicativo (`apps/`)"). La diagnosi del passo 3 vale solo sul codice
+   corrente. L'helper non blocca mai: un'app non aggiornata (modifiche
+   locali, fetch fallito) va segnalata al PM insieme alla classificazione
+   proposta. Vale anche in dry-run; non serve in modalità backfill (non c'è
+   diagnosi: la card esiste già sul tracker).
+
 2. **Decomponi prima di classificare, se il materiale mescola più
    richieste indipendenti.** Una singola mail o trascrizione può
    contenere più idee distinte, ciascuna con la propria priorità futura.
@@ -114,7 +124,19 @@ Fuori da questa modalità, la skill si comporta come descritto nei
    futuro, bozza di risposta separati). Se invece il materiale è coeso
    (un solo problema descritto da più angolazioni), resta un'unica idea.
 
-3. **Classifica** ogni unità risultante secondo il playbook:
+3. **Classifica** ogni unità risultante secondo il playbook.
+
+   **Verifica nel codice prima di classificare.** Se l'unità riguarda il
+   comportamento di un'applicazione collegata in `apps/`, leggi il codice
+   pertinente (aggiornato al passo 1) invece di classificare dal solo testo
+   del mittente: un "bug" può essere il comportamento voluto (→ idea), una
+   richiesta può essere già implementata (→ scarto o risposta al
+   richiedente), un problema può essere debito tecnico (→ platform).
+   Riporta l'esito nelle `notes` dell'idea con il riferimento verificabile
+   (`apps/<slug>` @ commit, file/percorso) e proponilo al PM come ipotesi
+   — il codice informa la diagnosi, non sostituisce la sua conferma. Se
+   `apps/` è vuota o non pertinente, procedi senza.
+
    - **Bug** — se descrive un output diverso da quanto atteso per errore
      di codice o interpretazione errata del requisito. **Crea comunque la
      cartella idea** (passi 4-6 sotto), con `classification: bug` — serve

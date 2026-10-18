@@ -38,6 +38,16 @@ le implicazioni tecniche vanno considerate fin dall'authoring, non
 scoperte dopo. Se `apps/` è vuota o non pertinente al tema del PRD, procedi
 normalmente senza bloccarti.
 
+Prima di leggerli, **portali all'ultima versione**:
+`bash .claude/hooks/governance-sync.sh apps` (vedi playbook,
+"Sincronizzazione dell'istanza (`origin`)", sottosezione "Codice
+applicativo (`apps/`)"). I submodule restano altrimenti fermi al commit
+registrato all'init, e un How scritto su codice vecchio descrive un
+sistema che non esiste più. L'helper non blocca mai: un'app non
+aggiornata (modifiche locali, fetch fallito) va riportata tra le azioni
+aperte del riepilogo (passo 14), perché l'How su quell'app potrebbe non
+essere attuale. Vale anche in dry-run e in retrofit.
+
 Allo stesso modo, se `context/` (radice del repository, vedi playbook
 sezione "Contesto aziendale") ha file rilevanti per il Why/Who di questa
 idea — modello di business, dati di mercato, organizzazione, normativa —
@@ -257,7 +267,9 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
       residue accettate, "potrebbe iniziare domani?" per ciascun lettore;
     - **cosa hai aggiunto rispetto alla fonte** (P5) e quali decisioni ha
       preso il PM;
-    - **azioni aperte del PM** (materiali da allegare, date, verifiche).
+    - **azioni aperte del PM** (materiali da allegare, date, verifiche);
+    - su quale commit di ogni app pertinente si basa l'How, e le app che
+      `governance-sync.sh apps` non è riuscito ad aggiornare.
 
 15. **Sincronizza il repo**: esegui
     `bash .claude/hooks/governance-sync.sh push "prd-draft: PRD <slug>" product/prds/ product/ideas/ product/reference/glossary.yaml`
