@@ -30,6 +30,9 @@ fields:
   - field: "Chiuse nel periodo"
     source: "measurement*.yaml con closure.closed: true e closure.closed_at nel periodo"
     rule: "closure.outcome + closure.note, senza riformularli"
+  - field: "Dashboard dei path"
+    source: "product-lines.yaml: analytics_dashboard.ref (skill path-watch)"
+    rule: "un link per Product Line, solo se valorizzato; altrimenti la riga non compare"
 
 gaps: []
 ---
@@ -53,6 +56,8 @@ _Letture registrate fino al {data ultima lettura}._
 | Product Line / NSM | Baseline | Target | Ultima lettura (data) | Trend | Allarme |
 |---|---|---|---|---|---|
 | {product_line} / {name} | {baseline} {unit} | {target} {unit} | {value} ({date}) | {trend_status} | {alert.status} |
+
+Dashboard dei path da monitorare: {product_line} → {analytics_dashboard.ref}
 
 ## Iniziative in misurazione
 | KPI | Baseline | Target | Ultima lettura | Stato | Settimane dal rilascio |

@@ -21,3 +21,17 @@
     value: null
     source: null                    # es. "DataBricks", "HR system export"
     owner: null                     # chi è responsabile di tenerlo aggiornato
+  # Dashboard dei path da monitorare di questa linea (skill path-watch,
+  # passo 6b) — solo con una fonte analytics collegata e
+  # metrics.paths.write.dashboards.enabled non false. Mostra la NSM (se ha
+  # un oggetto nel catalogo) e un grafico per path active delle idee
+  # attive della linea, riallineata a ogni giro di path-watch. Scritto da
+  # path-watch, scrittura diretta: è un fatto di configurazione, non una
+  # decisione. Il framework gestisce SOLO i grafici in managed_charts;
+  # quelli messi da altri sulla stessa dashboard non si toccano.
+  analytics_dashboard:
+    ref: null                       # id/link della dashboard nel tool — creata da path-watch, oppure una esistente indicata dal PM
+    created_by_framework: false
+    last_synced_at: null
+    managed_charts: []              # [{chart_ref, source: "{idea_id}#{path_id}" | "nsm"}] — i soli grafici che path-watch aggiunge/riordina/toglie
+    changes: []                     # APPEND-ONLY, stessa forma di analytics_changes in idea.yaml: at, action, reversible, before (versione del tool o lista completa di grafici e layout), confirmed_by, reverted_at

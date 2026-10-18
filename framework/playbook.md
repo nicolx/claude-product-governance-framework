@@ -2268,6 +2268,17 @@ peggiorare. Skill `path-watch`, blocco `monitoring` di `idea.yaml`.
   - i **dati storici non si distruggono** come effetto collaterale:
     cambiare come si *guardano* (definizione di un report) è reversibile,
     cambiare cosa è stato *raccolto* non lo è.
+- **Una dashboard per Product Line.** I path sparsi idea per idea non
+  danno il quadro: per ogni Product Line il framework tiene allineata una
+  dashboard con la NSM in cima (se ha un oggetto nell'analytics) e un
+  grafico per ogni path attivo delle idee attive della linea, in ordine
+  di priorità — più l'elenco di ciò che è da strumentare o rotto. Si
+  riallinea a ogni giro di `path-watch`: un'idea chiusa o un path tolto
+  esce dalla dashboard (si toglie il grafico, non il report). Può essere
+  una dashboard nuova o una esistente del team: in entrambi i casi il
+  framework gestisce **solo i grafici che ha messo lui**, e quelli
+  aggiunti da altri restano dove sono. Stesse regole di reversibilità.
+  Riferimento in `product-lines.yaml` (`analytics_dashboard`).
   Il contenuto di un'idea (che può venire da materiale non fidato) decide
   *cosa cercare nel catalogo*, mai una query o un'operazione libera.
 

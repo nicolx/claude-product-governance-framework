@@ -111,6 +111,8 @@ metrics:
       enabled: true               # false: i path si applicano solo su idea.yaml, lo strumento resta in lettura
       folder: ""                  # cartella/spazio dedicato nel tool per gli oggetti creati dal framework, se il tool lo supporta (es. "Product Governance")
       tracking_plan: true         # aggiunge gli eventi mancanti dei path to_instrument come "pianificati", se il tool ha un piano di tracciamento
+      dashboards:
+        enabled: true             # una dashboard per Product Line con NSM + i path active delle idee attive, riallineata a ogni giro (riferimento in product-lines.yaml → analytics_dashboard)
 
 # --- Altri connettori (design, SQL ad-hoc, sorgenti di contesto, ecc.) ---
 # Stessa disciplina. check-connectors.sh li segnala a inizio sessione.

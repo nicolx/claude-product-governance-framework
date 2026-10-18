@@ -116,9 +116,10 @@ o intervento git esplicito dell'utente).
      `.run-meta.yaml` minimale `status: rolled_back`) — è costosa da
      ricreare. Default: **sì, conservala**;
    - le **scritture nello strumento di analytics** fatte dal run: le voci
-     `analytics_changes` aggiunte dai commit del run (skill `path-watch`,
-     passo 6). Il revert le toglie da `idea.yaml` ma **non** dallo
-     strumento. Elencale e per ciascuna proponi:
+     `analytics_changes` (in `idea.yaml`) e `analytics_dashboard.changes`
+     (in `product-lines.yaml`) aggiunte dai commit del run (skill
+     `path-watch`, passi 6 e 6b). Il revert le toglie dai file ma **non**
+     dallo strumento. Elencale e per ciascuna proponi:
      - `update_definition`/`move`/simili (reversibili) → **ripristino**
        dello stato `before` (versione del tool o definizione salvata) —
        a sua volta reversibile, si fa con la conferma del piano;

@@ -365,7 +365,9 @@ Fuori da questa modalità, la skill si comporta come descritto nei
    promemoria di rilanciare `jira-sync`.
 
 10. **Sincronizza il repo**: come ultimo passo, esegui
-    `bash .claude/hooks/governance-sync.sh push "idea-intake: <slug>[, +N unità]" product/ideas/`
+    `bash .claude/hooks/governance-sync.sh push "idea-intake: <slug>[, +N unità]" product/ideas/ product/reference/product-lines.yaml`
+    (`product-lines.yaml` cambia solo se il passo 8b ha riallineato una
+    dashboard per Product Line; altrimenti l'helper lo ignora)
     (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Se
     l'helper segnala un push fallito o un disallineamento, riferiscilo nel
     riepilogo — non ripetere le scritture.

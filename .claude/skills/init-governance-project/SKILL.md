@@ -155,7 +155,13 @@ per raccogliere:
    spegnerlo), se lo strumento va lasciato in sola lettura
    (`write.enabled: false`) e se c'è una **cartella/spazio dedicato** dove
    mettere gli oggetti creati (`write.folder` — consigliato: tiene il
-   lavoro del framework separato da quello degli analisti). Lascia i
+   lavoro del framework separato da quello degli analisti). Chiedi anche,
+   per ogni Product Line, se la **dashboard dei path** va creata nuova
+   (default) o se c'è già una dashboard del team da usare — in quel caso
+   scrivi il suo riferimento in `product-lines.yaml` →
+   `analytics_dashboard.ref` con `created_by_framework: false` (il
+   framework ci gestirà solo i grafici che aggiunge lui); per
+   spegnerla, `write.dashboards.enabled: false`. Lascia i
    default degli altri campi salvo indicazioni. **Nessuna credenziale nel config** (né altrove nel repo
    tracciato) — solo il *nome* e i *comandi*.
 8. **Eventuali altre configurazioni rilevanti** — canale Slack/Teams per

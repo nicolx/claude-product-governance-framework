@@ -1,6 +1,6 @@
 ---
 name: path-watch
-description: Quando l'istanza è collegata a una fonte analytics (blocco metrics in .governance/config.yaml), suggerisce per ogni idea attiva i path utente da monitorare (funnel, sequenze di pagine/schermate/eventi) trovati nel catalogo reale dell'analytics e nel codice di apps/, e li APPLICA — sull'idea (blocco monitoring.paths, con una baseline aggregata) e nello strumento di analytics (crea il funnel/report salvato del path o allinea uno esistente, pianifica gli eventi mancanti) — anche su oggetti creati da altri, purché in modo reversibile e senza toccare i dati storici; ogni azione irreversibile chiede conferma esplicita prima. Tiene vivi i path nel tempo — promuove quelli "da strumentare" quando gli eventi compaiono, segnala quelli rotti — e fornisce a measurement-watch il riferimento per le letture automatiche. Gira dentro idea-intake/inbox-triage/prd-draft, nella sweep del Backlog Refinement, e standalone.
+description: Quando l'istanza è collegata a una fonte analytics (blocco metrics in .governance/config.yaml), suggerisce per ogni idea attiva i path utente da monitorare (funnel, sequenze di pagine/schermate/eventi) trovati nel catalogo reale dell'analytics e nel codice di apps/, e li APPLICA — sull'idea (blocco monitoring.paths, con una baseline aggregata) e nello strumento di analytics (crea il funnel/report salvato del path o allinea uno esistente, pianifica gli eventi mancanti, tiene allineata una dashboard per Product Line con i path delle sue idee attive) — anche su oggetti creati da altri, purché in modo reversibile e senza toccare i dati storici; ogni azione irreversibile chiede conferma esplicita prima. Tiene vivi i path nel tempo — promuove quelli "da strumentare" quando gli eventi compaiono, segnala quelli rotti — e fornisce a measurement-watch il riferimento per le letture automatiche. Gira dentro idea-intake/inbox-triage/prd-draft, nella sweep del Backlog Refinement, e standalone.
 ---
 
 # path-watch
@@ -245,6 +245,53 @@ esplicita del PM prima di essere fatto — regole al passo 6.
      un'operazione diversa "che ci somiglia", che potrebbe non essere
      reversibile.
 
+6b. **Riallinea la dashboard della Product Line** (solo con
+   `metrics.paths.write.dashboards.enabled` diverso da `false`). Per ogni
+   Product Line toccata da questo giro (almeno un'idea con un path
+   applicato, promosso, rotto o rimosso), la dashboard in
+   `product/reference/product-lines.yaml` → `analytics_dashboard` deve
+   mostrare **i path `active` di tutte le idee attive della linea** —
+   non solo di quelle viste in questo giro: rileggi le `idea.yaml` della
+   linea.
+   - **Contenuto.** In cima, se la NSM della linea (`nsm`) ha un oggetto
+     corrispondente nel catalogo (report/metrica salvata con lo stesso
+     significato), il suo grafico. Poi un grafico per path `active`,
+     raggruppati per idea in ordine di RICE decrescente (mandate e
+     strategic exception in testa, come in `backlog-list`); titolo
+     `[{short_ref o slug}] {label}`, e — se il tool ha blocchi di testo —
+     una riga con `summary` e stato dell'idea. I path `to_instrument`/
+     `broken` non hanno un grafico: se il tool ha blocchi di testo,
+     elencali in fondo come "da strumentare"/"rotti", così chi guarda la
+     dashboard vede anche cosa manca.
+   - **Quale dashboard.** Se `analytics_dashboard.ref` è vuoto: crea
+     `[{short_ref_prefix}] {product_line} — path da monitorare` nella
+     cartella `metrics.paths.write.folder`, e registra `ref` e
+     `created_by_framework: true`. Se il PM ha indicato una dashboard
+     esistente del team (all'init o in conversazione), `ref` punta a
+     quella e `created_by_framework: false`.
+   - **Il framework gestisce solo i suoi grafici.** In `managed_charts`
+     tieni l'elenco dei grafici che ha messo lui (id del grafico/report +
+     path `{idea_id}#{path_id}` o `nsm`). Aggiunge, aggiorna, riordina e
+     toglie **solo quelli**: i grafici e i testi messi da altre persone
+     sulla stessa dashboard non si toccano, né si spostano. Se la
+     dashboard è condivisa, metti i grafici gestiti in una sezione/tab
+     dedicata se il tool la prevede.
+   - **Togliere un grafico** (idea chiusa/archiviata, path rimosso o
+     rotto) toglie il grafico dalla dashboard, **non** il report
+     sottostante: è reversibile (si rimette). Eliminare il report resta
+     l'azione irreversibile del passo 6, con conferma.
+   - **Stesse regole di reversibilità del passo 6.** Prima di modificare
+     la dashboard salva lo stato precedente (versione del tool, o la
+     lista completa di grafici e layout) in
+     `analytics_dashboard.changes` (append-only, stessa forma di
+     `analytics_changes`). Eliminare la dashboard, o modificarla senza
+     poterne salvare lo stato, è irreversibile → conferma esplicita.
+     Le modifiche a una dashboard `created_by_framework: false` vanno
+     nel recap con prima/dopo.
+   - Scrivi `analytics_dashboard.last_synced_at`. È una scrittura su un
+     dato di riferimento condiviso (`product-lines.yaml`), diretta, senza
+     approvazione — come il resto del giro.
+
 7. **Recap al PM**, sempre, anche quando tutto è stato applicato. Prima
    colonna l'identificatore (`short_ref`, altrimenti lo slug — playbook,
    "Ogni elenco prodotto dal sistema è indirizzabile"), poi `summary`,
@@ -255,6 +302,8 @@ esplicita del PM prima di essere fatto — regole al passo 6.
      e come annullare —, eventi pianificati, scritture fallite;
    - **modifiche irreversibili in attesa di conferma** (cosa cambia, cosa
      si perde, chi ne è toccato), se non confermate in conversazione;
+   - **dashboard per Product Line**: link, grafici aggiunti/tolti in
+     questo giro;
    - **da strumentare** (path + `missing_steps`) — con un'enfasi in più
      se l'idea è già `in_development`: gli eventi vanno aggiunti *in
      questa* iterazione o la misurazione partirà senza baseline;
@@ -270,8 +319,8 @@ esplicita del PM prima di essere fatto — regole al passo 6.
    al PM, mai presunto).
 
 8. **Sincronizza il repo** (standalone): se hai scritto almeno una
-   `idea.yaml`, `bash .claude/hooks/governance-sync.sh push "path-watch:
-   path di monitoraggio su N idee" product/ideas/`. Dentro un'altra skill
+   `idea.yaml` o `product-lines.yaml`, `bash .claude/hooks/governance-sync.sh push "path-watch:
+   path di monitoraggio su N idee" product/ideas/ product/reference/product-lines.yaml`. Dentro un'altra skill
    **non** fare push: le scritture entrano nel commit della skill
    chiamante; in modalità solo-calcolo (sweep) restituisci le scritture
    proposte senza toccare né i file né lo strumento.
@@ -290,6 +339,8 @@ esplicita del PM prima di essere fatto — regole al passo 6.
   specifica modifica — mai per categoria, mai in background.
 - Non modificare in silenzio un oggetto creato da altri: va nel recap con
   prima/dopo, anche se reversibile.
+- Non toccare, spostare o riordinare su una dashboard i grafici e i testi
+  che non sono in `managed_charts`: sono di chi li ha messi.
 - Non creare un doppione di un funnel/report che esiste già e copre il
   flusso: riusalo (e allinealo, se serve, in modo reversibile).
 - Non scrivere righe grezze o dati per utente in `idea.yaml`: solo

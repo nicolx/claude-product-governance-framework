@@ -291,6 +291,6 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
       `governance-sync.sh apps` non è riuscito ad aggiornare.
 
 15. **Sincronizza il repo**: esegui
-    `bash .claude/hooks/governance-sync.sh push "prd-draft: PRD <slug>" product/prds/ product/ideas/ product/reference/glossary.yaml`
+    `bash .claude/hooks/governance-sync.sh push "prd-draft: PRD <slug>" product/prds/ product/ideas/ product/reference/glossary.yaml product/reference/product-lines.yaml`
     (vedi playbook, "Sincronizzazione dell'istanza (`origin`)"). Se l'helper
     segnala un push fallito, riferiscilo nel riepilogo finale.

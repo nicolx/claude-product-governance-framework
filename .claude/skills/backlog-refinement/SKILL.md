@@ -138,7 +138,9 @@ piano passa **sempre** da `product/approvals/pending/`
          idee `in_development`: gli eventi vanno aggiunti in questa
          iterazione), promossi, **rotti**, KPI collegabili a un path,
          modifiche previste nello strumento (in evidenza quelle su
-         oggetti creati da altri). I path e le modifiche reversibili si
+         oggetti creati da altri), e il **link alla dashboard di ogni
+         Product Line** con i grafici che entrano/escono — è il quadro da
+         tenere aperto durante la discussione delle priorità. I path e le modifiche reversibili si
          applicano senza conferma (playbook, "Path da monitorare"): al
          checkpoint il PM può toglierne uno ("togli il path {id} da {ID}"
          → `status: removed` + `removed_reason` chiesto a lui) e **deve
@@ -198,11 +200,14 @@ piano passa **sempre** da `product/approvals/pending/`
 
    f. **Una sola scrittura, un solo commit.** Applica *tutti* i valori
       calcolati (`escalation_status`, `rice_status.*`, `alert.*`,
-      `closure`, i blocchi `monitoring` restituiti da `path-watch`) e
-      *tutte* le azioni di checkpoint concordate. Le scritture di
-      `path-watch` **nello strumento di analytics** si eseguono qui,
-      *prima* di scrivere le `idea.yaml`, perché id e stato precedente
-      finiscono in `analytics_ref`/`analytics_changes`: le **reversibili**
+      `closure`, i blocchi `monitoring` e gli `analytics_dashboard`
+      restituiti da `path-watch`) e *tutte* le azioni di checkpoint
+      concordate. Le scritture di `path-watch` **nello strumento di
+      analytics** (path e dashboard per Product Line) si eseguono qui,
+      *prima* di scrivere `idea.yaml`/`product-lines.yaml`, perché id e
+      stato precedente finiscono in `analytics_ref`/`analytics_changes`/
+      `analytics_dashboard.changes`; la dashboard si riallinea **dopo**
+      i path di quella linea, sui path finali: le **reversibili**
       direttamente, le **irreversibili** solo quelle che il PM ha
       confermato una per una al checkpoint del blocco 7 (le altre restano
       proposte nel recap); quelle fallite restano nel recap. Poi:

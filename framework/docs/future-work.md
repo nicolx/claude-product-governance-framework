@@ -206,13 +206,15 @@ esplicita; la **configurazione di osservazione** dello strumento (report,
 funnel, dashboard, piano di tracciamento) è scrivibile, in modo
 reversibile.
 
+**Dashboard per Product Line: FATTO** (2026-10-18). `path-watch` passo
+6b, `product-lines.yaml` → `analytics_dashboard`,
+`metrics.paths.write.dashboards`: NSM + un grafico per path attivo delle
+idee attive della linea, riallineata a ogni giro; nuova o una esistente
+del team (scelta all'init), con il framework che gestisce solo i grafici
+in `managed_charts`.
+
 Restano fuori scope, da rivedere se emerge la domanda:
 
-- **Dashboard per Product Line.** Raccogliere i report dei path delle
-  idee di una Product Line in una dashboard (aggiornata a ogni giro).
-  Utile per le cerimonie; con il criterio di reversibilità è fattibile,
-  ma va deciso quale dashboard (nuova o una esistente del team) e con che
-  cadenza riallinearla.
 - **Pulizia degli oggetti orfani.** Gli oggetti propri di path rimossi o
   di idee chiuse restano nello strumento finché il PM non conferma
   l'eliminazione. Un giro periodico che li elenchi (o li archivi, se il
