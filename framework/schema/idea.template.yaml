@@ -206,6 +206,47 @@ requester_reply:
   deep_dive_meeting_needed: false
   sent_at: null
 
+# --- Avviso di conclusione agli stakeholder (chiudere il loop alla fine) ---
+#
+# requester_reply chiude il loop all'INGRESSO; conclusion_notices lo chiude
+# all'USCITA. Ogni conclusione di un'iniziativa genera un avviso
+# OBBLIGATORIO agli stakeholder — vedi playbook, "Avvisare gli stakeholder
+# della conclusione". Tre conclusioni:
+#   - delivered          -> status passa a done (codice in produzione; per
+#     un bug: il problema segnalato è chiuso)
+#   - measurement_closed -> closure.closed passa a true nel
+#     measurement*.yaml del PRD (esito: si è mossa / non si è mossa)
+#   - aborted            -> status passa ad aborted (iniziativa avviata e
+#     poi interrotta: perché, e cosa succede alla richiesta)
+#
+# GATE: status: done, status: aborted e closure.closed: true si scrivono
+# SOLO nello stesso passo in cui la voce corrispondente arriva a
+# notice_status: sent (il PM dichiara di averla inviata) o waived (esente,
+# con waived_reason dato dal PM — mai presunto, mai automatico). Finché la
+# voce è pending/drafted, l'idea resta nello stato precedente: la
+# conclusione è RILEVATA, non ancora AVVENUTA per il metodo. done_at
+# resta la data del fatto (rilascio in produzione), non quella dell'invio.
+#
+# Mai inviato in automatico: la bozza la scrive la skill, il PM la manda a
+# mano (stessa logica di requester_reply). Scrittura diretta sull'idea, NON
+# passa da product/approvals/pending/: è comunicazione 1:1 con
+# l'iniziativa, non una decisione di priorità. APPEND-ONLY: una voce per
+# conclusione, mai cancellata (audit — "chi abbiamo avvisato, quando, con
+# che testo"). L'hook check-conclusion-notices.sh conta le voci
+# pending/drafted a inizio e fine sessione.
+conclusion_notices: []
+# Esempio di singola voce:
+# - kind: delivered             # delivered | measurement_closed | aborted
+#   detected_at: ""             # ISO — quando la conclusione è stata rilevata/proposta
+#   detected_by: ""             # delivery-watch | jira-sync | measurement-watch | backlog-refinement | pm
+#   source_ref: null            # es. id della voce di coda di delivery-watch, o percorso del measurement*.yaml
+#   notice_status: pending      # pending | drafted | sent | waived
+#   recipients: []              # proposer (se esterno) + stakeholders della product_line (product-lines.yaml) — confermati dal PM
+#   subject: null
+#   body: null                  # testo pronto da copiare — mai inviato in automatico
+#   sent_at: null               # data dichiarata dal PM dopo l'invio manuale
+#   waived_reason: null         # solo se waived: perché non c'è nessuno da avvisare (es. "idea interna del PM, product line senza stakeholder esterni") — dato dal PM
+
 # --- Solo per classification: idea (bug e strategic_exception saltano il RICE) ---
 #
 # La "E" del RICE è ENTANGLEMENT (footprint del cambiamento), NON Effort

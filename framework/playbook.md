@@ -746,6 +746,10 @@ Il contenuto dipende da come è stata classificata:
 - [ ] Per le idee normali: la prima ipotesi di timing è una forbice onesta, non una data né una promessa?
 - [ ] Per le Strategic Exception: la bozza dice "in attesa di conferma", non "approvata", finché non lo è?
 
+Il loop si chiude anche **all'uscita**: consegna, interruzione e chiusura
+della misurazione generano un avviso obbligatorio agli stakeholder — vedi
+"Avvisare gli stakeholder della conclusione".
+
 ## Intake storico e roadmap pre-esistente
 
 *"You can't cross the sea merely by standing and staring at the water." —
@@ -1871,6 +1875,15 @@ inviato, i destinatari e la data restano nella voce di coda come trail —
 archiviare la voce con un motivo, o lasciarla per dopo. Non c'è nessun
 percorso non presidiato.
 
+**Le conclusioni non si archiviano.** Per `delivered` e `bug_resolved` la
+comunicazione non è una scelta: è l'avviso di conclusione obbligatorio
+(sezione "Avvisare gli stakeholder della conclusione"). Nel triage la
+bozza va nella voce `delivered` di `conclusion_notices` sull'idea, e il
+dismiss non esiste — l'unica alternativa all'invio è l'**esenzione**
+(`waived`) con un motivo dato dal PM. L'idea passa a `status: done` solo
+quando l'avviso è `sent` o `waived`. Per gli altri eventi (`entered_development`,
+`blocked`, `regression`) resta la scelta del PM.
+
 **Lavoro che bypassa la governance.** Se `delivery_watch.board_jql` è
 configurata, `delivery-watch` guarda anche le card della board non
 collegate a nessuna idea. Quando ne intercetta una con una transizione
@@ -1916,6 +1929,12 @@ un blocco tecnico impatta la roadmap.
 > non alla Definition of Done. Tenerli separati evita che una card resti
 > aperta indefinitamente in attesa che una metrica di business si muova.
 > "Done" risponde a "abbiamo consegnato?", non a "ha funzionato?".
+>
+> Nel repo di governance, però, l'idea passa a `status: done` solo
+> quando la consegna è stata **comunicata** agli stakeholder (o
+> esplicitamente esentata dal PM) — vedi "Avvisare gli stakeholder della
+> conclusione". Il codice in produzione è il fatto; l'avviso è ciò che
+> lo rende vero anche per chi lo aveva chiesto.
 >
 > **Nota operativa per una nuova istanza.** In assenza di una DoD
 > dichiarata dal tech lead, una bozza può essere derivata ispezionando la
@@ -2048,6 +2067,84 @@ un'eccezione che nessuno chiude formalmente.
 - [ ] Per le iniziative il cui impatto non convince: è stata presa una decisione esplicita (follow-up o chiusura), invece di lasciarle in un limbo?
 - [ ] Per le iniziative senza una metrica di business (es. compliance): è dichiarato esplicitamente il perché, invece di una metrica proxy inventata?
 - [ ] Ogni iniziativa rilasciata ha, prima o poi, un atto esplicito di chiusura/accettazione — non resta aperta indefinitamente senza che nessuno se ne occupi?
+- [ ] La chiusura è stata comunicata agli stakeholder (`conclusion_notices`, `kind: measurement_closed`, `sent` o `waived`) — nello stesso passo, non dopo?
+
+## Avvisare gli stakeholder della conclusione
+
+*"The single biggest problem in communication is the illusion that it has
+taken place." — George Bernard Shaw*
+
+"Chiudere il loop col richiedente" chiude il loop **all'ingresso**: chi
+ha chiesto sa che la richiesta è stata vista. Questa sezione lo chiude
+**all'uscita**, ed è altrettanto non negoziabile. Un'iniziativa che si
+conclude senza che gli stakeholder lo sappiano è, per loro, un'iniziativa
+ancora in corso — o peggio, dimenticata. Il valore consegnato che nessuno
+sa di avere non costruisce fiducia nel processo; un'interruzione
+scoperta per caso la distrugge.
+
+**Tre conclusioni, tre avvisi obbligatori.**
+
+| Conclusione | Quando | Cosa dice l'avviso | Destinatari tipici |
+|---|---|---|---|
+| `delivered` | l'idea passa a `status: done` (codice in produzione — Definition of Done; per un bug: problema chiuso) | cosa è cambiato, da quando, come si vede (screenshot da `demo-capture` se c'è UI), quando si guarderà l'impatto | richiedente (`proposer`) + stakeholders della `product_line` |
+| `measurement_closed` | `closure.closed: true` nel `measurement*.yaml` | l'esito: la KPI si è mossa o non si è mossa, nelle parole del PM (`closure.outcome`/`note`), ed eventuale follow-up | stakeholders della `product_line` + richiedente |
+| `aborted` | l'idea passa a `status: aborted` | perché ci si ferma, cosa succede alla richiesta (rimessa nel bucket, assorbita da un'altra iniziativa, abbandonata) | richiedente + chi era stato informato dell'avvio |
+
+`declined` non è in tabella: è uno scarto al triage, già coperto dalla
+`requester_reply` di tipo `decline`.
+
+**Il gate.** La conclusione, per il metodo, **avviene quando è
+comunicata**, non quando è rilevata. Nessuna skill scrive `status: done`,
+`status: aborted` o `closure.closed: true` se non nello stesso passo in
+cui la voce corrispondente di `conclusion_notices` sull'idea arriva a:
+
+- **`sent`** — il PM dichiara di aver inviato l'avviso (testo,
+  destinatari e data restano nella voce come trail); oppure
+- **`waived`** — esente, con un `waived_reason` **dato dal PM** (es.
+  "idea interna del PM, nessuno stakeholder esterno da avvisare"; "intake
+  storico, esito già comunicato a suo tempo"). Mai un'esenzione presunta
+  o automatica: "non c'è nessuno da avvisare" è un giudizio del PM.
+
+Finché la voce resta `pending` o `drafted`, l'idea resta nello stato
+precedente (`in_jira`, o in lavorazione) e la conclusione compare come
+**rilevata, in attesa di avviso** — nella sweep di apertura del Backlog
+Refinement e nel promemoria dell'hook `check-conclusion-notices.sh` (a
+inizio e fine sessione). `done_at` resta comunque la data del fatto (il
+rilascio in produzione), non quella dell'invio: la finestra di
+misurazione non si sposta perché l'avviso è partito in ritardo.
+
+**Chi apre la voce.** Chi rileva la conclusione:
+
+- `delivery-watch` — un evento `delivered`/`bug_resolved` nel triage
+  apre (o aggiorna) la voce `delivered` sull'idea; non è archiviabile con
+  un semplice dismiss (vedi "Transizioni di delivery rilevanti per gli
+  stakeholder");
+- `jira-sync` — in Pull o in Riconciliazione, quando il PM conferma che
+  un ticket chiuso significa Done;
+- `measurement-watch` — quando il PM conferma l'atto di chiusura;
+- `backlog-refinement` (o qualunque skill/PM in conversazione) — quando
+  il PM decide di interrompere un'iniziativa (`aborted`) o dichiara a
+  mano che è in produzione (istanza senza tracker collegato).
+
+**Mai inviato in automatico.** Come `requester_reply`: la skill scrive la
+bozza (`subject`, `body`, `recipients` proposti da `proposer` +
+stakeholders della `product_line` in `product-lines.yaml`), il PM la
+rivede e la manda a mano. Non passa da `product/approvals/pending/`: è
+comunicazione 1:1 con l'iniziativa, non una decisione di priorità, e
+rimandarla a un secondo assenso significherebbe perderla — la stessa
+ragione per cui il ticket di un bug confermato si apre subito. Il gate
+non chiede un'approvazione in più: chiede che l'avviso **esista**.
+
+*Principio Agile da incarnare in questa fase:*
+- *La nostra massima priorità è soddisfare il cliente* — e il cliente
+  interno che non sa di essere stato soddisfatto non lo è.
+
+**Checklist operativa**
+- [ ] Ogni idea `done` ha una voce `delivered` in `conclusion_notices` con `sent` o `waived`?
+- [ ] Ogni idea `aborted` (dopo l'avvio) ha una voce `aborted` con `sent` o `waived`?
+- [ ] Ogni `closure.closed: true` ha la sua voce `measurement_closed` con `sent` o `waived`?
+- [ ] Ogni `waived` ha un motivo dato dal PM, non presunto?
+- [ ] Le conclusioni rilevate e ancora `pending`/`drafted` sono state riviste all'ultimo Backlog Refinement?
 
 ---
 

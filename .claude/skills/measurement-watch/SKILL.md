@@ -143,6 +143,21 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
      (per il caso senza KPI) | `inconclusive_accepted`
    - `note`: il perché in una riga, nelle parole del PM
 
+   **Gate: la chiusura si comunica.** Prima di scrivere `closed: true`,
+   apri sull'idea una voce `conclusion_notices` (`kind:
+   measurement_closed`, `detected_by: measurement-watch`, `source_ref` =
+   percorso del `measurement*.yaml`) con una bozza di avviso agli
+   stakeholder: l'esito (`outcome`/`note` nelle parole del PM), cosa
+   significa, l'eventuale follow-up. `recipients` = stakeholders della
+   `product_line` + `proposer` (il PM conferma/edita). **Mostrala, non
+   inviarla.** `closure` si scrive **nello stesso passo** in cui il PM
+   dichiara l'avviso inviato (`notice_status: sent` + `sent_at`) o lo
+   esenta con un motivo suo (`waived` + `waived_reason`). Se il PM
+   rimanda l'invio, la voce resta `drafted` e `closure.closed` resta
+   `false` — l'iniziativa continua a comparire, segnalata come "chiusura
+   decisa, avviso da inviare" (playbook, "Avvisare gli stakeholder della
+   conclusione").
+
    Anche questa è cattura di una decisione già presa in conversazione,
    non passa da `product/approvals/pending/`. Da questo momento,
    `measurement-watch` non segnala più questa iniziativa nei run
@@ -183,6 +198,9 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
   `inconclusive`, non un esito positivo o negativo per default.
 - Non creare una nuova idea di follow-up di tua iniziativa — proponilo,
   la creazione resta un passo esplicito del PM tramite `idea-intake`.
+- Non impostare `closure.closed: true` senza una voce
+  `conclusion_notices` `measurement_closed` `sent` o `waived` — la
+  chiusura non comunicata non è una chiusura.
 - Non impostare `closure.closed: true` senza una decisione esplicita del
   PM in questa conversazione — nemmeno per le iniziative senza KPI:
   "non c'è nulla da misurare" non equivale a "possiamo chiuderla senza

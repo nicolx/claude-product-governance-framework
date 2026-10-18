@@ -159,7 +159,15 @@ locale, tipicamente prima di generare uno `roadmap-snapshot`.
    indica che il ticket è chiuso/in produzione, segnalalo esplicitamente
    — ma non decidere tu se questo significa "Done" secondo la Definition
    of Done dell'istanza (vedi playbook): riportalo, lascia la
-   valutazione all'utente.
+   valutazione all'utente. Se il PM conferma che è Done, **non scrivere
+   subito `status: done`**: prima l'avviso di conclusione agli
+   stakeholder (playbook, "Avvisare gli stakeholder della conclusione")
+   — voce `conclusion_notices` `kind: delivered`, `detected_by:
+   jira-sync`, bozza mostrata e mai inviata; `status: done` + `done_at`
+   (data della transizione, non dell'invio) solo quando il PM la dichiara
+   `sent` o la esenta (`waived` + motivo suo). Se `delivery-watch` è
+   attiva e ha già una voce aperta per la stessa card, riusala — non
+   duplicarla.
 3. Questo aggiornamento è un fatto osservato (stato remoto), non una
    proposta: **non passa dalla coda di approvazione**. Se invece dal
    commento Jira emerge un'informazione che dovrebbe cambiare il RICE o
@@ -212,7 +220,8 @@ rimanda la riconciliazione se il PM sceglie di proseguire.
    scrivi `jira.card_id`/`jira.url`/`jira.status`/`jira.last_polled_at`,
    porta `status` al valore coerente col ticket (`in_jira`, o `done` con
    `done_at` se il ticket è chiuso/in produzione — chiedi conferma, non
-   presumere la Definition of Done). Scrittura diretta, non passa da
+   presumere la Definition of Done; per `done` vale il gate dell'avviso
+   di conclusione, come in Pull passo 2). Scrittura diretta, non passa da
    `pending/` (stessa logica di Push/Pull). Se emerge che serve comunque
    un RICE retroattivo per capire se l'iniziativa valeva la pena,
    **suggerisci `rice-update`** — non forzarlo.

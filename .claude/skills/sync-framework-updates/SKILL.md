@@ -67,6 +67,14 @@ segnalalo invece di procedere.
      con valore a essere backfillato è `summary` (una riga per idea
      ancora attiva), perché `backlog-list` lo mostra — proponilo come
      lavoretto incrementale, non un blocco.
+   - "un nuovo **gate** su una transizione di stato" (es.
+     `conclusion_notices`: `status: done`/`aborted` e `closure.closed`
+     solo con l'avviso agli stakeholder `sent`/`waived`) → il gate vale
+     **in avanti**: le idee già `done`/`aborted` e le closure già scritte
+     restano valide, nessun backfill retroattivo di voci. Spiega cosa
+     cambia nel lavoro quotidiano (la conclusione si chiude quando è
+     comunicata) e — solo se il PM lo chiede — proponi di aprire una voce
+     per le consegne recenti che non erano mai state comunicate.
    - "un campo esistente ha cambiato significato" (es. la "E" del RICE è
      passata da `effort_weeks`/settimane a `entanglement_score`/footprint
      1-10) → **caso di migrazione dati**: le voci `rice_history` esistenti
