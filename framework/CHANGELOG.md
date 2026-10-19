@@ -54,6 +54,25 @@ Tipi di impatto:
 
 ---
 
+### 2026-10-19-atomicita-implementativa · L'How si scrive a incrementi atomici, mai come un ribaltone
+
+- **Impatto**: nessuna
+- **Cosa cambia**: l'How di un PRD e la proposta di implementazione
+  nella card diventano una sequenza di incrementi, ciascuno
+  implementabile, testabile e rilasciabile da solo, con un primo passo
+  piccolo (A3, divide et impera). Il revisore IT del panel dà un
+  punteggio basso a un How che non lo è: almeno un rilievo `major` e
+  niente `go`; un ribaltone (tutto insieme, nessun rilascio intermedio,
+  nessun rollback) è `blocker`/`no_go`. Resta un consiglio: il PM può
+  accettare un incremento non atomico dichiarandolo nei *Rischi*. Vedi
+  playbook, "Atomicità implementativa: divide et impera".
+- **Cosa fare nell'istanza**: niente. Facoltativo: rivalidare con
+  `prd-review-panel` i PRD in `draft`/`in_review` scritti prima, il cui
+  How non è ancora scomposto.
+- **Già a posto se**: sempre.
+
+---
+
 ### 2026-10-19-proposta-implementazione-card · Le card per i dev possono portare una proposta di implementazione
 
 - **Impatto**: nessuna

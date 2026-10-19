@@ -101,7 +101,10 @@ Planning).
    in playbook, "La proposta di implementazione nella card". In breve:
    esegui prima `bash .claude/hooks/governance-sync.sh apps` e parti
    dall'How del PRD e dal codice reale di `apps/` (file/moduli toccati,
-   commit letto); approccio possibile, alternative scartate, punti aperti
+   commit letto); approccio possibile come **sequenza numerata di
+   incrementi atomici** — ciascuno implementabile, testabile e
+   rilasciabile da solo, mai un ribaltone (playbook, "Atomicità
+   implementativa: divide et impera") —, alternative scartate, punti aperti
    per il team; una riga sullo stato di validazione (validata con il
    `tech_reference` o "non ancora validata — prima scelta per
    discuterla: {tech_reference}"). Bullet, mai requisiti o criteri di

@@ -140,6 +140,20 @@ updated_at: "2026-01-08"
      può raffinare: se cambia, la revisione passa da rice-update.
      Per primary_reader diverso da tech: tienilo minimo e senza gergo.
 
+     Poi la sequenza di incrementi (playbook, "Atomicità implementativa:
+     divide et impera"): una riga numerata per incremento, ciascuno
+     implementabile, testabile e rilasciabile da solo — mai un unico
+     "rifacciamo tutto e rilasciamo". Il primo è il passo più piccolo che
+     riduce il rischio maggiore. Es.:
+     1. Nuova tabella approvals_v2 scritta in parallelo alla vecchia ·
+        test di confronto dei record · nessun effetto visibile, dati
+        allineati su dashboard.
+     2. Lettura dalla v2 dietro flag per un solo cliente pilota · test
+        end-to-end del flusso · pilota senza errori per una settimana.
+     3. …
+     Un incremento che non può essere atomico va dichiarato nei Rischi,
+     con il motivo.
+
      Chiudi la sezione con una riga sul referente tecnico (frontmatter
      tech_reference) e perché: chi conosce i sistemi toccati / copre i
      rischi aperti. Es.:

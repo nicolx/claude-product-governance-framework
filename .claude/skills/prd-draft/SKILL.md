@@ -167,6 +167,13 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
    - **vincolo dimensionale attivo**: se un PRD supera ~2 facciate A4,
      **fermati e proponi lo split** lungo le cuciture — non comprimere la prosa.
      Il contesto in più va nel brief, i dati nell'allegato;
+   - **How a incrementi atomici** (playbook, "Atomicità implementativa:
+     divide et impera"): scrivi l'How come sequenza numerata di incrementi,
+     ciascuno implementabile, testabile e rilasciabile da solo (cosa cambia ·
+     come si verifica · cosa si vede al rilascio), fondata sul codice letto
+     in `apps/`. Mai un unico passo "rifacciamo tutto": se un incremento non
+     si lascia spaccare, chiedi al PM se accettarlo e, se sì, dichiaralo nei
+     *Rischi* con il motivo;
    - allegato: definizioni prima dei dati, dati in unità assolute, parametri in
      un posto solo, **risultati attesi espliciti** (diventano criteri di
      accettazione), testi pronti, regole di arrotondamento. **Ricalcola tu

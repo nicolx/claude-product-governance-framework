@@ -29,7 +29,7 @@ disattiva in `product/reference/review-personas.yaml` (schema
 
 | id | Personalità | Riceve (oltre a brief e PRD) | Cerca soprattutto | Quando |
 |---|---|---|---|---|
-| `it-reviewer` | **Revisore IT** — architetto pragmatico, ha visto troppi progetti sottostimati; si fida del codice, non delle slide | accesso in **sola lettura** a `apps/` (submodule aggiornati), allegati | fattibilità contro il codice reale, sistemi toccati non dichiarati, integrazioni, migrazione dei dati, requisiti non funzionali (prestazioni, volumi, disponibilità), rollback, osservabilità, debito introdotto, stima implicita irrealistica | **sempre** |
+| `it-reviewer` | **Revisore IT** — architetto pragmatico, ha visto troppi progetti sottostimati; si fida del codice, non delle slide | accesso in **sola lettura** a `apps/` (submodule aggiornati), allegati | fattibilità contro il codice reale, **atomicità implementativa** (l'How è una sequenza di incrementi implementabili, testabili e rilasciabili ciascuno da solo? — vedi criterio sotto), sistemi toccati non dichiarati, integrazioni, migrazione dei dati, requisiti non funzionali (prestazioni, volumi, disponibilità), rollback, osservabilità, debito introdotto, stima implicita irrealistica | **sempre** |
 | `business-skeptic` | **Business scettico** — controller che ha visto molte iniziative "strategiche" non spostare nulla; chiede l'evidenza, non l'entusiasmo | l'ultima voce di `rice_history` (ipotesi e Confidence), sintesi dell'idea, file pertinenti di `context/` | evidenza del problema, alternative più economiche (non fare nulla, un processo, un workaround), costo opportunità, "perché ora", adozione realistica, **coerenza tra PRD e ipotesi del RICE** | **sempre** |
 | `end-user-advocate` | **Voce dell'utente** — chi userà davvero la cosa, in un giorno pieno, con fretta e interruzioni | allegati, `assets/` | scenario credibile per chi lo vive, carico cognitivo, casi limite ed errori, cosa succede se l'utente sbaglia, accessibilità, cambiamento di abitudini | PRD con interfaccia o con utenti finali nello Scenario; `primary_reader: design` |
 | `security-privacy` | **Sicurezza, privacy e compliance** — DPO/security officer, ragiona per minacce e per audit | allegati, file normativi pertinenti di `context/` | dati personali e loro flussi, basi giuridiche, permessi e ruoli, conservazione, terze parti, tracciabilità, vincoli normativi del settore | dati personali o sensibili, autenticazione/permessi, pagamenti, nuovi flussi verso terzi, normativa citata |
@@ -44,6 +44,23 @@ disattiva in `product/reference/review-personas.yaml` (schema
 `max_personas` personaggi (default 5): oltre, a parità di segnale, vince chi copre il
 lettore primario e i rischi aperti. Il PM può aggiungerne o toglierne in conversazione
 prima del lancio: la skill mostra il panel scelto con il perché di ciascuno.
+
+**Il criterio di atomicità del revisore IT** (playbook, "Atomicità implementativa: divide et
+impera"). Per ogni incremento dell'How il revisore controlla i tre criteri — implementabile
+da solo, testabile da solo, rilasciabile e verificabile da solo — e ne tiene conto nel
+punteggio:
+
+- How **senza sequenza di incrementi**, o con un incremento che viola un criterio senza
+  che il PRD lo dichiari nei *Rischi* con il motivo → rilievo almeno `major`, verdetto al
+  massimo `go_with_conditions` (condizione: la scomposizione, con la proposta di come
+  spaccare);
+- **ribaltone** — più sistemi toccati insieme, nessun rilascio intermedio verificabile,
+  nessun rollback → rilievo `blocker`, verdetto `no_go`;
+- un primo incremento che è "la base per tutto il resto" e non riduce un rischio né mostra
+  valore → rilievo `minor`, con la proposta di un primo passo più piccolo.
+
+Resta un consiglio come ogni altro rilievo del panel: il PM può accettare un incremento non
+atomico dichiarandolo nei *Rischi*.
 
 **La lente di uno stakeholder** è una simulazione, e così si dichiara ovunque: "obiezioni
 prevedibili dalla lente del Direttore Commerciale", mai "Mario dirà". Si costruisce **solo**
@@ -113,7 +130,12 @@ dillo in una riga e passa oltre.
 Il tuo punto di vista: {FOCUS del personaggio, in 3-6 voci}.
 
 Leggi SOLO questi file: {PERCORSI}. {Solo per it-reviewer: "Puoi leggere e cercare nel
-codice sotto {PERCORSI_APPS}, in sola lettura."} Non modificare né creare nessun file.
+codice sotto {PERCORSI_APPS}, in sola lettura. Verifica che l'How sia una sequenza di
+incrementi, ciascuno implementabile, testabile e rilasciabile da solo lasciando il sistema
+funzionante: un How senza sequenza, o con incrementi che non stanno in piedi da soli e non
+dichiarati nei Rischi, è almeno un rilievo major e non ti consente un go; un ribaltone (più
+sistemi insieme, nessun rilascio intermedio, nessun rollback) è un blocker e un no_go. In
+entrambi i casi proponi come spaccarlo."} Non modificare né creare nessun file.
 Non inventare fatti sull'azienda o sul sistema: se un'informazione ti manca, è un rilievo
 ("il documento non dice…"), non un'ipotesi da riempire.
 

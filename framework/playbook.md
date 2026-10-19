@@ -1959,7 +1959,9 @@ raccogliere **consigli** prima della revisione umana:
 - sempre il **revisore IT** — architetto pragmatico che si fida del codice
   più che dei documenti: legge `apps/` in sola lettura e controlla l'How
   contro il sistema reale (sistemi toccati non dichiarati, migrazioni,
-  requisiti non funzionali, rollback, osservabilità);
+  requisiti non funzionali, rollback, osservabilità) e dà un punteggio
+  basso a un How che non è una sequenza di incrementi atomici (vedi
+  "Atomicità implementativa: divide et impera");
 - sempre il **business scettico** — chiede l'evidenza del problema, le
   alternative più economiche, il costo opportunità, e confronta il PRD con
   le ipotesi del RICE approvato;
@@ -2036,6 +2038,60 @@ Lo scheletro consigliato è in `framework/schema/prd.template.md`; il brief
 in `framework/schema/initiative-brief.template.md`; l'allegato dati in
 `framework/schema/prd-annex.template.md`.
 
+### Atomicità implementativa: divide et impera
+
+Lo stesso principio A3 vale per il *come*. Un piano di implementazione
+che dice "rifacciamo tutto e poi rilasciamo" — il **ribaltone** — è il
+modo più rapido per perdere il controllo della pipeline: niente si può
+verificare finché non è tutto finito, un errore si scopre insieme a
+tutti gli altri, il rollback è totale o non c'è. Con un agente AI che
+implementa è ancora più pericoloso: chiedergli il ribaltone produce un
+diff enorme che nessuno riesce davvero a rivedere.
+
+**Regola.** L'How di un PRD, e la proposta di implementazione di una
+card, si scrivono come una **sequenza di incrementi**. Ogni incremento
+è **atomico** se soddisfa tutti e tre i criteri:
+
+1. **implementabile da solo** — un cambiamento circoscritto (pochi
+   moduli, un'interfaccia), che non richiede gli incrementi successivi
+   per compilare o per funzionare;
+2. **testabile da solo** — ha una verifica sua, dichiarata (il test, il
+   controllo, l'osservazione che dice "funziona"), eseguibile senza gli
+   incrementi successivi;
+3. **rilasciabile e verificabile** — può andare in produzione da solo
+   (anche spento dietro un flag, o in parallelo al vecchio percorso)
+   lasciando il sistema funzionante, con un segnale osservabile che il
+   rilascio è andato bene e un modo di tornare indietro.
+
+Il primo incremento è il **primo passo**, alla A3: il più piccolo che
+riduce il rischio maggiore o rende visibile il valore — non "la base
+che serve a tutto il resto". Se un incremento non sta in piedi da solo,
+la risposta è **spaccarlo** lungo le cuciture del sistema (dati prima
+del comportamento, lettura prima della scrittura, nuovo percorso
+accanto al vecchio prima dello switch, migrazione in più passi
+reversibili), non accettarlo così.
+
+**Come si valuta.** Un How o una proposta di implementazione **senza
+sequenza di incrementi**, o con incrementi che non soddisfano i tre
+criteri, riceve un **punteggio basso**: nel panel di revisione il
+revisore IT lo segnala almeno come rilievo `major` e non può dare `go`
+(al più `go_with_conditions`, con la scomposizione come condizione); un
+ribaltone vero — molti sistemi toccati insieme, nessun rilascio
+intermedio, nessun rollback — è un `blocker` e un `no_go` (prompt in
+`framework/prompts/review-panel.md`). Come ogni rilievo del panel resta
+un consiglio, non un veto: il PM può accettare un incremento non
+atomico, ma lo dichiara nei *Rischi* del PRD con il motivo (es. una
+migrazione davvero indivisibile) e il piano di rientro.
+
+**Cosa non è.** Non è la specifica tecnica né la scomposizione in user
+story del team: la sequenza resta in bullet, una riga per incremento
+(cosa cambia · come si verifica · cosa si vede al rilascio). Gli
+sviluppatori possono ridisegnarla — l'ultima parola sul come resta loro
+(vedi "La proposta di implementazione nella card") — ma una sequenza
+riscritta deve rispettare gli stessi tre criteri. Non è nemmeno la
+`release_sequence` del frontmatter, che ordina i **PRD** tra loro: qui
+si ordinano gli incrementi **dentro** un PRD.
+
 ---
 
 Il processo va descritto anche con diagrammi di flusso dove utile — non è
@@ -2089,6 +2145,7 @@ approfondimento potrebbe cambiare il RICE Score.
 - [ ] Il target della KPI è stato definito e condiviso con lo stakeholder?
 - [ ] La GTM strategy è stata discussa con chi presidia il marketing/comunicazione?
 - [ ] L'How di alto livello è stato abbozzato con il team tech?
+- [ ] L'How è una sequenza di incrementi atomici (implementabile, testabile e rilasciabile ciascuno da solo), con un primo passo piccolo? Se un incremento non lo è, è dichiarato nei Rischi con il motivo?
 - [ ] Il PRD ha un `tech_reference` (il referente tecnico con cui validare l'How), proposto da `team-fit` e confermato dal PM?
 - [ ] Il ROI atteso è ancora coerente col RICE originale? Se no, il ranking è stato aggiornato nella fonte di verità?
 
@@ -2210,6 +2267,17 @@ Regole:
 - **Proporzionata.** Bullet, non una specifica: il PRD resta linkato e
   non si copia nella card. Per un bug: ipotesi di causa e zona del
   codice, marcate come ipotesi, accanto ai passi di riproduzione.
+- **A incrementi, mai un ribaltone.** L'approccio è una sequenza
+  numerata di incrementi atomici — ciascuno implementabile, testabile e
+  rilasciabile da solo, una riga per incremento (cosa cambia · come si
+  verifica · cosa si vede al rilascio) — che parte da quella dell'How
+  del PRD e la raffina sul codice (vedi "Atomicità implementativa:
+  divide et impera"). Ogni incremento deve poter diventare da solo una
+  sotto-attività o un'istruzione per un agente AI, con una verifica
+  propria. Se il lavoro non si lascia scomporre, la proposta lo dice
+  come punto aperto per il team, invece di proporre un unico passo.
+  Per un bug piccolo basta un incremento solo (la correzione con il suo
+  test).
 - **Non è assegnazione né stima.** Non dice chi la fa né quanto ci vuole
   — quelle restano dell'Iteration Planning e del team (blocco `delivery`).
 - **L'ultima parola è del team.** Se gli sviluppatori scelgono un'altra
