@@ -35,7 +35,7 @@ fields:
     rule: "ordinate per ultimo RICE score approvato decrescente, prime backlog_limit per Product Line; posizione = rango nel backlog"
   - field: "Scadenza"
     source: "mandate.due_date + mandate.escalation_status; altrimenti deadline.due_date + deadline.escalation_status"
-    rule: "data esatta + stato (in evidenza due_soon/overdue); '—' se non dichiarata. Mai una data stimata"
+    rule: "data esatta + stato (in evidenza due_soon/at_risk/overdue); '—' se non dichiarata. Mai una data stimata"
   - field: "Capacità"
     source: "capacity_check del Piano di Iterazione approvato più recente"
     rule: "una riga in testa: saturazione per competenza; in evidenza tight/over, con 'sforamento accettato' se c'è over_capacity_decision; 'capacità non dichiarata' se basis: not_available"

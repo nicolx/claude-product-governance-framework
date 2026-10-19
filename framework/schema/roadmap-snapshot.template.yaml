@@ -167,7 +167,7 @@ mandates_status:
 # (mai mandate, che ha già mandates_status sopra) con un blocco `deadline`
 # valorizzato — una scadenza reale che NON basta da sola a giustificare il
 # bypass del RICE, ma che va sorvegliata mentre si avvicina. Elenca TUTTE
-# quelle con escalation_status due_soon o overdue, non solo quelle già in
+# quelle con escalation_status due_soon, at_risk o overdue, non solo quelle già in
 # initiatives — stesso motivo di mandates_status: è prima di entrare in
 # lavorazione che rischiano di passare inosservate. Popolato leggendo
 # escalation_status calcolato da deadline-watch (non ricalcolato qui).
@@ -175,7 +175,9 @@ deadline_alerts:
   - idea_id: ""
     classification: ""                 # idea | strategic_exception
     due_date: null
-    escalation_status: ""              # on_track | due_soon | overdue
+    escalation_status: ""              # due_soon | at_risk | overdue
+    escalation_basis: ""               # calendar | start_by | slot — da deadline-watch
+    slot_end_week: null                # fine stimata dallo slot_plan, se c'è — la distanza da due_date è il rischio
     rice_rank_note: null                # opzionale: posizione approssimativa in backlog, se classification: idea
     current_status: ""                   # status corrente dell'idea
 

@@ -116,9 +116,12 @@ piano passa **sempre** da `product/approvals/pending/`
          delle iniziative `status: done` con `closure.closed: false`.
       3. `mandate-watch` — `escalation_status` dei `classification: mandate`
          da `analysis_start_by` vs oggi.
-      4. `deadline-watch` — `escalation_status` delle idee con
-         `deadline.due_date`; **push forte** a ≤ 4 settimane, non una riga
-         tra le altre.
+      4. `deadline-watch` — `escalation_status`/`escalation_basis`/
+         `start_by` delle idee con `deadline.due_date`, usando anche lo
+         `slot_plan` dell'ultimo snapshot (già nel dump); **push forte**
+         a ≤ 4 settimane dalla scadenza, quando l'idea deve partire entro 4
+         settimane per finire in tempo, o quando lo slot la fa finire dopo
+         la scadenza (`at_risk`) — non una riga tra le altre.
       5. `rice-watch` — idee `classification: idea` con `rice_history`
          vuoto: `stale`, `blocked_on`, `needs_deep_dive`.
       6. **Avvisi di conclusione in sospeso** — voci di
@@ -363,7 +366,7 @@ piano passa **sempre** da `product/approvals/pending/`
         `classification: idea` che entrano nell'iterazione **davanti a
         idee con RICE score più alto** ancora in backlog (dal ranking del
         passo 5), più le idee con `deadline`/`mandate` a `due_soon`/
-        `overdue` che il team decide di forzare in analisi adesso. Per
+        `at_risk`/`overdue` che il team decide di forzare in analisi adesso. Per
         ciascuna, chiedi esplicitamente al PM se è una **Strategic
         Exception** (bypass autorizzato da uno stakeholder) o una
         **scelta qualitativa del team** dentro il processo normale:

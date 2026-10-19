@@ -1177,13 +1177,23 @@ Il framework tiene questo caso **distinto e più leggero** di `mandate`:
 un blocco `deadline` (`due_date`, `note`) compilabile su qualunque
 `classification` tranne `mandate` (che ha già il proprio). Impostarlo
 **non salta il RICE e non decide nulla da solo** — è un fatto reso
-visibile, non un'autorizzazione. La skill `deadline-watch` lo sorveglia:
-quando mancano **4 settimane o meno** alla scadenza, fa un push esplicito
-e forte al PM (non una riga tra le altre), chiedendo di scegliere tra tre
+visibile, non un'autorizzazione. La skill `deadline-watch` lo sorveglia
+e fa un push esplicito e forte al PM (non una riga tra le altre) in tre
+casi: quando mancano **4 settimane o meno** alla scadenza; quando, con la
+durata stimata dal team, l'idea **dovrebbe partire entro 4 settimane**
+per finire in tempo (`start_by`); e quando lo **slot plan** dell'ultimo
+snapshot, con la capacità reale del team e l'ordine di priorità attuale,
+la fa finire **dopo** la scadenza o non la colloca (`at_risk` — vedi
+"Capacità del team e slot della roadmap"). Il calendario da solo non
+basta: un'idea con dieci settimane di lavoro e la scadenza tra otto è
+già persa, e lo slot plan lo dice con mesi d'anticipo, quando le
+alternative costano ancora poco. Il push chiede di scegliere tra tre
 strade — invocare una Strategic Exception, verificare se l'iniziativa
 soddisfa davvero la definizione di Iniziativa Mandataria e farla
 riclassificare, o lasciarla nel processo RICE normale perché la scadenza
-non è poi così rigida. **Nessuna delle tre è automatica**: `deadline-watch`
+non è poi così rigida — più, quando il problema è la capacità e non il
+calendario, una quarta: ridurre lo scope o anticiparla nel piano, da
+decidere in cerimonia. **Nessuna è automatica**: `deadline-watch`
 segnala con la massima evidenza, la decisione resta del PM, con lo stesso
 principio delle altre watch del framework.
 
@@ -1208,7 +1218,8 @@ riclassificazione era giustificata.
 **Checklist operativa**
 - [ ] Le idee con un vincolo di tempo esterno noto hanno `deadline.due_date` compilato, con `note` che spiega perché?
 - [ ] `deadline-watch` è stata eseguita all'ultimo Backlog Refinement?
-- [ ] Le idee `due_soon`/`overdue` hanno ricevuto una decisione esplicita del PM (Strategic Exception, riclassificazione, o conferma che restano nel processo normale) — non un silenzio?
+- [ ] Le idee con una scadenza hanno una stima di durata, così `deadline-watch` può dire se ci stanno e non solo quanto manca?
+- [ ] Le idee `due_soon`/`at_risk`/`overdue` hanno ricevuto una decisione esplicita del PM (Strategic Exception, riclassificazione, o conferma che restano nel processo normale) — non un silenzio?
 - [ ] Se un'idea è stata riclassificata a `mandate`: è passata da `product/approvals/pending/`, e il `rice_history` precedente è rimasto intatto?
 
 ## Iniziative Mandatarie

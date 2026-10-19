@@ -56,7 +56,7 @@ traduce in qualcosa che parte questo trimestre.
    - `summary` — se vuoto, segnalalo esplicitamente ("⚠ summary
      mancante") invece di inventarlo o di ripetere il `title`
    - **scadenza**: se `deadline.due_date` è valorizzato, mostrala con il
-     suo `deadline.escalation_status` (`due_soon`/`overdue` in evidenza) e
+     suo `deadline.escalation_status` (`due_soon`/`at_risk`/`overdue` in evidenza, con `escalation_basis`) e
      `deadline.note`
    - **note di prioritizzazione**: `notes`, più `rice_status.blocked_reason`/
      `waiting_on` se presenti (un'idea RICE-ranked di solito non ne ha,

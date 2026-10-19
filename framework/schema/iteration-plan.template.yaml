@@ -89,7 +89,7 @@ in_development:
 
 urgent_priority:
 # Strategic Exception invocate in questa cerimonia + idee con
-# deadline/mandate a due_soon/overdue che il team decide di forzare in
+# deadline/mandate a due_soon/at_risk/overdue che il team decide di forzare in
 # analisi adesso, scavalcando il ranking RICE. Assorbe il vecchio campo
 # "rilevamento reprioritizzazioni fuori-RICE" del Backlog Refinement.
   - idea_ref: ""

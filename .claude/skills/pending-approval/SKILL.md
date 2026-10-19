@@ -53,7 +53,7 @@ tabella** con una riga per voce e queste colonne:
   "—".
 - **Scadenza** — se l'idea ha `deadline.due_date` (o, per un `mandate`,
   `mandate.due_date`), mostrala con il suo `escalation_status`
-  (`due_soon`/`overdue` in evidenza). "—" se non c'è.
+  (`due_soon`/`at_risk`/`overdue` in evidenza). "—" se non c'è.
 - **Bypass** — segnala se l'iniziativa scavalca il RICE e se il bypass è
   **coperto da un'approvazione o solo dichiarato**:
   - `Strategic Exception ✋ non approvata` — la voce è un

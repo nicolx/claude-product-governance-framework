@@ -1,6 +1,6 @@
 ---
 name: deadline-watch
-description: Scansiona tutte le idee (qualunque classification tranne mandate) con un deadline.due_date dichiarato e fa un push esplicito e forte quando mancano 4 settimane o meno — senza mai decidere da sola se bypassare il RICE. Usala periodicamente e sempre come parte del Backlog Refinement, subito dopo mandate-watch (backlog-refinement la richiama).
+description: Scansiona tutte le idee (qualunque classification tranne mandate) con un deadline.due_date dichiarato e fa un push esplicito e forte quando mancano 4 settimane o meno, quando per finire in tempo dovrebbe partire entro 4 settimane, o quando lo slot plan dice che con la capacità del team finirà dopo la scadenza — senza mai decidere da sola se bypassare il RICE. Usala periodicamente e sempre come parte del Backlog Refinement, subito dopo mandate-watch (backlog-refinement la richiama).
 ---
 
 # deadline-watch
@@ -21,6 +21,15 @@ come un mandate dichiarato.
 non una riga tra le altre nel riepilogo (vedi passo 4). Aspettare che
 qualcuno se ne accorga da solo è esattamente il fallimento che questa
 skill esiste per evitare.
+
+Le 4 settimane di calendario però non bastano: un'idea con 10 settimane
+di lavoro e la scadenza tra 8 è già persa, anche se il calendario la dà
+`on_track`. Per questo la watch guarda anche **quanto lavoro c'è** (la
+durata stimata → l'ultimo inizio utile, `start_by`) e **quando il team
+riesce davvero a farlo** (lo `slot_plan` dell'ultimo snapshot approvato,
+playbook "Capacità del team e slot della roadmap"). Una scadenza che lo
+slot plan manca è `at_risk` con settimane, a volte mesi, di anticipo —
+il momento in cui le tre strade del passo 4 costano ancora poco.
 
 ## Quando usarla
 
@@ -47,8 +56,9 @@ skill esiste per evitare.
 
 0. **Sincronizza e leggi in blocco** (uso standalone): `bash
    .claude/hooks/governance-sync.sh pull`, poi `bash
-   .claude/hooks/governance-dump.sh ideas` per avere tutte le `idea.yaml`
-   in un colpo invece di leggerle una per una.
+   .claude/hooks/governance-dump.sh sweep` — tutte le `idea.yaml`,
+   `team.yaml` (per `analysis_lead_weeks`) e l'ultimo snapshot approvato
+   (lo `slot_plan`) in un colpo invece di leggerli uno per uno.
 
 1. **Elenca tutte le idee** (dal dump) con `deadline.due_date` valorizzato
    e `status` diverso da `done` o `aborted`. Includi qualunque `classification` — `idea`,
@@ -57,15 +67,38 @@ skill esiste per evitare.
    duplicherebbe il segnale. Se non ce ne sono, dillo esplicitamente e
    fermati — è uno stato normale, non un errore.
 
-2. **Per ciascuna, calcola `escalation_status`** confrontando `due_date`
-   con oggi:
+2. **Per ciascuna, calcola `start_by` ed `escalation_status`**.
+   - **`start_by`** (se l'idea ha `delivery.estimated_effort_weeks`, o
+     `platform.estimated_effort_weeks`): `due_date` − durata, meno
+     `capacity.analysis_lead_weeks` di `team.yaml` (default 2) se l'idea
+     non è ancora `in_analysis` o oltre. Senza stima di durata: `null`.
+   - **Lo slot**: cerca l'idea nello `slot_plan` dell'ultimo snapshot
+     approvato (`slots`, poi `unslotted`).
+   Poi lo stato, nel primo caso che si applica (e `escalation_basis`
+   che dice quale):
    - **`overdue`** — `due_date` è già passata e lo `status` dell'idea non
-     ha ancora raggiunto almeno `in_jira`.
-   - **`due_soon`** — mancano **4 settimane o meno**. Questa è la soglia
-     che conta per il push del passo 4.
-   - **`on_track`** — mancano più di 4 settimane.
+     ha ancora raggiunto almeno `in_jira`. (`calendar`)
+   - **`due_soon`** — mancano **4 settimane o meno** alla `due_date`
+     (`calendar`), **oppure** `start_by` cade entro 4 settimane da oggi
+     e l'idea non è ancora in sviluppo (`start_by`): per finire in tempo
+     deve partire adesso.
+   - **`at_risk`** — lo slot finisce **dopo** la `due_date`
+     (`end_week` > settimana della `due_date`), oppure la `due_date` cade
+     nell'orizzonte dello slot plan e l'idea è in `unslotted` come
+     `beyond_horizon` o `infeasible` (`slot`): con la capacità che il
+     team ha, e nell'ordine di priorità attuale, non ci arriva.
+   - **`on_track`** — nessuno dei casi sopra.
+   Un'idea **non dimensionata** (nessuna stima, quindi né `start_by` né
+   slot) resta sulla sola regola di calendario: segnalala nel riepilogo
+   ("scadenza il {due_date}, nessuna stima — non si sa se ci sta"),
+   perché è proprio il caso che il calendario da solo non vede. Se
+   `team.yaml` non ha capacità o non c'è uno snapshot con `slot_plan`, la
+   regola `slot` non si applica: dillo una volta in testa al riepilogo.
+   Lo slot plan è quello **dell'ultimo snapshot approvato** (di solito la
+   settimana precedente): non ricalcolarlo qui.
 
-3. **Scrivi `escalation_status` direttamente** su ciascun `idea.yaml` —
+3. **Scrivi `escalation_status`, `escalation_basis` e `start_by`
+   direttamente** su ciascun `idea.yaml` —
    è un fatto calcolato da una formula, non una decisione di priorità,
    quindi **non passa da `product/approvals/pending/`** (stesso principio
    di `mandate.escalation_status`).
@@ -85,6 +118,20 @@ skill esiste per evitare.
    > Mandatarie») e farla riclassificare, o (c) lasciarla nel processo
    > normale perché la scadenza non è così rigida?"
 
+   Per `escalation_basis: start_by` o `slot` la prima frase dice il
+   motivo reale, non il calendario:
+
+   > "⏰ L'idea «{title}» ({idea_id}) ha una scadenza il {due_date}. Con
+   > {N} settimane di lavoro stimate dovrebbe partire entro il
+   > {start_by}" — oppure — "Con la capacità attuale del team, lo slot
+   > plan la fa finire in {end_week} (stima), dopo la scadenza{, per la
+   > capacità {delayed_by}}" — "oppure: non trova spazio nel trimestre."
+
+   e alle tre strade aggiunge una quarta, che spesso è la più economica:
+   **(d) ridurre lo scope** (80/20) o **anticiparla nel piano** — da
+   portare al prossimo Backlog Refinement o Iteration Planning, dove si
+   decide l'ordine.
+
    **Solo segnalazione — nessuna azione automatica**: non invocare tu
    stessa una Strategic Exception, non riclassificare a `mandate`, non
    toccare il RICE. La decisione resta del PM:
@@ -96,15 +143,20 @@ skill esiste per evitare.
      `framework/schema/approval.template.yaml`) — non applicarla da sola;
    - se sceglie (c), non fare nulla: la scadenza resta visibile e
      continuerà a essere segnalata ai run successivi finché non cambia
-     stato.
+     stato;
+   - se sceglie (d), annotalo come azione aperta per la prossima
+     cerimonia — non cambi tu né la stima né il piano.
 
 5. **Presenta un riepilogo ordinato per urgenza** (`overdue` prima, poi
-   `due_soon`, poi `on_track` solo se richiesto esplicitamente). **Prima
+   `due_soon`, poi `at_risk`, poi `on_track` solo se richiesto
+   esplicitamente). **Prima
    colonna: l'identificatore** — `short_ref` se assegnato, altrimenti lo
    slug `idea_id` (mai vuoto — vedi playbook, "Ogni elenco prodotto dal
    sistema è indirizzabile"), così il PM può riferirsi a una riga con
    "{ID}". Poi `summary`, R · I · C · E e RICE ("—" e il motivo se senza
-   RICE — playbook, "Ogni riga che parla di un'idea si capisce da sola"), `due_date`, `escalation_status`.
+   RICE — playbook, "Ogni riga che parla di un'idea si capisce da sola"), `due_date`, `escalation_status` con
+   `escalation_basis`, `start_by` e la fine stimata dallo slot (o
+   "nessuna stima").
 
 6. Se chiamata da `backlog-refinement`, restituisci il riepilogo perché venga
    incluso nel log della cerimonia — non scrivere tu stessa in
@@ -128,7 +180,10 @@ skill esiste per evitare.
 - Non includere le idee `classification: mandate` in questa scansione —
   hanno già `mandate-watch`, con una logica di lead time diversa
   (`analysis_start_by`, non solo `due_date`).
-- Non silenziare un'idea `due_soon`/`overdue` solo perché è già stata
+- Non ricalcolare lo slot plan né correggere stime o priorità per far
+  rientrare una scadenza: la watch legge lo `slot_plan` approvato e
+  segnala; l'ordine e le stime si cambiano in cerimonia.
+- Non silenziare un'idea `due_soon`/`at_risk`/`overdue` solo perché è già stata
   segnalata in un run precedente — resta visibile finché lo stato non
   cambia (riclassificata, in `in_jira`/`done`, o il PM ha esplicitamente
   chiarito che la scadenza non è più rilevante e ha svuotato

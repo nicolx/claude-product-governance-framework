@@ -442,7 +442,11 @@ strategic_exceptions: []
 deadline:
   due_date: null                # data precisa, mai "presto"/"appena possibile" — null se non c'è una scadenza reale
   note: null                     # perché c'è questa scadenza (contratto, impegno con un cliente, evento) — mai presunta
-  escalation_status: null        # on_track | due_soon | overdue — calcolato da deadline-watch; null finché due_date è null
+  escalation_status: null        # on_track | at_risk | due_soon | overdue — calcolato da deadline-watch; null finché due_date è null
+  escalation_basis: null         # perché quello stato: calendar (mancano ≤ 4 settimane) | start_by (deve partire entro 4 settimane per
+                                 #   finire in tempo) | slot (lo slot_plan dell'ultimo snapshot finisce dopo due_date, o non la colloca)
+  start_by: null                 # calcolato da deadline-watch: ultimo inizio utile = due_date − delivery.estimated_effort_weeks
+                                 #   (− analysis_lead_weeks di team.yaml se l'idea non è ancora in analisi); null senza stima di durata
 
 # --- Solo per classification: mandate ---
 #

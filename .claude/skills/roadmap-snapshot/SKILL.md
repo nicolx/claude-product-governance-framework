@@ -131,8 +131,9 @@ creato/aggiornato.
      `initiatives`), leggendo `escalation_status`/`analysis_start_by`
      già calcolati da `mandate-watch` — non ricalcolarli qui.
    - `deadline_alerts`: le idee `classification: idea`/`strategic_exception`
-     (mai `mandate`) con `deadline.escalation_status` a `due_soon` o
-     `overdue`, leggendo il valore già calcolato da `deadline-watch` —
+     (mai `mandate`) con `deadline.escalation_status` a `due_soon`,
+     `at_risk` o `overdue` (con `escalation_basis` e la fine stimata dallo
+     `slot_plan`), leggendo il valore già calcolato da `deadline-watch` —
      non ricalcolarlo qui. Stesso principio di `mandates_status`: vanno
      rese visibili anche se non ancora in `initiatives`.
    - `unscored_ideas`: idee `classification: idea` con `rice_history`
