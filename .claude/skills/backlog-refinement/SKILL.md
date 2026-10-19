@@ -115,7 +115,9 @@ piano passa **sempre** da `product/approvals/pending/`
       2. `measurement-watch` — KPI `check_due`/`at_risk`/`invalidated`
          delle iniziative `status: done` con `closure.closed: false`.
       3. `mandate-watch` — `escalation_status` dei `classification: mandate`
-         da `analysis_start_by` vs oggi.
+         da `analysis_start_by` (sul lead time più prudente tra dichiarato
+         e stimato dal team) vs oggi, e dallo `slot_plan` dell'ultimo
+         snapshot (`at_risk` se lo slot finisce dopo la `due_date`).
       4. `deadline-watch` — `escalation_status`/`escalation_basis`/
          `start_by` delle idee con `deadline.due_date`, usando anche lo
          `slot_plan` dell'ultimo snapshot (già nel dump); **push forte**

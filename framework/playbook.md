@@ -1292,6 +1292,23 @@ mandataria senza una scadenza nota (il caso "critical ma senza data") non
 è esente da questo controllo: resta in stato di verifica finché qualcuno
 non la chiarisce, comparendo ogni settimana finché non viene risolta.
 
+**Il lead time dichiarato si verifica con la capacità reale.** Il lead
+time si dichiara alla creazione, spesso prima di qualunque analisi. Più
+avanti il team stima la durata vera (`delivery.estimated_effort_weeks`)
+e lo slot plan dice quando, con la capacità che c'è, l'iniziativa finisce
+davvero ("Capacità del team e slot della roadmap"). `mandate-watch` usa
+sempre il dato più prudente: se la stima del team è più lunga del lead
+time dichiarato, l'inizio dell'analisi si anticipa di conseguenza e la
+discrepanza si segnala (il lead time dichiarato si riallinea solo con
+una proposta `mandate_update`, mai in silenzio); se lo slot plan fa
+finire l'iniziativa dopo la scadenza, il mandate è **a rischio** anche
+se sul calendario sembra in tempo. Poiché lo slot plan mette i mandate
+davanti al backlog RICE, un mandate a rischio è quasi sempre un
+problema di **capacità**, non di priorità: le strade sono ridurre lo
+scope, aggiungere capacità sulla competenza che lo frena, rinegoziare la
+scadenza con chi l'ha imposta, o accettare il rischio dichiarandolo —
+decisioni del PM, non della watch.
+
 *Principi Agile da incarnare in questa fase:*
 - *La nostra massima priorità è soddisfare il cliente rilasciando
   software di valore, fin da subito ed in maniera continua.*
@@ -1301,7 +1318,8 @@ non la chiarisce, comparendo ogni settimana finché non viene risolta.
 **Checklist operativa**
 - [ ] Chi impone l'iniziativa (`mandated_by`) e perché (`rationale`) sono stati dichiarati esplicitamente, non presunti?
 - [ ] Se esiste una scadenza esterna: è stata registrata come data precisa, non come "presto" o "appena possibile"?
-- [ ] È stata fatta una stima di lead time con un referente tecnico?
+- [ ] È stata fatta una stima di lead time con un referente tecnico? E quando il team ha stimato la durata, il lead time dichiarato è ancora realistico (`lead_time_basis: declared`)?
+- [ ] Lo slot plan fa finire l'iniziativa prima della scadenza? Se è `at_risk`, il PM ha scelto una strada (scope, capacità, rinegoziazione, rischio accettato)?
 - [ ] L'iniziativa è stata controllata all'ultimo Backlog Refinement, indipendentemente da quanto sembri lontana la scadenza?
 - [ ] Se la scadenza è a rischio: è stato segnalato esplicitamente al PM, non lasciato in un file che nessuno rilegge?
 - [ ] L'iniziativa mandataria compare nei report di roadmap anche se non è ancora entrata in lavorazione?

@@ -481,8 +481,13 @@ mandate:
   is_critical: false              # true se leadership la marca "critical" indipendentemente da una data
   due_date: null                   # scadenza fissa esterna, se esiste (null se non c'è)
   lead_time_weeks: null            # runway stimato prima della due_date — andrebbe validato con un referente tecnico
-  analysis_start_by: null          # calcolato da mandate-watch: due_date - lead_time_weeks
-  escalation_status: pending_review   # pending_review | on_track | due_soon | overdue — calcolato da mandate-watch
+  analysis_start_by: null          # calcolato da mandate-watch: due_date − il più prudente tra lead_time_weeks e il lead time stimato
+                                   #   (delivery.estimated_effort_weeks + analysis_lead_weeks di team.yaml), vedi lead_time_basis
+  lead_time_basis: null            # calcolato da mandate-watch: declared (vale lead_time_weeks) | estimated (la stima del team è più lunga
+                                   #   del lead time dichiarato — segnalato, e da riallineare con una proposta mandate_update)
+  escalation_status: pending_review   # pending_review | on_track | at_risk | due_soon | overdue — calcolato da mandate-watch
+  escalation_basis: null           # calcolato da mandate-watch: lead_time (analysis_start_by) | slot (lo slot_plan dell'ultimo
+                                   #   snapshot approvato la fa finire dopo due_date, o non la colloca)
 
 # --- Solo per classification: platform ---
 #

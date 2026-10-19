@@ -128,8 +128,10 @@ creato/aggiornato.
      solo se `total_capacity_weeks` è noto.
    - `mandates_status`: **tutte** le idee `classification: mandate` con
      `status` diverso da `done`/`aborted` (non solo quelle già in
-     `initiatives`), leggendo `escalation_status`/`analysis_start_by`
-     già calcolati da `mandate-watch` — non ricalcolarli qui.
+     `initiatives`), leggendo `escalation_status`/`escalation_basis`/
+     `analysis_start_by`/`lead_time_basis` già calcolati da
+     `mandate-watch` — non ricalcolarli qui — più `slot_end_week` e
+     `delayed_by` dallo `slot_plan` appena composto.
    - `deadline_alerts`: le idee `classification: idea`/`strategic_exception`
      (mai `mandate`) con `deadline.escalation_status` a `due_soon`,
      `at_risk` o `overdue` (con `escalation_basis` e la fine stimata dallo

@@ -159,7 +159,11 @@ mandates_status:
     mandated_by: ""
     due_date: null
     analysis_start_by: null
-    escalation_status: ""             # pending_review | on_track | due_soon | overdue
+    lead_time_basis: null              # declared | estimated — da mandate-watch
+    escalation_status: ""             # pending_review | on_track | at_risk | due_soon | overdue
+    escalation_basis: null             # lead_time | slot — da mandate-watch
+    slot_end_week: null                # fine stimata dallo slot_plan, se c'è (anche per i mandate "critical" senza data: dice quando arriva)
+    delayed_by: null                   # competenza che ne fa slittare lo slot, se c'è
     current_status: ""                 # status corrente dell'idea (bucket, in_analysis, ecc.)
 
 # deadline_alerts è il fratello di mandates_status per il caso più comune
