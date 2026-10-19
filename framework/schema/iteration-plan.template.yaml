@@ -104,6 +104,37 @@ urgent_priority:
     friction_log_ref: null       # se ha generato una riga in product/reference/friction-log.yaml
 
 # ---------------------------------------------------------------------------
+# CAPACITY CHECK — il piano sta nella capacità reale del team?
+# ---------------------------------------------------------------------------
+# Calcolato da backlog-refinement alla composizione del piano e ricalcolato
+# da iteration-planning dopo le stime committed. OFFERTA della settimana da
+# product/reference/team.yaml, DOMANDA = carichi settimanali
+# (effort_by_competency / estimated_effort_weeks) delle iniziative che
+# consumano capacità di sviluppo questa settimana: in_development,
+# urgent_priority che entra in sviluppo, platform in lavorazione. Le
+# analisi (analysis_todo / analysis_in_progress) non consumano capacità di
+# delivery: rientrano nell'overhead. Regole: playbook, "Capacità del team
+# e slot della roadmap".
+#
+# Sforare è possibile ma MAI implicito: se una competenza è over, il PM
+# decide in conversazione — riequilibrare (spostare/togliere voci) oppure
+# accettare lo sforamento con una motivazione, registrata qui e in
+# decisions.yaml della cerimonia. Mai presunta dalla skill.
+capacity_check:
+  basis: computed                # computed (da team.yaml) | not_available (team.yaml senza dati di capacità — check saltato e segnalato)
+  team_updated_at: ""            # team.yaml updated_at usato per il calcolo
+  by_competency: []
+  #   - { competency: backend, supply: 2.4, demand: 2.8, saturation_pct: 117, status: over }   # ok | tight | over
+  over_capacity: []              # competency id con status: over
+  over_capacity_decision: null
+  #   accepted: true
+  #   rationale: ""              # perché si accetta lo sforamento (es. "rilascio mandatario, una settimana di straordinario concordata")
+  #   decided_by: ""             # chi l'ha deciso in cerimonia — mai presunto
+  #   ceremony_ref: ""
+  undimensioned: []              # idea_ref delle voci che consumerebbero capacità ma non hanno stima — il check è parziale finché restano
+  unsized_members: []            # membri di team.yaml senza capacity.fte
+
+# ---------------------------------------------------------------------------
 # DIFF vs piano precedente (based_on)
 # ---------------------------------------------------------------------------
 # Ricostruito dalla skill confrontando i bucket di QUESTO piano con quelli

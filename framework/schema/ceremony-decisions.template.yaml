@@ -86,3 +86,23 @@ reprioritizations: []
 #   reason_type: strategic_exception    # strategic_exception | qualitative_team_call
 #   reason: ""                          # perché, in entrambi i casi
 #   strategic_exception_approved_by: null   # solo se reason_type: strategic_exception — "CEO" | "CPO/CTO" | null finché non confermato
+
+# --- Solo per ceremony_type: backlog-refinement / roadmap-iteration-planning ---
+#
+# Ogni sforamento di capacità ACCETTATO in cerimonia: il capacity check del
+# Piano di Iterazione ha trovato una competenza oltre l'offerta del team
+# (team.yaml) e il PM/team ha scelto di non riequilibrare. Sforare si può,
+# ma mai in silenzio (playbook, "Capacità del team e slot della roadmap"):
+# la serie di queste voci, cerimonia dopo cerimonia, mostra se lo
+# sforamento è un'eccezione o il modo normale di lavorare — cioè se il
+# team è sottodimensionato rispetto a ciò che si promette. Specchio di
+# capacity_check.over_capacity_decision del piano, che resta la fonte.
+capacity_overrides: []
+# Esempio di singola voce:
+# - competency: backend
+#   supply: 2.4                       # persona-settimane della settimana
+#   demand: 2.8
+#   saturation_pct: 117
+#   rationale: ""                      # perché si accetta, detto in cerimonia
+#   decided_by: ""                     # mai presunto
+#   iteration_plan_ref: ""

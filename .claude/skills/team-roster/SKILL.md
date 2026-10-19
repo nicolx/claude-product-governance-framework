@@ -1,14 +1,16 @@
 ---
 name: team-roster
-description: Crea e fa evolvere l'anagrafica del team di sviluppo dell'istanza (product/reference/team.yaml) — chi c'è, quali aree di apps/ presidia, competenze, disponibilità. Primo popolamento (se init non l'ha fatto) e modifiche successive (aggiungi / aggiorna / rimuovi un membro). Dato di riferimento condiviso come product-lines.yaml: scrittura diretta, non passa da approvazione. La legge team-fit per proporre candidati su un PRD.
+description: Crea e fa evolvere l'anagrafica del team di sviluppo dell'istanza (product/reference/team.yaml) — chi c'è, quali aree di apps/ presidia, competenze, e la capacità che porta (FTE dedicato, ripartizione per competenza, assenze, squad) su cui si pianificano gli slot della roadmap. Primo popolamento (se init non l'ha fatto) e modifiche successive (aggiungi / aggiorna / rimuovi un membro). Dato di riferimento condiviso come product-lines.yaml: scrittura diretta, non passa da approvazione. La legge team-fit per proporre candidati su un PRD; le cerimonie e roadmap-snapshot per calcolare la capacità per competenza.
 ---
 
 # team-roster
 
 Mantiene `product/reference/team.yaml` — la mappa di **chi c'è nel team di
-sviluppo, cosa presidia, cosa sa fare**. È il gemello in scrittura di
-`team-fit` (che la legge in sola lettura per proporre chi potrebbe
-prendere in carico un PRD).
+sviluppo, cosa presidia, cosa sa fare e quanta capacità porta**. È il
+gemello in scrittura di `team-fit` (che la legge in sola lettura per
+proporre chi potrebbe prendere in carico un PRD) e la fonte dell'**offerta**
+nel capacity check del Piano di Iterazione e nello slot plan dello
+snapshot.
 
 `team.yaml` è un **dato di riferimento condiviso**, alla pari di
 `product/reference/product-lines.yaml` e `annual-target.yaml`: scrittura
@@ -71,9 +73,49 @@ istanza).
    - `skills` — tag liberi (linguaggi, framework, aree: `kafka`, `go`,
      `payments`, `react`, `observability`…). Punta al concreto, non a
      etichette vaghe ("bravo col back-end" → chiedi *cosa*);
-   - `availability` — in prosa, un fatto dichiarato dal PM, mai calcolato;
+   - `squad` — solo se l'istanza ha `squads` (vedi passo 3b);
+   - `capacity` — la parte che serve a pianificare gli slot della
+     roadmap dentro la capacità reale (playbook, "Capacità del team e
+     slot della roadmap"):
+     - `fte` — quota del tempo lavorativo **dedicata a questo prodotto**,
+       0–1. Chiedi esplicitamente se la persona è condivisa con altri
+       prodotti o part-time: un default a 1 gonfia l'offerta. Se il PM
+       non lo sa, lascia `null` (la persona resta fuori dal calcolo e le
+       cerimonie lo segnalano) — mai presunto;
+     - `competencies` — la ripartizione abituale del suo tempo sulle
+       competenze del catalogo, quote che sommano a 1 (verificalo; se
+       non sommano a 1, chiedi). Ricavala dalla conversazione ("fa
+       soprattutto back-end, un po' di devops" → proponi `{backend: 0.8,
+       devops: 0.2}` e fallo confermare);
+     - `can_also` — competenze che copre all'occorrenza;
+     - `from` / `until` — se entra, esce o cambia prodotto in una data
+       nota;
+     - `absences` — ferie e assenze pianificate, **solo date**: se il PM
+       racconta il motivo, non registrarlo;
+   - `availability` — in prosa, un fatto dichiarato dal PM, mai calcolato:
+     ciò che i numeri non dicono (onboarding, incidente in corso);
    - `notes` — contesto extra utile al matching (owner di fatto di un
      sistema, in onboarding su un'area, vincoli noti).
+
+3b. **Parametri di team** — al primo popolamento, e quando il PM li
+   tocca:
+   - `competencies` (catalogo) — poche famiglie larghe con cui il team
+     tech stima (proponi `backend`, `frontend`, `mobile`, `ux`, `qa`,
+     `data`, `devops` e tieni solo quelle che il team usa davvero). Non
+     sono i tag `skills` delle persone: servono a trovare il collo di
+     bottiglia. **Rinominare o togliere** una competenza già usata in una
+     stima (`delivery.effort_by_competency` / `platform.effort_by_competency`
+     sulle idee) rompe quelle stime: cerca gli usi, mostrali e chiedi
+     come rimapparli prima di scrivere;
+   - `capacity.overhead_pct` (default 0.2 se il team non lo dichiara),
+     `capacity.analysis_lead_weeks` (default 2), `capacity.holidays`;
+   - `squads` — solo se l'istanza ha più di un team stabile; chiedi
+     "lavorate come un unico gruppo o in squad separate con il proprio
+     backlog?". Se sì, ogni membro va in una squad.
+
+   **Capacità ≠ produttività.** `fte` è tempo dedicato, non velocità. Se
+   la conversazione va su "X rende la metà", riporta il focus: le
+   differenze di ritmo stanno nelle stime del team, non nel roster.
 
 4. **Scrivi `product/reference/team.yaml`.** Aggiorna `updated_at` alla
    data odierna. Ordina `members` per `name` (stabilità dei diff).
@@ -86,14 +128,21 @@ istanza).
 
 6. **Riepiloga** cosa è cambiato e — se utile — ricorda che `team-fit
    <prd-slug>` usa questi dati per proporre chi potrebbe prendere in
-   carico un PRD.
+   carico un PRD. Se dopo la modifica restano membri senza `capacity.fte`
+   o con una ripartizione che non somma a 1, elencali: finché restano,
+   capacity check e slot plan sono parziali. Se la modifica cambia
+   l'offerta in modo rilevante (ingresso/uscita, `fte`, assenze lunghe),
+   ricorda che lo `slot_plan` dell'ultimo snapshot non ne tiene ancora
+   conto: si ricalcola al prossimo `roadmap-snapshot`.
 
 ## Cosa NON fare
 
-- Non registrare giudizi di performance, note disciplinari, valutazioni.
-  Solo competenze, presidio, disponibilità.
-- Non presumere skill, seniority o disponibilità: sono dati che il PM
-  dichiara.
+- Non registrare giudizi di performance, note disciplinari, valutazioni,
+  né il motivo di un'assenza. Solo competenze, presidio, tempo dedicato.
+- Non usare `fte` come misura di produttività: è tempo dedicato al
+  prodotto.
+- Non presumere skill, seniority, disponibilità, `fte` o ripartizione:
+  sono dati che il PM dichiara.
 - Non trattare `team.yaml` come soggetta ad approvazione: è reference
   data, scrittura diretta (stessa regola di `product-lines.yaml`).
 - Non inserire i PM nel team di sviluppo per default — solo se sviluppano

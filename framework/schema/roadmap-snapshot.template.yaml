@@ -59,30 +59,92 @@ initiatives:
 
 retro_notes: ""                     # mini-retrospettiva dell'iterazione precedente (facoltativa)
 
-# capacity_allocation mostra quanta capacità dell'iterazione è andata a
-# classification: platform (debito tecnico/devops) rispetto alla roadmap
-# principale — playbook, "flusso di protezione del team". total_capacity_weeks
-# è una stima del team tech (chiesta esplicitamente da roadmap-snapshot,
-# mai presunta); platform_weeks è la somma di platform.estimated_effort_weeks
-# delle iniziative classification: platform in lavorazione questa
-# settimana; roadmap_weeks è la somma di delivery.estimated_effort_weeks
-# delle iniziative classification: idea presenti nei bucket analysis_todo /
-# in_development / urgent_priority del Piano di Iterazione referenziato
-# (NON la entanglement_score del RICE — quella è un footprint 1-10, non
-# settimane).
-# Le idee in iterazione ancora senza delivery.estimated_effort_weeks (non
-# passate da Iteration Planning) vanno elencate come "non dimensionate" in
-# note, non stimate d'ufficio. La serie storica di questo blocco, snapshot
-# dopo snapshot, è ciò che permette di vedere se il debito tecnico si
-# accumula silenziosamente perché non gli si dà mai spazio, o se sta
-# assorbendo più capacità di quanto sostenibile.
+# capacity_allocation mostra, per la SETTIMANA dello snapshot, quanta
+# capacità del team c'è e dove va: roadmap principale (idea /
+# strategic_exception / mandate) vs. classification: platform (debito
+# tecnico/devops) — playbook, "flusso di protezione del team" — e, per
+# competenza, dove il team è saturo. Unità: persona-settimane NELLA
+# settimana dello snapshot (una persona a tempo pieno, senza assenze, al
+# netto dell'overhead 0.2 = 0.8). Regole di calcolo: playbook, "Capacità
+# del team e slot della roadmap".
+#   - total_capacity_weeks: OFFERTA calcolata da team.yaml (fte ×
+#     ripartizione per competenza × giorni lavorativi / 5 × (1 −
+#     overhead_pct), al netto di festività e assenze). Se team.yaml non ha
+#     ancora i dati di capacità (basis: declared), si chiede al team tech
+#     come prima — mai presunta.
+#   - roadmap_weeks / platform_weeks: DOMANDA della settimana, somma dei
+#     carichi settimanali (effort_by_competency / estimated_effort_weeks)
+#     delle iniziative il cui slot copre questa settimana (slot_plan
+#     sotto). NON la entanglement_score del RICE — è un footprint 1-10.
+# Le iniziative in iterazione ancora senza stima vanno in
+# undimensioned_ideas, non stimate d'ufficio. La serie storica di questo
+# blocco, snapshot dopo snapshot, mostra se il debito tecnico si accumula
+# perché non gli si dà spazio, se una competenza è cronicamente il collo
+# di bottiglia, e se l'overhead dichiarato è realistico.
 capacity_allocation:
-  total_capacity_weeks: null
-  platform_weeks: null
+  basis: computed                    # computed (da team.yaml) | declared (team.yaml senza capacità: total chiesto al team tech)
+  total_capacity_weeks: null         # offerta della settimana, persona-settimane
+  platform_weeks: null               # domanda platform della settimana
   platform_pct: null                 # calcolato: platform_weeks / total_capacity_weeks
-  roadmap_weeks: null
-  undimensioned_ideas: []            # idea_id delle iniziative idea in iterazione senza delivery.estimated_effort_weeks
-  note: ""                            # contesto libero, es. "settimana pesante per un incidente in produzione"
+  roadmap_weeks: null                # domanda roadmap (idea / strategic_exception / mandate) della settimana
+  by_competency: []
+  #   - competency: backend          # id del catalogo di team.yaml
+  #     supply: 2.4                  # persona-settimane disponibili
+  #     demand: 2.8                  # persona-settimane impegnate dagli slot attivi
+  #     saturation_pct: 117
+  #     status: over                 # ok (< 85%) | tight (85–100%) | over (> 100%)
+  #     could_cover: []              # members con questa competenza in can_also — proposta, non riassegnazione
+  over_capacity_ref: null            # se qualche competenza è over: path del Piano di Iterazione con la decisione registrata (capacity_check.over_capacity_decision)
+  undimensioned_ideas: []            # idea_id delle iniziative in iterazione senza effort_by_competency / estimated_effort_weeks
+  unsized_members: []                # name dei membri di team.yaml senza capacity.fte — esclusi dall'offerta, da completare con team-roster
+  note: ""                           # contesto libero, es. "settimana pesante per un incidente in produzione"
+
+# slot_plan colloca le iniziative dimensionate nelle prossime
+# horizon_weeks settimane, in ordine di priorità, dentro la capacità
+# residua per competenza (e per squad, se l'istanza ne ha). È la base
+# delle viste di medio periodo (roadmap trimestrale, Now/Next/Later): le
+# date di inizio/fine NON sono stimate a mano, le ricava lo slotting.
+# Advisory come tutto lo snapshot: passa da pending/ con lui, e un
+# riordino delle priorità si fa nel Backlog Refinement, non qui.
+#
+# Ordine di priorità (playbook, "Capacità del team e slot della roadmap"):
+#   1. in sviluppo (committed: tengono lo slot già iniziato)
+#   2. urgent_priority del piano + mandate / deadline da collocare entro
+#      la scadenza
+#   3. platform in lavorazione o pianificata dal team
+#   4. analisi in corso / da avviare del piano, per RICE
+#   5. resto del backlog con stima, per RICE
+# Un'iniziativa prende il primo inizio possibile (non prima di
+# team.yaml capacity.analysis_lead_weeks se non è ancora in analisi) in
+# cui il suo carico settimanale sta nella capacità residua di ogni
+# competenza per tutta la durata. Se lo slot si sposta in avanti per
+# mancanza di capacità, delayed_by dice quale competenza l'ha fatta
+# slittare.
+slot_plan:
+  horizon_weeks: 13                  # default un trimestre
+  from_week: ""                      # settimana ISO dello snapshot
+  to_week: ""
+  team_updated_at: ""                # team.yaml updated_at usato per il calcolo — rende il calcolo riproducibile
+  slots:
+  #   - idea_ref: "PG-042"
+  #     idea_id: ""
+  #     summary: ""
+  #     classification: idea         # idea | strategic_exception | mandate | platform
+  #     priority_basis: ""           # perché in questa posizione: "in sviluppo" | "mandate, scade 2026-12-31" | "RICE 4.2"
+  #     squad: null
+  #     start_week: "2026-W44"
+  #     end_week: "2026-W48"
+  #     estimate_basis: committed    # rough | committed — le viste marcano "stima grezza" le rough
+  #     load_by_competency: {}       # carico settimanale, persona-settimane per settimana
+  #     status: planned              # committed (in sviluppo) | planned | over_capacity (committed oltre capacità, decisione registrata)
+  #     delayed_by: null             # competenza che ne ha fatto slittare l'inizio, o null
+  #     due_date: null               # mandate.due_date o deadline.due_date, se c'è
+  #     at_risk: false               # true se end_week cade dopo due_date
+  unslotted: []
+  #   - { idea_ref: "", reason: undimensioned }        # undimensioned | beyond_horizon | infeasible | unknown_competency
+  #     # infeasible: il carico settimanale su una competenza supera l'offerta TOTALE (durata troppo corta per il team, o competenza assente)
+  saturation_by_month: []
+  #   - { month: "2026-11", competency: backend, supply: 9.6, demand: 8.8, saturation_pct: 92 }
 
 # mandates_status elenca TUTTE le idee classification: mandate ancora
 # aperte (status diverso da done/aborted) — non solo quelle già in

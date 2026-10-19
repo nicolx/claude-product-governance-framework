@@ -1,10 +1,15 @@
 # Template per product/reference/team.yaml
 #
 # Anagrafica del team di sviluppo di QUESTA istanza — chi c'è, cosa
-# presidia, cosa sa fare. Popolata durante l'inizializzazione (skill
-# init-governance-project, passo "Team di sviluppo") e mantenuta dalla
-# skill team-roster quando il team cambia. La legge team-fit, in sola
-# lettura, per proporre una shortlist di candidati su un PRD.
+# presidia, cosa sa fare e QUANTA CAPACITÀ porta, per competenza.
+# Popolata durante l'inizializzazione (skill init-governance-project,
+# passo "Team di sviluppo") e mantenuta dalla skill team-roster quando il
+# team cambia. La leggono, in sola lettura:
+#   - team-fit, per proporre una shortlist di candidati su un PRD;
+#   - backlog-refinement / iteration-planning / roadmap-snapshot, per
+#     calcolare l'OFFERTA di capacità per competenza e verificare che il
+#     Piano di Iterazione e gli slot della roadmap ci stiano dentro
+#     (playbook, "Capacità del team e slot della roadmap").
 #
 # Scrittura DIRETTA, come product-lines.yaml / annual-target.yaml: è un
 # dato di riferimento condiviso, non una decisione di priorità — NON passa
@@ -12,21 +17,77 @@
 # product/inbox/): ogni collega che clona la vede.
 #
 # NON è uno strumento di valutazione delle persone. È una mappa di
-# competenze e presidio per instradare il lavoro: descrittiva, non
-# valutativa. Niente giudizi di performance, niente note sensibili qui —
-# team-roster reindirizza se la conversazione va in quella direzione.
+# competenze, presidio e capacità per instradare e dimensionare il lavoro:
+# descrittiva, non valutativa. La capacità è TEMPO DEDICATO al prodotto
+# (contratto, part-time, quota condivisa con altri prodotti, assenze), mai
+# una misura di produttività o velocità individuale — team-roster
+# reindirizza se la conversazione va in quella direzione. Niente giudizi
+# di performance, niente note sensibili: per un'assenza basta l'intervallo
+# di date, il motivo non serve e non si registra.
 #
-# Privacy: il minimo che serve al matching. Nome (o handle) e, se il team
-# lo vuole, email come pm_roster (altrimenti "").
+# Privacy: il minimo che serve al matching e al dimensionamento. Nome (o
+# handle) e, se il team lo vuole, email come pm_roster (altrimenti "").
 
 updated_at: ""                    # data ISO dell'ultimo aggiornamento (team-roster la riscrive a ogni modifica)
+
+# --- Catalogo delle competenze di capacità ---
+#
+# Vocabolario CHIUSO dell'istanza con cui si misura offerta (qui) e domanda
+# (idea.yaml, delivery.effort_by_competency / platform.effort_by_competency).
+# Poche famiglie, larghe: servono a trovare il collo di bottiglia, non a
+# descrivere le persone (per quello ci sono i tag liberi di members[].skills).
+# Un id usato in una stima e assente da qui è un errore che le skill
+# segnalano, mai una competenza aggiunta in silenzio.
+competencies:
+  - id: ""                        # slug stabile — es. backend | frontend | mobile | ux | qa | data | devops
+    label: ""                     # nome leggibile nelle viste — es. "Back-end"
+    notes: ""                     # opzionale: cosa ci rientra, se non ovvio ("include le API pubbliche")
+
+# --- Parametri di capacità del team ---
+capacity:
+  overhead_pct: 0.2               # quota del tempo dedicato che NON va in delivery pianificata: cerimonie,
+                                  #   supporto, bug fix ordinari, review. Default 0.2 se il team non lo dichiara;
+                                  #   è una stima del team tech, rivista quando la serie di capacity_check
+                                  #   mostra sistematicamente più (o meno) lavoro consegnato del previsto.
+  analysis_lead_weeks: 2          # quante settimane, di norma, tra l'avvio dell'analisi e l'inizio dello sviluppo:
+                                  #   lo slotting non fa partire prima di così un'iniziativa non ancora in analisi
+  holidays: []                    # chiusure aziendali / festività che valgono per tutti
+  #   - { from: "2026-12-24", to: "2027-01-06" }
+
+# --- Squad (opzionale) ---
+#
+# Solo per le istanze con più di un team stabile. Se vuoto, il team è un
+# pool unico e tutta la capacità è condivisa. Se popolato, ogni membro
+# appartiene a una squad (members[].squad) e un'iniziativa assegnata a una
+# squad (idea.yaml, delivery.squad) consuma SOLO la capacità di quella
+# squad; un'iniziativa senza squad attinge al pool dell'intero team.
+squads: []
+#   - id: ""                      # slug — es. checkout
+#     label: ""                   # es. "Squad Checkout"
+#     apps: []                    # opzionale: slug apps/ di cui la squad è owner (aiuta a proporre delivery.squad)
 
 members:
   - name: ""                      # nome o handle con cui il team lo chiama — identificatore della persona nelle liste di team-fit
     email: ""                     # opzionale, come pm_roster — "" se non lo si vuole tracciare
     seniority: ""                 # libero: "junior" | "mid" | "senior" | "staff" | "lead" — convenzione a scelta dell'istanza
+    squad: null                   # id di squads[] se l'istanza ha squad, altrimenti null
     apps: []                      # slug delle voci apps/ che la persona presidia — es. ["checkout-service", "employer/portal"].
                                   #   Devono corrispondere agli slug in .governance/config.yaml (apps[].slug); team-roster avvisa se non combaciano.
     skills: []                    # tag liberi: linguaggi, framework, aree — es. ["kafka", "go", "payments", "observability", "react"]
-    availability: ""              # nota in PROSA, non un valore calcolato: "pieno" | "-20% fino a fine mese" | "in ferie 12-19 set"
+    capacity:
+      fte: null                   # quota del tempo lavorativo DEDICATA a questo prodotto, 0–1 (1 = tempo pieno sul prodotto;
+                                  #   0.5 = metà tempo o condiviso con un altro prodotto). null = non dichiarata: la persona
+                                  #   NON entra nel calcolo dell'offerta e le skill lo segnalano, mai presunto a 1.
+      competencies: {}            # come si ripartisce il suo tempo dedicato tra le competenze del catalogo, quote che sommano a 1
+                                  #   — es. { backend: 0.7, devops: 0.3 }. È la ripartizione ABITUALE dichiarata dal PM/team,
+                                  #   non un vincolo: chi sa fare anche altro lo dice in can_also.
+      can_also: []                # competenze del catalogo che la persona può coprire all'occorrenza (fuori dalla ripartizione
+                                  #   abituale) — es. [frontend]. Non entrano nell'offerta: servono a proporre come sciogliere
+                                  #   un collo di bottiglia ("frontend saturo; Marco può coprire").
+      from: null                  # opzionale: data ISO da cui conta (nuovo ingresso, rientro)
+      until: null                 # opzionale: data ISO fino a cui conta (uscita, fine contratto, passaggio ad altro prodotto)
+      absences: []                # intervalli in cui non c'è (ferie, formazione, congedo) — SOLO date, il motivo non si registra
+      #   - { from: "2026-08-10", to: "2026-08-21" }
+    availability: ""              # nota in PROSA per il matching di team-fit, complementare ai numeri sopra:
+                                  #   "in onboarding fino a fine mese", "di supporto all'incidente X questa settimana"
     notes: ""                     # contesto extra utile al matching: "owner di fatto del checkout", "in onboarding su employer/", "preferisce back-end"

@@ -276,6 +276,18 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
     - Se nessun membro copre bene i sistemi/rischi del PRD: dillo
       esplicitamente (è un segnale — supporto esterno, upskilling), non
       forzare un nome debole.
+    - **Stima grezza di delivery** (playbook, "Capacità del team e slot
+      della roadmap"): se `team.yaml` ha un catalogo `competencies`,
+      chiedi al PM — che la raccoglie dal referente tecnico appena
+      confermato, mai inventata da te — `effort_by_competency` in
+      persona-settimane e `estimated_effort_weeks` di durata. Scrivila sul
+      blocco `delivery` di `idea.yaml` con `estimate_basis: rough` e
+      `estimated_at` (scrittura diretta, come le stime di Iteration
+      Planning); se c'è già una stima `committed`, non toccarla. Serve a
+      collocare l'iniziativa nello `slot_plan` del trimestre prima che
+      entri in iterazione; senza, resta "non dimensionata". Se il
+      referente non è disponibile ora, lascia i campi vuoti e mettilo
+      tra le azioni aperte del PM — non bloccare il PRD.
 
 14. **Riepilogo finale**, oltre alle scritture fatte:
     - documenti prodotti, ciascuno con il suo lettore;

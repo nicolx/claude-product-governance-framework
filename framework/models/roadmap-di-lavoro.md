@@ -20,6 +20,7 @@ options:
 
 sources:
   - "product/roadmap/iterations/{ultima settimana approvata}.yaml"
+  - "product/roadmap/snapshots/{ultima settimana approvata}.yaml (solo slot_plan)"
   - "product/ideas/*/idea.yaml"
   - "product/ceremonies/*/{ultime comments_lookback per tipo}/decisions.yaml"
   - "product/approvals/pending/ (solo i nomi: per dichiarare cosa è ancora in attesa)"
@@ -35,9 +36,12 @@ fields:
   - field: "Scadenza"
     source: "mandate.due_date + mandate.escalation_status; altrimenti deadline.due_date + deadline.escalation_status"
     rule: "data esatta + stato (in evidenza due_soon/overdue); '—' se non dichiarata. Mai una data stimata"
-  - field: "Stima"
-    source: "delivery.estimated_effort_weeks (Iteration Planning)"
-    rule: "'N sett. (stima)' per le voci in iterazione che ce l'hanno; '—' altrimenti"
+  - field: "Capacità"
+    source: "capacity_check del Piano di Iterazione approvato più recente"
+    rule: "una riga in testa: saturazione per competenza; in evidenza tight/over, con 'sforamento accettato' se c'è over_capacity_decision; 'capacità non dichiarata' se basis: not_available"
+  - field: "Slot"
+    source: "slot_plan dell'ultimo snapshot approvato (start_week, end_week, estimate_basis, delayed_by, at_risk; unslotted.reason)"
+    rule: "'W44–W48 (stima)' — 'stima grezza' se rough; 'slitta per {competenza}' se delayed_by; '⚠ oltre la scadenza' se at_risk. Senza slot: 'non dimensionata' / 'oltre il trimestre' / 'non fattibile col team attuale' da unslotted. Mai uno slot calcolato qui"
   - field: "RICE"
     source: "ultima voce APPROVATA di rice_history (reach_points/impact_points/confidence_score/entanglement_score/score)"
     rule: "'R4 I6 C8 E2 → 96' (o solo lo score se show_rice_components: false). Senza RICE: '—' + motivo (mandate / platform / SE / senza RICE). Una proposta rice_diff in pending/ si segnala come '(revisione in attesa)', mai mostrata come valore"
@@ -74,6 +78,7 @@ dichiara quello come vista `per_ceremony` (modello aziendale, anche con
 ```markdown
 # Roadmap di lavoro — {periodo}
 _Aggiornata al {data} dopo {cerimonia} · Piano di Iterazione {settimana}._
+_Capacità della settimana: {competenza saturation_pct% (stato)} · … · slot dallo snapshot {settimana}._
 {⚠ In attesa di approvazione: {elenco proposte pending che toccano la roadmap} — questa versione mostra ancora l'ultimo stato approvato.}
 
 ## Cambiato dall'ultima versione
@@ -82,14 +87,14 @@ _Aggiornata al {data} dopo {cerimonia} · Piano di Iterazione {settimana}._
 ## {Product Line}
 
 ### In iterazione
-| ID | Iniziativa | Stato | Scadenza | Stima | RICE | Commenti |
+| ID | Iniziativa | Stato | Scadenza | Slot | RICE | Commenti |
 |---|---|---|---|---|---|---|
-| {short_ref} | {summary} | {stato} | {due_date · escalation} | {N sett. (stima)} | {R I C E → score} | {commento (cerimonia)}<br>{…} |
+| {short_ref} | {summary} | {stato} | {due_date · escalation} | {W44–W48 (stima) · slitta per …} | {R I C E → score} | {commento (cerimonia)}<br>{…} |
 
 ### Backlog prioritizzato
-| # | ID | Iniziativa | Scadenza | RICE | Commenti |
-|---|---|---|---|---|---|
-| {rango} | {short_ref} | {summary} | {due_date · escalation} | {R I C E → score} | {commento (cerimonia)} |
+| # | ID | Iniziativa | Scadenza | Slot | RICE | Commenti |
+|---|---|---|---|---|---|---|
+| {rango} | {short_ref} | {summary} | {due_date · escalation} | {da W50 (stima) / oltre il trimestre / non dimensionata} | {R I C E → score} | {commento (cerimonia)} |
 
 ## Scadenze (prossime {deadline_horizon_weeks} settimane e scadute)
 | Data | ID | Iniziativa | Tipo | Stato | Dove è oggi |
@@ -101,8 +106,9 @@ _Aggiornata al {data} dopo {cerimonia} · Piano di Iterazione {settimana}._
 
 ---
 Come leggere questa roadmap: l'ordine del backlog è quello del RICE
-approvato; le uniche date esatte sono scadenze dichiarate; le stime sono
-del team tech e portano la dicitura "stima". I commenti vengono dalle
+approvato; le uniche date esatte sono scadenze dichiarate; gli slot sono
+ricavati dalle stime del team tech e dalla sua capacità per competenza, e
+portano la dicitura "stima". I commenti vengono dalle
 cerimonie indicate tra parentesi.
 ```
 

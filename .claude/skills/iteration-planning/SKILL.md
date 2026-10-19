@@ -1,6 +1,6 @@
 ---
 name: iteration-planning
-description: Conduce e registra il meeting di Roadmap Update & Iteration Planning — qualche giorno dopo il Backlog Refinement, quando il team tech conferma l'agenda concreta, fa la valutazione 80/20 rischio-rendimento sulle user story, stima le settimane di delivery delle iniziative in iterazione, conferma/aggiusta il Piano di Iterazione (spostamenti tra bucket → proposta aggiornata in pending/) e dichiara la capacità dedicata al debito tecnico. Punto d'ingresso dedicato: fissa ceremony_type e periodo, poi delega a log-ceremony per la registrazione.
+description: Conduce e registra il meeting di Roadmap Update & Iteration Planning — qualche giorno dopo il Backlog Refinement, quando il team tech conferma l'agenda concreta, fa la valutazione 80/20 rischio-rendimento sulle user story, stima la delivery delle iniziative in iterazione per competenza (persona-settimane + durata), verifica che il piano stia nella capacità reale del team (team.yaml) registrando ogni sforamento accettato, conferma/aggiusta il Piano di Iterazione (spostamenti tra bucket → proposta aggiornata in pending/) e dichiara la capacità dedicata al debito tecnico. Punto d'ingresso dedicato: fissa ceremony_type e periodo, poi delega a log-ceremony per la registrazione.
 ---
 
 # iteration-planning
@@ -8,11 +8,12 @@ description: Conduce e registra il meeting di Roadmap Update & Iteration Plannin
 Punto d'ingresso per **Roadmap Update & Iteration Planning** (playbook,
 sezione omonima). `ceremony_type` e cadenza sono fissi: averla come skill
 a sé evita di doverli rispecificare e tiene insieme i passi specifici di
-questa cerimonia (stime di delivery, 80/20, capacità platform).
+questa cerimonia (stime di delivery per competenza, capacity check, 80/20,
+capacità platform).
 
 > **Dry-run.** Se l'utente chiede la simulazione (`dry-run`), propaga
 > l'argomento a `log-ceremony`: nessuna scrittura (né `decisions.yaml`,
-> né `.run-meta.yaml`, né `delivery.estimated_effort_weeks` o
+> né `.run-meta.yaml`, né il blocco `delivery` (stime) o
 > `tech_reference` sulle idee/PRD, né la proposta `iteration_plan`
 > aggiornata in `pending/`, né azioni di
 > checkpoint applicate), nessun commit, chiusura con `🔍 DRY-RUN`. Vedi playbook, "Modalità dry-run
@@ -57,25 +58,46 @@ in aggiunta, i passi specifici sotto.
    PRD non ha `tech_reference`, segnalalo — il team può assegnarlo ora
    (passo 4).
 
-3. **Stima di settimane di delivery.** Per ogni iniziativa
-   `classification: idea` nei bucket `analysis_todo` / `in_development` /
-   `urgent_priority` del piano, cattura dal team tech
-   `delivery.estimated_effort_weeks` — **tempo-calendario**,
-   non l'Entanglement del RICE (che è un footprint 1-10, non settimane —
-   playbook, "Roadmap update & Iteration planning"). Serve prima non
-   perché al RICE interessasse: è qui, con la valutazione 80/20 in mano,
-   che una stima di durata diventa realistica.
+3. **Stima di delivery, per competenza.** Per ogni iniziativa
+   `classification: idea` / `strategic_exception` / `mandate` nei bucket
+   `analysis_todo` / `in_development` / `urgent_priority` del piano,
+   cattura dal team tech due numeri (playbook, "Capacità del team e slot
+   della roadmap"):
+   - `delivery.effort_by_competency` — **quanto lavoro**, in
+     persona-settimane per competenza del catalogo di
+     `product/reference/team.yaml` (`{ backend: 3, frontend: 2, qa: 1 }`).
+     Una competenza non in catalogo non si aggiunge in silenzio: chiedi
+     se è un sinonimo di una esistente o se il catalogo va esteso con
+     `team-roster`;
+   - `delivery.estimated_effort_weeks` — **in quanto tempo-calendario**,
+     una volta partita (la durata dello slot).
+   Entrambi sono tempo, non l'Entanglement del RICE (che è un footprint
+   1-10 — playbook, "Roadmap update & Iteration planning"). È qui, con la
+   valutazione 80/20 in mano, che la stima diventa `estimate_basis:
+   committed`: se c'era una stima `rough` da `prd-draft`, mostrala come
+   punto di partenza e chiedi di confermarla o correggerla. Aggiorna
+   `estimated_at`. Se l'istanza ha squad e `delivery.squad` è vuoto,
+   chiedi quale squad la prende (proponi quella che possiede gli `apps/`
+   toccati).
+   **Verifica di fattibilità**, per ogni stima: il carico settimanale
+   `effort_by_competency[c] / estimated_effort_weeks` non deve superare
+   l'offerta settimanale **totale** di quella competenza (nella squad, se
+   assegnata). Se la supera, la durata è troppo corta per il team che
+   c'è (o la competenza manca): dillo subito e chiedi al team se
+   allungare la durata, ridurre lo scope (80/20) o se serve supporto
+   esterno — non correggerla da solo.
    - Scrittura **diretta** su `product/ideas/{slug}/idea.yaml`, blocco
      `delivery`: è un fatto di pianificazione, non una decisione di
      priorità — non passa da `product/approvals/pending/` (stessa logica
      di `deadline`/`rice_status`).
-   - Se una stima non è disponibile in riunione, lascia `null` e
+   - Se una stima non è disponibile in riunione, lascia i campi vuoti e
      segnalalo — `roadmap-snapshot` la tratterà come "non ancora
      dimensionata" (`capacity_allocation.undimensioned_ideas`), non
      stimarla d'ufficio.
-   - Le iniziative `classification: platform` usano invece
-     `platform.estimated_effort_weeks` (già raccolto all'intake o qui se
-     emerge) — non `delivery`.
+   - Le iniziative `classification: platform` usano gli stessi due campi
+     nel blocco `platform` (`platform.effort_by_competency`,
+     `platform.estimated_effort_weeks`, già raccolti all'intake o qui se
+     emergono) — non `delivery`.
    - **Sincronizza subito queste scritture** (stesso principio delle
      watch): se hai scritto almeno un `idea.yaml`, esegui
      `bash .claude/hooks/governance-sync.sh push "iteration-planning: stime delivery <periodo>" product/ideas/`
@@ -101,9 +123,27 @@ in aggiunta, i passi specifici sotto.
    passo"): la parola al PM sulle voci discusse prima di generare la
    proposta aggiornata.
 
+4b. **Ricalcola il capacity check** del piano con le stime `committed`
+   del passo 3 e i bucket dopo il passo 4 — stesse regole del Backlog
+   Refinement (`capacity_check` nel template del piano; playbook,
+   "Capacità del team e slot della roadmap"). Mostra la tabella
+   competenza → offerta / domanda / saturazione. Se una competenza è
+   `over`: proponi le opzioni (spostare una voce, ridurre lo scope con
+   l'80/20, un membro con quella competenza in `can_also`), e se il team
+   accetta lo sforamento registra motivazione e `decided_by` in
+   `over_capacity_decision` e in `decisions.yaml` (`capacity_overrides`)
+   — **mai presunti**. Una decisione di sforamento già presa al Backlog
+   Refinement resta valida solo se il quadro non è peggiorato: se la
+   domanda è cresciuta, richiedila. È anche il momento per un'anteprima
+   di **quando** atterrano le voci in `analysis_todo`: applica lo
+   slotting dello snapshot (stesso algoritmo) e mostra inizio/fine
+   stimati — utile per rispondere alla domanda della checklist sulle date
+   di rilascio, senza scrivere nulla (lo slot plan vero lo produce
+   `roadmap-snapshot`).
+
 5. **Produci la proposta di Piano di Iterazione aggiornata**, se il passo
-   3 o il passo 4 hanno cambiato qualcosa (stime di delivery inserite,
-   voci spostate/tolte tra bucket). Non modifichi il file di iterazione
+   3, il passo 4 o il 4b hanno cambiato qualcosa (stime di delivery
+   inserite, voci spostate/tolte tra bucket, `capacity_check` cambiato). Non modifichi il file di iterazione
    in place: generi una **nuova proposta** `type: iteration_plan` in
    `product/approvals/pending/{settimana}-iteration-plan-refined.yaml`
    (o sovrascrivi quella del Backlog Refinement se è ancora in `pending/`
@@ -124,7 +164,11 @@ in aggiunta, i passi specifici sotto.
 6. **Capacità platform dell'iterazione, dichiarata esplicitamente.**
    Quanta capacità del team va a debito tecnico/devops questa iterazione
    — un numero esplicito, non lasciato implicito (checklist playbook).
-   Alimenta `capacity_allocation` in `roadmap-snapshot`.
+   Con `team.yaml` dimensionato, mostralo come quota dell'offerta
+   calcolata al passo 4b (es. "platform 1.2 persona-settimane su 6.4 =
+   19%") invece di chiederlo in astratto; il team conferma o corregge le
+   stime `platform.*` da cui viene. Alimenta `capacity_allocation` in
+   `roadmap-snapshot`.
 
 7. Consegna a `log-ceremony` (passi comuni): estrazione decisioni,
    `decisions.yaml` (con gli esiti della valutazione 80/20, la capacità

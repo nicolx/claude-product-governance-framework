@@ -11,7 +11,7 @@
 # Refinement".
 #
 # Uso:
-#   governance-dump.sh sweep         # tutto il quadro per il Backlog Refinement (default; + scarti con risposta non inviata)
+#   governance-dump.sh sweep         # tutto il quadro per il Backlog Refinement (default; + scarti con risposta non inviata, team.yaml, ultimo snapshot)
 #   governance-dump.sh backlog       # idee + coda di approvazione (per backlog-list)
 #   governance-dump.sh ideas [--all] # le idea.yaml (attive; --all include declined/aborted)
 #   governance-dump.sh measurements  # product/prds/*/measurement*.yaml
@@ -118,6 +118,7 @@ emit_reference() {
   emit_file "product/reference/friction-log.yaml"
   emit_file "product/reference/delivery-watch.yaml"
   emit_file "product/reference/reporting-models.yaml"
+  emit_file "product/reference/team.yaml"          # offerta di capacità per competenza (capacity_check, slot_plan)
 }
 
 emit_latest_snapshot() {
@@ -180,6 +181,7 @@ case "$MODE" in
     emit_closed_with_drafted_replies
     emit_glob "product/prds" 'measurement*.yaml'
     emit_iterations
+    emit_latest_snapshot   # slot_plan precedente: le iniziative in sviluppo ne ereditano lo slot
     emit_pending
     emit_reports_index
     footer

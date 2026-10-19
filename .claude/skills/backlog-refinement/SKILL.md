@@ -1,6 +1,6 @@
 ---
 name: backlog-refinement
-description: Conduce e registra il Product Backlog Refinement settimanale — si apre "guardando indietro" (NSM, impatti, scadenze, idee senza RICE, aggiornamenti del contesto aziendale via context-watch), svuota la coda di approvazione RICE, presenta il backlog ordinato come base della prioritizzazione, compone il Piano di Iterazione della settimana (la board a quattro bucket, output primario, proposto in pending/) rilevando le reprioritizzazioni fuori-RICE, poi delega a log-ceremony per la registrazione. Punto d'ingresso dedicato: fissa ceremony_type e periodo. Usala per la cerimonia settimanale di team.
+description: Conduce e registra il Product Backlog Refinement settimanale — si apre "guardando indietro" (NSM, impatti, scadenze, idee senza RICE, aggiornamenti del contesto aziendale via context-watch), svuota la coda di approvazione RICE, presenta il backlog ordinato come base della prioritizzazione, compone il Piano di Iterazione della settimana (la board a quattro bucket, output primario, proposto in pending/) rilevando le reprioritizzazioni fuori-RICE e verificando con un capacity check che stia nella capacità reale del team per competenza, poi delega a log-ceremony per la registrazione. Punto d'ingresso dedicato: fissa ceremony_type e periodo. Usala per la cerimonia settimanale di team.
 ---
 
 # backlog-refinement
@@ -383,7 +383,27 @@ piano passa **sempre** da `product/approvals/pending/`
           `strategic_exception_flag`.
    5. **Chiedi il `iteration_goal`** — una frase: focus della settimana /
       iniziativa o metrica che si cerca di impattare.
-   6. Il PM conferma la board finale.
+   6. **Capacity check, poi il PM conferma la board finale.** Prima della
+      conferma, calcola `capacity_check` del piano (template, e playbook,
+      "Capacità del team e slot della roadmap"): offerta della settimana
+      per competenza da `product/reference/team.yaml`, domanda = carichi
+      settimanali (`effort_by_competency` / `estimated_effort_weeks`,
+      `delivery` o `platform`) delle voci che consumano capacità di
+      sviluppo questa settimana — `in_development`, `urgent_priority` che
+      entra in sviluppo, platform in lavorazione. Mostra la tabella
+      competenza → offerta / domanda / saturazione, con le voci senza
+      stima (`undimensioned`) e i membri senza `fte` (`unsized_members`):
+      il check è parziale finché restano, dillo. Se `team.yaml` non ha
+      dati di capacità, `basis: not_available` — segnalalo e rimanda a
+      `team-roster`, non bloccare la cerimonia.
+      Se una competenza è `over`, **non procedere in silenzio**: chiedi
+      al PM se riequilibrare (spostare/togliere voci — torni ai punti
+      sopra) o accettare lo sforamento. Se lo accetta, registra in
+      `over_capacity_decision` motivazione e `decided_by` (**mai
+      presunti**) e la stessa decisione in `decisions.yaml`
+      (`capacity_overrides`). Se una competenza è satura e qualcuno la ha in
+      `can_also`, proponilo come opzione — non riassegnare nessuno.
+      Poi il PM conferma la board finale.
 
    Per ogni voce di **tutti e quattro** i bucket, popola `summary`,
    `rice_score` e `rice_components` (`reach`/`impact`/`confidence`/

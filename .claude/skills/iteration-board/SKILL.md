@@ -62,7 +62,12 @@ non richiama skill di scrittura.
    *approvata* di `rice_history`, e dillo in una riga in testa ("summary/
    RICE letti dalle idee, non dal piano") — non lasciare le colonne
    vuote.
-   Apri con `iteration_goal` in testa e la settimana. **Prima colonna:
+   Apri con `iteration_goal` in testa e la settimana, e sotto una riga
+   di **capacità** dal `capacity_check` del piano: saturazione per
+   competenza (es. *backend 117% ⚠ sforamento accettato · frontend 80% ·
+   qa 95%*), più quante voci sono senza stima — "capacità non
+   dichiarata" se `basis: not_available` o se il piano non ha il blocco
+   (piani precedenti). Non ricalcolarla. **Prima colonna:
    l'identificatore** `idea_ref` (short_ref); se una voce non ce l'ha, lo
    slug — mai vuoto (playbook, "Ogni elenco prodotto dal sistema è
    indirizzabile").

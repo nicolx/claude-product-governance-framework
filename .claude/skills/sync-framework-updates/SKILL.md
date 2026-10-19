@@ -152,5 +152,33 @@ segnalalo invece di procedere.
      note che citano il vecchio handle; i titoli delle card Jira si
      aggiornano a mano). Non farlo tu — proponilo e lascia decidere.
 
+   - "la roadmap si pianifica a slot dentro la capacità reale del team"
+     (catalogo `competencies`, `capacity` per membro e per team, `squads`
+     in `team.yaml`; `effort_by_competency`/`squad`/`estimate_basis` nei
+     blocchi `delivery` e `platform` dell'idea; `capacity_check` nel
+     Piano di Iterazione; `capacity_allocation.by_competency` e
+     `slot_plan` nello snapshot — playbook, "Capacità del team e slot
+     della roadmap") → **nessuna migrazione obbligatoria, ma un dato da
+     raccogliere**: tutti i campi nuovi sono opzionali e senza di loro
+     l'istanza si comporta come prima (capacity check `not_available`,
+     `total_capacity_weeks` chiesto al team, slot plan vuoto con il
+     motivo). Spiega cosa si guadagna (date di roadmap che il team può
+     mantenere, il collo di bottiglia con un nome) e proponi, in
+     quest'ordine e senza applicarlo da solo:
+     1. `team-roster` per dichiarare catalogo delle competenze, `fte`,
+        ripartizione e assenze — è il prerequisito di tutto il resto;
+     2. al prossimo Iteration Planning, le stime `effort_by_competency`
+        per le iniziative in iterazione: quelle con il solo
+        `estimated_effort_weeks` restano valide come durata, ma senza
+        ripartizione per competenza contano come non dimensionate nel
+        check e nello slot plan. Non ripartire d'ufficio le stime vecchie;
+     3. per le idee prioritizzate fuori dal piano con un PRD, una stima
+        `rough` dal referente tecnico (`prd-draft` la chiede alla prossima
+        revisione), così entrano nello slot plan del trimestre.
+     Gli snapshot già approvati restano com'erano: il loro
+     `total_capacity_weeks` era dichiarato (equivale a `basis:
+     declared`) e `roadmap_weeks` sommava durate — non confrontabile 1:1
+     con i nuovi, dillo se il PM ne guarda la serie storica.
+
 6. Chiudi con un riepilogo breve: cosa è cambiato, cosa richiede
    attenzione da parte dell'utente, cosa non richiede nulla.

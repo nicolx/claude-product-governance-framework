@@ -93,7 +93,7 @@ inizializzata) e scaffolda `apps/` e `product/`.
         ├── friction-log.yaml
         ├── reporting-models.yaml ← quali viste produce l'istanza, per chi, ogni quanto: modelli standard (framework/models/) o aziendali
         ├── models/               ← formati aziendali trascritti (MBR, roadmap, KPI) con la mappatura campo → dato del framework
-        ├── team.yaml             ← anagrafica del team di sviluppo: presidio apps/, competenze, disponibilità (skill team-roster per popolarla). team-fit la incrocia con un PRD e ne fissa il `tech_reference` — il referente tecnico, mostrato poi in backlog-list / iteration-board / cerimonie
+        ├── team.yaml             ← anagrafica del team di sviluppo: presidio apps/, competenze, disponibilità e capacità per competenza (FTE, assenze, squad — skill team-roster per popolarla), su cui si pianificano gli slot della roadmap. team-fit la incrocia con un PRD e ne fissa il `tech_reference` — il referente tecnico, mostrato poi in backlog-list / iteration-board / cerimonie
         └── delivery-watch.yaml   ← coda di triage delle transizioni di delivery da comunicare (skill delivery-watch; lazy, richiede jira + delivery_watch.enabled)
 ```
 

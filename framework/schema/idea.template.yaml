@@ -491,22 +491,45 @@ mandate:
 # dell'iterazione andata a platform vs. roadmap principale) — va validato
 # dal team tech (è una stima di tempo-calendario, non l'Entanglement del
 # RICE: quello per le platform non esiste, saltano il RICE).
+# effort_by_competency / squad hanno lo stesso significato del blocco
+# delivery sotto: la platform consuma la stessa capacità del team e va
+# negli stessi slot (playbook, "Capacità del team e slot della roadmap").
 platform:
   rationale: null                # perché serve (rischio di rottura, manutenibilità, upgrade necessario, ecc.)
-  estimated_effort_weeks: null    # stima settimane — usata per il calcolo della capacità protetta, non per un RICE
+  estimated_effort_weeks: null    # durata stimata in settimane-calendario — usata per la capacità protetta e lo slot, non per un RICE
+  effort_by_competency: {}        # persona-settimane per competenza del catalogo di team.yaml — es. { devops: 2, backend: 1 }
+  squad: null                     # id di team.yaml squads[] se l'istanza ha squad; null = pool dell'intero team
 
-# --- Solo per classification: idea — stima di delivery per la contabilità
-# di capacità d'iterazione (capacity_allocation.roadmap_weeks in
-# roadmap-snapshot, in parallelo a platform.estimated_effort_weeks per le
-# iniziative platform). NON è un input del RICE — la E del RICE è
-# Entanglement (footprint), non tempo. Questo è tempo-calendario, riempito
-# in Iteration Planning dal team tech quando l'iniziativa viene
-# dimensionata davvero (valutazione 80/20). Resta null prima di allora:
-# roadmap-snapshot lo tratta come "non ancora dimensionata" e lo segnala,
-# non lo presume. Scrittura diretta come un fatto di pianificazione, non
-# passa da product/approvals/pending/. ---
+# --- Per classification: idea / strategic_exception / mandate — stima di
+# delivery per la capacità e gli slot della roadmap (capacity_check del
+# Piano di Iterazione, capacity_allocation e slot_plan dello snapshot, in
+# parallelo al blocco platform). NON è un input del RICE — la E del RICE è
+# Entanglement (footprint), non tempo.
+#
+# Due numeri distinti, entrambi del team tech:
+#   - effort_by_competency: QUANTO lavoro, in persona-settimane per
+#     competenza del catalogo di team.yaml (la domanda da confrontare con
+#     l'offerta). { backend: 3, frontend: 2, qa: 1 } = 6 persona-settimane.
+#   - estimated_effort_weeks: in QUANTO TEMPO-CALENDARIO, una volta
+#     partita (la durata dello slot). Il carico settimanale su una
+#     competenza è effort_by_competency[c] / estimated_effort_weeks: se
+#     supera l'offerta di quella competenza l'iniziativa non può stare in
+#     quella durata — le skill lo segnalano, non lo correggono da sole.
+# La data di inizio e di fine NON si stimano qui: le ricava lo slotting
+# della roadmap dalla capacità residua (slot_plan dello snapshot).
+#
+# Una stima nasce "rough" quando il referente tecnico valida l'How in
+# prd-draft (serve a collocare l'iniziativa nel trimestre prima che entri
+# in iterazione) e diventa "committed" in Iteration Planning, con la
+# valutazione 80/20 in mano. Resta null finché nessuno l'ha data: le viste
+# la mostrano come "non dimensionata", non la presumono. Scrittura diretta
+# come un fatto di pianificazione, non passa da product/approvals/pending/. ---
 delivery:
-  estimated_effort_weeks: null    # settimane stimate dal team tech in Iteration Planning — solo capacità, non RICE
+  estimated_effort_weeks: null    # durata in settimane-calendario stimata dal team tech — solo capacità/slot, non RICE
+  effort_by_competency: {}        # persona-settimane per competenza del catalogo di team.yaml — es. { backend: 3, frontend: 2, qa: 1 }
+  squad: null                     # id di team.yaml squads[] se l'istanza ha squad; null = pool dell'intero team
+  estimate_basis: null            # rough (prd-draft, dal referente tecnico) | committed (Iteration Planning) | null
+  estimated_at: null              # data ISO dell'ultima stima
 
 # --- Puntatore denormalizzato al Piano di Iterazione corrente ---
 #

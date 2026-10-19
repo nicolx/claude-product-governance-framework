@@ -73,8 +73,11 @@ vive nel tracker, unica fonte di verità per l'esecuzione). Vedi playbook,
      codice è il segnale più forte;
    - `skills` del membro ∩ tecnologie e aree di rischio del PRD (es. un
      rischio "throughput su Kafka" è coperto da uno `skills: [kafka]`);
-   - `availability` — un ottimo match tecnico a disponibilità zero va
-     detto, non nascosto;
+   - disponibilità — `capacity.fte`, `from`/`until`, le `absences` nelle
+     prossime settimane e la nota in prosa `availability`; se lo
+     `slot_plan` dell'ultimo snapshot mostra satura la competenza
+     principale del candidato, dillo. Un ottimo match tecnico a
+     disponibilità zero va detto, non nascosto;
    - `seniority` / `notes` — per iniziative ad alto blast radius o su
      sistemi legacy, il presidio storico conta.
 

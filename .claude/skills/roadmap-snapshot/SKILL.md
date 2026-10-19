@@ -1,6 +1,6 @@
 ---
 name: roadmap-snapshot
-description: Genera la proposta di snapshot settimanale della roadmap (il rollup strategico per MBR/MTR) a partire dalle cerimonie loggate e dallo stato Jira, inclusi allarmi sulle NSM in degrado, capacità protetta per il debito tecnico (platform), iniziative mandatarie a rischio, scadenze in avvicinamento su idee normali, idee senza RICE e stato delle misurazioni. Referenzia il Piano di Iterazione della settimana (iteration_plan_ref) invece di ricostruire una propria lista di iniziative. Scrive in product/approvals/pending/, mai direttamente in product/roadmap/snapshots/.
+description: Genera la proposta di snapshot settimanale della roadmap (il rollup strategico per MBR/MTR) a partire dalle cerimonie loggate e dallo stato Jira, inclusi allarmi sulle NSM in degrado, capacità del team per competenza (calcolata da team.yaml) con la quota protetta per il debito tecnico (platform), slot delle iniziative nel trimestre dentro la capacità reale, iniziative mandatarie a rischio, scadenze in avvicinamento su idee normali, idee senza RICE e stato delle misurazioni. Referenzia il Piano di Iterazione della settimana (iteration_plan_ref) invece di ricostruire una propria lista di iniziative. Scrive in product/approvals/pending/, mai direttamente in product/roadmap/snapshots/.
 ---
 
 # roadmap-snapshot
@@ -58,6 +58,11 @@ creato/aggiornato.
      lista `initiatives`. Se manca del tutto, `iteration_plan_ref` resta
      `null` e lo si segnala: il Backlog Refinement non ha prodotto il
      piano.
+   - `product/reference/team.yaml` — l'offerta di
+     capacità per competenza su cui si calcolano `capacity_allocation` e
+     `slot_plan` — e lo `slot_plan` dello snapshot precedente, da cui le
+     iniziative in sviluppo ereditano il loro slot (entrambi già nel dump
+     `sweep`).
    - Se i riepiloghi delle cerimonie non coprono già lo stato più
      recente, richiama direttamente `nsm-watch`, `mandate-watch`,
      `deadline-watch`, `rice-watch` e `measurement-watch` prima di
@@ -84,22 +89,43 @@ creato/aggiornato.
      ciascuna voce riporta `idea_id`, `prd_id`, `jira_card_id`, `status`,
      `completion_pct`, `iteration_bucket`. Altrimenti lasciala vuota: il
      dettaglio operativo vive nel piano referenziato.
-   - `capacity_allocation`: `roadmap_weeks` = somma di
-     `delivery.estimated_effort_weeks` delle iniziative `classification:
-     idea` nei bucket `analysis_todo` / `in_development` /
-     `urgent_priority` del Piano di Iterazione; `platform_weeks` = somma
-     di `platform.estimated_effort_weeks` delle iniziative
-     `classification: platform` in lavorazione questa settimana. **NON**
-     usare la `entanglement_score` del RICE per `roadmap_weeks`: è un
-     footprint 1-10, non settimane. Le iniziative `idea` di quei bucket
-     senza `delivery.estimated_effort_weeks` (non ancora passate da
-     Iteration Planning) vanno in
-     `capacity_allocation.undimensioned_ideas` (lista di `idea_id`), non
-     stimate d'ufficio né ignorate silenziosamente. **Chiedi sempre**
-     `total_capacity_weeks` al team tech (non presumerlo, non dedurlo da
-     `platform_weeks + roadmap_weeks` — la capacità reale del team può
-     essere diversa dal lavoro effettivamente pianificato). Calcola
-     `platform_pct` solo se `total_capacity_weeks` è noto.
+   - `slot_plan` **prima** di `capacity_allocation` (che ne legge la
+     prima settimana). Applica lo slotting del playbook ("Capacità del
+     team e slot della roadmap") sulle prossime `horizon_weeks` (default
+     13): offerta settimana per settimana e per competenza da
+     `product/reference/team.yaml` (per squad, se l'istanza ne ha), poi
+     le iniziative dimensionate in ordine di priorità — in sviluppo
+     (tengono lo slot dello snapshot precedente, salvo nuova stima),
+     `urgent_priority` + mandate/deadline da chiudere entro la scadenza,
+     platform, analisi del piano per RICE, resto del backlog con stima
+     per RICE. Ogni iniziativa prende il primo inizio in cui il suo
+     carico settimanale sta nella capacità residua di ogni sua
+     competenza per tutta la durata; `delayed_by` se è slittata per
+     capacità, `at_risk` se finisce oltre la sua `due_date`. Quelle che
+     non si possono collocare vanno in `unslotted` con il motivo — mai
+     omesse. **Mostra il calcolo** (offerta per competenza, ordine,
+     slot risultanti) nel checkpoint: è aritmetica che il PM deve poter
+     verificare, non una scatola nera. Le stime `rough` restano tali
+     (`estimate_basis`) e le viste le marcano.
+   - `capacity_allocation`: per la settimana dello snapshot, dalla prima
+     colonna dello `slot_plan`. `total_capacity_weeks` = offerta
+     calcolata da `team.yaml` (`basis: computed`); `roadmap_weeks` /
+     `platform_weeks` = somma dei carichi settimanali degli slot attivi
+     questa settimana (idea / strategic_exception / mandate vs.
+     platform); `by_competency` con saturazione e stato; se una
+     competenza è `over`, `over_capacity_ref` punta al Piano di
+     Iterazione che ha registrato la decisione di sforamento — se il
+     piano non ce l'ha, **segnalalo** (sforamento non deciso). **NON**
+     usare la `entanglement_score` del RICE: è un footprint 1-10, non
+     settimane. Le iniziative in iterazione senza stima vanno in
+     `undimensioned_ideas`, i membri senza `fte` in `unsized_members` —
+     non stimati d'ufficio né ignorati in silenzio.
+     Se `team.yaml` non ha ancora dati di capacità (nessun membro con
+     `capacity.fte`), `basis: declared`: **chiedi**
+     `total_capacity_weeks` al team tech come prima (non presumerlo, non
+     dedurlo dal lavoro pianificato), salta `slot_plan` (`slots: []`,
+     motivo in `note`) e rimanda a `team-roster`. Calcola `platform_pct`
+     solo se `total_capacity_weeks` è noto.
    - `mandates_status`: **tutte** le idee `classification: mandate` con
      `status` diverso da `done`/`aborted` (non solo quelle già in
      `initiatives`), leggendo `escalation_status`/`analysis_start_by`

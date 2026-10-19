@@ -80,7 +80,11 @@ si decide se approvarlo.
 Per un `iteration_plan`, il riepilogo mostra `iteration_goal`, quante voci
 per bucket, e il diff `changes_since_last` (completate / avanzate /
 slittate / rimosse / nuove) — è la parte che dice se vale la pena
-approvarlo così com'è.
+approvarlo così com'è — e il `capacity_check`: saturazione per
+competenza, e per ogni competenza `over` la decisione di sforamento
+registrata (motivazione, chi). Una competenza `over` **senza**
+`over_capacity_decision` va segnalata in evidenza: è uno sforamento non
+deciso, da chiarire prima di approvare.
 
 ## Approvazione
 

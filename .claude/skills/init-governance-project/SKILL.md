@@ -223,8 +223,16 @@ per raccogliere:
     la vuole tracciare** (default `""`, come per `pm_roster`), seniority,
     gli slug delle voci `apps/` che presidia (quelle collegate al passo
     5), tag di competenza liberi (linguaggi, framework, aree),
-    disponibilità in prosa, note di contesto. Se l'utente ha già una
-    tabella/export pronto, usalo direttamente. Popola
+    disponibilità in prosa, note di contesto. In più, la **capacità** su
+    cui si pianificano gli slot della roadmap (playbook, "Capacità del
+    team e slot della roadmap"): il catalogo di competenze con cui il
+    team tech stima (poche famiglie larghe — es. backend, frontend,
+    mobile, ux, qa, data, devops), se il team lavora in squad separate,
+    l'overhead (default 0.2), e per persona `fte` dedicato al prodotto,
+    ripartizione sulle competenze e assenze già note (solo date). Segui
+    i passi 3 e 3b di `team-roster`. Se l'utente ha già una
+    tabella/export pronto, usalo direttamente; se la capacità non è
+    nota ora, lascia `fte: null` — le cerimonie lo segnaleranno. Popola
     `product/reference/team.yaml` da `framework/schema/team.template.yaml`.
     Se il PM non ha il dato pronto ora, va bene: crea lo scaffold vuoto
     (solo header, `members: []`) e nota che `team-roster` lo popola in
@@ -427,7 +435,9 @@ che serve da lì e chiedi solo quello che manca.
   (`product/reference/annual-target.yaml`, `value: null`), materiale di
   contesto aziendale non ancora fornito se `context/` è rimasta vuota,
   **anagrafica del team non ancora popolata** se `team.yaml` ha
-  `members: []` — `team-roster` la riempie; **modelli di reporting**
+  `members: []`, o **capacità non dichiarata** se mancano il catalogo
+  `competencies` o gli `fte` — `team-roster` la riempie (senza, il
+  capacity check e lo slot plan non si calcolano); **modelli di reporting**
   dichiarati come ponte su un modello standard in attesa del formato
   aziendale, o `views: []` — `report-render` in modalità setup li
   completa). Indica quali viste sono state dichiarate, quale è la roadmap

@@ -175,7 +175,9 @@ Tre macro fasi di lavoro per ogni prodotto:
   la quota di capacità che assorbono è tracciata esplicitamente
   (`capacity_allocation` in ogni snapshot settimanale) perché il
   bilanciamento tra le due cose sia una scelta consapevole, non un
-  effetto collaterale.
+  effetto collaterale. Entrambi i flussi stanno dentro la capacità reale
+  del team, per competenza: la roadmap si pianifica a slot che il team
+  può davvero coprire (vedi "Capacità del team e slot della roadmap").
 
 ## Le fasi ricorrenti
 
@@ -1084,8 +1086,9 @@ RICE è un framework di prioritizzazione basato su quattro parametri:
   diventato un segnale rumoroso di ciò che il RICE vuole davvero
   catturare al denominatore — il costo e il rischio di far atterrare il
   cambiamento. La stima di tempo-calendario serve ancora, ma per la
-  pianificazione, non per il ranking: vive in `delivery.estimated_effort_weeks`
-  (riempita in Iteration Planning, alimenta `capacity_allocation`) e in
+  pianificazione, non per il ranking: vive nel blocco `delivery`
+  (`effort_by_competency` + `estimated_effort_weeks`, stimato dal team
+  tech — vedi "Capacità del team e slot della roadmap") e in
   `mandate.lead_time_weeks` per le iniziative con scadenza.
 
 Nessuno di questi parametri richiede precisione chirurgica, ma avere
@@ -1518,7 +1521,9 @@ corti `short_ref` (`PG-042`) alle idee che ancora non ne hanno — il
 refinement settimanale è il punto di serializzazione a scrittore singolo
 per cui questo non collide — **compone il Piano di Iterazione**
 partendo da quello della settimana precedente (rilevando lì le
-reprioritizzazioni fuori-RICE), e delega a `log-ceremony` per la
+reprioritizzazioni fuori-RICE e verificando con il capacity check che
+stia nella capacità reale del team — "Capacità del team e slot della
+roadmap"), e delega a `log-ceremony` per la
 scrittura in `product/ceremonies/backlog-refinement/{YYYY-Www}/` —
 trascrizione grezza in `source/`, esito strutturato in `decisions.yaml`
 (vedi `framework/schema/ceremony-decisions.template.yaml`), metadati di
@@ -1536,6 +1541,7 @@ d'occhio" del piano si ottiene con la skill **`iteration-board`**.
 - [ ] Il Piano di Iterazione è stato generato **partendo da quello della settimana precedente** (`based_on`)?
 - [ ] Le idee su cui iniziare l'analisi (`analysis_todo`) sono state scelte esplicitamente dal ranking RICE, con un `why_now` per ciascuna?
 - [ ] Il diff vs. settimana precedente (completate / avanzate / slittate / rimosse / nuove) è stato rivisto col team? Le voci slittate da ≥ 3 iterazioni sono state affrontate?
+- [ ] Il capacity check del piano è stato mostrato al team? Ogni competenza oltre capacità è stata riequilibrata, o lo sforamento è stato accettato con motivazione e chi l'ha deciso?
 - [ ] Le voci `prioritizzate d'urgenza` che sono Strategic Exception hanno una proposta `strategic_exception_flag` in coda e una riga nel friction-log?
 - [ ] La proposta `type: iteration_plan` è in `product/approvals/pending/` (non applicata nella camminata)?
 - [ ] È stata fatta una mini-retrospettiva sull'iterazione precedente?
@@ -1810,10 +1816,13 @@ documenti e la tiene visibile in tutte le viste e le cerimonie.
 ### L'anagrafica del team (`product/reference/team.yaml`)
 
 Un'istanza mantiene una mappa leggera di **chi c'è nel team di sviluppo,
-quali aree di `apps/` presidia, cosa sa fare, quanto è disponibile**. Per
-persona: nome (o handle), eventuale email, seniority, gli slug `apps/` che
-presidia, tag di competenza liberi (linguaggi, framework, aree),
-disponibilità in prosa, note di contesto.
+quali aree di `apps/` presidia, cosa sa fare, quanta capacità porta**.
+Per persona: nome (o handle), eventuale email, seniority, squad, gli slug
+`apps/` che presidia, tag di competenza liberi (linguaggi, framework,
+aree), la capacità (`fte` dedicato al prodotto, ripartizione sulle
+competenze del catalogo, assenze), disponibilità in prosa, note di
+contesto. La parte di capacità è la fonte dell'offerta nella sezione
+"Capacità del team e slot della roadmap".
 
 - **Chi la scrive.** `init-governance-project` la popola all'intervista
   (passo "Team di sviluppo"); `team-roster` la fa evolvere quando il team
@@ -1884,6 +1893,171 @@ lanciarla a mano dopo un PRD appena scritto); a mano quando il roster
 cambia, il PRD evolve, o all'Iteration Planning si riconfermano i
 referenti.
 
+## Capacità del team e slot della roadmap
+
+Una roadmap che non sa quanta gente c'è promette date che il team non
+può mantenere. Il problema tipico non è la capacità totale ma quella di
+**una competenza**: tre iniziative che si contendono l'unico sviluppatore
+mobile non partono in parallelo, qualunque sia il loro RICE. Il metodo
+mette a confronto due cose, entrambe dichiarate dal team e mai inventate:
+
+- **l'offerta** — quanta capacità c'è, per competenza, settimana per
+  settimana (`product/reference/team.yaml`);
+- **la domanda** — quanto lavoro chiede ogni iniziativa, per competenza
+  (blocco `delivery` o `platform` di `idea.yaml`).
+
+Il confronto produce due cose: un **capacity check** sul Piano di
+Iterazione della settimana, e uno **slot plan** che colloca le iniziative
+nel trimestre dentro la capacità residua. Il RICE dice *in che ordine*;
+lo slot plan dice *quando, con il team che c'è*.
+
+### L'offerta: chi sa fare cosa, e quanto tempo ha
+
+`team.yaml` porta, oltre a presidio e competenze per il matching di
+`team-fit`:
+
+- un **catalogo di competenze** dell'istanza — poche famiglie larghe con
+  cui il team tech stima (es. `backend`, `frontend`, `mobile`, `ux`,
+  `qa`, `data`, `devops`). È un vocabolario chiuso: offerta e domanda
+  usano gli stessi id, altrimenti non si confrontano;
+- per persona: **`fte`** — la quota del tempo lavorativo dedicata a
+  *questo* prodotto (0–1: part-time o condivisa con altri prodotti vale
+  meno di 1) — la **ripartizione** di quel tempo sulle competenze
+  (`{backend: 0.7, devops: 0.3}`), le competenze che copre all'occorrenza
+  (`can_also`), le date di ingresso/uscita, le **assenze** (solo date);
+- per il team: l'**overhead** (cerimonie, supporto, bug ordinari,
+  review — default 0.2), le festività comuni, le eventuali **squad**.
+
+**Capacità non è produttività.** `fte` è tempo dedicato, non velocità:
+le differenze di ritmo stanno nelle stime del team, mai nel roster. Vale
+la stessa regola dell'anagrafica: descrittiva, non valutativa.
+
+**Calcolo dell'offerta** di una competenza `c` in una settimana `w`, in
+persona-settimane:
+
+```
+offerta(c, w) = Σ membri  fte × quota_c × (giorni lavorativi in w / 5) × (1 − overhead_pct)
+```
+
+dove i giorni lavorativi escludono weekend, `holidays`, `absences` del
+membro e i giorni fuori da `from`/`until`. Con le squad, l'offerta si
+calcola per squad (i soli suoi membri). Un membro con `fte: null` non
+entra nel calcolo e va segnalato (`unsized_members`) — mai presunto a 1.
+`can_also` **non** entra nell'offerta: serve a proporre come sciogliere
+un collo di bottiglia, non a gonfiare i numeri.
+
+### La domanda: quanto lavoro, e in quanto tempo
+
+Il team tech stima ogni iniziativa con due numeri distinti:
+
+- **`effort_by_competency`** — quanto lavoro, in persona-settimane per
+  competenza: `{backend: 3, frontend: 2, qa: 1}`;
+- **`estimated_effort_weeks`** — in quanto tempo-calendario, una volta
+  partita: la durata dello slot.
+
+Il **carico settimanale** su una competenza è
+`effort_by_competency[c] / estimated_effort_weeks`. Se supera l'offerta
+**totale** di quella competenza, l'iniziativa non può stare in quella
+durata con il team che c'è (o la competenza manca del tutto): è
+`infeasible`, e lo si dice subito al team — allungare la durata, ridurre
+lo scope con l'80/20, supporto esterno. Nessuna skill lo corregge da
+sola.
+
+Nessuno dei due numeri è l'Entanglement del RICE (un footprint 1-10). La
+stima nasce **`rough`** quando il referente tecnico valida l'How in
+`prd-draft` — serve a collocare l'iniziativa nel trimestre prima che
+entri in iterazione — e diventa **`committed`** in Iteration Planning,
+con la valutazione 80/20 in mano. Le viste marcano le `rough` come stima
+grezza. Un'iniziativa senza stima è **non dimensionata**: compare come
+tale, non viene stimata d'ufficio. Vale per `idea`, `strategic_exception`
+e `mandate` (blocco `delivery`) e per `platform` (blocco `platform`): il
+debito tecnico consuma la stessa capacità e sta negli stessi slot. I bug
+ordinari stanno nell'overhead.
+
+### Il capacity check del Piano di Iterazione
+
+Il Backlog Refinement lo calcola componendo il piano, l'Iteration
+Planning lo ricalcola dopo le stime `committed`. Domanda della settimana
+= carichi settimanali di ciò che consuma capacità di sviluppo *questa*
+settimana: `in_development`, `urgent_priority` che entra in sviluppo,
+platform in lavorazione. Le analisi non consumano capacità di delivery
+(sono nell'overhead). Per competenza:
+
+| Stato | Saturazione (domanda / offerta) |
+|---|---|
+| `ok` | < 85% |
+| `tight` | 85–100% |
+| `over` | > 100% |
+
+**Sforare si può, ma mai in silenzio.** Se una competenza è `over`, il
+PM sceglie in cerimonia: **riequilibrare** (spostare o togliere una
+voce, ridurre lo scope, coinvolgere chi ha la competenza in `can_also`)
+oppure **accettare lo sforamento** con una motivazione e chi l'ha
+deciso — registrati nel piano (`capacity_check.over_capacity_decision`)
+e in `decisions.yaml` (`capacity_overrides`). Non passa da `pending/`
+di per sé: viaggia dentro la proposta di piano, che ci passa già. È
+la stessa logica della Strategic Exception: non è vietato, è tracciato.
+La serie dei `capacity_overrides` mostra se lo sforamento è
+un'eccezione o il modo normale di lavorare — nel secondo caso il
+problema è il dimensionamento del team rispetto a ciò che si promette,
+ed è un'informazione per la leadership, non un fallimento del team.
+
+### Lo slot plan: quando, con il team che c'è
+
+`roadmap-snapshot` colloca le iniziative dimensionate nelle prossime 13
+settimane (`slot_plan`), con un algoritmo semplice e verificabile a mano:
+
+1. **Ordine di priorità:**
+   1. in sviluppo — tengono lo slot già iniziato (dallo snapshot
+      precedente; una nuova stima lo ricalcola; senza snapshot
+      precedente, l'inizio è il primo Piano di Iterazione in cui la voce
+      compare in `in_development`);
+   2. `urgent_priority` del piano, poi mandate e idee con `deadline` non
+      ancora in lavorazione, ordinate per ultimo inizio utile (`due_date`
+      − durata);
+   3. platform in lavorazione o pianificata dal team;
+   4. `analysis_in_progress` / `analysis_todo` del piano, per RICE;
+   5. resto del backlog con stima, per RICE.
+2. **Collocazione:** ogni iniziativa prende la **prima settimana di
+   inizio** in cui, per tutta la sua durata e per ogni sua competenza, il
+   carico settimanale sta nella capacità residua (della sua squad, o del
+   team). Non prima della settimana corrente se è già in analisi, non
+   prima di `capacity.analysis_lead_weeks` se non lo è ancora. Le
+   iniziative in sviluppo si collocano comunque (sono un impegno preso):
+   se sforano, lo slot è `over_capacity` e deve esserci la decisione
+   registrata nel piano.
+3. **Esito per iniziativa:** inizio/fine, `delayed_by` (la competenza
+   che l'ha fatta slittare, se è slittata), `at_risk` se finisce oltre la
+   sua `due_date`. Quelle che non si collocano vanno in `unslotted` con il
+   motivo — `undimensioned`, `beyond_horizon` (non ci sta nel trimestre:
+   è il "Later"), `infeasible`, `unknown_competency` — mai omesse.
+
+Lo slot plan è **advisory e derivato**: passa da `pending/` con lo
+snapshot, e non cambia le priorità — se uno slot non piace, si cambia
+l'ordine nel Backlog Refinement o la stima in Iteration Planning, non lo
+slot a mano. Lo snapshot mostra il calcolo (offerta per competenza,
+ordine, slot) perché il PM possa verificarlo.
+
+**Cosa ci dice.** `delayed_by` è il collo di bottiglia con un nome: "il
+checkout slitta di 4 settimane per `mobile`" è una conversazione molto
+più utile, con gli stakeholder e con la leadership, di "il team è
+pieno". Un mandate `at_risk` nello slot plan è il segnale da anticipare
+nel prossimo Backlog Refinement, prima che lo dica `mandate-watch`.
+
+### Quando i dati mancano
+
+Ogni pezzo degrada in modo esplicito, mai con un default silenzioso:
+
+- `team.yaml` senza capacità (nessun `fte`) → capacity check
+  `not_available`, slot plan vuoto con il motivo, `total_capacity_weeks`
+  chiesto al team come numero dichiarato (`basis: declared`). Rimanda a
+  `team-roster`.
+- Membri senza `fte`, iniziative senza stima → elencati
+  (`unsized_members`, `undimensioned`): il calcolo è parziale e lo dice.
+- Una competenza usata in una stima ma assente dal catalogo → segnalata,
+  l'iniziativa va in `unslotted` (`unknown_competency`) finché il PM non
+  la rimappa o estende il catalogo.
+
 ## Roadmap update & Iteration planning
 
 *"You don't need to be perfect. You need to be fast and learning." —
@@ -1915,20 +2089,26 @@ rischio resta una buona cosa: fail fast.
 - *Le architetture, i requisiti e la progettazione migliori emergono da
   team che si auto-organizzano.*
 
-È anche il momento in cui le iniziative `classification: idea` entrate in
-iterazione ricevono una **stima di settimane di delivery**
-(`delivery.estimated_effort_weeks`) dal team tech — tempo-calendario, non
-l'Entanglement del RICE. Non serve prima: al RICE scoring interessa il
-footprint del cambiamento, non la durata; è qui, con la valutazione
-80/20 in mano, che una stima di durata diventa realistica. Alimenta
-`capacity_allocation` in `roadmap-snapshot`, in parallelo a
-`platform.estimated_effort_weeks` per le iniziative platform.
+È anche il momento in cui le iniziative entrate in iterazione ricevono
+la **stima di delivery `committed`** dal team tech: quanto lavoro per
+competenza (`delivery.effort_by_competency`, persona-settimane) e in
+quanto tempo-calendario (`delivery.estimated_effort_weeks`) — non
+l'Entanglement del RICE. Al RICE scoring interessa il footprint del
+cambiamento, non la durata; è qui, con la valutazione 80/20 in mano, che
+la stima diventa realistica (una stima `rough` del referente tecnico può
+esserci già da `prd-draft`, per collocare l'iniziativa nel trimestre).
+Con le stime in mano, il team **ricalcola il capacity check** del piano
+e decide su ogni competenza oltre capacità — vedi "Capacità del team e
+slot della roadmap". Alimenta `capacity_allocation` e `slot_plan` in
+`roadmap-snapshot`, in parallelo alle stesse stime nel blocco `platform`
+per le iniziative platform.
 
 Anche questa cerimonia va registrata con una skill dedicata,
 **`iteration-planning`**: **carica il Piano di Iterazione** prodotto dal
-Backlog Refinement (non ne crea uno nuovo), raccoglie le stime
-`delivery.estimated_effort_weeks` dal team tech per le iniziative nei suoi
-bucket, registra la valutazione 80/20 e la capacità platform dichiarata.
+Backlog Refinement (non ne crea uno nuovo), raccoglie le stime di
+delivery per competenza dal team tech per le iniziative nei suoi bucket,
+ricalcola il capacity check, registra la valutazione 80/20 e la capacità
+platform dichiarata.
 Se la valutazione 80/20 porta a spostare voci tra bucket o a toglierle,
 la skill produce una **proposta di Piano di Iterazione aggiornata**
 (`refined_by_iteration_planning: true`) che passa da
@@ -1944,7 +2124,9 @@ pattern trascrizione + decisioni strutturate + `.run-meta.yaml`.
 - [ ] L'agenda tiene conto del flusso di manutenzione ordinaria/debito tecnico?
 - [ ] Le date di rilascio stimate sono coerenti con quanto discusso?
 - [ ] Gli stakeholder chiave sono stati aggiornati sulle aspettative di delivery?
-- [ ] Le iniziative `idea` in iterazione hanno una stima `delivery.estimated_effort_weeks` per la contabilità di capacità?
+- [ ] Le iniziative in iterazione hanno una stima `committed` per competenza (`effort_by_competency` + `estimated_effort_weeks`)?
+- [ ] Il piano sta nella capacità del team per ogni competenza, o lo sforamento è stato deciso e registrato (`capacity_overrides`)?
+- [ ] `team.yaml` riflette il team di questa settimana (ingressi/uscite, assenze note)?
 - [ ] La capacità dedicata a platform (debito tecnico/devops) questa iterazione è stata dichiarata esplicitamente, non lasciata implicita?
 
 ## Modelli di reporting (roadmap, metriche, aggiornamenti)
@@ -2073,8 +2255,10 @@ setup — non inventa una vista.
 i modelli aziendali):
 - **Nessuna data inventata.** Le uniche date esatte sono le scadenze
   dichiarate (`mandate.due_date`, `deadline.due_date`). Una collocazione
-  in un mese si basa solo su `delivery.estimated_effort_weeks` e porta la
-  dicitura "stima"; le iniziative non dimensionate si elencano a parte.
+  in un mese si basa solo sullo `slot_plan` dell'ultimo snapshot (inizio
+  e fine ricavati dalla capacità del team) e porta la dicitura "stima"
+  — "stima grezza" se `estimate_basis: rough`; le iniziative non
+  dimensionate o fuori orizzonte si elencano a parte.
 - **L'ordine è quello del RICE e del Piano**, non quello di chi chiede
   più forte: Next e Later si leggono dal Piano di Iterazione e dal
   backlog ordinato.
@@ -2702,8 +2886,8 @@ estesa). Valore alto = più intrecciata = più a rischio = deprioritizzata
 (è a denominatore). Sostituisce la vecchia "Effort" (settimane-
 sviluppatore), resa un segnale rumoroso dall'implementazione AI-assistita
 che scollega il tempo di codifica dal costo reale del cambiamento. La
-stima di tempo-calendario per la pianificazione vive altrove
-(`delivery.estimated_effort_weeks`, riempita in Iteration Planning;
+stima di tempo per la pianificazione vive altrove (blocco `delivery`,
+persona-settimane per competenza + durata, stimato dal team tech;
 `mandate.lead_time_weeks` per le iniziative con scadenza). Vedi "Ideas
 prioritization".
 
@@ -2821,6 +3005,24 @@ piano della settimana precedente. È la board operativa "cosa fa il team
 adesso"; lo snapshot di roadmap è il rollup strategico che lo referenzia.
 Passa sempre da `product/approvals/pending/`. Vista rapida:
 skill `iteration-board`.
+
+**Capacity check** — Confronto, per competenza, tra l'offerta del team
+nella settimana (`team.yaml`: `fte` × ripartizione × giorni lavorativi,
+al netto dell'overhead) e la domanda del Piano di Iterazione (carichi
+settimanali delle iniziative in sviluppo). Una competenza oltre il 100%
+si riequilibra o si accetta con decisione registrata
+(`capacity_overrides`). Vedi "Capacità del team e slot della roadmap".
+
+**Slot plan** — Collocazione delle iniziative dimensionate nelle
+prossime 13 settimane, in ordine di priorità, dentro la capacità residua
+per competenza (`roadmap-snapshot`, blocco `slot_plan`). Dice *quando*,
+con il team che c'è; `delayed_by` nomina la competenza collo di
+bottiglia. Advisory e derivato: non cambia le priorità.
+
+**Persona-settimana** — Unità di capacità e di stima: una persona a tempo
+pieno sul prodotto per una settimana lavorativa. L'offerta si esprime al
+netto dell'overhead; la domanda (`effort_by_competency`) è il lavoro
+pianificato.
 
 **Why / What / How / When** — I quattro assi dell'analisi di ogni
 feature. Why: il problema reale. What: cosa si costruisce. How: come lo

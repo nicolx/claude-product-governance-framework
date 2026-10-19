@@ -22,16 +22,19 @@ sources:
 
 fields:
   - field: "Timeline"
-    source: "idee nei bucket in_development/urgent_priority del Piano di Iterazione, con delivery.estimated_effort_weeks"
-    rule: "finestra stimata = dalla settimana iteration.current per estimated_effort_weeks settimane; collocata nel mese in cui cade la fine, marcata 'stima'"
-  - field: "Non dimensionate"
-    source: "capacity_allocation.undimensioned_ideas dello snapshot"
-    rule: "elencate a parte, mai collocate in un mese"
+    source: "slot_plan.slots dello snapshot (start_week, end_week, estimate_basis, delayed_by, at_risk)"
+    rule: "barra dal mese di start_week al mese di end_week, marcata 'stima' ('stima grezza' se estimate_basis: rough); 'slitta per {competenza}' se delayed_by; 'a rischio' se at_risk"
+  - field: "Capacità per competenza"
+    source: "slot_plan.saturation_by_month dello snapshot"
+    rule: "una riga per competenza, saturazione per mese; evidenziate le celle > 100%"
+  - field: "Non collocate"
+    source: "slot_plan.unslotted e capacity_allocation.undimensioned_ideas dello snapshot"
+    rule: "elencate a parte con il motivo (non dimensionata / oltre il trimestre / non fattibile), mai collocate in un mese"
   - field: "Scadenze"
     source: "mandate (mandate.due_date, escalation_status) e idee con deadline.due_date nel trimestre"
     rule: "data esatta + stato di escalation; ordinate per data"
   - field: "Segnali"
-    source: "snapshot: nsm_alerts, capacity_allocation (platform_pct), mandates_status a rischio"
+    source: "snapshot: nsm_alerts, capacity_allocation (platform_pct, by_competency over), mandates_status a rischio, slot at_risk"
     rule: "copiati dallo snapshot, non ricalcolati"
 
 gaps: []
@@ -55,13 +58,15 @@ _Dallo snapshot {settimana} e dal Piano di Iterazione {settimana}._
 
 ## Segnali
 - NSM in allarme: {product_line / name — trend}
-- Capacità sul debito tecnico: {platform_pct}% ({platform_weeks} su {total_capacity_weeks} settimane)
+- Capacità sul debito tecnico: {platform_pct}% ({platform_weeks} su {total_capacity_weeks} persona-settimane)
+- Colli di bottiglia: {competenza — saturazione — iniziative slittate per lei}
 - Iniziative mandatarie a rischio: {short_ref — due_date — escalation_status}
 
 ## Timeline
 | Product Line | {mese 1} | {mese 2} | {mese 3} |
 |---|---|---|---|
 | {Product Line} | {short_ref} {summary} (stima) | … | … |
+
 
 ## Scadenze nel trimestre
 | Data | Iniziativa | Tipo | Stato |
