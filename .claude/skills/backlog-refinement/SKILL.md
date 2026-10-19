@@ -113,7 +113,11 @@ piano passa **sempre** da `product/approvals/pending/`
       1. `nsm-watch` — per prima, è il segnale più strategico: trend delle
          NSM dalle `readings` in `nsm-tracking.yaml`, `alert.status`.
       2. `measurement-watch` — KPI `check_due`/`at_risk`/`invalidated`
-         delle iniziative `status: done` con `closure.closed: false`.
+         delle iniziative `status: done` con `closure.closed: false`; e,
+         guardando avanti dallo `slot_plan` dell'ultimo snapshot, le
+         iniziative in rilascio entro 6 settimane con la misurazione non
+         pronta (baseline mancante, evento da strumentare, file di
+         misurazione assente).
       3. `mandate-watch` — `escalation_status` dei `classification: mandate`
          da `analysis_start_by` (sul lead time più prudente tra dichiarato
          e stimato dal team) vs oggi, e dallo `slot_plan` dell'ultimo

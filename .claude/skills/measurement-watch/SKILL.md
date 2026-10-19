@@ -1,6 +1,6 @@
 ---
 name: measurement-watch
-description: Scansiona le iniziative già rilasciate (idea status "done") e verifica se le loro KPI stanno mostrando gli impatti attesi, chiedendo al PM le letture correnti quando è passata la finestra di misurazione. Gestisce anche iniziative senza KPI di business (es. compliance) e l'atto di chiusura/accettazione che chiude il cantiere di misurazione. Usala periodicamente e sempre all'apertura del Backlog Refinement.
+description: Scansiona le iniziative già rilasciate (idea status "done") e verifica se le loro KPI stanno mostrando gli impatti attesi, chiedendo al PM le letture correnti quando è passata la finestra di misurazione. Gestisce anche iniziative senza KPI di business (es. compliance) e l'atto di chiusura/accettazione che chiude il cantiere di misurazione. Guarda anche avanti: dallo slot plan dello snapshot, verifica che le iniziative in rilascio nelle prossime settimane abbiano la misurazione pronta (baseline catturata, evento strumentato) prima che sia troppo tardi. Usala periodicamente e sempre all'apertura del Backlog Refinement.
 ---
 
 # measurement-watch
@@ -43,8 +43,9 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
 
 0. **Sincronizza, leggi in blocco, verifica il connettore metriche** (uso
    standalone): `bash .claude/hooks/governance-sync.sh pull`, poi `bash
-   .claude/hooks/governance-dump.sh measurements` — i `measurement*.yaml`
-   e le `idea.yaml` in un colpo.
+   .claude/hooks/governance-dump.sh measurements` — i `measurement*.yaml`,
+   le `idea.yaml` e l'ultimo snapshot approvato (lo `slot_plan`) in un
+   colpo.
    - **Se `.governance/config.yaml` ha `metrics.integration` = `mcp:*` o
      `cli:*`**, verifica che il connettore risponda usando `metrics.probe`.
      Se **dichiarato ma irraggiungibile**, applica la regola del playbook,
@@ -169,6 +170,35 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
    `measurement-watch` non segnala più questa iniziativa nei run
    successivi (passo 1).
 
+5b. **Rilasci in arrivo: la misurazione è pronta?** Il resto di questa
+   skill guarda indietro (iniziative già `done`); questo passo guarda
+   avanti, perché alcune cose vanno fatte **prima** del rilascio o non si
+   recuperano più. Dallo `slot_plan` dell'ultimo snapshot approvato
+   (playbook, "Capacità del team e slot della roadmap"), prendi le idee
+   non ancora `done` il cui slot finisce entro **6 settimane** e, per
+   ciascuna, controlla — sola lettura, nessuna scrittura:
+   - **c'è un `measurement*.yaml`?** Se l'idea ha un PRD ma nessun
+     file di misurazione: "misurazione non preparata" (`prd-draft` la
+     scaffolda). Se non ha nemmeno un PRD, dillo: sta per uscire
+     un'iniziativa senza un documento che dica cosa doveva muovere;
+   - **ogni KPI ha la `baseline`?** Una baseline `null` va catturata
+     **adesso**: dopo il rilascio il dato di partenza è contaminato
+     dall'iniziativa stessa. È il segnale più importante di questo passo;
+   - **la fonte è pronta?** Per una KPI `data_source.mode: automated`
+     con `path_ref`, se quel path in `monitoring.paths` dell'idea è
+     `to_instrument` o `broken`, gli eventi mancanti vanno strumentati
+     nello stesso rilascio — altrimenti la prima lettura automatica non
+     ci sarà (requisito di tracciamento da portare al team, playbook
+     "Path da monitorare");
+   - **`kpis: []` senza `not_applicable_reason`**: chiedi ora se è
+     davvero un'iniziativa senza metrica di business, invece di
+     scoprirlo alla chiusura.
+   Per ogni voce mostra la fine stimata dello slot ("fine nov (stima)",
+   "stima grezza" se `rough`) e, se la misurazione è pronta, quando
+   cadrà la **prima lettura attesa** (fine slot + `measurement_window_weeks`)
+   — utile al PM per sapere quando servirà il dato. Se non c'è uno
+   snapshot con `slot_plan`, salta il passo e dillo in una riga.
+
 6. **Presenta un riepilogo ordinato per urgenza** (`check_due` e
    `at_risk`/`invalidated` prima, poi le iniziative senza KPI ancora da
    accettare, poi `on_track`; le iniziative appena chiuse in questo run
@@ -181,7 +211,9 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
    "nessuna KPI" per il caso compliance), settimane da `done_at`, ultimo
    valore noto vs. baseline/target. **Solo segnalazione** per ciò che
    resta aperto — nessuna comunicazione o escalation automatica, stesso
-   principio di `mandate-watch`.
+   principio di `mandate-watch`. In coda, la sezione **Rilasci in
+   arrivo** del passo 5b — prima le baseline mancanti, poi gli eventi da
+   strumentare, poi le misurazioni non preparate.
 
 7. Se chiamata da `backlog-refinement`, restituisci il riepilogo perché venga
    incluso nel log della cerimonia — non scrivere tu stessa in
@@ -195,6 +227,9 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
 
 ## Cosa NON fare
 
+- Non scrivere nulla sulle iniziative del passo 5b: baseline, eventi e
+  file di misurazione li prepara chi li possiede (`prd-draft`,
+  `path-watch`, il PM che dà il valore) — la watch li segnala in tempo.
 - Non inventare un valore di lettura per completare uno schema — se il
   PM non lo sa, resta `check_due`, non forzare un numero.
 - Non inventare una KPI proxy per un'iniziativa che non ne ha (es.

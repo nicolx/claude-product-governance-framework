@@ -2684,6 +2684,17 @@ far riapparire quell'iniziativa negli alert successivi. Senza questo
 atto esplicito, un'iniziativa senza KPI rischia di restare per sempre
 un'eccezione che nessuno chiude formalmente.
 
+**La misurazione si controlla prima del rilascio, non solo dopo.** Alcune
+cose non si recuperano a rilascio avvenuto: una baseline presa dopo è già
+contaminata dall'iniziativa, un evento non strumentato non ha storia da
+leggere. Per questo `measurement-watch` guarda anche avanti: dallo slot
+plan dell'ultimo snapshot ("Capacità del team e slot della roadmap")
+prende le iniziative che finiscono entro sei settimane e verifica che
+abbiano un file di misurazione, una baseline per ogni KPI e gli eventi
+strumentati per le KPI automatiche — e dice quando cadrà la prima lettura
+attesa. Lo segnala soltanto: a preparare la misurazione sono `prd-draft`,
+`path-watch` e il PM.
+
 ### Path da monitorare: la misurazione si prepara all'intake
 
 Il secondo modo di dimenticarsi di misurare è arrivare al momento della

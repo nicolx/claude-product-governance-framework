@@ -14,7 +14,7 @@
 #   governance-dump.sh sweep         # tutto il quadro per il Backlog Refinement (default; + scarti con risposta non inviata, team.yaml, ultimo snapshot, report distribuiti)
 #   governance-dump.sh backlog       # idee + coda di approvazione + ultimo snapshot (slot_plan) (per backlog-list)
 #   governance-dump.sh ideas [--all] # le idea.yaml (attive; --all include declined/aborted)
-#   governance-dump.sh measurements  # product/prds/*/measurement*.yaml
+#   governance-dump.sh measurements  # product/prds/*/measurement*.yaml + idee + ultimo snapshot (slot_plan)
 #   governance-dump.sh iterations    # gli ultimi due product/roadmap/iterations/*.yaml + ultimo snapshot (slot_plan, per iteration-board)
 #   governance-dump.sh pending       # contenuto di product/approvals/pending/*.yaml
 #   governance-dump.sh reference     # product/reference/*.yaml
@@ -228,6 +228,7 @@ case "$MODE" in
     printf '# governance-dump: measurements — SOLA LETTURA\n'
     emit_glob "product/prds" 'measurement*.yaml'
     emit_ideas
+    emit_latest_snapshot   # slot_plan: i rilasci in arrivo, per preparare la misurazione prima che sia tardi
     footer
     ;;
   iterations)
