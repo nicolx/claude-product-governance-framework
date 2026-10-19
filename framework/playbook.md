@@ -2283,6 +2283,17 @@ si accumula qui. La base si sposta solo con una nuova distribuzione
 della roadmap trimestrale, decisa dal PM. È una proposta in `pending/`
 (`outbound_comm`) come ogni comunicazione in uscita: la manda il PM.
 
+**Anche la scorecard legge lo snapshot.** `framework:metriche-scorecard`
+prende i valori dalle letture registrate (`nsm-tracking.yaml`,
+`measurement*.yaml`), ma il legame con la roadmap dallo snapshot
+approvato: per ogni NSM in allarme, se il focus di Discovery è stato
+deciso e quali iniziative la mirano (`links.nsm_targeted`) con il loro
+slot — in sviluppo, a fine novembre, oltre il trimestre per la capacità
+di una competenza — e quali KPI inizieranno a muoversi a breve perché la
+loro iniziativa sta per essere rilasciata. Così la scorecard non dice
+solo che una metrica peggiora, ma anche se e quando arriva una risposta
+con il team che c'è.
+
 **Principi delle viste standard** (valgono anche come buona pratica per
 i modelli aziendali):
 - **Nessuna data inventata.** Le uniche date esatte sono le scadenze
