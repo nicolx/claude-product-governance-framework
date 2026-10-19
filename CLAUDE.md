@@ -72,7 +72,7 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `product/reference/reporting-models.yaml`, `product/reference/models/` | Istanza, **tracciata da git** | Creati da `init-governance-project` (passo "Modelli di reporting" dell'intervista); aggiornati in seguito da `report-render` in modalità setup, su richiesta esplicita. Le viste che l'istanza produce (modello, pubblico, cadenza, destinazione) e i formati aziendali **trascritti** con la mappatura campo → dato del framework (il file grezzo non persiste, come in `context/`). Dato di riferimento condiviso come `product-lines.yaml`: scrittura diretta, non passa da approvazione. I modelli standard vivono in `framework/models/` (proprietà framework): un'istanza non li modifica, li estende con `extends: framework:<id>` |
 | `product/reports/{vista}/{periodo}.md` | Istanza, **tracciata da git** | Solo `report-render` — report **derivato** dai soli dati approvati (piano, snapshot, idee, NSM, misurazioni) e dal registro delle cerimonie (commenti), rigenerabile, mai editato a mano: se è sbagliato si corregge la fonte e si rigenera. Scrittura diretta. Le viste `cadence: per_ceremony` (la roadmap aggiornata, nel formato dell'istanza — `framework:roadmap-di-lavoro` di default o un modello aziendale) si rigenerano **in automatico, senza conferma**: `log-ceremony` alla chiusura di ogni cerimonia (nel commit del run) e `pending-approval` a fine giro se ha approvato piano/RICE/SE/mandate/snapshot; con proposte ancora in `pending/` il report lo dichiara in testa, mai le mostra come decise. L'aggiornamento settimanale (`framework:aggiornamento-settimanale` o un modello che lo estende, `cadence: weekly`) lo prepara `pending-approval` subito dopo aver approvato lo snapshot della settimana, con le consegne stimate dal suo `slot_plan` Distribuirlo fuori dal team è invece una comunicazione in uscita: passa da `pending/` (`type: outbound_comm`), e lo invia/pubblica il PM a mano |
 | `product/reference/glossary.yaml` | Istanza | Creato vuoto da `init-governance-project`; termini aggiunti da `prd-draft`/`idea-intake`/`inbox-triage` alla conferma del PM in conversazione. Dato di riferimento condiviso, scrittura diretta |
-| `.governance/config.yaml` | Istanza | Solo `init-governance-project`, in scrittura successiva solo su richiesta esplicita dell'utente |
+| `.governance/config.yaml` | Istanza | Solo `init-governance-project`, in scrittura successiva solo su richiesta esplicita dell'utente. Eccezione: `framework.upstream_ref` lo riscrive `sync-framework-updates` dopo ogni merge da `upstream` (fatto di sincronizzazione, non una scelta) |
 | `.claude/settings.local.json` | Istanza, **NON tracciata da git** | Solo `init-governance-project` (allow entries dei tool del connettore dichiarato — ricerca/lettura + creazione ticket, così le skill non chiedono permesso per i passi che il metodo impone: probe, dedup, filing immediato di un bug; per un connettore sorgente di contesto, **solo** i tool di lettura/elenco) e richiesta esplicita dell'utente. La parte stack-agnostica dei permessi sta invece in `.claude/settings.json` (proprietà framework) |
 
 Non spostare mai contenuto da `framework/` verso cartelle di istanza per
@@ -300,6 +300,23 @@ di esecuzione) non devono potersi confondere in riunione. Non usare mai la
 sigla del prodotto o la project key di Jira come prefisso —
 `init-governance-project` lo rifiuta all'intervista e `backlog-refinement`
 si ferma se i due coincidono.
+
+## Changelog del framework (`framework/CHANGELOG.md`)
+
+Ogni modifica al canonico che chiede qualcosa a un'istanza già
+inizializzata — uno schema nuovo o cambiato, un blocco di config, una
+cartella o un file di riferimento di istanza, permessi, un campo con un
+significato nuovo, una funzione che si attiva solo con un dato da
+raccogliere — **aggiunge una voce in `framework/CHANGELOG.md` nello
+stesso commit**: `id` stabile, tipo di impatto (`nessuna` / `setup` /
+`migrazione` / `migrazione-meccanica`), cosa cambia in linguaggio PM,
+cosa fare nell'istanza, e un controllo "già a posto se". È ciò che
+`sync-framework-updates` legge dopo il merge per proporre a ogni istanza
+solo ciò che le manca; una modifica senza voce costringe a ricostruire
+il setup dal diff, e la skill la segnala come difetto del canonico. Se
+la funzione si raccoglie anche all'init, aggiorna anche
+`init-governance-project`: l'init copre le istanze nuove, il changelog
+quelle esistenti.
 
 ## Quando scrivi codice/script in questo repo
 

@@ -1,12 +1,19 @@
 ---
 name: sync-framework-updates
-description: Tira giù gli aggiornamenti del metodo (playbook, skill, schema) dall'upstream del framework canonico e li spiega in linguaggio PM, segnalando se richiedono una migrazione dei dati locali. Usala periodicamente in un'istanza già inizializzata.
+description: Tira giù gli aggiornamenti del metodo (playbook, skill, schema) dall'upstream del framework canonico, li spiega in linguaggio PM e — leggendo le voci nuove di framework/CHANGELOG.md — verifica per ciascuna se l'istanza è già a posto e propone solo ciò che resta da fare (setup di una funzione nuova, migrazione dei dati locali). Usala periodicamente in un'istanza già inizializzata.
 ---
 
 # sync-framework-updates
 
 Aggiorna un'istanza già inizializzata con le ultime modifiche del metodo
-dal repo canonico (`upstream`), senza toccare i dati dell'istanza.
+dal repo canonico (`upstream`), senza toccare i dati dell'istanza, e
+porta a termine l'adozione delle funzioni nuove: cosa configurare, cosa
+migrare, cosa non chiede nulla.
+
+La fonte di cosa fare dopo l'aggiornamento è **`framework/CHANGELOG.md`**
+(una voce per evoluzione, con tipo di impatto, passi e un controllo "già
+a posto se"). Leggi l'intestazione del file per il formato e il
+significato dei tipi di impatto prima di iniziare.
 
 ## Prerequisiti
 
@@ -18,19 +25,44 @@ segnalalo invece di procedere.
 
 1. `git fetch upstream`.
 
-2. Mostra `git log HEAD..upstream/main --oneline` (o il branch principale
-   configurato) — se è vuoto, informa l'utente che è già allineato e
-   fermati qui.
+2. **Fissa il punto di partenza** prima del merge:
+   `BASE=$(git merge-base HEAD upstream/main)` — l'ultimo commit di
+   upstream già integrato in questa istanza (più affidabile di
+   `framework.upstream_ref` in config, che va solo confrontato: se
+   differiscono, l'istanza è stata aggiornata a mano, dillo). Mostra
+   `git log $BASE..upstream/main --oneline` (o il branch principale
+   configurato) — se è vuoto, l'istanza è già allineata: passa al passo
+   7 (voci in sospeso) e poi fermati.
 
-3. Prima di fare merge, leggi i commit/diff che toccano
-   **esclusivamente** cartelle di proprietà framework
-   (`framework/`, `.claude/skills/`, `.githooks/`, `bootstrap.sh`,
-   `CLAUDE.md`, `README.md`). Se un commit upstream tocca `apps/` o
-   `product/`, è un'anomalia (quelle cartelle non dovrebbero esistere nel
-   canonico) — segnalala esplicitamente invece di applicarla in
-   automatico.
+3. Prima di fare merge, controlla che i commit upstream tocchino
+   **solo** file di proprietà framework (`CLAUDE.md`, tabella "Confini di
+   proprietà"): `bootstrap.sh`, `.githooks/`, `framework/`,
+   `.claude/skills/`, `.claude/settings.json`, `.claude/hooks/`,
+   `.gitignore`, `CLAUDE.md`, `README.md`, `examples/`. Se un commit
+   upstream tocca `apps/`, `product/`, `context/` o `.governance/`, è
+   un'anomalia (quelle cartelle non dovrebbero esistere nel canonico) —
+   segnalala esplicitamente invece di applicarla in automatico.
 
-4. Fai `git merge upstream/main` (o il branch configurato). Se emergono
+4. **Raccogli le voci nuove del changelog** (prima del merge, così puoi
+   anticiparle al PM):
+   - se `framework/CHANGELOG.md` esiste a `$BASE`: le voci nuove sono
+     quelle il cui `id` compare in
+     `git show upstream/main:framework/CHANGELOG.md` e non in
+     `git show $BASE:framework/CHANGELOG.md`;
+   - se a `$BASE` il file non esisteva ancora (primo aggiornamento dopo
+     la sua introduzione): le voci con data (prefisso dell'`id`) uguale o
+     successiva a quella di `$BASE` (`git show -s --format=%cs $BASE`).
+     Alcune possono riguardare cose già integrate lo stesso giorno: il
+     controllo "già a posto se" del passo 6 le scarta.
+   - **Controllo di copertura**: per ogni commit di
+     `git log $BASE..upstream/main` che tocca uno schema
+     (`framework/schema/`), la config, i permessi o il `.gitignore`
+     senza una voce nuova corrispondente, spiega la modifica dal diff
+     come sempre e segnala che al canonico manca una voce di changelog
+     (è un difetto da riportare a chi lo mantiene, non da correggere
+     nell'istanza).
+
+5. Fai `git merge upstream/main` (o il branch configurato). Se emergono
    conflitti, **non risolverli automaticamente su file di proprietà
    framework**: mostrali all'utente. I conflitti su file di istanza
    dovrebbero essere rari per costruzione (l'upstream non scrive lì), se
@@ -44,161 +76,51 @@ segnalalo invece di procedere.
    "solo fast-forward" della sincronizzazione dati (playbook,
    "Sincronizzazione dell'istanza (`origin`)").
 
-5. **Spiega cosa è cambiato in linguaggio PM, non solo il diff grezzo.**
-   Esempi del tipo di traduzione richiesta:
-   - "il playbook ha aggiornato le soglie di Confidence" → spiega la
-     nuova soglia e se qualche RICE esistente andrebbe rivalutato.
-   - "è stata aggiunta la skill X" → spiega cosa fa e quando userla.
-   - "è stato aggiunto un file di riferimento di istanza" (es.
-     `framework/schema/annual-target.template.yaml`, nuovo) → l'istanza
-     non ha ancora il file corrispondente in `product/reference/`.
-     Proponi di crearlo dal template e di raccogliere il dato mancante
-     (nel caso di `annual-target.yaml`: l'incremento annuo atteso, non il
-     totale a budget — vedi il template) — senza bloccare, ma segnalando
-     cosa resta approssimato finché non è dichiarato.
-   - "lo schema di `idea.yaml` ha un nuovo campo obbligatorio" →
-     **questo è il caso che richiede attenzione**: segnala esplicitamente
-     che le idee esistenti in `product/ideas/` potrebbero non avere quel
-     campo, e proponi (senza applicarlo da solo) un piano di migrazione
-     minimo. Non modificare in massa i file di istanza senza che
-     l'utente lo chieda esplicitamente. Se i campi nuovi sono opzionali
-     (es. `summary`, `notes`, `requester_reply`, `followup_replies`,
-     `rice_status.deep_dive`, `status: declined`): le idee vecchie restano
-     valide senza; l'unico con valore a essere backfillato è `summary` (una
-     riga per idea ancora attiva), perché `backlog-list` lo mostra —
-     proponilo come lavoretto incrementale, non un blocco. Eccezione
-     meccanica: `requester_reply.reply_status` — per le idee con
-     `needed: true` e `sent_at` valorizzato vale `sent`, con `needed:
-     false` vale `not_needed`; quelle con `needed: true` e `sent_at: null`
-     vanno chieste al PM (inviata a voce/fuori traccia → `sent` o
-     `waived`, altrimenti `drafted`), mai presunte — è ciò che
-     l'hook `check-requester-replies.sh` conta.
-   - "un nuovo **comportamento automatico** che si attiva da una
-     dichiarazione di istanza" (es. la roadmap rigenerata a fine
-     cerimonia, che vale solo per le viste `cadence: per_ceremony` di
-     `reporting-models.yaml`) → nessuna migrazione: senza la
-     dichiarazione l'istanza si comporta come prima, e la cerimonia lo
-     ricorda in una riga. Spiega cosa si guadagna e proponi (senza
-     applicarlo) di dichiararla con `report-render` setup — dando
-     `per_ceremony` alla vista di roadmap che l'istanza già ha, se c'è (il
-     suo formato resta il suo), o aggiungendo
-     `framework:roadmap-di-lavoro`.
-   - "un nuovo **gate** su una transizione di stato" (es.
-     `conclusion_notices`: `status: done`/`aborted` e `closure.closed`
-     solo con l'avviso agli stakeholder `sent`/`waived`) → il gate vale
-     **in avanti**: le idee già `done`/`aborted` e le closure già scritte
-     restano valide, nessun backfill retroattivo di voci. Spiega cosa
-     cambia nel lavoro quotidiano (la conclusione si chiude quando è
-     comunicata) e — solo se il PM lo chiede — proponi di aprire una voce
-     per le consegne recenti che non erano mai state comunicate.
-   - "un campo esistente ha cambiato significato" (es. la "E" del RICE è
-     passata da `effort_weeks`/settimane a `entanglement_score`/footprint
-     1-10) → **caso di migrazione dati**: le voci `rice_history` esistenti
-     hanno la vecchia semantica e i loro `score` sono calcolati sulla
-     vecchia formula. Spiega che restano valide come storico ma non sono
-     più confrontabili 1:1 con le voci nuove, e proponi (senza applicarlo)
-     di ricalcolare l'Entanglement — via `rice-update`, con la sua coda di
-     approvazione — per le idee ancora attive in backlog, lasciando
-     intatte quelle già chiuse. Segnala anche i campi nuovi che le idee
-     attive dovranno avere popolati (es. `delivery.estimated_effort_weeks`
-     in Iteration Planning per le iniziative in iterazione;
-     `short_ref`, assegnato dal prossimo `backlog-refinement` alle idee
-     ancora senza handle).
-
-   - "Reach del RICE è passata da percentuale 0-100 a banda intera 1-10"
-     → **migrazione dati MECCANICA** (a differenza del caso Entanglement
-     sopra, che richiede ri-stima): non serve giudizio, è pura
-     conversione di formato. Per **ogni** voce di `rice_history` di
-     **ogni** idea con `reach_percent` valorizzato:
-     - `reach_points = max(1, ceil(reach_percent / 10))`;
-     - `score` ricalcolato = `reach_points * impact_points *
-       confidence_score / entanglement_score`;
-     - il vecchio valore va spostato in `reach_absolute_note`
-       (prependi "≈{reach_percent}% della popolazione → {reach_points}"
-       se la nota ha già contenuto), poi rimuovi la chiave `reach_percent`
-       (o lasciala a `null` — è marcata deprecata nello schema).
-     Questo **puoi applicarlo direttamente su conferma esplicita
-     dell'utente** — idea per idea, un unico commit
-     (`sync-framework-updates: migrazione Reach %→1-10`), poi
+6. **Per ogni voce nuova, verifica e spiega in linguaggio PM.** Esegui il
+   controllo "Già a posto se" sul repo dell'istanza (file presenti,
+   chiavi in `.governance/config.yaml`, campi delle idee — per le idee
+   usa `bash .claude/hooks/governance-dump.sh ideas`, una sola lettura).
+   Poi presenta le voci in tre gruppi:
+   - **Da fare** — voci `setup`/`migrazione`/`migrazione-meccanica` il
+     cui controllo non è soddisfatto: cosa si guadagna, i passi della
+     voce, la skill da lanciare;
+   - **Già a posto** — una riga per voce;
+   - **Nessuna azione** — voci `nessuna`: cosa cambia nel lavoro
+     quotidiano, in una o due righe.
+   Le regole per tipo valgono sempre, anche se la voce non le ripete:
+   - `setup` → **proponi**, non applicare da solo; non blocca nulla.
+     Scritture in `.governance/config.yaml` solo su richiesta esplicita
+     del PM (`CLAUDE.md`); permessi in `.claude/settings.local.json`
+     mostrati prima, come in `init-governance-project` punto 7.
+   - `migrazione` → proponi un piano minimo; **non modificare in massa i
+     file di istanza** senza richiesta esplicita. Le correzioni che
+     cambiano una priorità (RICE) passano da `rice-update` e dalla sua
+     coda di approvazione.
+   - `migrazione-meccanica` → applicabile da te **su conferma
+     esplicita**, in un unico commit con il nome indicato dalla voce (o
+     `sync-framework-updates: <id>`), mostrando prima/dopo, poi
      `governance-sync.sh push`. Non passa da `product/approvals/pending/`:
-     è un riscalamento di formato, non una revisione di priorità (vedi
-     `idea.template.yaml`, nota sull'append-only). Mostra all'utente la
-     tabella prima/dopo degli `score` così vede se qualche ranking si
-     sposta ai confini di banda — è un effetto atteso, non un errore.
+     è un cambio di formato, non una decisione di priorità.
+   - Una voce che richiede un **dato** al PM (es. il target annuale) non
+     si completa con un valore inventato: se il PM non lo sa, resta da
+     fare e lo dici.
 
-   - "i PRD si scrivono per il loro lettore" (brief d'iniziativa,
-     `primary_reader`/`prd_kind`, registro dei punti chiave, allegato dati,
-     lettura a freddo, glossario — playbook, "Scrivere per il lettore:
-     dalla fonte all'artefatto") → **nessuna migrazione obbligatoria**: i
-     campi nuovi del frontmatter PRD sono opzionali e i PRD esistenti
-     restano validi. Spiega al PM cosa cambia nel modo di lavorare
-     (`prd-draft` ora intervista anche su lettore e scenario, scrive il
-     brief e collauda i documenti con una lettura a freddo) e:
-     - se manca `product/reference/glossary.yaml`, proponi di crearlo vuoto
-       dal template;
-     - per i PRD in `draft`/`in_review` che dovranno essere condivisi con
-       persone o agenti fuori dalla sessione, **proponi** `prd-draft {slug}
-       retrofit` (registro dei punti chiave, brief, lettura a freddo,
-       correzioni proposte). Non toccare i PRD `approved`/`superseded`.
+7. **Voci in sospeso.** Le voci "da fare" che il PM rimanda restano
+   tali: al prossimo giro il controllo "già a posto se" le ritrova e le
+   ripropone in una riga, senza insistere. Per vederle anche quando non
+   c'è nulla da integrare (passo 2 vuoto), esegui i controlli delle voci
+   `setup`/`migrazione*` con data uguale o successiva a `initialized_at`
+   della config — le voci precedenti all'inizializzazione non riguardano
+   l'istanza, perché l'init raccoglie già lo stato corrente del
+   framework.
 
-   - "il framework ora vieta che `short_ref_prefix` coincida con
-     `jira.project_key`" → **controllo di setup**: leggi
-     `.governance/config.yaml`. Se `short_ref_prefix` (o il default `PG`
-     se la chiave manca) è uguale (case-insensitive) a `jira.project_key`,
-     l'istanza ha handle di governance che si confondono con le card del
-     tracker. Segnala che serve un **rinominamento una-tantum** degli
-     `short_ref` già assegnati verso un prefisso proprio: è manuale
-     (`sed`/`grep -rl` su `product/`, aggiornare i titoli dei PRD e le
-     note che citano il vecchio handle; i titoli delle card Jira si
-     aggiornano a mano). Non farlo tu — proponilo e lascia decidere.
+8. **Registra la versione integrata**: dopo un merge riuscito, scrivi
+   `framework.upstream_ref` = `git rev-parse upstream/main` in
+   `.governance/config.yaml` (è l'unica chiave della config che questa
+   skill scrive, ed è un fatto di sincronizzazione, non una scelta del
+   PM) e sincronizza con
+   `bash .claude/hooks/governance-sync.sh push "sync-framework-updates: upstream_ref <sha breve>" .governance/config.yaml`.
 
-   - "la roadmap si pianifica a slot dentro la capacità reale del team"
-     (catalogo `competencies`, `capacity` per membro e per team, `squads`
-     in `team.yaml`; `effort_by_competency`/`squad`/`estimate_basis` nei
-     blocchi `delivery` e `platform` dell'idea; `capacity_check` nel
-     Piano di Iterazione; `capacity_allocation.by_competency` e
-     `slot_plan` nello snapshot — playbook, "Capacità del team e slot
-     della roadmap") → **nessuna migrazione obbligatoria, ma un dato da
-     raccogliere**: tutti i campi nuovi sono opzionali e senza di loro
-     l'istanza si comporta come prima (capacity check `not_available`,
-     `total_capacity_weeks` chiesto al team, slot plan vuoto con il
-     motivo). Spiega cosa si guadagna (date di roadmap che il team può
-     mantenere, il collo di bottiglia con un nome) e proponi, in
-     quest'ordine e senza applicarlo da solo:
-     1. `team-roster` per dichiarare catalogo delle competenze, `fte`,
-        ripartizione e assenze — è il prerequisito di tutto il resto;
-     2. al prossimo Iteration Planning, le stime `effort_by_competency`
-        per le iniziative in iterazione: quelle con il solo
-        `estimated_effort_weeks` restano valide come durata, ma senza
-        ripartizione per competenza contano come non dimensionate nel
-        check e nello slot plan. Non ripartire d'ufficio le stime vecchie;
-     3. per le idee prioritizzate fuori dal piano con un PRD, una stima
-        `rough` dal referente tecnico (`prd-draft` la chiede alla prossima
-        revisione), così entrano nello slot plan del trimestre.
-     Gli snapshot già approvati restano com'erano: il loro
-     `total_capacity_weeks` era dichiarato (equivale a `basis:
-     declared`) e `roadmap_weeks` sommava durate — non confrontabile 1:1
-     con i nuovi, dillo se il PM ne guarda la serie storica.
-
-   - "il framework naviga gli ambienti con utenti di prova" (registro
-     `product/reference/test-environments.yaml`, blocco `browser:` in
-     config, archivio locale `.governance/test-credentials.local.env`,
-     skill `test-accounts` e `app-test` — playbook, "Ambienti e utenti di
-     prova") → **nessuna migrazione obbligatoria, un setup da proporre**:
-     senza registro `app-test` si ferma e rimanda a `test-accounts`, e
-     `demo-capture` continua a usare le env var della recipe. Proponi,
-     senza applicarlo da solo:
-     1. `test-accounts` (modalità setup) per dichiarare ambienti e utenti
-        di prova esistenti — anche nessun utente, solo i `wanted`;
-     2. il blocco `browser:` in `.governance/config.yaml` (scrittura in
-        config solo su richiesta esplicita) e, se il PM lo vuole, le allow
-        entries del driver in `.claude/settings.local.json`;
-     3. per le recipe `deployed` con credenziali in env var, il passaggio
-        a `deployed.environment`/`account_ref` — le env var restano un
-        ripiego valido.
-     Se `.governance/test-credentials.local.env` esiste già, verifica con
-     `git check-ignore` che sia escluso (lo è dal `.gitignore` di root
-     aggiornato).
-
-6. Chiudi con un riepilogo breve: cosa è cambiato, cosa richiede
-   attenzione da parte dell'utente, cosa non richiede nulla.
+9. Chiudi con un riepilogo breve: cosa è cambiato, cosa richiede
+   attenzione da parte dell'utente (le voci "da fare", in ordine
+   consigliato), cosa non richiede nulla.

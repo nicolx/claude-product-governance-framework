@@ -11,7 +11,7 @@ initialized_at: ""                # data ISO dell'inizializzazione
 pm_roster: []                     # [NOME] dei PM che operano su questa istanza
 
 framework:
-  upstream_ref: ""                # commit di upstream/main al momento dell'init (o HEAD) — lo usa sync-framework-updates
+  upstream_ref: ""                # ultimo commit di upstream/main integrato: scritto all'init (o HEAD), riscritto da sync-framework-updates dopo ogni merge
 
 # --- Sincronizzazione dati con origin (vedi playbook) ---
 sync:
