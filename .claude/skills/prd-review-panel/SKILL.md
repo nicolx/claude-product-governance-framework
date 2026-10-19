@@ -1,17 +1,18 @@
 ---
 name: prd-review-panel
-description: Valida i PRD di un'iniziativa con un panel di agenti dalle personalità diverse — il revisore IT che controlla l'How contro il codice reale di apps/, il business scettico che chiede l'evidenza e confronta il PRD con le ipotesi del RICE, e secondo i segnali la voce dell'utente, sicurezza/privacy, lo scettico della misura, esercizio e supporto, finanza, l'avvocato del diavolo (pre-mortem), la lente di uno stakeholder che deve dire sì. Ogni personaggio dà un verdetto e rilievi con gravità; la skill li verifica, fa emergere le tensioni tra personaggi, porta al PM le decisioni e registra l'esito in .reviews/. Advisory: non approva né boccia, ma nessun PRD passa a in_review con un blocker aperto. prd-draft la esegue già dentro la stesura, dopo la lettura a freddo; usala a mano per rivalidare un PRD cambiato, prima di un'approvazione, o per configurare i personaggi dell'istanza (setup).
+description: Raccoglie consigli sui PRD di un'iniziativa da un panel di agenti dalle personalità diverse — il revisore IT che controlla l'How contro il codice reale di apps/, il business scettico che chiede l'evidenza e confronta il PRD con le ipotesi del RICE, e secondo i segnali la voce dell'utente, sicurezza/privacy, lo scettico della misura, esercizio e supporto, finanza, l'avvocato del diavolo (pre-mortem), la lente di uno stakeholder che deve dire sì. Ogni personaggio dà un verdetto e rilievi con gravità; la skill li verifica, fa emergere le tensioni tra personaggi, li presenta al PM che sceglie quali raccogliere, e registra l'esito in .reviews/. Solo consigli: non approva, non boccia, non blocca lo stato del PRD. prd-draft la esegue già dentro la stesura, dopo la lettura a freddo; usala a mano per rivalidare un PRD cambiato, prima di un'approvazione, o per configurare i personaggi dell'istanza (setup).
 ---
 
 # prd-review-panel
 
-Risponde a "**questo PRD regge davanti a chi dovrà approvarlo, costruirlo,
-esercirlo?**" facendolo attaccare, prima della revisione umana, da agenti
-con personalità e mestieri diversi. Procedura, catalogo dei personaggi e
+Risponde a "**cosa direbbe di questo PRD chi dovrà approvarlo, costruirlo,
+esercirlo?**" facendolo rivedere, prima della revisione umana, da agenti
+con personalità e mestieri diversi. Il risultato sono **consigli**: il PM
+sceglie quali raccogliere. Procedura, catalogo dei personaggi e
 prompt sono in `framework/prompts/review-panel.md` — **leggilo prima di
 iniziare**, insieme al playbook, "Scrivere per il lettore: dalla fonte
 all'artefatto" (sottosezioni "La lettura a freddo", "Il panel di
-revisione", "Gate di stato del PRD").
+revisione").
 
 `prd-draft` esegue già questa logica dentro la stesura (passo 11b),
 **dopo** la lettura a freddo — non serve rilanciarla subito dopo. Usala
@@ -21,16 +22,15 @@ quando: il PRD è cambiato in modo sostanziale, prima di un'approvazione
 
 ## Cosa scrive (e cosa no)
 
-È **advisory**: il panel consiglia, il PM decide. Non approva né boccia un
-PRD, non crea voci in `product/approvals/pending/`, non compie azioni in
+Il panel **consiglia e basta**: il PM decide quali consigli raccogliere.
+Non approva né boccia un PRD, non ne blocca né cambia lo `status`, non crea voci in `product/approvals/pending/`, non compie azioni in
 uscita. Scrive, con scrittura diretta:
 
 - `product/prds/{slug}/.reviews/panel-{YYYY-MM-DD}-iterazione-{N}.md` —
   l'esito (fatto osservato, come le letture a freddo);
-- le **correzioni** ai PRD/brief e i **rischi accettati** nella sezione
-  *Rischi* — **solo dopo** che il PM ha deciso sui rilievi che lo
-  richiedono;
-- le **domande per gli stakeholder** nel registro
+- le **correzioni** ai PRD/brief e i **rischi** nella sezione *Rischi* —
+  solo per i consigli che il PM ha scelto di raccogliere;
+- le **domande per gli stakeholder** che il PM vuole porre, nel registro
   `product/ideas/{slug}/discovery/questions.yaml` (fase `prd_review`);
 - in modalità `setup`, `product/reference/review-personas.yaml`, su
   richiesta esplicita del PM.
@@ -91,27 +91,27 @@ Un rilievo che tocca il RICE **non** si risolve qui: si propone
    saltato in silenzio**.
 
 4. **Sintetizza**: deduplica, verifica i rilievi di fatto (nel codice, nei
-   documenti), fai emergere le tensioni tra personaggi, classifica ogni
-   rilievo (correzione / decisione del PM / domanda per uno stakeholder /
-   da validare con il `tech_reference` / segnale sul RICE / rischio
-   accettato / respinto). Presenta al PM:
+   documenti), fai emergere le tensioni tra personaggi, e per ogni rilievo
+   indica che forma prenderebbe se raccolto (correzione / decisione del PM
+   / domanda per uno stakeholder / da validare con il `tech_reference` /
+   segnale sul RICE / rischio dichiarato). Presenta al PM:
    - una riga per personaggio: verdetto e motivo principale;
    - i **blocker** e le **tensioni** per primi, ciascuno con le opzioni e
      una raccomandazione;
    - poi i `major`, poi i `minor` in forma compatta;
    - ogni riga indirizzabile (`P-01`, `P-02`…) così il PM può rispondere
-     "P-03 accetto il rischio, P-05 respingo perché…".
-   Con metodo socratico (playbook, "Discovery socratica", regola 8):
-   quando il PM respinge un `blocker`, chiedi una volta su quale evidenza,
-   e registra la risposta come motivo.
+     "P-03 lo mettiamo nei rischi, P-05 correggi, il resto lascia".
+   Il PM non deve rispondere a tutto né motivare ciò che lascia: un
+   consiglio non raccolto resta nel file del panel, per chi rivedrà il
+   PRD.
 
-5. **Applica le decisioni.**
+5. **Applica i consigli raccolti** (solo quelli).
    - correzioni ai documenti — mostrale prima, applicale alla conferma;
      in un PRD, ciò che il panel ha fatto aggiungere va nella sezione
      *Provenienza* ("aggiunto dall'analisi: … emerso dal panel di
      revisione");
-   - rischi accettati nella sezione *Rischi e dipendenze aperte*, con il
-     segnale che li farebbe riaprire;
+   - rischi nella sezione *Rischi e dipendenze aperte*, con il segnale
+     che li farebbe riaprire;
    - domande per gli stakeholder nel registro (fase `prd_review`,
      `gap_ref: "panel {data}-iterazione-{N} · {persona}"`, `ask_to` dal
      rilievo), con la logica di `discovery-questions`;
@@ -120,10 +120,8 @@ Un rilievo che tocca il RICE **non** si risolve qui: si propone
    - obiezioni da validare con il `tech_reference`: elencale in testa al
      file del panel come scaletta per la revisione dell'How.
 
-6. **Seconda iterazione** (al massimo 2), solo con i personaggi che
-   avevano `blocker` o `no_go`, sul testo corretto. Se alla seconda un
-   `blocker` resta e il PM non lo accetta né lo respinge, il PRD resta
-   `draft`: dillo chiaramente.
+6. **Seconda passata**, solo se il PM la chiede (tipicamente dopo
+   correzioni importanti), con i personaggi che indica.
 
 7. **Registra** ogni iterazione in
    `product/prds/{slug}/.reviews/panel-{YYYY-MM-DD}-iterazione-{N}.md`
@@ -131,12 +129,9 @@ Un rilievo che tocca il RICE **non** si risolve qui: si propone
    le obiezioni di una lente di stakeholder si scrivono come "obiezioni
    prevedibili dalla lente di {ruolo}", sulla sostanza.
 
-8. **Riepilogo**: panel e verdetti; blocker e come sono stati chiusi;
-   tensioni e decisioni del PM; `major` aperti; domande create e a chi;
-   proposte di `rice-update`; scaletta per il `tech_reference`; se il PRD
-   può passare a `in_review` (gate) o cosa manca. Lo `status` del PRD lo
-   cambia `prd-draft` o il PM: questa skill dice solo se il gate del panel
-   è soddisfatto.
+8. **Riepilogo**: panel e verdetti; consigli raccolti (e cosa è
+   cambiato) e consigli lasciati; tensioni tra personaggi; domande create
+   e a chi; proposte di `rice-update`; scaletta per il `tech_reference`.
 
 9. **Sincronizza il repo**:
    `bash .claude/hooks/governance-sync.sh push "prd-review-panel: <slug> iterazione <N>" product/prds/ product/ideas/`
@@ -162,10 +157,10 @@ push.
 
 ## Cosa NON fare
 
-- Non cambiare lo `status` del PRD e non trattare un `go` come
-  approvazione o un `no_go` come veto.
-- Non correggere i documenti prima che il PM abbia deciso sui rilievi che
-  lo richiedono; non "far tornare" il PRD con il RICE: si propone
+- Non cambiare lo `status` del PRD, non trattare un `go` come
+  approvazione o un `no_go` come veto, non presentare un `blocker` come
+  qualcosa da chiudere per forza.
+- Non correggere i documenti per consigli che il PM non ha scelto; non "far tornare" il PRD con il RICE: si propone
   `rice-update`.
 - Non passare ai personaggi il rapporto individuale del PM, il registro
   delle domande, i `.reviews/` o file `.local.*`; non usare tratti

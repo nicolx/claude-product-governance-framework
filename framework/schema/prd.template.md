@@ -34,9 +34,9 @@ primary_reader: stakeholder         # design | tech | business | legal_finance |
 prd_kind: delivery                  # discovery (PoC/prototipo: si vuole IMPARARE) | delivery (si vuole RILASCIARE)
 brief_ref: "README.md"              # brief d'iniziativa; null solo se il brief non è obbligatorio (un solo PRD, lettore pm/stakeholder)
 status: draft                       # draft | in_review | approved | superseded
-                                    #   draft → in_review solo dopo almeno una lettura a freddo, un panel di revisione
-                                    #   senza blocker aperti e con il registro dei punti chiave senza punti "open"
-                                    #   (prd-draft); in_review → approved: decisione umana (il panel non approva).
+                                    #   draft → in_review solo dopo almeno una lettura a freddo e con il registro dei
+                                    #   punti chiave senza punti "open" (prd-draft); in_review → approved: decisione umana.
+                                    #   Il panel di revisione dà consigli, non è una condizione di stato.
 reading_sequence:
   position: 1
   of: 1
@@ -149,8 +149,8 @@ updated_at: "2026-01-08"
 ## Rischi e dipendenze aperte
 
 <!-- Rischi tecnici e di prodotto ancora aperti, dipendenze da altri team o
-     sistemi. Qui anche i rilievi del panel di revisione ACCETTATI dal PM come
-     rischio dichiarato, ciascuno con il segnale che lo farebbe riaprire. -->
+     sistemi. Qui anche i consigli del panel di revisione che il PM ha scelto di
+     tenere come rischio dichiarato, ciascuno con il segnale che lo farebbe riaprire. -->
 
 ## Provenienza
 

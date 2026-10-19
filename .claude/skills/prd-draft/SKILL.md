@@ -268,14 +268,15 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
     umana: **mai saltata in silenzio**. Lo `status: in_review` si raggiunge
     solo dopo almeno una lettura a freddo, con la copertura completa e
     senza domande `blocking` aperte nel registro — o con quelle rimaste
-    accettate esplicitamente dal PM come rischio dichiarato nel PRD — e
-    dopo il panel di revisione (passo 11b).
+    accettate esplicitamente dal PM come rischio dichiarato nel PRD. Il
+    panel di revisione (passo 11b) non è una condizione: è un consiglio.
 
 11b. **Panel di revisione** (logica della skill `prd-review-panel`,
     procedura, catalogo dei personaggi e prompt in
     `framework/prompts/review-panel.md`). Dopo l'ultima iterazione della
-    lettura a freddo — prima si capisce, poi si giudica — fai attaccare i
-    documenti da agenti con personalità diverse: sempre il **revisore IT**
+    lettura a freddo — prima si capisce, poi si giudica — fai rivedere i
+    documenti da agenti con personalità diverse, per **raccogliere
+    consigli** prima della revisione umana: sempre il **revisore IT**
     (con accesso in sola lettura ad `apps/`, appena aggiornate al passo
     precedente) e il **business scettico** (con l'ultima voce di
     `rice_history`), più quelli che i segnali del PRD chiamano (voce
@@ -284,23 +285,23 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
     d'istanza in `product/reference/review-personas.yaml`. Poi:
     - mostra al PM il panel con il perché di ciascuno, prima del lancio;
     - sintetizza: deduplica, **verifica** i rilievi di fatto, fai
-      emergere le **tensioni** tra personaggi, classifica (correzione /
-      decisione del PM / domanda per uno stakeholder / da validare con il
-      `tech_reference` / segnale sul RICE / rischio accettato / respinto);
-    - **porta al PM blocker e tensioni** prima di correggere; i rischi
-      accettati vanno nella sezione *Rischi*, le domande nel registro
-      (fase `prd_review`), i segnali sul RICE diventano una proposta di
-      `rice-update`, le obiezioni sull'How la scaletta per il
-      `tech_reference` (passo 13);
-    - correggi, poi seconda iterazione solo con chi aveva `blocker` o
-      `no_go` (massimo 2);
+      emergere le **tensioni** tra personaggi, indica per ogni rilievo la
+      forma che prenderebbe se raccolto (correzione / decisione del PM /
+      domanda per uno stakeholder / da validare con il `tech_reference` /
+      segnale sul RICE / rischio dichiarato);
+    - **presenta i consigli al PM**, i più gravi e le tensioni per primi;
+      il PM sceglie quali raccogliere. Solo per quelli: correzioni ai
+      documenti (alla conferma), rischi nella sezione *Rischi*, domande
+      nel registro (fase `prd_review`), proposta di `rice-update`, e le
+      obiezioni sull'How nella scaletta per il `tech_reference` (passo
+      13). Gli altri restano nel file del panel, senza bisogno di motivo;
+    - una seconda passata solo se il PM la chiede;
     - registra in
       `product/prds/{slug}/.reviews/panel-{YYYY-MM-DD}-iterazione-{N}.md`.
-    Il panel consiglia, non decide: nessun verdetto è un'approvazione o un
-    veto. Ma **nessun PRD passa a `in_review` con un `blocker` aperto** —
-    ogni blocker è corretto, accettato come rischio dichiarato o respinto
-    dal PM con un motivo. Senza subagent, panel umano: **mai saltato in
-    silenzio**.
+    **Il panel consiglia e basta**: nessun verdetto è un'approvazione o un
+    veto, e nessun rilievo — nemmeno `blocker` — blocca lo `status` del
+    PRD. Il PM può saltarlo; se lo salta o mancano i subagent, il
+    riepilogo lo dice.
 
 12. **Aggiorna `idea.yaml`**: aggiungi lo slug della cartella PRD a
     `links.prd_ids`, valuta `status: in_prd`, e aggiungi in `notes` una riga
@@ -357,9 +358,9 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
     - copertura: N punti, X coperti, Y esclusi (con motivo);
     - esito delle letture a freddo: lacune trovate e corrette, domande
       residue accettate, "potrebbe iniziare domani?" per ciascun lettore;
-    - esito del panel di revisione: verdetto di ciascun personaggio,
-      blocker e come sono stati chiusi, tensioni decise dal PM, `major`
-      aperti, scaletta di obiezioni da validare con il `tech_reference`;
+    - consigli del panel di revisione: verdetto di ciascun personaggio,
+      consigli raccolti e lasciati, tensioni tra personaggi, scaletta di
+      obiezioni da validare con il `tech_reference` (o "panel saltato");
     - **cosa hai aggiunto rispetto alla fonte** (P5) e quali decisioni ha
       preso il PM;
     - **domande per gli stakeholder** (sempre, anche se nessuna è

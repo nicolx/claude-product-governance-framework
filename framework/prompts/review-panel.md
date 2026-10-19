@@ -5,7 +5,8 @@ il lettore: dalla fonte all'artefatto", sottosezione "Il panel di revisione"). U
 subagent, ciascuno con una **personalità** dichiarata — il revisore IT, il business
 scettico, la voce dell'utente… — attacca il PRD dal proprio punto di vista, come farebbe
 la persona vera in una revisione. Serve a far emergere **prima** della revisione umana le
-obiezioni che il PRD dovrà comunque reggere.
+obiezioni che il PRD dovrà comunque reggere. Il risultato sono **consigli**, non un
+esame da superare.
 
 **Non è la lettura a freddo.** La lettura a freddo (`cold-read.md`) chiede "si capisce?":
 lettori a contesto vergine, solo i documenti del loro ruolo. Il panel chiede "**regge?**":
@@ -14,9 +15,9 @@ revisore IT legge il codice di `apps/`, il business scettico legge le ipotesi de
 fa **dopo** la lettura a freddo (giudicare un testo che non si capisce produce rilievi
 duplicati) e prima che il PRD passi a `in_review`.
 
-**Il panel consiglia, non decide.** Un `no_go` di un personaggio non è un veto e un `go`
-non è un'approvazione: `in_review → approved` resta una decisione umana (PM e
-`tech_reference`, playbook "Gate di stato del PRD"). Le obiezioni del revisore IT sul
+**Il panel consiglia e basta.** Un `no_go` di un personaggio non è un veto, un `go` non è
+un'approvazione, e nessun rilievo — nemmeno `blocker`, che indica solo la gravità del
+consiglio — blocca lo `status` del PRD. Il PM sceglie quali consigli raccogliere. Le obiezioni del revisore IT sul
 codice sono **ipotesi da validare** con il `tech_reference`, non verdetti — il file del
 panel è la sua scaletta di revisione, non un sostituto.
 
@@ -74,7 +75,8 @@ caricatura della persona.
    - **verifica** i rilievi di fatto prima di portarli al PM: un "il modulo X non esiste"
      del revisore IT si controlla nel codice; un rilievo smentito dai documenti si scarta
      dicendolo;
-   - **classifica** ogni rilievo rimasto:
+   - **presenta i consigli al PM**, i più gravi e le tensioni per primi; per quelli che
+     sceglie di raccogliere, la forma che prendono:
      - **correzione** — il documento è incompleto o sbagliato, e la correzione non richiede
        scelte;
      - **decisione del PM** — scope, trade-off, tensione tra personaggi, liceità, date:
@@ -86,21 +88,15 @@ caricatura della persona.
        sistema può confermare: vanno nella scaletta di revisione dell'How;
      - **segnale sul RICE** — le ipotesi del RICE non reggono più (Reach, Impact, Effort):
        si propone `rice-update`, mai si corregge il PRD per farlo tornare;
-     - **rischio accettato** — il PM lo accetta: va nella sezione *Rischi* del PRD, con il
-       segnale che lo farebbe riaprire;
-     - **respinto** — il PM non è d'accordo: si registra il suo motivo. Il PM ha l'ultima
-       parola, il motivo resta per chi rivedrà il PRD.
-4. **Correggi, poi seconda iterazione** (al massimo 2) solo con i personaggi che avevano
-   rilievi `blocker` o un verdetto `no_go`, sul testo corretto.
+     - **rischio dichiarato** — va nella sezione *Rischi* del PRD, con il segnale che lo
+       farebbe riaprire.
+     I consigli che il PM non raccoglie restano nel file del panel, senza bisogno di motivo.
+4. **Seconda passata** solo se il PM la chiede, con i personaggi che indica.
 5. **Registra** in `product/prds/{slug}/.reviews/panel-{YYYY-MM-DD}-iterazione-{N}.md`: il
    panel (chi e perché), cosa ha ricevuto ciascuno, il verdetto di ciascuno con le sue
-   condizioni, la tabella rilievo → gravità → classificazione → esito (correzione fatta,
-   decisione del PM con data, domanda `DQ-..`, rischio accettato, motivo del rifiuto), le
-   tensioni e come il PM le ha risolte, i rilievi scartati in verifica.
-
-**Gate.** Un PRD passa a `in_review` solo con un panel registrato e **nessun `blocker`
-aperto**: ogni `blocker` è corretto, accettato come rischio dichiarato nel PRD, o respinto
-dal PM con un motivo. I `major` aperti si elencano nel riepilogo e nel file del panel.
+   condizioni, la tabella rilievo → gravità → raccolto sì/no → forma (correzione fatta,
+   decisione del PM con data, domanda `DQ-..`, rischio dichiarato), le tensioni tra
+   personaggi, i rilievi scartati in verifica.
 
 ## Testo del prompt
 
@@ -148,8 +144,8 @@ resta sulla sostanza, niente imitazioni del suo modo di fare."}
 
 ## Fallback
 
-Se l'ambiente non permette subagent, la skill lo dice e propone al PM un panel umano: gli
-stessi documenti a una persona per ciascun ruolo (un collega IT, qualcuno del controllo di
-gestione…), con le stesse quattro domande, e ne registra l'esito nello stesso formato.
-**Mai saltato in silenzio.** In dry-run il panel si esegue, ma `.reviews/` e il registro
+Se l'ambiente non permette subagent, la skill lo dice e può suggerire al PM un panel
+umano: gli stessi documenti a una persona per ciascun ruolo (un collega IT, qualcuno del
+controllo di gestione…), con le stesse quattro domande. Il PM può anche saltarlo: il
+riepilogo lo dice. In dry-run il panel si esegue, ma `.reviews/` e il registro
 delle domande non si scrivono.

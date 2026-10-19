@@ -1952,7 +1952,8 @@ costruirà e chi lo eserciterà lo attaccheranno ciascuno dal suo mestiere,
 e ogni obiezione arrivata in riunione invece che in stesura costa un giro.
 Per questo, dopo la lettura a freddo, `prd-draft` (o `prd-review-panel` a
 mano) lo fa rivedere da un **panel di agenti con personalità diverse**
-(catalogo, procedura e prompt in `framework/prompts/review-panel.md`):
+(catalogo, procedura e prompt in `framework/prompts/review-panel.md`), per
+raccogliere **consigli** prima della revisione umana:
 
 - sempre il **revisore IT** — architetto pragmatico che si fida del codice
   più che dei documenti: legge `apps/` in sola lettura e controlla l'How
@@ -1975,23 +1976,20 @@ rilievi con gravità (`blocker` / `major` / `minor`), ciascuno con lo
 scenario in cui il problema si manifesta e cosa gli farebbe cambiare
 idea. La skill verifica i rilievi di fatto, fa emergere le **tensioni**
 tra personaggi (il revisore IT vuole meno scope, il business scettico
-dice che così non sposta la KPI) e le porta al PM come decisioni, non le
-risolve da sola. Un rilievo diventa una correzione, una decisione del PM,
-una domanda per uno stakeholder (registro, fase `prd_review`),
-un'obiezione da validare con il `tech_reference`, una proposta di
-`rice-update`, un rischio accettato nel PRD, o un rifiuto motivato dal PM.
+dice che così non sposta la KPI) e le presenta al PM, che sceglie quali
+consigli raccogliere: diventano una correzione, una domanda per uno
+stakeholder (registro, fase `prd_review`), un'obiezione da validare con
+il `tech_reference`, una proposta di `rice-update`, o un rischio
+dichiarato nel PRD. Quelli non raccolti restano nel file del panel.
 
-**Il panel consiglia, non decide**: un `no_go` non è un veto, un `go` non
-è un'approvazione, e le obiezioni sul codice sono ipotesi finché il
-`tech_reference` non le conferma — il file del panel in `.reviews/` è la
-sua scaletta di revisione, non un sostituto. Al massimo due iterazioni.
-Mai saltato in silenzio: senza subagent, si fa con un collega per ruolo.
+**Il panel consiglia e basta**: un `no_go` non è un veto, un `go` non è
+un'approvazione, nessun rilievo blocca lo stato del PRD, e le obiezioni
+sul codice sono ipotesi finché il `tech_reference` non le conferma — il
+file del panel in `.reviews/` è la sua scaletta di revisione, non un
+sostituto. Il PM può saltarlo; il riepilogo lo dice.
 
 **Gate di stato del PRD.** `draft` → `in_review`: almeno una lettura a
-freddo registrata, un panel di revisione registrato **senza `blocker`
-aperti** (ogni blocker corretto, accettato come rischio dichiarato nel
-PRD, o respinto dal PM con un motivo), registro dei punti chiave senza
-punti `open`, e nessuna domanda `blocking` del registro delle domande
+freddo registrata, registro dei punti chiave senza punti `open`, e nessuna domanda `blocking` del registro delle domande
 ancora aperta — o, se resta aperta, accettata esplicitamente dal PM come
 rischio dichiarato nel PRD.
 `in_review` → `approved`: decisione umana — PM e `tech_reference`, più un
@@ -2079,7 +2077,7 @@ approfondimento potrebbe cambiare il RICE Score.
 - [ ] Ogni PRD dichiara il suo `primary_reader` e `prd_kind`, e ha uno Scenario?
 - [ ] Il registro dei punti chiave non ha punti `open` (ogni punto coperto o escluso con motivo confermato)?
 - [ ] La lettura a freddo è stata fatta e registrata in `.reviews/`, e le decisioni emerse sono state prese dal PM?
-- [ ] Il panel di revisione (almeno revisore IT e business scettico) è stato fatto e registrato in `.reviews/`, senza `blocker` aperti, e le tensioni tra personaggi sono state decise dal PM?
+- [ ] Hai raccolto i consigli del panel di revisione (almeno revisore IT e business scettico) e scelto quali applicare?
 - [ ] Le lacune che solo uno stakeholder può chiudere sono diventate domande del registro, con un incontro preparato, e le risposte avute sono state propagate al brief e ai PRD?
 - [ ] I documenti si reggono senza la sessione, la memoria locale e `context/` (P7)?
 - [ ] Il PRD rispetta il vincolo A3 (circa due facciate A4 in PDF)? Se no, è stato spaccato lungo le cuciture del problema?

@@ -54,24 +54,22 @@ Tipi di impatto:
 
 ---
 
-### 2026-10-19-panel-revisione-prd · I PRD vengono validati da un panel di agenti con personalità diverse prima della revisione
+### 2026-10-19-panel-revisione-prd · Un panel di agenti con personalità diverse dà consigli sui PRD prima della revisione
 
 - **Impatto**: nessuna
 - **Cosa cambia**: dopo la lettura a freddo ("si capisce?"), `prd-draft`
   fa rivedere i PRD da un **panel di revisione** ("regge?"): agenti con
-  personalità e mestieri diversi che attaccano il documento come farebbe
-  la persona vera. Sempre il **revisore IT** (legge il codice di `apps/`
+  personalità e mestieri diversi che danno **consigli** come farebbe la
+  persona vera. Sempre il **revisore IT** (legge il codice di `apps/`
   e controlla l'How contro il sistema reale) e il **business scettico**
   (chiede l'evidenza, le alternative, il costo opportunità, e confronta
   il PRD con le ipotesi del RICE); secondo i segnali del PRD anche voce
   dell'utente, sicurezza/privacy, scettico della misura, esercizio e
   supporto, finanza, avvocato del diavolo (pre-mortem) e la lente di uno
   stakeholder che deve dire sì (dal solo identikit condiviso). Ogni
-  personaggio dà un verdetto e rilievi con gravità; blocker e tensioni
-  tra personaggi arrivano al PM come decisioni. Il panel **consiglia, non
-  decide**, ma un PRD non passa più a `in_review` con un `blocker`
-  aperto (corretto, accettato come rischio dichiarato, o respinto con un
-  motivo). L'esito si registra in `.reviews/panel-*.md`, che diventa la
+  personaggio dà un verdetto e rilievi con gravità; il PM sceglie quali
+  consigli raccogliere. Il panel **consiglia e basta**: nessun verdetto
+  approva o blocca, e lo stato del PRD non dipende dal panel. L'esito si registra in `.reviews/panel-*.md`, che diventa la
   scaletta per la revisione dell'How con il `tech_reference`. Nuova
   skill `prd-review-panel` (anche per rivalidare un PRD cambiato o prima
   di un'approvazione); catalogo e prompt in
@@ -82,7 +80,7 @@ Tipi di impatto:
   disattivarne uno del framework.
 - **Cosa fare nell'istanza**: niente di obbligatorio. I PRD già
   `in_review`/`approved` non sono toccati; per quelli ancora `draft`, il
-  panel scatta alla prossima passata di `prd-draft` (o lancia
+  panel viene proposto alla prossima passata di `prd-draft` (o lancia
   `prd-review-panel {slug}`). Se il tuo dominio ha un revisore che il
   catalogo non copre (compliance di settore, sicurezza clinica…),
   `prd-review-panel setup`.
