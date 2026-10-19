@@ -2049,7 +2049,9 @@ slotting, leggono lo `slot_plan` dell'ultimo snapshot approvato: la
 roadmap di lavoro (colonna "Slot"), la trimestrale (timeline per mese e
 saturazione per competenza) e la Now/Next/Later, dove **Next è ciò che
 il team riesce a iniziare nel trimestre con la capacità che ha** e Later
-ciò che non ci sta ancora — senza date, salvo opzione.
+ciò che non ci sta ancora — senza date, salvo opzione. Anche
+`iteration-board` mostra accanto a ogni voce del piano il suo slot di
+sviluppo e le voci fuori dal piano in arrivo entro 4 settimane.
 
 ### Quando i dati mancano
 

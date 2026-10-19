@@ -1,6 +1,6 @@
 ---
 name: iteration-board
-description: Mostra il Piano di Iterazione della settimana (product/roadmap/iterations/) come vista a colpo d'occhio — i quattro bucket (analisi da avviare, analisi in corso, in sviluppo, prioritizzate d'urgenza) più il diff rispetto alla settimana precedente (completate / avanzate / slittate / rimosse / nuove). Sola lettura, non scrive nulla. Usala per il daily standup, la mail settimanale, Confluence — "cosa stiamo facendo questa settimana?".
+description: Mostra il Piano di Iterazione della settimana (product/roadmap/iterations/) come vista a colpo d'occhio — i quattro bucket (analisi da avviare, analisi in corso, in sviluppo, prioritizzate d'urgenza) più il diff rispetto alla settimana precedente (completate / avanzate / slittate / rimosse / nuove), la saturazione per competenza e, per ogni voce, lo slot di sviluppo dallo slot plan dello snapshot (quando parte, quando finisce, cosa la fa slittare). Sola lettura, non scrive nulla. Usala per il daily standup, la mail settimanale, Confluence — "cosa stiamo facendo questa settimana?".
 ---
 
 # iteration-board
@@ -11,7 +11,9 @@ Refinement (`framework/schema/iteration-plan.template.yaml`). È a
 "su cosa lavora il team questa settimana" senza aprire lo YAML.
 
 È **sola lettura** — legge `product/roadmap/iterations/*.yaml` (e, per il
-diff, il piano precedente). Non scrive nulla, non applica approvazioni,
+diff, il piano precedente) e lo `slot_plan` dell'ultimo snapshot
+approvato (playbook, "Capacità del team e slot della roadmap") per dire
+*quando* ogni voce entra ed esce dallo sviluppo. Non scrive nulla, non applica approvazioni,
 non richiama skill di scrittura.
 
 > **Dry-run.** Questa skill è già read-only: in dry-run si comporta
@@ -24,8 +26,8 @@ non richiama skill di scrittura.
 0. **Sincronizza e leggi in blocco**: `bash
    .claude/hooks/governance-sync.sh pull` (una vista su dati vecchi è
    fuorviante), poi `bash .claude/hooks/governance-dump.sh iterations` —
-   gli ultimi due piani di iterazione (corrente + `based_on`) in una tool
-   call. Aggiungi `governance-dump.sh pending` se devi controllare una
+   gli ultimi due piani di iterazione (corrente + `based_on`) e l'ultimo
+   snapshot approvato (per lo `slot_plan`) in una tool call. Aggiungi `governance-dump.sh pending` se devi controllare una
    proposta `iteration_plan` non ancora approvata.
 
 1. **Determina il piano da mostrare.**
@@ -56,6 +58,25 @@ non richiama skill di scrittura.
    4. **Prioritizzate d'urgenza** (`urgent_priority`) — `kind`,
       `trigger`, `decided`; per `kind: strategic_exception` segnala
       `approved_by` (o "✋ bypass non ancora confermato" se `null`).
+   **Colonna Slot, in tutti e quattro i bucket**, dallo `slot_plan`
+   dell'ultimo snapshot approvato (cerca la voce per `idea_id`):
+   - in sviluppo: *fino a W48 (stima)*; *⚠ oltre capacità* se lo slot è
+     `over_capacity`;
+   - in analisi / da avviare / d'urgenza: *sviluppo W50–W03 (stima)*;
+   - in più, dove vale: *stima grezza* se `estimate_basis: rough`,
+     *slitta per {competenza}* se `delayed_by`, *⚠ oltre la scadenza* se
+     `at_risk`;
+   - senza slot, il motivo da `unslotted`: *da dimensionare* /
+     *oltre il trimestre* / *non fattibile col team attuale* /
+     *competenza sconosciuta*. Una voce assente sia da `slots` sia da
+     `unslotted` (entrata nel piano dopo lo snapshot): *slot non ancora
+     calcolato*.
+   Se lo snapshot è di una settimana **precedente** al piano mostrato,
+   dillo nella riga di capacità ("slot dallo snapshot W41, il piano è
+   W42"): gli slot possono non riflettere le voci entrate questa
+   settimana. Se non c'è nessuno snapshot o il suo `slot_plan` è vuoto,
+   ometti la colonna e dillo in una riga ("slot non disponibili —
+   `roadmap-snapshot`, e `team-roster` se la capacità non è dichiarata").
    **Piani precedenti allo schema attuale** (voci senza `summary` o
    `rice_components`): completa quei campi leggendo le idee
    (`governance-dump.sh ideas`, una tool call) dall'ultima voce
@@ -67,7 +88,11 @@ non richiama skill di scrittura.
    competenza (es. *backend 117% ⚠ sforamento accettato · frontend 80% ·
    qa 95%*), più quante voci sono senza stima — "capacità non
    dichiarata" se `basis: not_available` o se il piano non ha il blocco
-   (piani precedenti). Non ricalcolarla. **Prima colonna:
+   (piani precedenti). Non ricalcolarla. Sotto, se lo `slot_plan` ne
+   ha, una riga **In arrivo**: le voci *fuori dal piano* il cui slot
+   inizia entro 4 settimane (*PG-051 da W45 · PG-047 da W46, slitta per
+   mobile*) — è ciò che il team dovrà prendere a breve, utile allo
+   standup per non scoprirlo all'ultimo. **Prima colonna:
    l'identificatore** `idea_ref` (short_ref); se una voce non ce l'ha, lo
    slug — mai vuoto (playbook, "Ogni elenco prodotto dal sistema è
    indirizzabile").
@@ -94,9 +119,11 @@ non richiama skill di scrittura.
 
 - Non scrivere su nessun file, non fare commit/push — è sola lettura.
 - Non ricalcolare `changes_since_last`, `weeks_in_bucket`, `rice_score`,
-  `rice_components`:
+  `rice_components`, `capacity_check` né gli slot:
   leggi i valori già persistiti nel file di iterazione (li calcola
-  `backlog-refinement` al passo 6).
+  `backlog-refinement` al passo 6) e nello snapshot (li calcola
+  `roadmap-snapshot`). Uno slot che sembra sbagliato è un'osservazione da
+  riferire, non da correggere qui.
 - Non fondere i quattro bucket in un unico elenco ordinato per "priorità":
   sono stati diversi del lavoro, non una classifica.
 - Non presentare una proposta `iteration_plan` ancora in `pending/` come

@@ -15,7 +15,7 @@
 #   governance-dump.sh backlog       # idee + coda di approvazione (per backlog-list)
 #   governance-dump.sh ideas [--all] # le idea.yaml (attive; --all include declined/aborted)
 #   governance-dump.sh measurements  # product/prds/*/measurement*.yaml
-#   governance-dump.sh iterations    # gli ultimi due product/roadmap/iterations/*.yaml
+#   governance-dump.sh iterations    # gli ultimi due product/roadmap/iterations/*.yaml + ultimo snapshot (slot_plan, per iteration-board)
 #   governance-dump.sh pending       # contenuto di product/approvals/pending/*.yaml
 #   governance-dump.sh reference     # product/reference/*.yaml
 #   governance-dump.sh delivery      # delivery-watch.yaml + product-lines.yaml + le idea.yaml (per delivery-watch)
@@ -207,6 +207,7 @@ case "$MODE" in
   iterations)
     printf '# governance-dump: iterations — SOLA LETTURA\n'
     emit_iterations
+    emit_latest_snapshot   # slot_plan: quando parte / finisce ogni voce della board
     ;;
   pending)
     printf '# governance-dump: pending — SOLA LETTURA\n'
