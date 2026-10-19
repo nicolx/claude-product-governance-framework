@@ -12,7 +12,7 @@
 #
 # Uso:
 #   governance-dump.sh sweep         # tutto il quadro per il Backlog Refinement (default; + scarti con risposta non inviata, team.yaml, ultimo snapshot)
-#   governance-dump.sh backlog       # idee + coda di approvazione (per backlog-list)
+#   governance-dump.sh backlog       # idee + coda di approvazione + ultimo snapshot (slot_plan) (per backlog-list)
 #   governance-dump.sh ideas [--all] # le idea.yaml (attive; --all include declined/aborted)
 #   governance-dump.sh measurements  # product/prds/*/measurement*.yaml
 #   governance-dump.sh iterations    # gli ultimi due product/roadmap/iterations/*.yaml + ultimo snapshot (slot_plan, per iteration-board)
@@ -191,6 +191,7 @@ case "$MODE" in
     emit_file "product/reference/product-lines.yaml"
     emit_ideas
     emit_pending
+    emit_latest_snapshot   # slot_plan: quando ogni idea prioritizzata può partire con il team attuale
     footer
     ;;
   ideas)

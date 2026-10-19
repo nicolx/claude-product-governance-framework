@@ -2051,7 +2051,9 @@ saturazione per competenza) e la Now/Next/Later, dove **Next è ciò che
 il team riesce a iniziare nel trimestre con la capacità che ha** e Later
 ciò che non ci sta ancora — senza date, salvo opzione. Anche
 `iteration-board` mostra accanto a ogni voce del piano il suo slot di
-sviluppo e le voci fuori dal piano in arrivo entro 4 settimane.
+sviluppo e le voci fuori dal piano in arrivo entro 4 settimane, e
+`backlog-list` lo mostra accanto a ogni idea del ranking, con i colli di
+bottiglia in testa.
 
 ### Quando i dati mancano
 

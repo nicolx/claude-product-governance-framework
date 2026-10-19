@@ -1,12 +1,13 @@
 ---
 name: backlog-list
-description: Mostra il backlog delle idee ordinato per RICE score, con — per ciascuna — descrizione sommaria, eventuale scadenza, note utili a decidere se prioritizzare, e flag di bypass (mandate/strategic exception). Sezioni separate per le proposte RICE ancora in coda di approvazione, le idee senza RICE e gli scarti recenti. Sola lettura, non scrive nulla. Usala quando serve "la lista delle idee ordinate".
+description: Mostra il backlog delle idee ordinato per RICE score, con — per ciascuna — descrizione sommaria, eventuale scadenza, note utili a decidere se prioritizzare, flag di bypass (mandate/strategic exception) e quando può partire con il team attuale (slot dallo slot plan dello snapshot, collo di bottiglia per competenza). Sezioni separate per le proposte RICE ancora in coda di approvazione, le idee senza RICE e gli scarti recenti. Sola lettura, non scrive nulla. Usala quando serve "la lista delle idee ordinate".
 ---
 
 # backlog-list
 
 Produce la vista ordinata del backlog. È **sola lettura** — legge
-`idea.yaml` e `product/approvals/pending/`, non scrive nulla, non applica
+`idea.yaml`, `product/approvals/pending/` e lo `slot_plan` dell'ultimo
+snapshot approvato, non scrive nulla, non applica
 approvazioni, non richiama skill di scrittura. Serve a rispondere a "cosa
 c'è in cima e perché", con abbastanza contesto da decidere senza aprire
 ogni cartella.
@@ -14,7 +15,10 @@ ogni cartella.
 Un RICE score da solo non basta per decidere: il playbook ("Ideas
 prioritization") è esplicito che la scadenza, la comprensione di cosa
 c'è da fare e le note di contesto contano quanto il numero. Questa skill
-li mette tutti sulla stessa riga.
+li mette tutti sulla stessa riga — insieme a **quando** l'idea può
+partire con il team che c'è (playbook, "Capacità del team e slot della
+roadmap"): il RICE dice in che ordine, lo slot dice se l'ordine si
+traduce in qualcosa che parte questo trimestre.
 
 ## Passi
 
@@ -22,7 +26,18 @@ li mette tutti sulla stessa riga.
    .claude/hooks/governance-sync.sh pull` (una vista su dati vecchi è
    fuorviante, e la sezione 2 dipende dalla coda aggiornata), poi `bash
    .claude/hooks/governance-dump.sh backlog` — tutte le `idea.yaml` attive
-   + la coda `pending/` in **una** tool call, invece di glob-e-leggi-ognuna.
+   + la coda `pending/` + l'ultimo snapshot approvato in **una** tool
+   call, invece di glob-e-leggi-ognuna.
+
+0b. **Riga di capacità in testa**, dallo `slot_plan` dello snapshot (se
+   c'è e non è vuoto): quante idee del ranking ufficiale hanno uno slot
+   nel trimestre, e i colli di bottiglia — le competenze più frequenti in
+   `delayed_by` e quelle `over` in `capacity_allocation.by_competency`
+   (*"Nel trimestre partono 6 delle 14 idee prioritizzate · backend fa
+   slittare 4 idee · snapshot W42"*). Se lo snapshot ha più di 2
+   settimane, dillo. Se manca o lo `slot_plan` è vuoto, una riga: "slot
+   non disponibili — `roadmap-snapshot`, e `team-roster` se la capacità
+   non è dichiarata"; la colonna slot sotto viene omessa.
 
 1. **Idee RICE-ranked.** Elenca tutte le idee `classification: idea` con
    almeno una voce in `rice_history`, **ordinate per lo `score` della
@@ -55,6 +70,16 @@ li mette tutti sulla stessa riga.
      corrente, e — se `iteration.current` è valorizzato — "in iterazione
      {settimana} · {iteration.bucket}" (letto dal campo già persistito da
      `pending-approval`, non ricalcolato)
+   - **slot**, dallo `slot_plan` (cerca l'idea per `idea_id`): *sviluppo
+     W50–W03 (stima)*, con *stima grezza* se `estimate_basis: rough`,
+     *slitta per {competenza}* se `delayed_by`, *⚠ oltre la scadenza* se
+     `at_risk`; senza slot, il motivo da `unslotted` — *da dimensionare*,
+     *oltre il trimestre con il team attuale*, *non fattibile col team
+     attuale*, *competenza sconosciuta*; *slot non ancora calcolato* se
+     l'idea non compare né in `slots` né in `unslotted`. È la colonna
+     che spiega perché un'idea alta nel ranking può partire dopo una più
+     bassa (una competenza satura, una stima mancante): rendila
+     visibile, non riordinare il ranking per slot
    Se la voce di `rice_history` più recente ha `entanglement_basis:
    structured_estimate`, segnala che lo score poggia su una stima di
    footprint più debole.
@@ -79,11 +104,14 @@ li mette tutti sulla stessa riga.
 3. **Iniziative fuori RICE ancora aperte.** Sezione separata, non
    mescolata col ranking: `classification: mandate` (con
    `escalation_status` da `mandate-watch`), `classification:
-   platform` (con `estimated_effort_weeks`), e le `strategic_exception`
-   con `status` diverso da `done`/`aborted`/`declined`. Queste non hanno
-   uno score — vanno lette per scadenza/stato, non per posizione. Se
-   `iteration.current` è valorizzato, mostralo qui pure ("in iterazione
-   {settimana} · {bucket}").
+   platform` (con `estimated_effort_weeks` ed `effort_by_competency`),
+   e le `strategic_exception` con `status` diverso da `done`/`aborted`/
+   `declined`. Queste non hanno uno score — vanno lette per
+   scadenza/stato, non per posizione. Se `iteration.current` è
+   valorizzato, mostralo qui pure ("in iterazione {settimana} ·
+   {bucket}"). Mostra lo **slot** come al passo 1: per un mandate, uno
+   slot `at_risk` (finisce oltre la `due_date`) è l'informazione più
+   importante della riga.
 
 4. **Idee senza RICE.** Sezione separata: `classification: idea` con
    `rice_history` vuoto **e nessuna proposta `rice_diff` in coda** (se
@@ -108,8 +136,13 @@ li mette tutti sulla stessa riga.
 
 - Non scrivere su nessun file, non fare commit/push — è sola lettura.
 - Non ricalcolare score, `escalation_status`, `rice_status`,
-  `iteration.*`, `tech_reference`: leggi i valori già persistiti dalle
-  skill che li possiedono.
+  `iteration.*`, `tech_reference` né gli slot: leggi i valori già
+  persistiti dalle skill che li possiedono (gli slot li calcola
+  `roadmap-snapshot`). Per una proposta RICE in coda (sezione 2) non
+  stimare dove finirebbe lo slot: dipende dall'approvazione e dal
+  prossimo snapshot.
+- Non riordinare il ranking per slot: l'ordine è quello del RICE, lo
+  slot è contesto accanto.
 - Non inventare un `summary` mancante — segnalalo come gap.
 - Non fondere in un unico elenco le idee RICE-ranked e quelle fuori RICE:
   confrontarle per "posizione" non ha senso, il playbook lo dice
