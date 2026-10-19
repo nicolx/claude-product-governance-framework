@@ -116,6 +116,7 @@ emit_reference() {
   emit_file "product/reference/annual-target.yaml"
   emit_file "product/reference/product-lines.yaml"
   emit_file "product/reference/friction-log.yaml"
+  emit_file "product/reference/stakeholders.yaml"   # identikit condiviso (il rapporto individuale è locale: .governance/*.local.yaml, mai nel dump)
   emit_file "product/reference/delivery-watch.yaml"
   emit_file "product/reference/reporting-models.yaml"
   emit_file "product/reference/team.yaml"          # offerta di capacità per competenza (capacity_check, slot_plan)

@@ -126,7 +126,14 @@ Quando l'utente approva una voce specifica (per nome file o descrizione):
    - `outbound_comm`: non hai qui il compito di inviare fisicamente la
      comunicazione (email, ecc.) a meno che l'istanza abbia
      un'integrazione dedicata configurata — se non c'è, prepara il testo
-     finale pronto per l'invio manuale da parte dell'utente.
+     finale pronto per l'invio manuale da parte dell'utente. Prima di
+     mostrarlo rileggi i `recipients` contro l'identikit
+     (`product/reference/stakeholders.yaml`) e il rapporto locale del PM
+     (`.governance/stakeholder-relationships.local.yaml`): se qualcuno ha
+     punti di attenzione rilevanti per questo contenuto, dillo nella riga
+     `Calibrazione: …` (solo in conversazione) e suggerisci un passaggio
+     1:1 prima dell'invio — il testo approvato non si riscrive (playbook,
+     "L'identikit degli stakeholder e il rapporto individuale").
    - `strategic_exception_flag`: appendi la voce a `strategic_exceptions`
      nell'idea (mai sovrascrivere voci precedenti — stesso principio
      append-only di `rice_history`). **In più**, appendi una riga

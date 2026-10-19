@@ -367,6 +367,14 @@ che serve da lì e chiedi solo quello che manca.
    raccolto al passo 4 dell'intervista, o `value: null` con nota se non
    ancora noto.
 4. `product/reference/friction-log.yaml` (da template, vuoto).
+   `product/reference/stakeholders.yaml` (da
+   `framework/schema/stakeholders.template.yaml`, con `stakeholders: []`)
+   — l'identikit condiviso degli stakeholder. Non si compila all'init:
+   cresce col lavoro tramite `stakeholder-profile` (playbook,
+   "L'identikit degli stakeholder e il rapporto individuale"). Il
+   rapporto individuale di ogni PM
+   (`.governance/stakeholder-relationships.local.yaml`) non si crea qui:
+   è locale al clone, lo crea `stakeholder-profile` al primo uso.
    `product/reference/team.yaml` (da `framework/schema/team.template.yaml`)
    — con i membri raccolti al passo 10 dell'intervista, o solo l'header
    con `members: []` se il PM non aveva il dato pronto (lo popola
@@ -505,7 +513,10 @@ che serve da lì e chiedi solo quello che manca.
   aziendale, o `views: []` — `report-render` in modalità setup li
   completa). Indica quali viste sono state dichiarate, quale è la roadmap
   che si rigenera a ogni cerimonia, e quando uscirà il primo report (alla
-  chiusura del primo Backlog Refinement).
+  chiusura del primo Backlog Refinement). Se `product-lines.yaml` ha
+  `stakeholders` dichiarati, suggerisci `stakeholder-profile` (modalità
+  semina) per iniziare l'identikit dei principali — le bozze per loro
+  escono comunque, con tono neutro, finché non c'è.
 - Ricorda che da questo momento in poi nessuna scrittura in `product/`
   deve avvenire senza passare da `product/approvals/pending/` — vedi
   `CLAUDE.md` e `framework/playbook.md`.

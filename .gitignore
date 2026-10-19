@@ -18,6 +18,13 @@ product/demos/captures/*/screenshots/
 # nel registro tracciato ci sono solo i riferimenti, mai i valori.
 .governance/*.local.env
 
+# .governance/*.local.yaml: dati LOCALI di un singolo PM, mai condivisi —
+# es. .governance/stakeholder-relationships.local.yaml, il rapporto
+# individuale tra il PM di questo clone e ogni stakeholder (familiarità,
+# fiducia, note franche), scritto da stakeholder-profile. L'identikit
+# condiviso sta invece in product/reference/stakeholders.yaml, tracciato.
+.governance/*.local.yaml
+
 # product/tests/runs/<run-id>/screenshots/: catture fatte da app-test
 # navigando un ambiente con un utente di prova (in produzione possono
 # contenere dati reali). Artefatti binari, restano nel clone; il run.yaml

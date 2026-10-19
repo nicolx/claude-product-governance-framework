@@ -164,7 +164,7 @@ locale, tipicamente prima di generare uno `roadmap-snapshot`.
    stakeholder (playbook, "Avvisare gli stakeholder della conclusione")
    — voce `conclusion_notices` `kind: delivered`, `detected_by:
    jira-sync`, bozza mostrata per intero in testo semplice pronto da
-   copiare (playbook, "Testi che il PM manda a mano: visibili e pronti da copiare") e mai inviata; `status: done` + `done_at`
+   copiare (playbook, "Testi che il PM manda a mano: visibili e pronti da copiare"), calibrata sui destinatari (playbook, "L'identikit degli stakeholder e il rapporto individuale") e mai inviata; `status: done` + `done_at`
    (data della transizione, non dell'invio) solo quando il PM la dichiara
    `sent` o la esenta (`waived` + motivo suo). Se `delivery-watch` è
    attiva e ha già una voce aperta per la stessa card, riusala — non

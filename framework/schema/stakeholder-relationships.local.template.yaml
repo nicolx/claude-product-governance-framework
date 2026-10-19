@@ -1,0 +1,46 @@
+# Template per .governance/stakeholder-relationships.local.yaml
+#
+# IL RAPPORTO INDIVIDUALE tra il PM di QUESTO clone e ogni stakeholder.
+# File LOCALE, NON tracciato da git (.gitignore di root:
+# .governance/*.local.yaml): ogni PM ha il suo per costruzione, nessun
+# collega, nessuno stakeholder con accesso al repo lo legge mai. Contro:
+# non ha il backup di git — se il PM cambia macchina lo copia a mano.
+#
+# Perché esiste: l'identikit condiviso (product/reference/stakeholders.yaml)
+# dice com'è lo stakeholder; questo file dice com'è il rapporto TRA LUI E
+# QUESTO PM. Lo stesso messaggio a una persona difficile si scrive in modo
+# diverso da chi ci lavora da anni e ha la sua fiducia, e da chi è appena
+# arrivato e non l'ha mai incontrata (playbook, "L'identikit degli
+# stakeholder e il rapporto individuale"). Senza una voce qui, il rapporto
+# vale "new": il framework assume che il PM non abbia ancora confidenza.
+#
+# Lo scrive la skill stakeholder-profile, su dichiarazione del PM (mai
+# dedotto in silenzio). Lo leggono, in sola lettura, le skill che
+# preparano un testo che il PM manda a mano. Mai copiato in un file
+# tracciato, mai citato in una bozza, mai riassunto in un recap che
+# finisce in un commit.
+#
+# Qui il PM può essere franco ("con me ha un pessimo carattere, ci siamo
+# già scontrati due volte") — resta suo. Vale comunque il buon senso: niente
+# dati sensibili (salute, vita privata, opinioni politiche/religiose/
+# sindacali) che non servono a lavorare meglio insieme.
+
+pm: ""                            # nome del PM di questo clone (dal pm_roster di .governance/config.yaml)
+updated_at: ""
+
+relationships: []
+# Esempio di voce:
+# - stakeholder_id: ""            # id di product/reference/stakeholders.yaml
+#   since: ""                     # da quando ci lavora (data ISO, anche approssimata: "2023-01")
+#   familiarity: ""               # new | building | established — quanto si conoscono
+#   trust: ""                     # unknown | low | medium | high — quanto lo stakeholder si fida di QUESTO PM
+#   tension: ""                   # none | past | ongoing — scontri o attriti tra loro due
+#   register: ""                  # il registro che usano tra loro: formal | neutral | informal ("" = usa quello dell'identikit)
+#   allies: []                    # chi, nel rapporto, può fare da ponte o va coinvolto prima (es. il suo diretto, un PM che ci lavora da anni)
+#   personal_notes: ""            # note franche del PM, solo per sé (vedi avvertenza sopra)
+#   approach: ""                  # come il PM ha deciso di gestirlo, in una riga ("per ora solo per iscritto con dati, poi chiedo un 1:1 mensile")
+#   history:                      # APPEND-ONLY: i momenti del rapporto tra loro due
+#     - date: ""
+#       what: ""                  # es. "primo 1:1, ha chiesto i numeri del funnel" / "mi ha scavalcato col CEO"
+#       effect: ""                # better | worse | neutral — sul rapporto
+#   last_contact_at: ""           # ultima interazione significativa (la aggiorna stakeholder-profile quando il PM dichiara di aver mandato una bozza calibrata)

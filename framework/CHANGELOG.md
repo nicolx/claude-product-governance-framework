@@ -54,6 +54,41 @@ Tipi di impatto:
 
 ---
 
+### 2026-10-19-identikit-stakeholder · Le bozze si calibrano sullo stakeholder e sul tuo rapporto con lui
+
+- **Impatto**: setup
+- **Cosa cambia**: il framework tiene l'identikit degli stakeholder
+  (ruolo, peso, cosa gli importa, come vuole ricevere le informazioni,
+  punti di attenzione come comportamenti osservati, cosa funziona e
+  cosa no) in `product/reference/stakeholders.yaml`, tracciato e
+  condiviso tra i PM. In più ogni PM tiene il **suo** rapporto con
+  ciascuno (familiarità, fiducia, tensioni, note franche) in
+  `.governance/stakeholder-relationships.local.yaml`, locale e mai
+  tracciato. Le bozze che il PM manda a mano (risposte all'intake,
+  avvisi di conclusione, mail di `delivery-watch`, comunicazioni in
+  uscita) si calibrano sui due livelli: chi è appena arrivato riceve
+  bozze diverse da chi ci lavora da anni, soprattutto con uno
+  stakeholder difficile. Accanto alla bozza, una riga `Calibrazione`
+  (solo in conversazione) dice cosa è stato adattato. Nuova skill
+  `stakeholder-profile`; nuova sezione del playbook "L'identikit degli
+  stakeholder e il rapporto individuale". Senza identikit le bozze
+  escono con tono neutro, come prima.
+- **Cosa fare nell'istanza**:
+  1. verifica che il `.gitignore` integrato escluda il file locale:
+     `git check-ignore -q .governance/stakeholder-relationships.local.yaml`
+     deve riuscire (lo fa il `.gitignore` di root, nessuna modifica
+     d'istanza). Finché non riesce, `stakeholder-profile` rifiuta di
+     scrivere il rapporto individuale;
+  2. proponi `stakeholder-profile` in modalità semina per gli
+     stakeholder ricorrenti (stakeholders delle linee, proposer
+     frequenti, `who` del registro delle frizioni) — uno alla volta,
+     mai in blocco. Il file condiviso si crea al primo uso;
+  3. ogni PM dell'istanza, sul proprio clone, dichiara il suo rapporto
+     con gli stakeholder che conosce già (altrimenti vale `new`).
+- **Già a posto se**: esiste `product/reference/stakeholders.yaml` e
+  `git check-ignore -q .governance/stakeholder-relationships.local.yaml`
+  riesce.
+
 ### 2026-10-19-utenti-di-prova · Il framework naviga gli ambienti con utenti di prova
 
 - **Impatto**: setup

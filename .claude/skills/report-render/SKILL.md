@@ -101,7 +101,15 @@ Due modalità:
    `report_ref` (il path del report), `view` e `period`, `sources` (i
    path del piano/snapshot usati, gli stessi del blocco di provenienza),
    `recipients`, `destination`,
-   `subject` e il corpo pronto all'invio/pubblicazione. Il framework
+   `subject` e il corpo pronto all'invio/pubblicazione. Il corpo è per
+   un pubblico, non per una persona: si calibra sull'identikit
+   (`product/reference/stakeholders.yaml`) solo per ciò che vale per
+   tutto il pubblico (formato, cosa mettere in testa); se tra i
+   `recipients` c'è uno stakeholder con punti di attenzione rilevanti
+   per questo contenuto, dillo al PM in conversazione (riga
+   `Calibrazione: …`, mai nel `payload`) e suggerisci un passaggio 1:1
+   prima della distribuzione (playbook, "L'identikit degli stakeholder e
+   il rapporto individuale"). Il framework
    **non pubblica né invia**: dopo l'approvazione è il PM a mandare la
    mail o aggiornare la pagina/il deck.
 

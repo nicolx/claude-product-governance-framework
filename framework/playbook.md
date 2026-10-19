@@ -879,6 +879,13 @@ di `conclusion_notices` — deve arrivare al PM **già leggibile** e
 passare nel client con **un solo copia-incolla**, senza ritocchi di
 formato. Il PM rivede e adatta il contenuto; non deve ripulire il testo.
 
+**Calibrata sul destinatario.** Prima di scrivere, la skill legge
+l'identikit condiviso dei destinatari e il rapporto individuale del PM
+con loro, e adatta forma e distanza del testo — mai la sostanza. Accanto
+ai blocchi mostra una riga `Calibrazione: …` (fuori dal testo, non si
+copia) che dice cosa ha adattato e perché. Vedi "L'identikit degli
+stakeholder e il rapporto individuale".
+
 **Visibile subito.** La bozza si mostra **per intero** nella
 conversazione nel momento in cui viene scritta — nel recap del run, non
 solo come titolo o conteggio. Se è stata scritta da un run non
@@ -3001,6 +3008,164 @@ allo stakeholder: assume un rischio non quantificato, sottrae risorse a
 priorità già valutate, e segnala al team che il processo è negoziabile.
 Il confine va tenuto con fermezza e rispetto, spiegando sempre il perché.
 
+## L'identikit degli stakeholder e il rapporto individuale
+
+*"Seek first to understand, then to be understood." — Stephen Covey*
+
+Lo stesso messaggio, mandato a due persone, non è lo stesso messaggio. Un
+"no, non questo trimestre" letto da un direttore che vuole i numeri prima
+della narrativa, o da uno che vuole sentirselo dire a voce prima di
+vederlo per iscritto, produce frizione se arriva nella forma sbagliata,
+anche quando è giusto nella sostanza. E lo stesso messaggio, mandato
+alla stessa persona da due PM diversi, non è lo stesso messaggio: chi ci
+lavora da anni e ne ha la fiducia può essere diretto; chi è appena
+arrivato, con uno stakeholder notoriamente difficile, ha bisogno di più
+forma, più evidenza e di non giocarsi il primo scambio su una mail.
+
+Per questo il framework tiene **due livelli distinti** e li combina ogni
+volta che prepara un testo che il PM manderà a mano.
+
+### Livello 1: l'identikit condiviso (`product/reference/stakeholders.yaml`)
+
+Com'è lo stakeholder, per chiunque ci lavori: ruolo, peso decisionale
+(influenza e interesse), cosa gli importa davvero, come vuole ricevere
+le informazioni (canale, formato, lunghezza, registro, come vuole le
+cattive notizie), punti di forza e **punti di attenzione**, cosa ha
+funzionato e cosa no. È la **memoria comune** dei PM dell'istanza:
+tracciata da git, chi arriva eredita ciò che i colleghi hanno imparato.
+Schema: `framework/schema/stakeholders.template.yaml`; la mantiene la
+skill `stakeholder-profile`.
+
+**Il test del lettore.** Ogni riga dell'identikit deve poter essere letta
+dallo stakeholder stesso senza imbarazzo per il PM che l'ha scritta. Il
+repo è condiviso, può essere aperto a chi non te lo aspetti, e un
+giudizio sul carattere di un collega in un file aziendale è un problema
+(di relazione, di HR, di trattamento dei dati personali) prima ancora che
+uno strumento. Quindi:
+
+- i **difetti** si scrivono come **comportamenti osservati**, con
+  l'episodio da cui nascono e il modo di gestirli: "contesta i numeri in
+  pubblico se li vede per la prima volta in riunione → mandarglieli il
+  giorno prima in 1:1 (Steering del 12/3)", non "è aggressivo";
+- un tratto senza episodio è un'**ipotesi** (`confidence: hypothesis`),
+  e così lo trattano le skill: suggerisce, non decide il tono;
+- gli **episodi** sono append-only e descritti senza aggettivi sulla
+  persona: sono l'evidenza, i tratti sono la sintesi;
+- niente dati che non servono a comunicare meglio sul lavoro (salute,
+  vita privata, opinioni politiche, religiose, sindacali).
+
+### Livello 2: il rapporto individuale (`.governance/stakeholder-relationships.local.yaml`)
+
+Com'è il rapporto **tra quello stakeholder e questo PM**: da quando si
+conoscono (`familiarity`: new / building / established), quanto si fida
+di lui (`trust`), se ci sono stati scontri (`tension`: none / past /
+ongoing), che registro usano tra loro, chi può fare da ponte, la storia
+dei loro momenti, e le **note franche** del PM — qui "con me ha un
+pessimo carattere, ci siamo già scontrati due volte" ha il suo posto.
+
+È un file **locale, non tracciato** (`.governance/*.local.yaml` nel
+`.gitignore` di root, come le credenziali degli utenti di prova): ogni
+PM ha il suo per costruzione, nessun collega e nessuno stakeholder lo
+legge mai. Non ha il backup di git: chi cambia macchina lo copia a mano.
+Il suo contenuto non entra mai in un file tracciato, in una bozza, o in
+un recap che finisce in un commit. Schema:
+`framework/schema/stakeholder-relationships.local.template.yaml`.
+
+**Senza una voce, il rapporto vale `new`.** Il framework non presume mai
+una confidenza che il PM non ha dichiarato: un PM appena arrivato (o con
+un clone nuovo) riceve bozze calibrate per chi lo stakeholder non lo
+conosce ancora.
+
+### Calibrare il testo: identikit × rapporto
+
+Ogni skill che prepara un testo che il PM manda a mano (vedi "Testi che
+il PM manda a mano: visibili e pronti da copiare") **prima** di scriverlo
+cerca i destinatari nell'identikit (per `id`, `aliases`, email) e nel
+rapporto locale, e calibra:
+
+- **dall'identikit, la forma**: canale (se l'identikit dice "a voce
+  prima", la bozza scritta si accompagna al suggerimento di una call),
+  formato e lunghezza, cosa mettere in testa (il KPI che gli importa), come
+  dare una cattiva notizia, cosa evitare;
+- **dal rapporto, la distanza**: il registro, quanto essere diretti,
+  quanto contesto e quanta evidenza servono perché il messaggio regga
+  da solo.
+
+| Rapporto | Stakeholder senza punti di attenzione | Stakeholder con punti di attenzione rilevanti |
+|---|---|---|
+| `new` / `trust` unknown o low | registro dell'identikit (default formale), presentarsi in una riga, contesto completo, nessuna confidenza presunta | formale; evidenza prima delle conclusioni; nessun "no" netto per iscritto come primo contatto — la bozza suggerisce di parlarne prima a voce (o di coinvolgere un `ally` / il PM che lo conosce da più tempo, se l'identikit o il rapporto lo indicano); niente ironia, niente sottintesi |
+| `building` | registro dell'identikit, contesto essenziale | come sopra, con meno cerimonia; i `what_works` dell'identikit si applicano per esteso |
+| `established` / `trust` high | il registro che usano tra loro, diretto e breve | diretto, ma i `watch_out` restano: un buon rapporto non rende sicuro un formato che l'identikit sconsiglia |
+| `tension: ongoing` (qualunque familiarità) | — | il registro più neutro e fattuale possibile, solo fatti e prossimi passi, nessuna frase che possa leggersi come replica allo scontro; la bozza segnala al PM che, se il tema è delicato, conviene una conversazione (o un ponte) prima dello scritto |
+
+Un tratto `hypothesis` orienta ma non vince su un comportamento
+`observed`. Il rapporto non cambia la **sostanza**: un "no" resta un
+"no", una data resta una forbice, una Strategic Exception resta "in
+attesa di conferma" — si calibra come lo si dice, mai cosa si dice. E la
+calibrazione non scavalca le regole del testo (testo semplice, nessun
+gergo, nessuna firma).
+
+**La calibrazione si vede, il profilo no.** Accanto ai tre blocchi della
+bozza (A, Oggetto, Testo) la skill mostra al PM una riga **fuori dal
+testo**, che non si copia: `Calibrazione: …` — cosa ha adattato e perché
+("registro formale: rapporto new; dati in testa: identikit, format;
+suggerita una call prima dell'invio: watch_out sulle cattive notizie per
+iscritto"). Il PM la vede, la corregge o la ignora. Nessuna parola
+dell'identikit o del rapporto entra mai nel Testo. La riga vive **solo in
+conversazione**: non si salva nella voce YAML della bozza né in una
+proposta in `pending/` (sono file tracciati, e la riga può riflettere il
+rapporto locale). Per una bozza a più
+destinatari (es. un avviso di conclusione agli stakeholder di una linea)
+si calibra sul destinatario principale (il richiedente) e si segnalano
+in quella riga gli altri con punti di attenzione rilevanti — se la
+differenza è forte, la skill propone una seconda bozza separata invece
+di un compromesso che non va bene a nessuno.
+
+Uno stakeholder senza identikit non blocca nulla: la bozza esce con il
+tono neutro di default e la riga di calibrazione lo dice ("nessun
+identikit per X: tono neutro"). Se il destinatario compare spesso
+(richiedente ricorrente, stakeholder di una linea), la skill propone di
+crearlo.
+
+### Come si arricchisce
+
+L'identikit e il rapporto **non si compilano a tavolino**: crescono con
+il lavoro, e sempre su conferma del PM, mai dedotti in silenzio.
+
+- **Dalle bozze modificate.** Quando il PM dà la versione finale di una
+  bozza diversa da quella proposta, la skill guarda cosa ha cambiato
+  (più corta, meno formale, dati spostati in testa) e, se il cambiamento
+  dice qualcosa sullo stakeholder, propone in una riga di registrarlo —
+  nell'identikit se vale per tutti, nel rapporto se vale per lui.
+- **Dalle reazioni.** Quando il PM racconta com'è andata ("ha risposto
+  male", "mi ha ringraziato e ha girato la mail al suo capo"), la skill
+  propone un episodio (identikit) e/o un momento del rapporto (locale).
+- **Dalle frizioni.** Ogni voce del registro delle frizioni con un `who`
+  è un episodio candidato: `stakeholder-profile` lo propone come
+  evidenza e chiede se ne nasce un tratto o un `what_to_avoid`.
+- **Dalle cerimonie.** `log-ceremony`, quando la trascrizione mostra un
+  comportamento ricorrente di uno stakeholder presente, può proporre un
+  episodio — mai un tratto direttamente.
+
+Ogni proposta di aggiunta all'identikit passa il test del lettore
+**prima** di essere mostrata al PM: se il PM detta un giudizio ("scrivi
+che è un despota"), la skill lo riformula in comportamento osservato da
+confermare, e offre di tenere la versione franca nel rapporto locale.
+
+**Le persone cambiano.** Un identikit con `last_reviewed_at` di oltre sei
+mesi si usa ancora, ma la riga di calibrazione lo dice e la skill
+propone una rilettura. Un tratto smentito da episodi recenti si toglie
+(non si lascia accanto al suo contrario). Uno stakeholder che non lo è
+più passa a `status: left` e non calibra più nulla.
+
+**Checklist operativa**
+- [ ] Ogni bozza che il PM manda a mano è stata calibrata su identikit e rapporto dei destinatari, e la riga `Calibrazione` dice cosa è stato adattato (o che non c'era un identikit)?
+- [ ] Nessuna parola dell'identikit o del rapporto è finita nel Testo di una bozza?
+- [ ] Un PM senza voce di rapporto con lo stakeholder ha ricevuto una bozza da `new`, non una confidenza presunta?
+- [ ] Ogni tratto dell'identikit condiviso passa il test del lettore ed è un comportamento osservato con il suo episodio (o è marcato `hypothesis`)?
+- [ ] Le note franche sono rimaste nel file locale, mai copiate in un file tracciato o in un commit?
+- [ ] Gli stakeholder ricorrenti senza identikit sono stati proposti per la creazione?
+
 ## Scenario 1: lo stakeholder che bypassa il processo
 
 *"Ho bisogno che il team faccia questa cosa entro venerdì. È urgente." —
@@ -3072,6 +3237,12 @@ creare conflitti, ma per due ragioni pratiche: i pattern emergono e
 diventano dati con cui migliorare il processo o la comunicazione verso
 certi stakeholder; e se il processo viene messo in discussione, il PM ha
 evidenze concrete su come il team ha operato e perché.
+
+Una frizione con un `who` è anche un **episodio** per l'identikit di quello
+stakeholder: `stakeholder-profile` lo propone come evidenza, così il
+pattern non resta solo un dato di processo ma cambia come gli si scrive
+la volta dopo — vedi "L'identikit degli stakeholder e il rapporto
+individuale".
 
 ---
 

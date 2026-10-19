@@ -204,7 +204,10 @@ piano passa **sempre** da `product/approvals/pending/`
          **solo con conferma esplicita del PM**; per `aborted` vale il
          gate dell'avviso di conclusione: bozza in `conclusion_notices`
          `kind: aborted` — perché ci si ferma e cosa succede alla
-         richiesta — e `status: aborted` solo se il PM la dichiara `sent`
+         richiesta, calibrata sui destinatari (playbook, "L'identikit
+         degli stakeholder e il rapporto individuale": un'interruzione è
+         una cattiva notizia, conta come la vuole ricevere) — e
+         `status: aborted` solo se il PM la dichiara `sent`
          o la esenta con un motivo suo, altrimenti resta `drafted` e
          l'idea nel suo stato; playbook, "Avvisare gli stakeholder della
          conclusione"); svuotare una `deadline`

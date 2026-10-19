@@ -124,6 +124,15 @@ direttamente, questi passi sono tutto ciò che serve.
    più strategico della cerimonia, per playbook), seguiti dalle scadenze
    `overdue`/`due_soon` di `mandate-watch` e `deadline-watch`.
 
+   In coda al riepilogo, se la trascrizione mostra un comportamento
+   ricorrente di uno stakeholder presente (contesta i numeri visti per
+   la prima volta, chiede sempre il dato per canale, porta pressione dal
+   top), proponi in una riga di registrarlo come **episodio**
+   nell'identikit (`stakeholder-profile`) — mai un tratto direttamente,
+   mai senza conferma del PM, descritto senza aggettivi sulla persona
+   (playbook, "L'identikit degli stakeholder e il rapporto individuale").
+   Non è una decisione della cerimonia: non va in `decisions.yaml`.
+
 7. **Rigenera la roadmap aggiornata.** Richiama `report-render` in
    modalità ceremony (`trigger: ceremony`, `ceremony_ref` = la cartella
    di questo run): rigenera tutte le viste `cadence: per_ceremony` di

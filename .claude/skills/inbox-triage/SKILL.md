@@ -383,7 +383,7 @@ soli non coprono. In sintesi:
    `followup_replies`, qualunque esito: idea, bug, SE, mandate, platform,
    decline, clarification, aggiornamento) pronta per la revisione e
    l'invio manuale del PM, con i destinatari, mostrata **per intero** in
-   testo semplice pronto da incollare nel client di posta (playbook, "Testi che il PM manda a mano: visibili e pronti da copiare") — oppure il motivo esplicito
+   testo semplice pronto da incollare nel client di posta (playbook, "Testi che il PM manda a mano: visibili e pronti da copiare") e calibrata sul destinatario — identikit in `product/reference/stakeholders.yaml` × rapporto locale in `.governance/stakeholder-relationships.local.yaml` (senza voce vale `new`), forma e distanza mai la sostanza, riga `Calibrazione: …` solo in conversazione; proposta di identikit per i mittenti ricorrenti che non ce l'hanno (playbook, "L'identikit degli stakeholder e il rapporto individuale") — oppure il motivo esplicito
    per cui non c'è nessuno da avvisare, o "canale da trovare". Nessun
    elemento senza né l'una né l'altro. Non inviarne nessuna in
    automatico. Riporta il recap dei **path da

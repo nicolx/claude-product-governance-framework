@@ -95,6 +95,7 @@ inizializzata) e scaffolda `apps/` e `product/`.
     └── reference/
         ├── product-lines.yaml
         ├── friction-log.yaml
+        ├── stakeholders.yaml     ← identikit condiviso degli stakeholder: cosa gli importa, come vogliono ricevere le informazioni, punti di attenzione come comportamenti osservati (skill stakeholder-profile). Il rapporto di ogni PM con loro sta in .governance/stakeholder-relationships.local.yaml (non tracciato); insieme calibrano le bozze che il PM manda
         ├── reporting-models.yaml ← quali viste produce l'istanza, per chi, ogni quanto: modelli standard (framework/models/) o aziendali
         ├── models/               ← formati aziendali trascritti (MBR, roadmap, KPI) con la mappatura campo → dato del framework
         ├── team.yaml             ← anagrafica del team di sviluppo: presidio apps/, competenze, disponibilità e capacità per competenza (FTE, assenze, squad — skill team-roster per popolarla), su cui si pianificano gli slot della roadmap. team-fit la incrocia con un PRD e ne fissa il `tech_reference` — il referente tecnico, mostrato poi in backlog-list / iteration-board / cerimonie

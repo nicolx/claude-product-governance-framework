@@ -351,6 +351,17 @@ Fuori da questa modalità, la skill si comporta come descritto nei
    mandarla, copia il Testo negli appunti con `bash
    .claude/hooks/copy-to-clipboard.sh`.
 
+   **Calibrata sul destinatario** (playbook, "L'identikit degli
+   stakeholder e il rapporto individuale"): prima di scriverla cerca i
+   destinatari in `product/reference/stakeholders.yaml` (per `id`,
+   `aliases`, email) e nel rapporto locale
+   `.governance/stakeholder-relationships.local.yaml` (senza voce vale
+   `new`), adatta forma e distanza — mai la sostanza — e mostra accanto
+   ai blocchi la riga `Calibrazione: …`, solo in conversazione. Se il
+   richiedente non ha identikit e compare spesso, proponi di crearlo
+   (`stakeholder-profile`); se il PM dà una versione finale diversa o
+   racconta la reazione, proponi in una riga di registrarlo.
+
    **Un mittente, una risposta.** Se il passo 2 ha decomposto il
    materiale in più unità dallo stesso mittente, scrivi **una sola bozza**
    che copre tutti gli esiti (es. "delle tre richieste: la prima è presa

@@ -215,7 +215,15 @@ e le label (item non di stato) producono gli eventi indicati sotto.
    "Testi che il PM manda a mano: visibili e pronti da copiare"):
    niente Markdown, un paragrafo per riga, nessun simbolo grafico,
    nessuna firma, `[DA COMPLETARE: …]` per un dato mancante. Nel YAML
-   `draft_body` è un blocco letterale `|` con la stessa struttura. **Una mail per card per giro:** se lo stesso giro rileva più
+   `draft_body` è un blocco letterale `|` con la stessa struttura.
+   **Calibrata sui destinatari** (playbook, "L'identikit degli
+   stakeholder e il rapporto individuale"): identikit in
+   `product/reference/stakeholders.yaml` × rapporto del PM in
+   `.governance/stakeholder-relationships.local.yaml` (senza voce vale
+   `new`; in un run non presidiato il file locale c'è solo se il cron
+   gira sul clone del PM — altrimenti calibra sul solo identikit e
+   dillo). Forma e distanza, mai la sostanza; la riga `Calibrazione: …`
+   si mostra solo quando il PM apre la coda, non si salva nella voce. **Una mail per card per giro:** se lo stesso giro rileva più
    eventi sulla stessa card, la bozza sta sulla voce più recente e
    racconta il percorso ("è passata in review e poi in produzione");
    le altre voci hanno `merged_into` = `id` di quella voce e niente

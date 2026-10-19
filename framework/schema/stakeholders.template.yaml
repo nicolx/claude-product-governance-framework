@@ -1,0 +1,82 @@
+# Template per product/reference/stakeholders.yaml
+#
+# L'IDENTIKIT CONDIVISO degli stakeholder di QUESTA istanza — chi sono,
+# cosa gli importa, come vogliono ricevere le informazioni, cosa funziona
+# e cosa no nel comunicare con loro. È la "memoria comune" dei PM
+# dell'istanza: chi arriva dopo eredita ciò che i colleghi hanno già
+# imparato, invece di scoprirlo a sue spese (playbook, "L'identikit degli
+# stakeholder e il rapporto individuale").
+#
+# Lo mantiene la skill stakeholder-profile (creazione, aggiornamento,
+# episodi), su conferma del PM in conversazione. Lo leggono, in sola
+# lettura, tutte le skill che preparano un testo che il PM manda a mano
+# (requester_reply, followup_replies, clarification.draft_message,
+# conclusion_notices, bozze di delivery-watch, outbound_comm) per
+# calibrarlo sul destinatario. Scrittura DIRETTA, come team.yaml: è un
+# dato di riferimento condiviso, non una decisione di priorità — NON passa
+# da product/approvals/pending/. Tracciato da git: ogni collega che clona
+# lo vede.
+#
+# REGOLA DI SCRITTURA — il test del lettore: ogni riga qui dentro deve
+# poter essere letta dallo stakeholder stesso senza che il PM se ne
+# debba vergognare. Quindi:
+#   - comportamenti OSSERVATI e professionali, ognuno con l'episodio da
+#     cui nasce ("reagisce male alle sorprese in riunione — Steering del
+#     2026-03-12"), MAI giudizi sul carattere ("è arrogante", "pessimo
+#     carattere") — quelli, se il PM li vuole annotare, vanno nel suo
+#     rapporto individuale, file locale non tracciato
+#     (.governance/stakeholder-relationships.local.yaml);
+#   - niente dati personali che non servono a comunicare meglio sul
+#     lavoro: salute, vita privata, opinioni politiche/religiose,
+#     sindacali, orientamento — mai, nemmeno "per contesto";
+#   - un tratto senza episodio è un'ipotesi: si scrive con
+#     confidence: hypothesis e si conferma (o si toglie) quando arriva
+#     l'evidenza.
+#
+# Gli stakeholder sono le persone che compaiono come proposer di un'idea,
+# in product-lines.yaml (stakeholders) o come destinatari di una bozza:
+# l'id qui è il riferimento stabile. Uno stakeholder senza identikit non
+# blocca nulla — la bozza esce con il tono neutro di default.
+
+updated_at: ""                    # data ISO dell'ultimo aggiornamento (stakeholder-profile la riscrive a ogni modifica)
+
+stakeholders: []
+# Esempio di voce:
+# - id: ""                        # slug stabile, es. "mario-rossi" — non cambia se cambia il ruolo
+#   name: ""                      # nome con cui il team lo chiama
+#   email: ""                     # opzionale — "" se non lo si vuole tracciare (come pm_roster)
+#   aliases: []                   # come compare nel materiale grezzo ("il CFO", "Mario R.", un indirizzo): serve a riconoscerlo all'intake
+#   role: ""                      # ruolo/funzione, es. "Direttore Commerciale"
+#   product_lines: []             # le linee su cui pesa (nomi di product-lines.yaml)
+#   influence: ""                 # high | medium | low — peso decisionale sulle priorità del prodotto
+#   interest: ""                  # high | medium | low — quanto segue da vicino il prodotto (griglia potere/interesse)
+#   cares_about: []               # cosa gli importa davvero: KPI, obiettivi, timori ("margine sul canale B2B", "nessuna sorpresa coi clienti top")
+#   communication:
+#     channel: ""                 # canale preferito: email | chat | call | in_person | "" (non noto)
+#     format: ""                  # es. "numeri prima della narrativa", "una riga di sintesi in testa", "slide, non testo"
+#     length: ""                  # short | medium | detailed | "" (non noto)
+#     register: ""                # formal | neutral | informal — il registro di default per chi NON ha un rapporto con lui
+#     language: ""                # lingua preferita, se diversa da quella dell'istanza
+#     timing: ""                  # es. "legge la posta la mattina presto", "mai il venerdì pomeriggio"
+#     bad_news: ""                # come vuole ricevere un no / un ritardo, es. "a voce prima, poi per iscritto"
+#   traits:                       # punti di forza e punti di attenzione, SEMPRE come comportamenti osservati
+#     - kind: ""                  # strength | watch_out
+#       text: ""                  # es. "contesta i numeri in pubblico se li vede la prima volta in riunione"
+#       how_to_handle: ""         # es. "mandargli i dati il giorno prima in 1:1"
+#       confidence: ""            # observed (c'è un episodio) | hypothesis (impressione da confermare)
+#       evidence: []              # riferimenti agli episodi (id di episodes, friction-log, cerimonie)
+#       recorded_by: ""           # PM che l'ha annotato (dal pm_roster)
+#       recorded_at: ""
+#   what_works: []                # approcci che hanno funzionato, con riferimento — es. "proporre due opzioni con il trade-off esplicito"
+#   what_to_avoid: []             # approcci che hanno peggiorato le cose, con riferimento
+#   episodes:                     # APPEND-ONLY: i fatti su cui si fonda l'identikit
+#     - id: ""                    # es. "2026-03-12-steering-sorpresa"
+#       date: ""
+#       recorded_by: ""           # PM che l'ha osservato
+#       context: ""               # dove/cosa: "Steering Q1, presentata la roadmap senza preview"
+#       what_happened: ""         # il fatto, descritto senza aggettivi sulla persona
+#       lesson: ""                # cosa se ne ricava per la prossima volta
+#       friction_log_ref: null    # data/voce di friction-log.yaml, se l'episodio è anche una frizione
+#       ceremony_ref: null        # link a product/ceremonies/..., se registrato lì
+#   last_reviewed_at: ""          # quando un PM ha riletto la voce per intero: un identikit vecchio va riverificato, le persone cambiano
+#   status: active                # active | left (non è più uno stakeholder — si tiene per lo storico, non si usa più per calibrare)

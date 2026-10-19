@@ -157,7 +157,7 @@ il cantiere, invece di lasciarlo in un limbo indefinito.
    significa, l'eventuale follow-up. `recipients` = stakeholders della
    `product_line` + `proposer` (il PM conferma/edita). **Mostrala per
    intero, non inviarla** — testo semplice pronto da copiare nel client
-   di posta (playbook, "Testi che il PM manda a mano: visibili e pronti da copiare"). `closure` si scrive **nello stesso passo** in cui il PM
+   di posta (playbook, "Testi che il PM manda a mano: visibili e pronti da copiare"), calibrata sui destinatari (playbook, "L'identikit degli stakeholder e il rapporto individuale"). `closure` si scrive **nello stesso passo** in cui il PM
    dichiara l'avviso inviato (`notice_status: sent` + `sent_at`) o lo
    esenta con un motivo suo (`waived` + `waived_reason`). Se il PM
    rimanda l'invio, la voce resta `drafted` e `closure.closed` resta
