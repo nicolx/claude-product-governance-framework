@@ -1,6 +1,6 @@
 ---
 name: delivery-watch
-description: Osserva il tracker di esecuzione e rileva OGNI movimento di una card (entrata in sviluppo, in review, ogni altro cambio di colonna, consegna in produzione, bug risolto, card bloccata, regressione) sulle iniziative con jira.card_id e su una board_jql configurata; annota ogni evento in una coda in product/reference/delivery-watch.yaml che sopravvive tra le sessioni e per ciascuno prepara già la bozza di mail agli stakeholder. Se trova attività su una card non collegata a un'idea, crea l'idea in automatico per recuperare il tracciamento. Nessun invio automatico — le bozze le manda il PM a mano; per le consegne (delivered/bug_resolved) l'avviso di conclusione è obbligatorio e condiziona il passaggio dell'idea a done. Usala periodicamente, come parte del Backlog Refinement, o via cron (/schedule).
+description: Osserva il tracker di esecuzione e rileva OGNI movimento di una card (entrata in sviluppo, in review, ogni altro cambio di colonna, consegna in produzione, bug risolto, card bloccata, regressione) sulle iniziative con jira.card_id e su una board_jql configurata; annota ogni evento in una coda in product/reference/delivery-watch.yaml che sopravvive tra le sessioni e per ciascuno prepara già la bozza di mail agli stakeholder. Confronta ogni inizio lavori e ogni consegna con lo slot previsto dallo slot plan dello snapshot (in linea, in anticipo, in ritardo) e tiene la serie degli scarti, che dice se le stime del team sono ottimistiche. Se trova attività su una card non collegata a un'idea, crea l'idea in automatico per recuperare il tracciamento. Nessun invio automatico — le bozze le manda il PM a mano; per le consegne (delivered/bug_resolved) l'avviso di conclusione è obbligatorio e condiziona il passaggio dell'idea a done. Usala periodicamente, come parte del Backlog Refinement, o via cron (/schedule).
 ---
 
 # delivery-watch
@@ -130,7 +130,8 @@ e le label (item non di stato) producono gli eventi indicati sotto.
    .claude/hooks/governance-sync.sh pull`, poi `bash
    .claude/hooks/governance-dump.sh delivery` —
    `product/reference/delivery-watch.yaml` + `product-lines.yaml` +
-   tutte le `idea.yaml` in un colpo. Se richiamata da
+   tutte le `idea.yaml` + l'ultimo snapshot approvato (lo `slot_plan`)
+   in un colpo. Se richiamata da
    `backlog-refinement`, il `pull` unico della sweep è già stato fatto:
    non rifarlo.
 
@@ -178,13 +179,34 @@ e le label (item non di stato) producono gli eventi indicati sotto.
    `suggested_audience`, `draft_headline` (una riga PM-facing). Append a
    `queue[]` con `id` = `{YYYY-MM-DD}-{card_id}-{event_type}` (se lo
    stesso `id` esiste già per un'altra transizione, suffisso `-2`, `-3`…).
+   **Confronto con lo slot** (`slot_check`) per `entered_development`,
+   `delivered` e `bug_resolved`: cerca l'idea nello `slot_plan`
+   dell'ultimo snapshot approvato (playbook, "Capacità del team e slot
+   della roadmap") e confronta la settimana di `occurred_at` con
+   `start_week` (inizio lavori) o `end_week` (consegna). `delta_weeks`
+   positivo = in ritardo, negativo = in anticipo; `on_plan` se lo scarto
+   è sotto le 2 settimane. Un'idea senza slot → `outcome: no_slot` (è
+   partita o è stata consegnata senza stima: segnalalo, è lavoro che la
+   capacità non vedeva). Per `blocked`/`regression` niente `slot_check`,
+   ma nel recap indica la fine stimata dello slot: un blocco su una voce
+   che deve finire tra due settimane pesa più di uno su una che finisce
+   tra due mesi. Nessuno snapshot o `slot_plan` vuoto → `slot_check:
+   null`, una riga nel recap. È un fatto osservato confrontato con una
+   stima: non tocca né lo slot né la stima.
 
 7b. **Prepara la bozza di mail — per ogni evento, senza aspettare il
    triage.** Per gli eventi diversi da `delivered`/`bug_resolved`:
    componi `draft_subject` e `draft_body` dal `suggested_framing`
    (aggiornamento: dov'è adesso, cosa succede dopo, chi ci lavora;
    criticità: cosa è successo, impatto atteso, quando ci sarà un
-   aggiornamento — mai un'ipotesi sui tempi non presente nella card),
+   aggiornamento — mai un'ipotesi sui tempi non presente nella card;
+   **unica fonte di tempi ammessa oltre alla card:** per un
+   aggiornamento (`entered_development`, `in_review`, `status_changed`)
+   la bozza può dire la fine prevista dello slot, **al mese e come stima
+   del team** ("il rilascio è previsto per novembre, secondo la stima
+   del team"), solo se lo slot ha `estimate_basis: committed` — mai per
+   `blocked`/`regression`, dopo cui la stima non vale finché il team non
+   la rivede, e mai da una stima `rough`),
    `draft_recipients` = `suggested_audience`, `triage_status: drafted`.
    Il corpo si regge da solo per chi lo riceve: nome leggibile
    dell'iniziativa (`summary`, non lo slug), stato in parole semplici
@@ -213,7 +235,9 @@ e le label (item non di stato) producono gli eventi indicati sotto.
    scrittura diretta, **non passa da `product/approvals/pending/`**
    (stessa esenzione di `jira-sync`). Non toccare altro sull'idea. Non
    giudicare la Definition of Done: "in produzione per Jira" si riporta,
-   la valutazione è del PM.
+   la valutazione è del PM. Non toccare lo slot né la stima di delivery:
+   il prossimo `roadmap-snapshot` usa la data reale di
+   `entered_development` come inizio dello slot.
 
 10. **Recap al PM — SEMPRE**, anche se non c'è nulla:
     - **Eventi nuovi**: raggruppati per card nell'ordine in cui sono
@@ -230,6 +254,17 @@ e le label (item non di stato) producono gli eventi indicati sotto.
       il PM le legge senza aprire file e le incolla nel client di posta.
       Non copiarle negli appunti qui (sono più d'una): lo si fa nel
       triage, una alla volta.
+    - **Rispetto al piano**: per gli eventi con `slot_check`, una riga
+      per voce — *in linea*, *in anticipo di N settimane*, *in ritardo di
+      N settimane*, *senza slot* — e per i blocchi la fine stimata che
+      mettono a rischio. Poi la **serie**: delle ultime consegne in
+      `queue[]` con `slot_check` (fino a 10), quante in linea, in
+      anticipo, in ritardo, e lo scarto medio. Se almeno metà sono in
+      ritardo di 2 settimane o più, dillo esplicitamente: le stime o
+      l'overhead del team (`capacity.overhead_pct` in `team.yaml`) sono
+      probabilmente ottimistici — proponi di parlarne in Iteration
+      Planning e, se il team concorda, `team-roster` per l'overhead. Non
+      cambiare nulla tu.
     - **Idee create per backfill**: slug, card, classificazione
       abbozzata — ricorda al PM di rivederle al triage.
     - **Coda**: bozze pronte da mandare (`drafted`) e voci da smarcare

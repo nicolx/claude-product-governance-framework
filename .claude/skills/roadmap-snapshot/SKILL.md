@@ -95,7 +95,9 @@ creato/aggiornato.
      13): offerta settimana per settimana e per competenza da
      `product/reference/team.yaml` (per squad, se l'istanza ne ha), poi
      le iniziative dimensionate in ordine di priorità — in sviluppo
-     (tengono lo slot dello snapshot precedente, salvo nuova stima),
+     (tengono lo slot dello snapshot precedente, salvo nuova stima; il
+     loro inizio è la settimana reale di `entered_development` in
+     `product/reference/delivery-watch.yaml`, se c'è),
      `urgent_priority` + mandate/deadline da chiudere entro la scadenza,
      platform, analisi del piano per RICE, resto del backlog con stima
      per RICE. Ogni iniziativa prende il primo inizio in cui il suo

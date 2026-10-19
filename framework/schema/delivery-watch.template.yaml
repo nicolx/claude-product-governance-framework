@@ -79,6 +79,14 @@ queue: []
 #                           # (conclusion_notices, kind: delivered) e qui si rispecchia l'esito; dismissed
 #                           # solo se l'avviso è waived, con lo stesso motivo (playbook, "Avvisare gli
 #                           # stakeholder della conclusione")
+#   slot_check: null        # confronto con lo slot previsto nello slot_plan dell'ultimo snapshot approvato (solo
+#                           #   entered_development / delivered / bug_resolved; null se l'idea non ha slot o non c'è snapshot):
+#   #   snapshot_week: ""     # settimana dello snapshot usato
+#   #   planned_week: ""      # start_week (entered_development) o end_week (consegne) dello slot
+#   #   actual_week: ""       # settimana ISO di occurred_at
+#   #   delta_weeks: 0        # actual − planned: > 0 in ritardo, < 0 in anticipo
+#   #   outcome: ""           # on_plan (|delta| < 2) | early | late | no_slot (partita/consegnata senza slot: non dimensionata)
+#   #   estimate_basis: ""    # rough | committed, dallo slot
 #   merged_into: null       # id della voce della stessa card in cui questa è confluita: una mail per card
 #                           #   racconta il percorso (es. in review → in produzione); ne segue l'esito
 #   draft_subject: null     # compilato al rilevamento (null per le consegne e le voci merged_into)

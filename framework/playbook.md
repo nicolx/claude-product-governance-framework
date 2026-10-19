@@ -2045,10 +2045,11 @@ ed è un'informazione per la leadership, non un fallimento del team.
 settimane (`slot_plan`), con un algoritmo semplice e verificabile a mano:
 
 1. **Ordine di priorità:**
-   1. in sviluppo — tengono lo slot già iniziato (dallo snapshot
-      precedente; una nuova stima lo ricalcola; senza snapshot
-      precedente, l'inizio è il primo Piano di Iterazione in cui la voce
-      compare in `in_development`);
+   1. in sviluppo — tengono lo slot già iniziato (una nuova stima lo
+      ricalcola). L'inizio è la settimana reale di `entered_development`
+      rilevata da `delivery-watch`, se c'è; altrimenti quello dello
+      snapshot precedente; senza nessuno dei due, il primo Piano di
+      Iterazione in cui la voce compare in `in_development`;
    2. `urgent_priority` del piano, poi mandate e idee con `deadline` non
       ancora in lavorazione, ordinate per ultimo inizio utile (`due_date`
       − durata);
@@ -2538,6 +2539,18 @@ opzionale (`/schedule`) può eseguire `delivery-watch` in modalità detect
 — rileva, accoda con le bozze pronte, committa — ma non fa triage e non
 manda nulla; il
 promemoria via hook resta il canale con cui la coda arriva davanti al PM.
+
+**Confronto con lo slot previsto.** Ogni inizio lavori e ogni consegna
+si confrontano con lo slot dell'ultimo snapshot ("Capacità del team e
+slot della roadmap"): in linea, in anticipo, in ritardo di N settimane,
+o senza slot (lavoro che la capacità non vedeva). Il dato reale torna nel
+modello: la data vera di inizio diventa l'inizio dello slot al prossimo
+snapshot, e la serie degli scarti alle consegne dice se le stime o
+l'overhead dichiarato dal team sono ottimistici — un tema per
+l'Iteration Planning, non una correzione automatica. Una bozza di
+aggiornamento può citare la fine prevista, ma solo al mese, come stima
+del team e da una stima `committed`; mai dopo un blocco o una
+regressione.
 
 **Relazione con `demo-capture`.** Per un evento `delivered` su
 un'iniziativa con UI visibile, `delivery-watch` suggerisce

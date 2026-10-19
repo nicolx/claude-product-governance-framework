@@ -18,7 +18,7 @@
 #   governance-dump.sh iterations    # gli ultimi due product/roadmap/iterations/*.yaml + ultimo snapshot (slot_plan, per iteration-board)
 #   governance-dump.sh pending       # contenuto di product/approvals/pending/*.yaml
 #   governance-dump.sh reference     # product/reference/*.yaml
-#   governance-dump.sh delivery      # delivery-watch.yaml + product-lines.yaml + le idea.yaml (per delivery-watch)
+#   governance-dump.sh delivery      # delivery-watch.yaml + product-lines.yaml + le idea.yaml + ultimo snapshot (per delivery-watch)
 #   governance-dump.sh reports       # viste dichiarate + ultimi report + tutte le fonti dei modelli (ultimi due snapshot) + ultime cerimonie + indice pending (per report-render)
 #
 # SOLA LETTURA: non scrive niente, non fa commit, non tocca git. Stampa su
@@ -249,6 +249,7 @@ case "$MODE" in
     emit_file "product/reference/delivery-watch.yaml"
     emit_file "product/reference/product-lines.yaml"
     emit_ideas
+    emit_latest_snapshot   # slot_plan: ogni movimento confrontato con lo slot previsto
     footer
     ;;
   reports)
