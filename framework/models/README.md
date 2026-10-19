@@ -14,7 +14,7 @@ Fonte normativa: playbook, "Modelli di reporting". Generazione: skill
 | Modello | Tipo | Pubblico tipico | Cadenza | Domanda a cui risponde |
 |---|---|---|---|---|
 | [`roadmap-di-lavoro`](roadmap-di-lavoro.md) | roadmap | team, owner di Product Line | a ogni cerimonia (`per_ceremony`) | Com'è la roadmap dopo l'ultima cerimonia — scadenze, RICE e perché ogni voce è dove è? |
-| [`roadmap-now-next-later`](roadmap-now-next-later.md) | roadmap | stakeholder, leadership | mensile | Su cosa lavoriamo, cosa viene dopo, cosa è in coda? |
+| [`roadmap-now-next-later`](roadmap-now-next-later.md) | roadmap | stakeholder, leadership | mensile | Su cosa lavoriamo, cosa viene dopo (entro il trimestre, nella capacità del team), cosa è in coda? |
 | [`roadmap-trimestrale`](roadmap-trimestrale.md) | roadmap | leadership (MBR/MTR) | trimestrale | Cosa arriva in quale mese, quali scadenze, quali rischi? |
 | [`metriche-scorecard`](metriche-scorecard.md) | metrics | leadership, owner di Product Line | mensile | Il prodotto sta muovendo le metriche che contano? |
 | [`aggiornamento-settimanale`](aggiornamento-settimanale.md) | update | stakeholder di business | settimanale | Cosa è cambiato questa settimana? |

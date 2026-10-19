@@ -2044,6 +2044,13 @@ più utile, con gli stakeholder e con la leadership, di "il team è
 pieno". Un mandate `at_risk` nello slot plan è il segnale da anticipare
 nel prossimo Backlog Refinement, prima che lo dica `mandate-watch`.
 
+**Chi lo legge.** Le viste standard di roadmap non ricalcolano mai lo
+slotting, leggono lo `slot_plan` dell'ultimo snapshot approvato: la
+roadmap di lavoro (colonna "Slot"), la trimestrale (timeline per mese e
+saturazione per competenza) e la Now/Next/Later, dove **Next è ciò che
+il team riesce a iniziare nel trimestre con la capacità che ha** e Later
+ciò che non ci sta ancora — senza date, salvo opzione.
+
 ### Quando i dati mancano
 
 Ogni pezzo degrada in modo esplicito, mai con un default silenzioso:
