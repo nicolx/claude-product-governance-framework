@@ -70,7 +70,7 @@ segnalalo e fermati. L'idea deve esistere in `product/ideas/`. Per un'idea
    `analysis_todo` o il brief manca o è `stage: preliminary`;
    `complete` se il brief è `preliminary` e si scrivono i PRD;
    `prd_review` se un PRD è `draft`/`in_review` con domande residue della
-   lettura a freddo; `measurement` per un'idea `done` con una misurazione
+   lettura a freddo o del panel di revisione; `measurement` per un'idea `done` con una misurazione
    aperta che lo stakeholder deve leggere o accettare.
 
 ### Modalità `prepara`

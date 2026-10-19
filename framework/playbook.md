@@ -458,7 +458,8 @@ puntatore, che invecchia a ogni rilascio dei team tech. Le skill che
 **ragionano sul codice** — `inbox-triage` e `idea-intake` (è un bug? è
 già risolto? è debito tecnico?), `prd-draft` (l'How), `rice-update`
 (l'Entanglement da ispezione), `path-watch` (le rotte e gli eventi già
-tracciati nel codice) — prima di leggerlo eseguono quindi
+tracciati nel codice), `prd-review-panel` (il revisore IT che controlla
+l'How contro il codice) — prima di leggerlo eseguono quindi
 `governance-sync.sh apps`, che porta ogni submodule all'ultimo commit
 del suo branch remoto (`submodule.<nome>.branch` in `.gitmodules`,
 altrimenti il branch di default del remote). Stessi principi del pull: non blocca mai (fetch
@@ -1681,7 +1682,7 @@ Le fasi di analisi a cui si applica:
 | `deep_dive` | idea senza RICE con `rice_status.deep_dive.needed` | cosa serve sapere per quotare Reach/Impact/Confidence onestamente? |
 | `preliminary` | idea in *analisi da avviare*, brief `stage: preliminary` | qual è il problema reale, e regge contro la strategia? (Why) |
 | `complete` | brief da completare, PRD in stesura | cosa va fatto, per chi, come lo misuriamo, come lo comunichiamo? (What, KPI, GTM) |
-| `prd_review` | PRD `draft`/`in_review` con domande residue della lettura a freddo | cosa non regge per chi deve costruirlo o approvarlo? |
+| `prd_review` | PRD `draft`/`in_review` con domande residue della lettura a freddo o del panel di revisione | cosa non regge per chi deve costruirlo o approvarlo? |
 | `measurement` | idea `done` con misurazione aperta | l'impatto atteso si è visto? cosa ci dicono le persone, oltre ai numeri? |
 
 ### Perché il metodo socratico
@@ -1927,7 +1928,7 @@ decide dove si può usare:
 | PRD | `product/prds/{slug}/prd-N-*.md` | il suo `primary_reader` | Why, **Scenario**, What, (Vincoli di design), *Cosa vogliamo imparare* (discovery) o *Metriche* (delivery), How, Rischi, **Provenienza** |
 | Allegato dati | `product/prds/{slug}/allegato-*.md` | design e sviluppo di un PoC | definizioni, dati dimostrativi in unità assolute, parametri, testi, **risultati attesi** come criteri di accettazione |
 | Materiali visivi | `product/prds/{slug}/assets/` | design | mockup, schermate, precedenti |
-| Letture a freddo | `product/prds/{slug}/.reviews/` | audit | chi ha letto cosa, lacune → correzioni, domande residue |
+| Letture a freddo e panel di revisione | `product/prds/{slug}/.reviews/` | audit; il `tech_reference` (scaletta dell'How) | chi ha letto cosa, lacune → correzioni, domande residue; verdetti e rilievi dei personaggi, decisioni del PM |
 | Glossario | `product/reference/glossary.yaml` | tutti (via il brief) | il vocabolario di dominio dell'istanza |
 
 **La lettura a freddo.** Prima che un PRD passi da `draft` a `in_review`,
@@ -1945,11 +1946,54 @@ Una lettura a freddo fa emergere anche **decisioni che spettano al PM**, e
 vanno portate a lui prima di correggere. Al massimo due iterazioni. Mai
 saltata in silenzio: senza subagent, si fa con una persona del ruolo.
 
+**Il panel di revisione.** La lettura a freddo chiede "si capisce?"; un
+PRD che si capisce può comunque non reggere. Chi lo approverà, chi lo
+costruirà e chi lo eserciterà lo attaccheranno ciascuno dal suo mestiere,
+e ogni obiezione arrivata in riunione invece che in stesura costa un giro.
+Per questo, dopo la lettura a freddo, `prd-draft` (o `prd-review-panel` a
+mano) lo fa rivedere da un **panel di agenti con personalità diverse**
+(catalogo, procedura e prompt in `framework/prompts/review-panel.md`):
+
+- sempre il **revisore IT** — architetto pragmatico che si fida del codice
+  più che dei documenti: legge `apps/` in sola lettura e controlla l'How
+  contro il sistema reale (sistemi toccati non dichiarati, migrazioni,
+  requisiti non funzionali, rollback, osservabilità);
+- sempre il **business scettico** — chiede l'evidenza del problema, le
+  alternative più economiche, il costo opportunità, e confronta il PRD con
+  le ipotesi del RICE approvato;
+- secondo i segnali del PRD: la **voce dell'utente**, **sicurezza, privacy
+  e compliance**, lo **scettico della misura**, **esercizio e supporto**,
+  la **finanza**, l'**avvocato del diavolo** (pre-mortem), e la **lente di
+  uno stakeholder** che deve dire sì, costruita dal solo identikit
+  tracciato (mai dal rapporto individuale del PM), dichiarata come
+  simulazione;
+- i personaggi propri dell'istanza (es. un revisore di compliance di
+  settore) in `product/reference/review-personas.yaml`, facoltativo.
+
+Ogni personaggio dà un verdetto (`go` / `go_with_conditions` / `no_go`) e
+rilievi con gravità (`blocker` / `major` / `minor`), ciascuno con lo
+scenario in cui il problema si manifesta e cosa gli farebbe cambiare
+idea. La skill verifica i rilievi di fatto, fa emergere le **tensioni**
+tra personaggi (il revisore IT vuole meno scope, il business scettico
+dice che così non sposta la KPI) e le porta al PM come decisioni, non le
+risolve da sola. Un rilievo diventa una correzione, una decisione del PM,
+una domanda per uno stakeholder (registro, fase `prd_review`),
+un'obiezione da validare con il `tech_reference`, una proposta di
+`rice-update`, un rischio accettato nel PRD, o un rifiuto motivato dal PM.
+
+**Il panel consiglia, non decide**: un `no_go` non è un veto, un `go` non
+è un'approvazione, e le obiezioni sul codice sono ipotesi finché il
+`tech_reference` non le conferma — il file del panel in `.reviews/` è la
+sua scaletta di revisione, non un sostituto. Al massimo due iterazioni.
+Mai saltato in silenzio: senza subagent, si fa con un collega per ruolo.
+
 **Gate di stato del PRD.** `draft` → `in_review`: almeno una lettura a
-freddo registrata, registro dei punti chiave senza punti `open`, e
-nessuna domanda `blocking` del registro delle domande ancora aperta — o,
-se resta aperta, accettata esplicitamente dal PM come rischio dichiarato
-nel PRD.
+freddo registrata, un panel di revisione registrato **senza `blocker`
+aperti** (ogni blocker corretto, accettato come rischio dichiarato nel
+PRD, o respinto dal PM con un motivo), registro dei punti chiave senza
+punti `open`, e nessuna domanda `blocking` del registro delle domande
+ancora aperta — o, se resta aperta, accettata esplicitamente dal PM come
+rischio dichiarato nel PRD.
 `in_review` → `approved`: decisione umana — PM e `tech_reference`, più un
 rappresentante del lettore primario quando conta.
 
@@ -2035,6 +2079,7 @@ approfondimento potrebbe cambiare il RICE Score.
 - [ ] Ogni PRD dichiara il suo `primary_reader` e `prd_kind`, e ha uno Scenario?
 - [ ] Il registro dei punti chiave non ha punti `open` (ogni punto coperto o escluso con motivo confermato)?
 - [ ] La lettura a freddo è stata fatta e registrata in `.reviews/`, e le decisioni emerse sono state prese dal PM?
+- [ ] Il panel di revisione (almeno revisore IT e business scettico) è stato fatto e registrato in `.reviews/`, senza `blocker` aperti, e le tensioni tra personaggi sono state decise dal PM?
 - [ ] Le lacune che solo uno stakeholder può chiudere sono diventate domande del registro, con un incontro preparato, e le risposte avute sono state propagate al brief e ai PRD?
 - [ ] I documenti si reggono senza la sessione, la memoria locale e `context/` (P7)?
 - [ ] Il PRD rispetta il vincolo A3 (circa due facciate A4 in PDF)? Se no, è stato spaccato lungo le cuciture del problema?

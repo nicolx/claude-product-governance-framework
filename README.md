@@ -76,6 +76,7 @@ inizializzata) e scaffolda `apps/` e `product/`.
     │                            dopo l'incontro le risposte si recepiscono e si propagano a punti chiave, brief, PRD, RICE in pending/)
     ├── prds/{slug}/
     │   ├── prd.md              (o prd-1-*.md, prd-2-*.md se spaccato)
+    │   ├── .reviews/           (letture a freddo e panel di revisione: revisore IT, business scettico e altri personaggi — skill prd-review-panel)
     │   └── source/
     ├── ceremonies/{tipo}/{settimana-o-data}/
     │   ├── source/             (trascrizione grezza della riunione)
@@ -98,6 +99,7 @@ inizializzata) e scaffolda `apps/` e `product/`.
         ├── product-lines.yaml
         ├── friction-log.yaml
         ├── stakeholders.yaml     ← identikit condiviso degli stakeholder: cosa gli importa, come vogliono ricevere le informazioni, punti di attenzione come comportamenti osservati (skill stakeholder-profile). Il rapporto di ogni PM con loro sta in .governance/stakeholder-relationships.local.yaml (non tracciato); insieme calibrano le bozze che il PM manda
+        ├── review-personas.yaml ← facoltativo: personaggi del panel di revisione dei PRD propri dell'istanza (es. un revisore di compliance di settore), oltre al catalogo del framework (skill prd-review-panel, modalità setup)
         ├── reporting-models.yaml ← quali viste produce l'istanza, per chi, ogni quanto: modelli standard (framework/models/) o aziendali
         ├── models/               ← formati aziendali trascritti (MBR, roadmap, KPI) con la mappatura campo → dato del framework
         ├── team.yaml             ← anagrafica del team di sviluppo: presidio apps/, competenze, disponibilità e capacità per competenza (FTE, assenze, squad — skill team-roster per popolarla), su cui si pianificano gli slot della roadmap. team-fit la incrocia con un PRD e ne fissa il `tech_reference` — il referente tecnico, mostrato poi in backlog-list / iteration-board / cerimonie
@@ -214,7 +216,10 @@ Il playbook genericizzato è in
 PRD, specifiche scritte per il loro lettore (brief d'iniziativa, registro
 dei punti chiave della fonte, lettura a freddo con lettori simulati prima
 di condividere un PRD con persone o agenti che non erano nella
-conversazione), Discovery socratica (in ogni fase di analisi le domande
+conversazione, poi un panel di revisione con agenti dalle personalità
+diverse — revisore IT sul codice reale, business scettico sulle ipotesi
+del RICE, voce dell'utente, sicurezza, finanza, pre-mortem — che
+consiglia senza decidere), Discovery socratica (in ogni fase di analisi le domande
 per gli stakeholder, la guida del prossimo incontro e il recepimento
 delle risposte in tutti i materiali), cerimonie, meccanismo di approvazione, modalità dry-run per simulare
 una cerimonia senza scrivere nulla (e `rollback-ceremony` per annullarne

@@ -1,6 +1,6 @@
 ---
 name: prd-draft
-description: Redige il brief d'iniziativa e i PRD "A3-sized" di un'idea già prioritizzata, scritti per il loro lettore (design, tech, Finance/Legal, stakeholder — persone o agenti senza il contesto della sessione). Parte dal registro dei punti chiave della fonte, intervista il PM sugli aspetti di prodotto, verifica la copertura (nessun punto perso in silenzio) e collauda i documenti con una lettura a freddo. Legge apps/ e context/, scaffolda measurement*.yaml, non duplica mai il RICE. Anche in modalità retrofit su PRD esistenti.
+description: Redige il brief d'iniziativa e i PRD "A3-sized" di un'idea già prioritizzata, scritti per il loro lettore (design, tech, Finance/Legal, stakeholder — persone o agenti senza il contesto della sessione). Parte dal registro dei punti chiave della fonte, intervista il PM sugli aspetti di prodotto, verifica la copertura (nessun punto perso in silenzio), collauda i documenti con una lettura a freddo e li fa validare da un panel di agenti con personalità diverse (revisore IT, business scettico, …). Legge apps/ e context/, scaffolda measurement*.yaml, non duplica mai il RICE. Anche in modalità retrofit su PRD esistenti.
 ---
 
 # prd-draft
@@ -70,8 +70,8 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
 > **Dry-run.** Se la skill è stata invocata in modalità simulazione
 > (argomento `dry-run`, o `dry_run: true` in `.governance/config.yaml`),
 > applica il contratto della sezione "Modalità dry-run (simulazione)" del
-> playbook: esegui letture, analisi e anche la lettura a freddo
-> normalmente, **non** creare né modificare file sotto `product/` (brief,
+> playbook: esegui letture, analisi e anche la lettura a freddo e il
+> panel di revisione normalmente, **non** creare né modificare file sotto `product/` (brief,
 > PRD, allegati, `assets/`, `measurement*.yaml`, `.reviews/`, registro dei
 > punti chiave, registro delle domande, glossario), **non** invocare
 > `governance-sync.sh push`, mostra come testo il contenuto completo che
@@ -80,7 +80,8 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
 
 > **Retrofit.** Con l'argomento `retrofit` la skill lavora su PRD già
 > esistenti: genera il registro dei punti chiave se manca (passo 2), scrive
-> il brief se manca, esegue copertura e lettura a freddo (passi 9-11) e
+> il brief se manca, esegue copertura, lettura a freddo e panel di
+> revisione (passi 9-11b) e
 > **propone** le correzioni ai PRD — le applica solo alla conferma del PM.
 > Non tocca PRD `approved`/`superseded` senza richiesta esplicita.
 
@@ -267,7 +268,39 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
     umana: **mai saltata in silenzio**. Lo `status: in_review` si raggiunge
     solo dopo almeno una lettura a freddo, con la copertura completa e
     senza domande `blocking` aperte nel registro — o con quelle rimaste
-    accettate esplicitamente dal PM come rischio dichiarato nel PRD.
+    accettate esplicitamente dal PM come rischio dichiarato nel PRD — e
+    dopo il panel di revisione (passo 11b).
+
+11b. **Panel di revisione** (logica della skill `prd-review-panel`,
+    procedura, catalogo dei personaggi e prompt in
+    `framework/prompts/review-panel.md`). Dopo l'ultima iterazione della
+    lettura a freddo — prima si capisce, poi si giudica — fai attaccare i
+    documenti da agenti con personalità diverse: sempre il **revisore IT**
+    (con accesso in sola lettura ad `apps/`, appena aggiornate al passo
+    precedente) e il **business scettico** (con l'ultima voce di
+    `rice_history`), più quelli che i segnali del PRD chiamano (voce
+    dell'utente, sicurezza/privacy, scettico della misura, esercizio e
+    supporto, finanza, pre-mortem, lente di uno stakeholder) e quelli
+    d'istanza in `product/reference/review-personas.yaml`. Poi:
+    - mostra al PM il panel con il perché di ciascuno, prima del lancio;
+    - sintetizza: deduplica, **verifica** i rilievi di fatto, fai
+      emergere le **tensioni** tra personaggi, classifica (correzione /
+      decisione del PM / domanda per uno stakeholder / da validare con il
+      `tech_reference` / segnale sul RICE / rischio accettato / respinto);
+    - **porta al PM blocker e tensioni** prima di correggere; i rischi
+      accettati vanno nella sezione *Rischi*, le domande nel registro
+      (fase `prd_review`), i segnali sul RICE diventano una proposta di
+      `rice-update`, le obiezioni sull'How la scaletta per il
+      `tech_reference` (passo 13);
+    - correggi, poi seconda iterazione solo con chi aveva `blocker` o
+      `no_go` (massimo 2);
+    - registra in
+      `product/prds/{slug}/.reviews/panel-{YYYY-MM-DD}-iterazione-{N}.md`.
+    Il panel consiglia, non decide: nessun verdetto è un'approvazione o un
+    veto. Ma **nessun PRD passa a `in_review` con un `blocker` aperto** —
+    ogni blocker è corretto, accettato come rischio dichiarato o respinto
+    dal PM con un motivo. Senza subagent, panel umano: **mai saltato in
+    silenzio**.
 
 12. **Aggiorna `idea.yaml`**: aggiungi lo slug della cartella PRD a
     `links.prd_ids`, valuta `status: in_prd`, e aggiungi in `notes` una riga
@@ -297,6 +330,9 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
       3. il denormalizzato `tech_reference` su `product/ideas/{slug}/idea.yaml`
          (il PRD primario) — puntatore per viste e cerimonie, scrittura
          diretta senza approvazione (stessa logica di `links.prd_ids`).
+    - Se il panel (passo 11b) ha lasciato obiezioni sull'How **da
+      validare con il `tech_reference`**, mettile tra le azioni aperte del
+      PM: la revisione dell'How con il referente parte da quella scaletta.
     - Se `team.yaml` manca o è vuoto: lascia `tech_reference: ""` nel
       frontmatter, scrivilo chiaramente nel riepilogo come gap, e rimanda
       a `team-roster`.
@@ -321,6 +357,9 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
     - copertura: N punti, X coperti, Y esclusi (con motivo);
     - esito delle letture a freddo: lacune trovate e corrette, domande
       residue accettate, "potrebbe iniziare domani?" per ciascun lettore;
+    - esito del panel di revisione: verdetto di ciascun personaggio,
+      blocker e come sono stati chiusi, tensioni decise dal PM, `major`
+      aperti, scaletta di obiezioni da validare con il `tech_reference`;
     - **cosa hai aggiunto rispetto alla fonte** (P5) e quali decisioni ha
       preso il PM;
     - **domande per gli stakeholder** (sempre, anche se nessuna è

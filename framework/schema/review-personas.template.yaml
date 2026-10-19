@@ -1,0 +1,46 @@
+# Template per product/reference/review-personas.yaml
+#
+# I personaggi del PANEL DI REVISIONE dei PRD per QUESTA istanza — chi, oltre
+# ai personaggi del framework, deve attaccare un PRD prima che passi a
+# in_review, e quali personaggi del framework qui non servono (playbook,
+# "Scrivere per il lettore", sottosezione "Il panel di revisione"; catalogo,
+# procedura e prompt in framework/prompts/review-panel.md).
+#
+# FACOLTATIVO: senza questo file il panel usa il solo catalogo del
+# framework. Creato lazy da prd-review-panel in modalità setup, su richiesta
+# esplicita del PM (es. "aggiungi un revisore di compliance bancaria").
+# Scrittura DIRETTA, come team.yaml: dato di riferimento condiviso, non una
+# decisione di priorità — NON passa da product/approvals/pending/.
+# Tracciato da git.
+#
+# Un personaggio è un PUNTO DI VISTA PROFESSIONALE, non una persona reale:
+# per simulare come leggerebbe il brief uno stakeholder specifico c'è
+# stakeholder-lens:{id}, costruito dall'identikit (stakeholders.yaml). Qui
+# niente nomi di colleghi, niente giudizi su persone.
+
+updated_at: ""                    # data ISO dell'ultima modifica (prd-review-panel la riscrive)
+
+max_personas: 5                   # tetto del panel per PRD (sempre inclusi it-reviewer e business-skeptic)
+
+disabled: []                      # personaggi del framework da non usare mai in questa istanza, con motivo
+# - id: "framework:operations-support"
+#   reason: ""                    # es. "nessun servizio da gestire: prodotto interno di un solo team"
+#   decided_by: ""                # PM (dal pm_roster)
+#   decided_at: ""
+
+personas: []
+# Esempio di voce:
+# - id: ""                        # slug stabile, es. "compliance-bancaria"
+#   extends: null                 # "framework:<id>" per specializzare un personaggio del framework
+#                                 #   (eredita focus e materiali, sostituisce ciò che dichiari qui)
+#   name: ""                      # es. "Responsabile compliance bancaria"
+#   personality: ""               # chi è e con che postura legge, in una o due frasi
+#                                 #   (es. "ha passato tre ispezioni di vigilanza; ogni flusso senza traccia è un rilievo")
+#   focus: []                     # cosa cerca, 3-6 voci
+#   reads: []                     # materiali oltre a brief e PRD: annex | assets | rice | measurement |
+#                                 #   apps (sola lettura) | context:<file> (solo i file indicati)
+#   when: signals                 # always | signals
+#   signals: []                   # quando entra nel panel, in linguaggio leggibile
+#                                 #   (es. "il PRD tocca bonifici o dati di conto")
+#   added_by: ""                  # PM (dal pm_roster)
+#   added_at: ""

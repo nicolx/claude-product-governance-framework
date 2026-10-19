@@ -42,7 +42,8 @@ questions:
                                        # (playbook, tabella "Le sei famiglie di domande")
     gap: ""                            # cosa non sappiamo, in una riga ("chi paga il rinnovo e quando decide")
     gap_ref: null                      # da dove nasce: "KP-07" | "brief#cosa-non-sappiamo" | "rice.reach" |
-                                       # "cold-read 2026-…-iterazione-1" | "conversazione col PM, <data>"
+                                       # "cold-read 2026-…-iterazione-1" | "panel 2026-…-iterazione-1 · it-reviewer" |
+                                       # "conversazione col PM, <data>"
     why_it_matters: ""                 # quale decisione o artefatto cambia a seconda della risposta.
                                        # Se nessuna: la domanda non va posta (curiosità, non discovery)
     affects: []                        # rice.reach | rice.impact | rice.confidence | rice.entanglement |

@@ -1,7 +1,8 @@
 # Prompt · Lettura a freddo (cold read)
 
 Usato da `prd-draft` (playbook, "Scrivere per il lettore: dalla fonte all'artefatto",
-sottosezione "Lettura a freddo"). Un subagent a **contesto vergine** impersona un lettore e
+sottosezione "Lettura a freddo"). Chiede "si capisce?"; il passo successivo, "regge?", è
+il panel di revisione (`review-panel.md`). Un subagent a **contesto vergine** impersona un lettore e
 riceve **solo** i documenti destinati a quel lettore. Serve a far emergere quello che
 l'autore non vede, perché ha in testa il contesto: lacune, fraintendimenti, rimandi a
 materiale che il lettore non ha, numeri incoerenti, decisioni non ancora prese.
