@@ -2262,6 +2262,18 @@ Un'istanza senza nessuna vista `per_ceremony` non ha la roadmap
 automatica: la cerimonia lo dice in una riga e rimanda a `report-render`
 setup — non inventa una vista.
 
+**L'aggiornamento settimanale parte dallo snapshot.** La mail settimanale
+agli stakeholder (`framework:aggiornamento-settimanale`, o un modello
+aziendale che la estende) non si compone a memoria: appena
+`pending-approval` approva lo snapshot della settimana, richiama
+`report-render` su quella vista. Oltre al Piano di Iterazione (cosa è
+cambiato), la mail legge lo snapshot: i segnali di attenzione e
+**"Quando arriva"** — le consegne stimate a breve, ciò che si è spostato
+rispetto allo snapshot precedente e perché (capacità di una competenza,
+nuova stima, priorità), ciò che è entrato nel trimestre. Sempre al mese e
+con "stima", mai una data promessa. È una proposta in `pending/`
+(`outbound_comm`) come ogni comunicazione in uscita: la manda il PM.
+
 **Principi delle viste standard** (valgono anche come buona pratica per
 i modelli aziendali):
 - **Nessuna data inventata.** Le uniche date esatte sono le scadenze
@@ -2271,8 +2283,9 @@ i modelli aziendali):
   — "stima grezza" se `estimate_basis: rough`; le iniziative non
   dimensionate o fuori orizzonte si elencano a parte.
 - **L'ordine è quello del RICE e del Piano**, non quello di chi chiede
-  più forte: Next e Later si leggono dal Piano di Iterazione e dal
-  backlog ordinato.
+  più forte: Next e Later si leggono dallo `slot_plan`, che colloca le
+  idee nell'ordine del Piano e del backlog ordinato dentro la capacità
+  del team.
 - **Una metrica senza lettura recente si dichiara vecchia**, non si
   presenta come attuale.
 
@@ -2281,6 +2294,7 @@ i modelli aziendali):
 - [ ] Una vista di roadmap ha `cadence: per_ceremony` — nel formato standard o in quello aziendale — così si aggiorna da sola a fine cerimonia?
 - [ ] Ogni modello aziendale ha tutti i campi mappati su un dato del framework o dichiarati in `gaps`?
 - [ ] I report distribuiti sono passati da `pending/` come `outbound_comm`?
+- [ ] L'aggiornamento settimanale è uscito dallo snapshot approvato della settimana (non da uno vecchio senza dirlo)?
 - [ ] Le viste in scadenza segnalate dal Backlog Refinement sono state generate?
 - [ ] Nessuno compila più a mano, in parallelo, la roadmap o la scorecard che il framework genera?
 

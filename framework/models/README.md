@@ -17,7 +17,7 @@ Fonte normativa: playbook, "Modelli di reporting". Generazione: skill
 | [`roadmap-now-next-later`](roadmap-now-next-later.md) | roadmap | stakeholder, leadership | mensile | Su cosa lavoriamo, cosa viene dopo (entro il trimestre, nella capacità del team), cosa è in coda? |
 | [`roadmap-trimestrale`](roadmap-trimestrale.md) | roadmap | leadership (MBR/MTR) | trimestrale | Cosa arriva in quale mese, quali scadenze, quali rischi? |
 | [`metriche-scorecard`](metriche-scorecard.md) | metrics | leadership, owner di Product Line | mensile | Il prodotto sta muovendo le metriche che contano? |
-| [`aggiornamento-settimanale`](aggiornamento-settimanale.md) | update | stakeholder di business | settimanale | Cosa è cambiato questa settimana? |
+| [`aggiornamento-settimanale`](aggiornamento-settimanale.md) | update | stakeholder di business | settimanale | Cosa è cambiato questa settimana, e cosa arriva quando? |
 
 Set minimo consigliato per un progetto nascente: `roadmap-di-lavoro`
 (`cadence: per_ceremony`) + `metriche-scorecard`.

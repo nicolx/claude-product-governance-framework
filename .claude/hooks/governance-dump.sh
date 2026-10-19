@@ -19,7 +19,7 @@
 #   governance-dump.sh pending       # contenuto di product/approvals/pending/*.yaml
 #   governance-dump.sh reference     # product/reference/*.yaml
 #   governance-dump.sh delivery      # delivery-watch.yaml + product-lines.yaml + le idea.yaml (per delivery-watch)
-#   governance-dump.sh reports       # viste dichiarate + ultimi report + tutte le fonti dei modelli + ultime cerimonie + indice pending (per report-render)
+#   governance-dump.sh reports       # viste dichiarate + ultimi report + tutte le fonti dei modelli (ultimi due snapshot) + ultime cerimonie + indice pending (per report-render)
 #
 # SOLA LETTURA: non scrive niente, non fa commit, non tocca git. Stampa su
 # stdout. No-op (exit 0, nessun output) se non c'è una cartella product/
@@ -129,6 +129,14 @@ emit_latest_snapshot() {
   [ -n "$f" ] && emit_file "$f"
 }
 
+emit_last_two_snapshots() {
+  # gli ultimi due snapshot approvati: l'aggiornamento settimanale confronta
+  # gli slot_plan per dire cosa si è spostato
+  [ -d "product/roadmap/snapshots" ] || return 0
+  find product/roadmap/snapshots -maxdepth 1 -type f -name '*.yaml' 2>/dev/null | sort | tail -n 2 \
+    | while IFS= read -r f; do emit_file "$f"; done
+}
+
 emit_reports_index() {
   # per ogni vista in product/reports/, il periodo dell'ultimo report generato
   # (serve a capire quali viste sono in scadenza — non il contenuto)
@@ -232,7 +240,7 @@ case "$MODE" in
     emit_ideas
     emit_glob "product/prds" 'measurement*.yaml'
     emit_iterations
-    emit_latest_snapshot
+    emit_last_two_snapshots   # corrente + precedente: confronto degli slot nell'aggiornamento settimanale
     emit_recent_ceremonies
     emit_pending_index
     footer

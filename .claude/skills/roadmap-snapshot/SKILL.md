@@ -165,6 +165,12 @@ creato/aggiornato.
    viste (roadmap trimestrale, Now/Next/Later, aggiornamento settimanale o
    un formato aziendale) e a preparare l'`outbound_comm` — non
    improvvisarne il formato qui (playbook, "Modelli di reporting").
+   L'**aggiornamento settimanale** non va nemmeno chiesto: se l'istanza
+   lo dichiara, lo prepara `pending-approval` subito dopo aver approvato
+   questo snapshot, con le consegne stimate dallo `slot_plan` e ciò che
+   si è spostato rispetto allo snapshot precedente. Per questo `slot_plan`
+   e `capacity_allocation` vanno compilati per intero anche quando la
+   settimana sembra tranquilla: sono la fonte di "Quando arriva".
    Lo snapshot **non** riproduce gli eventi di delivery per-card (bug
    risolto, blocco, consegna): quelle sono comunicazioni verso
    stakeholder gestite da `delivery-watch`, non il rollup strategico. Al

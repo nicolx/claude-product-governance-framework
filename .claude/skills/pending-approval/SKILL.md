@@ -1,6 +1,6 @@
 ---
 name: pending-approval
-description: Elenca, spiega e applica (o rifiuta) le proposte in product/approvals/pending/ — l'unico punto in cui un diff di RICE, uno snapshot di roadmap, un Piano di Iterazione, una Strategic Exception rilevata in Backlog Refinement, un aggiornamento a un'iniziativa mandataria, un cambiamento materiale del contesto aziendale (context_update, da context-watch), o una comunicazione in uscita passano da proposti ad effettivi. Dopo un giro di approvazioni che tocca la roadmap la rigenera (viste per_ceremony). Usala per rivedere la coda.
+description: Elenca, spiega e applica (o rifiuta) le proposte in product/approvals/pending/ — l'unico punto in cui un diff di RICE, uno snapshot di roadmap, un Piano di Iterazione, una Strategic Exception rilevata in Backlog Refinement, un aggiornamento a un'iniziativa mandataria, un cambiamento materiale del contesto aziendale (context_update, da context-watch), o una comunicazione in uscita passano da proposti ad effettivi. Dopo un giro di approvazioni che tocca la roadmap la rigenera (viste per_ceremony); approvato lo snapshot della settimana, prepara l'aggiornamento settimanale agli stakeholder (proposta outbound_comm, mai inviata). Usala per rivedere la coda.
 ---
 
 # pending-approval
@@ -187,6 +187,21 @@ Quando l'utente approva una voce specifica (per nome file o descrizione):
    farlo; riporta in una riga cosa è cambiato nella roadmap. Un rifiuto
    non la rigenera (la roadmap mostrava già l'approvato), un
    `outbound_comm` o un `context_update` nemmeno.
+8. **Prepara l'aggiornamento settimanale**, se nel giro è stato approvato
+   un `roadmap_snapshot`: per ogni vista dichiarata in
+   `reporting-models.yaml` con modello `framework:aggiornamento-settimanale`
+   (o un modello aziendale che lo estende) e `cadence: weekly`, che non
+   ha ancora un report per la settimana dello snapshot, richiama
+   `report-render` in modalità render su quella vista e quel periodo. Il
+   report esce con le consegne stimate e gli spostamenti dallo snapshot
+   appena approvato; per un pubblico fuori dal team `report-render`
+   mette la mail in `pending/` come `outbound_comm` — **non parte
+   nulla**: la manda il PM dopo averla approvata. Non chiedere se farlo
+   (è una proposta, non un invio); riporta in una riga cosa hai
+   preparato. Se il report della settimana esiste già, non rigenerarlo
+   da solo: dillo e lascia decidere al PM. Nessuna vista settimanale
+   dichiarata → nessuna azione, al più una riga che suggerisce
+   `report-render` setup.
 
 ## Rifiuto
 
