@@ -1127,6 +1127,14 @@ marcate esplicitamente (`rice_status.deep_dive`) all'intake o quando
 promemoria — con un'escalation se il meeting è riconosciuto necessario da
 settimane e non è ancora nemmeno in calendario.
 
+Lo slot plan ("Capacità del team e slot della roadmap") aggiunge due
+segnali a questo controllo. Un'idea senza RICE che ha già uno slot —
+tipicamente perché la riconciliazione con il tracker l'ha trovata in
+sviluppo — **consuma capacità senza essere mai stata prioritizzata**: va
+quotata per prima. E se il trimestre ha capacità libera mentre idee
+aspettano da settimane il loro RICE, sbloccarle non è più solo pulizia
+del backlog: è ciò che manca per usare il team che c'è.
+
 **La lista ordinata del backlog non è solo una colonna di numeri.**
 Quando si guarda il backlog per decidere (skill `backlog-list`), accanto
 allo score vanno sempre mostrati: la `summary` (cosa c'è da fare, in

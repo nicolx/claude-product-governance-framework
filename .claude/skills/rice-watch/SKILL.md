@@ -1,6 +1,6 @@
 ---
 name: rice-watch
-description: Scansiona le idee classification "idea" ancora senza RICE (rice_history vuoto) e segnala da quanto tempo sono ferme e perché, se noto — incluse quelle che aspettano un meeting di approfondimento col richiedente, ricordate con insistenza finché il meeting non avviene. Usala periodicamente e sempre come parte del Backlog Refinement (backlog-refinement la richiama).
+description: Scansiona le idee classification "idea" ancora senza RICE (rice_history vuoto) e segnala da quanto tempo sono ferme e perché, se noto — incluse quelle che aspettano un meeting di approfondimento col richiedente, ricordate con insistenza finché il meeting non avviene. Con lo slot plan dello snapshot segnala anche le idee senza RICE che consumano già capacità del team, e quanta capacità resta libera nel trimestre mentre le idee aspettano di essere quotate. Usala periodicamente e sempre come parte del Backlog Refinement (backlog-refinement la richiama).
 ---
 
 # rice-watch
@@ -37,8 +37,8 @@ silenzio.
 
 0. **Sincronizza e leggi in blocco** (uso standalone): `bash
    .claude/hooks/governance-sync.sh pull`, poi `bash
-   .claude/hooks/governance-dump.sh ideas` — tutte le `idea.yaml` in un
-   colpo. Non vuoi segnalare come "senza RICE" un'idea che un collega ha
+   .claude/hooks/governance-dump.sh sweep` — tutte le `idea.yaml` e
+   l'ultimo snapshot approvato (lo `slot_plan`) in un colpo. Non vuoi segnalare come "senza RICE" un'idea che un collega ha
    già quotato in locale e non hai ancora ricevuto.
 
 1. **Elenca tutte le idee** (dal dump) con `classification: idea` (bug,
@@ -90,8 +90,32 @@ silenzio.
    segnalalo comunque nel riepilogo — non forzare una risposta che non
    c'è.
 
-5. **Presenta un riepilogo ordinato per urgenza**: prima le
-   **`needs_deep_dive`** (specie quelle in ritardo — il meeting è
+4b. **Incrocia con lo slot plan** dell'ultimo snapshot approvato
+   (playbook, "Capacità del team e slot della roadmap") — due segnali,
+   nessuna scrittura:
+   - **Consuma capacità senza RICE.** Un'idea di questa lista che ha uno
+     slot attivo (in `slot_plan.slots`, tipicamente `status: committed`:
+     è in sviluppo perché la riconciliazione con il tracker l'ha trovata
+     già partita) occupa capacità del team **senza essere mai stata
+     prioritizzata**. Mostrala con il suo carico per competenza
+     (`load_by_competency`) e la fine stimata: non è più "un'idea che
+     aspetta", è lavoro in corso che il RICE non ha mai visto. Va quotata
+     per prima (`rice-update`), o il PM dichiara perché no.
+   - **Capacità libera mentre si aspetta.** Da
+     `slot_plan.saturation_by_month`: le competenze sotto il 70% di
+     saturazione nei prossimi mesi, con le persona-settimane libere
+     (offerta − domanda). Se ci sono, mettilo in testa al riepilogo
+     accanto al numero di idee `stale`/`needs_deep_dive`: *"Nei prossimi
+     due mesi restano ~9 persona-settimane libere (frontend 6, qa 3) e 5
+     idee aspettano un RICE da oltre 21 giorni"*. Non dice quali idee
+     riempirebbero quello spazio (senza stima non si sa): dice che
+     sbloccarle ora ha un valore concreto.
+   Se non c'è uno snapshot con `slot_plan`, salta il passo e dillo in una
+   riga.
+
+5. **Presenta un riepilogo ordinato per urgenza**: in testa la riga di
+   capacità libera del passo 4b, se c'è; poi le idee che **consumano
+   capacità senza RICE**; poi le **`needs_deep_dive`** (specie quelle in ritardo — il meeting è
    riconosciuto necessario ma non ancora in calendario), poi `stale`,
    poi `blocked_on`, poi `aging`, `fresh` solo se rilevante o richiesto.
    **Prima colonna: l'identificatore** — `short_ref` se assegnato,
@@ -118,6 +142,9 @@ silenzio.
 
 ## Cosa NON fare
 
+- Non stimare tu né il RICE né la delivery di un'idea per collocarla
+  nella capacità libera: lo slot si ricava solo da stime del team, dopo
+  il RICE.
 - Non stimare tu un RICE "provvisorio" per sbloccare la segnalazione —
   un RICE inventato per completare lo schema è esattamente il rischio
   che il principio garantista di `idea-intake`/`rice-update` vuole

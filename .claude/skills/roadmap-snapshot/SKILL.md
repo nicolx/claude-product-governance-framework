@@ -142,7 +142,9 @@ creato/aggiornato.
      vuoto, leggendo `rice_status` già calcolato da `rice-watch` —
      incluso il `summary` dell'idea e, per quelle con
      `rice_status.deep_dive.needed`, lo stato `needs_deep_dive:{richiedente}`
-     con da quanto il meeting è in sospeso.
+     con da quanto il meeting è in sospeso. Se una di queste idee ha uno
+     slot attivo nello `slot_plan` appena composto, `consuming_capacity:
+     true` con il suo carico: lavoro in corso mai passato dal RICE.
    - `measurements_status`: KPI (o assenza di KPI) delle iniziative con
      `status: done` e `closure.closed: false`, leggendo
      `measurement_status` già calcolato da `measurement-watch`.

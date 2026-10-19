@@ -200,6 +200,8 @@ unscored_ideas:
     blocked_reason: null
     waiting_on: null
     deep_dive_pending_since: null        # se status needs_deep_dive: da quando il meeting è riconosciuto necessario e non ancora avvenuto
+    consuming_capacity: false            # true se l'idea ha uno slot attivo in slot_plan (in sviluppo senza RICE) — segnale di governance
+    load_by_competency: {}               # se consuming_capacity: il suo carico settimanale per competenza
 
 # measurements_status elenca le KPI delle iniziative già rilasciate
 # (idea status: done) che meritano attenzione — non solo check_due/

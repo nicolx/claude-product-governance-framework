@@ -125,7 +125,9 @@ piano passa **sempre** da `product/approvals/pending/`
          settimane per finire in tempo, o quando lo slot la fa finire dopo
          la scadenza (`at_risk`) — non una riga tra le altre.
       5. `rice-watch` — idee `classification: idea` con `rice_history`
-         vuoto: `stale`, `blocked_on`, `needs_deep_dive`.
+         vuoto: `stale`, `blocked_on`, `needs_deep_dive`; dallo
+         `slot_plan`, quelle che consumano già capacità senza RICE e la
+         capacità libera del trimestre mentre aspettano.
       6. **Avvisi di conclusione in sospeso** — voci di
          `conclusion_notices` con `notice_status` `pending`/`drafted`:
          consegne, chiusure di misurazione e interruzioni **rilevate ma
