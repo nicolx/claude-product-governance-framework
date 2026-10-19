@@ -151,10 +151,20 @@ per raccogliere:
      sviluppo, in review, bloccata, in produzione, bug risolto,
      regressione — ciascuno con la bozza di mail già pronta). Se sì
      (`enabled: true`):
-     - `board_jql` — una JQL della board/progetto per intercettare anche
-       le card **non** collegate a un'idea (lavoro andato dritto su Jira
-       → l'idea viene creata in automatico). `""` = solo idee con
-       `jira.card_id`;
+     - `board_jql` — una JQL dell'**agenda del team** (sprint aperti,
+       lavoro in corso — non l'intero backlog del progetto) per
+       intercettare anche le card **non** collegate a un'idea (lavoro
+       andato dritto su Jira → riconciliata con un'idea esistente se la
+       cita, altrimenti l'idea viene creata in automatico con una
+       descrizione sommaria dalla card). Proponi un esempio sul progetto
+       dichiarato, es. `project = ABC AND (sprint in openSprints() OR
+       statusCategory = "In Progress")`, e falla provare con
+       `searchJiraIssuesUsingJql` per vedere quante card restituisce.
+       `""` = solo idee con `jira.card_id`;
+     - `backfill_scope` — `active` (default: ogni card non collegata
+       dell'agenda diventa un'idea, il framework resta allineato a ciò
+       su cui il team lavora davvero) o `on_event` (solo le card che si
+       muovono — per una `board_jql` larga);
      - `default_product_line` — a quale product line assegnare le idee
        create per backfill quando non è inferibile dalla card;
      - `blocked_status_names` / `regression_labels` — se la board usa
@@ -167,9 +177,10 @@ per raccogliere:
        per inviare);
      - chiedi se vuole un **cron cloud agent** (`/schedule`) che esegua
        `delivery-watch` in modalità detect senza sessione aperta
-       (giornaliero se vuole avvisare gli stakeholder appena una card si
-       muove) — in tal caso l'MCP Atlassian va connesso anche
-       nell'ambiente cloud.
+       (giornaliero/notturno se vuole avvisare gli stakeholder appena una
+       card si muove e trovare ogni mattina il framework allineato
+       all'agenda del team) — in tal caso l'MCP Atlassian va connesso
+       anche nell'ambiente cloud.
      Nessun tool MCP nuovo da allowlistare: `delivery-watch` usa
      `getJiraIssue` (con `expand:"changelog"`) e `searchJiraIssuesUsingJql`,
      gli stessi già previsti per `jira-sync` (passo 7).

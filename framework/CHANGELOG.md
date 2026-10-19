@@ -54,6 +54,37 @@ Tipi di impatto:
 
 ---
 
+### 2026-10-19-backfill-agenda-team · Il sync con Jira tiene il framework allineato all'agenda del team
+
+- **Impatto**: setup
+- **Cosa cambia**: `delivery-watch` non crea più un'idea solo per le card
+  non tracciate che si muovono: con `delivery_watch.backfill_scope:
+  active` (nuovo default) ogni card dell'agenda del team (`board_jql`)
+  non collegata a un'idea diventa un'idea. Prima prova a riconciliarla:
+  se la card cita un'idea (o un'idea cita la card, o è figlia di un'epic
+  già tracciata) la collega a quella; se somiglia a idee esistenti le
+  propone come possibili duplicati (`backfill_candidates`), mai un
+  collegamento automatico. L'idea creata ha una descrizione sommaria
+  dalla card: classificazione (bug se `issuetype: Bug`), scadenza dalla
+  `duedate`, priorità, sprint, fixVersion ed epic nelle note, data di
+  creazione della card. Nel triage del backfill il PM risolve i possibili
+  duplicati (la card passa all'idea giusta, l'abbozzo si rimuove) e
+  conferma la scadenza. Con un cron notturno il framework ogni mattina
+  rispecchia su cosa il team sta lavorando.
+- **Cosa fare nell'istanza**: solo se `delivery_watch.board_jql` è
+  valorizzata. Controlla che descriva l'agenda del team e non l'intero
+  backlog (es. `project = ABC AND (sprint in openSprints() OR
+  statusCategory = "In Progress")`): con `active` ogni card non conclusa
+  restituita diventa un'idea, quindi al primo giro ne possono nascere
+  molte — prova prima `delivery-watch` in `dry-run` per vederle. Se la
+  JQL deve restare larga, aggiungi `backfill_scope: on_event` in
+  `.governance/config.yaml` (comportamento precedente). Se vuoi il sync
+  notturno, crea un cron con `/schedule` che esegue `delivery-watch` in
+  modalità detect.
+- **Già a posto se**: `delivery_watch.board_jql` è vuota, oppure
+  `delivery_watch.backfill_scope` è dichiarata in
+  `.governance/config.yaml`.
+
 ### 2026-10-19-panel-revisione-prd · Un panel di agenti con personalità diverse dà consigli sui PRD prima della revisione
 
 - **Impatto**: nessuna

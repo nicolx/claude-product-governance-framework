@@ -1,6 +1,6 @@
 ---
 name: delivery-watch
-description: Osserva il tracker di esecuzione e rileva OGNI movimento di una card (entrata in sviluppo, in review, ogni altro cambio di colonna, consegna in produzione, bug risolto, card bloccata, regressione) sulle iniziative con jira.card_id e su una board_jql configurata; annota ogni evento in una coda in product/reference/delivery-watch.yaml che sopravvive tra le sessioni e per ciascuno prepara già la bozza di mail agli stakeholder. Confronta ogni inizio lavori e ogni consegna con lo slot previsto dallo slot plan dello snapshot (in linea, in anticipo, in ritardo) e tiene la serie degli scarti, che dice se le stime del team sono ottimistiche. Se trova attività su una card non collegata a un'idea, crea l'idea in automatico per recuperare il tracciamento. Nessun invio automatico — le bozze le manda il PM a mano; per le consegne (delivered/bug_resolved) l'avviso di conclusione è obbligatorio e condiziona il passaggio dell'idea a done. Usala periodicamente, come parte del Backlog Refinement, o via cron (/schedule).
+description: Osserva il tracker di esecuzione e rileva OGNI movimento di una card (entrata in sviluppo, in review, ogni altro cambio di colonna, consegna in produzione, bug risolto, card bloccata, regressione) sulle iniziative con jira.card_id e su una board_jql configurata; annota ogni evento in una coda in product/reference/delivery-watch.yaml che sopravvive tra le sessioni e per ciascuno prepara già la bozza di mail agli stakeholder. Confronta ogni inizio lavori e ogni consegna con lo slot previsto dallo slot plan dello snapshot (in linea, in anticipo, in ritardo) e tiene la serie degli scarti, che dice se le stime del team sono ottimistiche. Tiene il framework allineato all'agenda reale del team: ogni card attiva della board non collegata a un'idea viene prima riconciliata con le idee esistenti e, se non corrisponde a nessuna, diventa un'idea creata in automatico con una descrizione sommaria dalla card (scadenza, bug, priorità). Nessun invio automatico — le bozze le manda il PM a mano; per le consegne (delivered/bug_resolved) l'avviso di conclusione è obbligatorio e condiziona il passaggio dell'idea a done. Usala periodicamente, come parte del Backlog Refinement, o via cron (/schedule).
 ---
 
 # delivery-watch
@@ -48,7 +48,12 @@ del confine "segnala, non comunica".
   (giornaliera per un "appena si muove"). Il promemoria via hook
   (`check-delivery-queue.sh`) rende la coda visibile alla sessione
   interattiva successiva. Richiede l'MCP Atlassian connesso anche
-  nell'ambiente cloud e `sync.auto_push` abilitato.
+  nell'ambiente cloud e `sync.auto_push` abilitato. È anche il **sync
+  notturno con l'agenda del team**: con `board_jql` configurata, ogni
+  giro crea (o riconcilia) le idee delle card attive non ancora
+  tracciate, così il framework la mattina dopo rispecchia su cosa il
+  team sta davvero lavorando. Le idee nate così restano
+  `backfill_review_needed: true` finché il PM non le rivede.
 
 ## Prerequisiti
 
@@ -62,9 +67,15 @@ niente da controllare (non è un guasto).
 - **Default**: ogni idea con `jira.card_id` valorizzato e `status` non
   `done`/`aborted`/`declined`.
 - **In più**, se `delivery_watch.board_jql` è configurata: le card
-  restituite da quella JQL. Una card di `board_jql` **non collegata** a
-  nessuna idea su cui scatta un evento → l'idea viene **creata in
-  automatico** (passo 6).
+  restituite da quella JQL — **l'agenda del team** (sprint aperti, lavoro
+  in corso), non l'intero backlog del progetto. Una card di `board_jql`
+  **non collegata** a nessuna idea viene prima **riconciliata** con le
+  idee esistenti e, se non corrisponde a nessuna, l'idea viene **creata
+  in automatico** (passo 6). Quali card ci entrano lo dice
+  `delivery_watch.backfill_scope`: `active` (default) = ogni card non
+  collegata non ancora in categoria `done`, più quelle che arrivano a
+  `done` in questo giro; `on_event` = solo le card su cui scatta un
+  evento (comportamento precedente, per board_jql larghe).
 - Override per-istanza (opzionali) in `.governance/config.yaml`,
   `delivery_watch:`: `blocked_status_names`, `regression_labels`,
   `default_product_line`, `review_status_names`. Se non dichiarati, la
@@ -121,7 +132,7 @@ e le label (item non di stato) producono gli eventi indicati sotto.
 > **non** scrivere `product/reference/delivery-watch.yaml`, **non**
 > creare idee di backfill, **non** toccare `jira.*` sulle idee, **non**
 > invocare `governance-sync.sh push`. Mostra come testo il recap completo
-> (eventi che avresti accodato + idee che avresti creato) e chiudi con
+> (eventi che avresti accodato + card che avresti collegato a un'idea esistente + idee che avresti creato, con la descrizione sommaria e gli eventuali candidati) e chiudi con
 > `🔍 DRY-RUN — nessun file scritto, nessun commit, nessun push.`
 
 ### Modalità POLL + DETECT (default)
@@ -162,17 +173,53 @@ e le label (item non di stato) producono gli eventi indicati sotto.
    Prendi `occurred_at` e `actor` dalla riga di `changelog.histories[]`
    che ha prodotto la transizione.
 
-6. **Per ogni ticket di `board_jql` SENZA idea collegata su cui è
-   scattato un evento**: invoca `idea-intake` in **modalità backfill**
-   (non interattiva) passando la card. `idea-intake` crea
-   `product/ideas/{data}-{slug}/` con `source.type: jira_backfill`,
-   `source.ref` = chiave card, `jira.card_id`/`url`/`status` popolati,
-   `classification` inferita (`issuetype: Bug` → `bug`, altrimenti
-   `idea`), `product_line` inferita o `delivery_watch.default_product_line`
-   o `null`, `backfill_review_needed: true`, `rice_history` vuoto.
-   Associa l'evento all'idea nuova (`backfilled_idea: true`). Se
-   `board_jql` non trova eventi su una card non collegata, **non creare
-   nulla** — non si accoda un'idea per ogni card della board.
+6. **Card di `board_jql` SENZA idea collegata** (nessuna `idea.yaml` ha
+   quel `jira.card_id`) che rientrano in `backfill_scope` (Perimetro):
+   prima la riconciliazione, poi — solo se non riconcilia — la
+   creazione. Ogni card si tratta una volta sola: dal giro successivo è
+   collegata a un'idea ed entra nel perimetro di default.
+
+   a. **Riconciliazione certa → collega, non creare.** Una card è
+      certamente di un'idea esistente se c'è un **riferimento esplicito**,
+      non una somiglianza: la card cita lo `short_ref` (`PG-042`) o lo
+      slug di un'idea; un'idea cita la chiave della card in `notes`,
+      `source/` o `key-points.yaml` (un `grep` della chiave su
+      `product/ideas/` basta); oppure la card è figlia (epic/parent)
+      di una card già collegata a un'idea. Nel caso **figlia**, il lavoro
+      è già tracciato dall'idea dell'epic: niente idea nuova, niente
+      scrittura — una riga nel recap. Negli altri casi, se l'idea ha
+      `jira.card_id: null`, scrivi `jira.card_id`/`url`/`status`/
+      `last_polled_at` sull'idea (fatto osservato, stessa esenzione di
+      `jira-sync`; **non** toccare `status` dell'idea: l'allineamento lo
+      conferma il PM, come nella Riconciliazione di `jira-sync`, passo
+      4); se l'idea ha già un'altra card, non sovrascrivere — riporta il
+      caso nel recap come card aggiuntiva della stessa idea. Più idee che
+      rivendicano la stessa card → nessuna scrittura, passa al punto b
+      con quelle idee come candidati.
+   b. **Riconciliazione plausibile → candidati.** Cerca tra le idee non
+      `declined`/`aborted`/`done` e senza `jira.card_id` quelle che
+      potrebbero essere la stessa iniziativa (parole chiave di summary e
+      description della card contro `title`/`summary`/`notes`, stessa
+      product line). Sono **ipotesi**: non si collega nulla, si
+      passano a `idea-intake` come `backfill_candidates` (`idea_id` +
+      motivo del match in una riga). Le risolve il PM nel triage.
+   c. **Crea l'idea**: invoca `idea-intake` in **modalità backfill** (non
+      interattiva) passando la card e gli eventuali candidati.
+      `idea-intake` crea `product/ideas/{data}-{slug}/` con
+      `source.type: jira_backfill`, `source.ref` = chiave card,
+      `jira.*` popolati, una descrizione sommaria dalla card, la
+      classificazione inferita (`issuetype: Bug` → `bug`), la scadenza
+      dalla `duedate`, priorità/sprint/fixVersion/epic in `notes`,
+      `backfill_review_needed: true`, `rice_history` vuoto. Gli eventi
+      di questo giro sulla card si associano all'idea nuova
+      (`backfilled_idea: true`); senza eventi la card entra comunque in
+      `tickets[]` come baseline.
+
+   Con `backfill_scope: on_event`, una card non collegata senza eventi
+   in questo giro **non** si tratta (né riconciliazione né creazione).
+   Una card non collegata già in categoria `done` alla prima vista non
+   si crea in nessuno scope: è lavoro concluso prima che la watch la
+   vedesse, non agenda.
 
 7. **Per ogni evento nuovo** (dedup su `card_id`+`event_type`+`occurred_at`,
    non già in `queue[]`): calcola `suggested_framing`,
@@ -273,8 +320,12 @@ e le label (item non di stato) producono gli eventi indicati sotto.
       probabilmente ottimistici — proponi di parlarne in Iteration
       Planning e, se il team concorda, `team-roster` per l'overhead. Non
       cambiare nulla tu.
-    - **Idee create per backfill**: slug, card, classificazione
-      abbozzata — ricorda al PM di rivederle al triage.
+    - **Agenda del team riallineata**: card collegate a un'idea
+      esistente per riferimento esplicito (passo 6a, con l'idea e il
+      riferimento trovato), card figlie di un'epic già tracciata, e
+      **idee create per backfill** — slug, card, `summary`,
+      classificazione e scadenza abbozzate, ed eventuali possibili
+      duplicati. Ricorda al PM di rivederle al triage.
     - **Coda**: bozze pronte da mandare (`drafted`) e voci da smarcare
       (`pending`), comprese quelle dei run precedenti — con l'invito a
       mandarle: ogni movimento ha il suo aggiornamento.
@@ -376,10 +427,29 @@ e le label (item non di stato) producono gli eventi indicati sotto.
      Se il PM rimanda, la voce resta `drafted`/`pending` e l'idea **non**
      passa a `done`: l'hook `check-conclusion-notices.sh` la ricorda.
 
-3. **Per ogni idea con `backfill_review_needed: true`** → il PM
-   conferma/corregge `classification`, `product_line`, `summary`; se è
-   lavoro spurio → `status: declined`/`aborted` + `decline_reason`. In
-   ogni caso azzera `backfill_review_needed`.
+3. **Per ogni idea con `backfill_review_needed: true`**, una alla volta:
+   - **Se ha `backfill_candidates`**, chiedi prima: "è la stessa
+     iniziativa di <candidato>?" (mostra entrambe con `summary` e
+     R · I · C · E). Se il PM conferma un candidato → **riconcilia**:
+     scrivi `jira.*` della card sull'idea candidata (se ha già un'altra
+     card, chiedi quale tenere come principale e annota l'altra in
+     `notes`), riporta sull'idea candidata ciò che il backfill aveva
+     raccolto e lei non ha (scadenza dalla card come proposta al PM,
+     righe `Jira: …` in `notes`), ripunta a lei `idea_ref`/`idea_slug`
+     delle voci di coda e di `tickets[]` della card, e **rimuovi la
+     cartella dell'idea di backfill** (`git rm`, nello stesso commit:
+     è un abbozzo automatico mai deciso — la storia git lo conserva).
+     Se ha già uno `short_ref` o è citata da una cerimonia, non
+     rimuoverla: `status: declined`, `decline_reason: "duplicato —
+     riconciliata con <short_ref/slug>"`. Allinea `status` della
+     candidata come nella Riconciliazione di `jira-sync`, passo 4
+     (conferma del PM). Se nessun candidato è quello giusto, svuota
+     `backfill_candidates` e prosegui.
+   - Il PM conferma/corregge `classification`, `product_line`,
+     `summary` e la scadenza abbozzata dalla `duedate` (tenerla,
+     correggerla o toglierla — `deadline.note` riscritta col motivo del
+     PM); se è lavoro spurio → `status: declined`/`aborted` +
+     `decline_reason`. In ogni caso azzera `backfill_review_needed`.
 
 4. **Sincronizza il repo**:
    `bash .claude/hooks/governance-sync.sh push "delivery-watch: triage — <k> bozze, <s> inviate, <j> dismiss, <d> idee done" product/reference/delivery-watch.yaml product/ideas/`.
@@ -397,8 +467,11 @@ e le label (item non di stato) producono gli eventi indicati sotto.
   RICE, `jira.card_id: null`) a card Jira attive trovate per parole
   chiave.
 - `delivery-watch` fa un **proprio read del `changelog`** (che Pull non
-  legge) per rilevare i **cambi**, e **crea idee nuove** per card mai
-  tracciate (che la Riconciliazione non fa).
+  legge) per rilevare i **cambi**, e parte dal verso opposto: dalle card
+  dell'agenda del team (`board_jql`) verso le idee. Collega da sola solo
+  per riferimento esplicito, propone i candidati plausibili, e **crea
+  idee nuove** per le card che non corrispondono a nessuna (cosa che la
+  Riconciliazione non fa).
 
 Se `delivery-watch` e `jira-sync` Pull scrivono entrambe
 `jira.status`/`jira.last_polled_at`, è lo **stesso fatto osservato**:
@@ -419,9 +492,14 @@ verità per l'esecuzione.
 - **Mai silenziare una voce `pending`** solo perché è vecchia — resta in
   coda finché il PM non le dà un esito.
 - **Mai scrivere in `product/ideas/`** oltre a
-  `jira.status`/`jira.last_polled_at`, alla creazione di backfill (via
-  `idea-intake`) e — **solo nel triage, ramo (d)** — a
+  `jira.status`/`jira.last_polled_at`, al collegamento `jira.*` per
+  riferimento esplicito (passo 6a), alla creazione di backfill (via
+  `idea-intake`), e — **solo nel triage** — alla riconciliazione di un
+  backfill confermata dal PM (passo 3) e, ramo (d), a
   `conclusion_notices`, `status: done`/`done_at`.
+- **Mai collegare una card a un'idea per somiglianza.** Solo un
+  riferimento esplicito collega da solo (passo 6a); una somiglianza è un
+  candidato che decide il PM.
 - **Mai archiviare (dismiss) un `delivered`/`bug_resolved`** e mai
   scrivere `status: done` senza una voce `conclusion_notices` `sent` o
   `waived` — e mai un `waived` senza motivo dato dal PM.

@@ -158,6 +158,18 @@ backfill_review_needed: false
 # flag. Fatto di provenienza, scrittura diretta, non passa da
 # product/approvals/pending/ (stessa logica di rice_status).
 
+backfill_candidates: []
+# Solo sulle idee di backfill: idee GIÀ esistenti che potrebbero essere la
+# stessa iniziativa della card (somiglianza trovata da delivery-watch, mai
+# un collegamento automatico — un riferimento esplicito invece collega la
+# card all'idea esistente senza creare il backfill). Il PM le risolve nel
+# triage del backfill: se conferma un candidato, la card passa
+# all'idea candidata e questo abbozzo si rimuove (o va declined come
+# duplicato); se no, la lista si svuota. Scrittura diretta.
+# Esempio di voce:
+# - idea_id: "2026-03-02-export-ricevute"   # slug della cartella idea candidata
+#   reason: "stesse parole chiave (ricevute, export) e stessa product line"
+
 # --- Solo se status: needs_clarification (materiale arrivato in product/inbox/
 # troppo ambiguo per essere classificato senza altre informazioni) ---
 clarification:
@@ -440,7 +452,9 @@ strategic_exceptions: []
 # stessa logica di rice_status. escalation_status è invece CALCOLATO
 # dalla skill `deadline-watch`, non va mai compilato a mano.
 deadline:
-  due_date: null                # data precisa, mai "presto"/"appena possibile" — null se non c'è una scadenza reale
+  due_date: null                # data precisa, mai "presto"/"appena possibile" — null se non c'è una scadenza reale.
+                                 #   In un backfill da Jira (source.type: jira_backfill) è la duedate della card: un fatto
+                                 #   del tracker, da confermare al triage del backfill (backfill_review_needed)
   note: null                     # perché c'è questa scadenza (contratto, impegno con un cliente, evento) — mai presunta
   escalation_status: null        # on_track | at_risk | due_soon | overdue — calcolato da deadline-watch; null finché due_date è null
   escalation_basis: null         # perché quello stato: calendar (mancano ≤ 4 settimane) | start_by (deve partire entro 4 settimane per

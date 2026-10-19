@@ -2766,17 +2766,40 @@ si prepara al rilevamento ma nel triage, dopo che il PM ha confermato la
 Definition of Done; se la card ha altre voci aperte (es. un `in_review`
 non ancora mandato) il percorso entra nell'avviso.
 
-**Lavoro che bypassa la governance.** Se `delivery_watch.board_jql` è
-configurata, `delivery-watch` guarda anche le card della board non
-collegate a nessuna idea. Quando ne intercetta una con una transizione
-rilevante — è lavoro partito dritto su Jira, fuori dal RICE —
-**crea l'idea in automatico** (via `idea-intake` in modalità backfill:
-classificazione e dati abbozzati dalla card, `backfill_review_needed:
-true`), la collega alla card, e accoda l'evento. Recupera il tracciamento
-senza fermare il rilevamento; il PM rivede la classificazione al triage.
-È il complemento della modalità Riconciliazione di `jira-sync` (che
-collega idee *già esistenti* a card attive): qui l'idea non c'è ancora e
-va creata.
+**Lavoro che bypassa la governance: il framework segue l'agenda del
+team.** Se `delivery_watch.board_jql` è configurata — e descrive
+l'agenda del team (sprint aperti, lavoro in corso), non l'intero backlog
+— `delivery-watch` guarda anche le card della board non collegate a
+nessuna idea. È lavoro partito dritto su Jira, fuori dal RICE, e il
+framework non deve ignorarlo: ogni card dell'agenda deve avere la sua
+idea. Per ogni card non collegata (con `backfill_scope: active`, il
+default, tutte quelle non ancora concluse; con `on_event` solo quelle
+che si muovono):
+
+1. **Riconciliazione certa.** Se c'è un riferimento esplicito — la card
+   cita lo `short_ref` o lo slug di un'idea, un'idea cita la chiave della
+   card, o la card è figlia di un'epic già collegata — la card si collega
+   all'idea esistente (o, se figlia, è già tracciata dall'epic) e non
+   nasce nulla di nuovo. Un riferimento è un fatto; una somiglianza no.
+2. **Riconciliazione plausibile.** Le idee che *somigliano* alla card
+   (parole chiave, product line) diventano candidati, mai collegamenti
+   automatici.
+3. **Creazione.** Se la card non si riconcilia, **l'idea si crea
+   comunque** (via `idea-intake` in modalità backfill), con una
+   descrizione sommaria fatta solo dei dati della card: cosa si fa,
+   classificazione (`Bug` → `bug`, il ticket esiste già e non si rifila),
+   scadenza dalla `duedate`, priorità, sprint, fixVersion ed epic nelle
+   note, data di creazione della card come `created_at`, eventuali
+   candidati (`backfill_candidates`). `backfill_review_needed: true`.
+
+Il PM rivede ogni backfill al triage: se un candidato è davvero la stessa
+iniziativa, la card passa a quell'idea e l'abbozzo si rimuove; altrimenti
+conferma o corregge classificazione, product line, descrizione e
+scadenza (o archivia l'idea se è lavoro spurio). Con un cron notturno di
+`delivery-watch` il framework ogni mattina rispecchia su cosa il team sta
+davvero lavorando, senza aspettare la cerimonia. È il complemento della
+modalità Riconciliazione di `jira-sync`, che parte dal verso opposto
+(dalle idee senza card verso Jira).
 
 **Rediscussione esplicita.** `framework/docs/future-work.md` chiedeva che
 un livello di notifiche non fosse "ereditato per default" dalla decisione

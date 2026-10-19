@@ -75,8 +75,13 @@ jira:
 # "Transizioni di delivery rilevanti per gli stakeholder (delivery-watch)".
 delivery_watch:
   enabled: false                  # true per attivare la watch
-  board_jql: ""                   # JQL della board/progetto per intercettare anche card NON collegate a un'idea
-                                  #   (→ backfill automatico dell'idea via idea-intake). "" = solo idee con jira.card_id
+  board_jql: ""                   # JQL dell'AGENDA del team per intercettare anche card NON collegate a un'idea
+                                  #   (→ riconciliazione con le idee esistenti, altrimenti backfill automatico via
+                                  #   idea-intake). Descrive il lavoro in corso, non l'intero backlog, es.
+                                  #   'project = ABC AND (sprint in openSprints() OR statusCategory = "In Progress")'.
+                                  #   "" = solo idee con jira.card_id
+  backfill_scope: "active"        # active = ogni card non collegata di board_jql non ancora done diventa un'idea
+                                  #   (sync con l'agenda del team) | on_event = solo quelle su cui scatta un evento
   default_product_line: ""        # product line assegnata alle idee di backfill quando non inferibile dalla card
   blocked_status_names: []        # nomi di stato che indicano "bloccata" oltre al flag Impediment (es. ["Blocked", "On Hold"])
   review_status_names: []         # nomi di stato che indicano "in review" (es. ["Code Review", "QA"]); [] = ogni stato il cui nome contiene "review"

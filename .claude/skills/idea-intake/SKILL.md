@@ -45,36 +45,65 @@ playbook, "Scrivere per il lettore", tabella "Tipi d'informazione".
 ## Modalità backfill (invocata da `delivery-watch`, non interattiva)
 
 `delivery-watch` invoca questa skill in modalità **backfill** quando
-intercetta attività su una card del tracker di esecuzione **non collegata**
-a nessuna idea — lavoro partito dritto su Jira, fuori dalla governance
+trova sul tracker di esecuzione una card dell'agenda del team **non
+collegata** a nessuna idea e che la riconciliazione non ha ricondotto a
+un'idea esistente — lavoro partito dritto su Jira, fuori dalla governance
 (precedente: `context-watch` → `context-intake` in auto-apply). Non è un
-intake da materiale grezzo: la fonte è una card Jira già letta.
+intake da materiale grezzo: la fonte è una card Jira già letta. Lo scopo
+è che il framework rispecchi l'agenda reale del team: ogni card su cui il
+team lavora ha un'idea, anche se nessuno l'ha mai proposta.
 
 In questa modalità:
 
 - **Nessuna conversazione, nessuna conferma per-elemento.** Si crea
   comunque la cartella idea subito — recuperare il tracciamento è il
   punto; la revisione avviene dopo.
-- **Seed dalla card**: `title` = summary della card; `summary` = una riga
-  dalla description (o dal summary se la description è vuota);
-  `classification` inferita — `issuetype: Bug` → `bug`, altrimenti
-  `idea`; `product_line` inferita dalla card se possibile, altrimenti
-  `delivery_watch.default_product_line` da `.governance/config.yaml`,
-  altrimenti `""`; `proposer` = reporter della card se disponibile,
-  altrimenti `""`.
+- **Seed dalla card** — solo dati presenti sulla card, mai integrati con
+  ipotesi:
+  - `title` = summary della card.
+  - `summary` = **descrizione sommaria** in linguaggio piano, una riga
+    (al massimo due frasi): cosa si fa e per chi, dalla description; se
+    la description è vuota, il summary della card riformulato. Niente
+    gergo della board.
+  - `classification` inferita — `issuetype: Bug` → `bug`, altrimenti
+    `idea`. Per un `bug` il ticket esiste già: **niente filing** (il
+    passo "bug confermato → ticket subito" è già soddisfatto dalla card).
+  - `product_line` inferita da component/label/progetto della card
+    confrontati con i `name` di `product/reference/product-lines.yaml`,
+    altrimenti `delivery_watch.default_product_line`, altrimenti `""`.
+  - `proposer` = reporter della card se disponibile, altrimenti `""`.
+  - `created_at` = data di **creazione della card** (non la data del
+    backfill — stessa regola dell'intake storico: le watch contano il
+    tempo trascorso da qui).
+  - **Scadenza**: se la card ha `duedate` → `deadline.due_date` =
+    quella data, `deadline.note` = `"duedate della card <key> — da
+    confermare al triage del backfill"`. Una `fixVersion` con
+    `releaseDate` **non** è una scadenza (è un'intenzione di rilascio):
+    va in `notes`, non in `deadline`.
+  - `notes` = una riga per ciascun dato utile presente sulla card, nel
+    formato `Jira: <campo> <valore>` — priorità, assegnatario, sprint,
+    fixVersion (con data di rilascio), epic/parent, label rilevanti. Per
+    un bug la priorità e, se c'è, l'ambiente colpito. Se il passo di
+    riconciliazione di `delivery-watch` ha trovato candidati,
+    aggiungi la riga `Possibile duplicato di: <short_ref/slug>, …`.
+- `backfill_candidates` = i candidati passati da `delivery-watch`
+  (idee esistenti che *potrebbero* essere la stessa iniziativa, con il
+  motivo del match), `[]` se nessuno. Non si decide qui: li risolve il
+  PM nel triage del backfill.
 - `source.type: jira_backfill`, `source.ref` = chiave della card (es.
   `EPITA-317`). In `source/` salva un breve `source/jira-<key>.md` con i
   campi letti dalla card (summary, description, issuetype, status,
-  reporter, URL) — non un intero export.
+  priorità, duedate, fixVersion, sprint, epic/parent, assegnatario,
+  reporter, data di creazione, URL) — non un intero export.
 - `jira.card_id` / `jira.url` / `jira.status` popolati dalla card;
   `jira.last_polled_at` = ora. `status` dell'idea: `in_jira` (il lavoro è
   già sul tracker). `rice_history` vuoto, `short_ref: null` (li assegnano
   `rice-update`/`backlog-refinement` come sempre).
 - **`backfill_review_needed: true`** — è ciò che segnala a
   `delivery-watch` (triage) e a `backlog-refinement` che
-  classificazione/product_line/summary sono abbozzati e vanno confermati
-  dal PM (o l'idea archiviata come `declined`/`aborted` se è lavoro
-  spurio).
+  classificazione/product_line/summary/scadenza sono abbozzati e vanno
+  confermati dal PM (o l'idea riconciliata con un candidato, o archiviata
+  come `declined`/`aborted` se è lavoro spurio).
 - **NON** creare un nuovo ticket sul tracker (esiste già), **non**
   compilare `requester_reply`/`clarification`, **non** aprire un
   `deep_dive`.
