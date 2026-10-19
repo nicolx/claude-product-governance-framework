@@ -2109,8 +2109,12 @@ cambiamento, non la durata; è qui, con la valutazione 80/20 in mano, che
 la stima diventa realistica (una stima `rough` del referente tecnico può
 esserci già da `prd-draft`, per collocare l'iniziativa nel trimestre).
 Con le stime in mano, il team **ricalcola il capacity check** del piano
-e decide su ogni competenza oltre capacità — vedi "Capacità del team e
-slot della roadmap". Alimenta `capacity_allocation` e `slot_plan` in
+e decide su ogni competenza oltre capacità, poi vede **in anteprima gli
+slot** che ne risultano: cosa si sposta e perché, quali mandate o
+scadenze diventano a rischio, cosa si allontana dalla roadmap
+trimestrale distribuita. Una stima che fa slittare un impegno si
+discute in questa riunione, non si scopre allo snapshot o in MBR — vedi
+"Capacità del team e slot della roadmap". Alimenta `capacity_allocation` e `slot_plan` in
 `roadmap-snapshot`, in parallelo alle stesse stime nel blocco `platform`
 per le iniziative platform.
 
@@ -2133,8 +2137,8 @@ pattern trascrizione + decisioni strutturate + `.run-meta.yaml`.
 - [ ] Il team tech ha fatto la valutazione 80/20 su ogni storia?
 - [ ] I task sono caricati nel tracker di esecuzione e assegnati? (`team-fit <prd-slug>` propone una shortlist di candidati dal roster; l'assegnazione si decide qui e vive nel tracker)
 - [ ] L'agenda tiene conto del flusso di manutenzione ordinaria/debito tecnico?
-- [ ] Le date di rilascio stimate sono coerenti con quanto discusso?
-- [ ] Gli stakeholder chiave sono stati aggiornati sulle aspettative di delivery?
+- [ ] Le date di rilascio stimate sono coerenti con quanto discusso? (anteprima degli slot dopo le nuove stime: ogni spostamento, e ogni mandate/scadenza diventata a rischio, è stato discusso?)
+- [ ] Gli stakeholder chiave sono stati aggiornati sulle aspettative di delivery? (le voci che si allontanano dalla roadmap trimestrale distribuita sono tra le azioni aperte del PM)
 - [ ] Le iniziative in iterazione hanno una stima `committed` per competenza (`effort_by_competency` + `estimated_effort_weeks`)?
 - [ ] Il piano sta nella capacità del team per ogni competenza, o lo sforamento è stato deciso e registrato (`capacity_overrides`)?
 - [ ] `team.yaml` riflette il team di questa settimana (ingressi/uscite, assenze note)?

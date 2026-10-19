@@ -11,7 +11,7 @@
 # Refinement".
 #
 # Uso:
-#   governance-dump.sh sweep         # tutto il quadro per il Backlog Refinement (default; + scarti con risposta non inviata, team.yaml, ultimo snapshot)
+#   governance-dump.sh sweep         # tutto il quadro per il Backlog Refinement (default; + scarti con risposta non inviata, team.yaml, ultimo snapshot, report distribuiti)
 #   governance-dump.sh backlog       # idee + coda di approvazione + ultimo snapshot (slot_plan) (per backlog-list)
 #   governance-dump.sh ideas [--all] # le idea.yaml (attive; --all include declined/aborted)
 #   governance-dump.sh measurements  # product/prds/*/measurement*.yaml
@@ -206,6 +206,7 @@ case "$MODE" in
     emit_glob "product/prds" 'measurement*.yaml'
     emit_iterations
     emit_latest_snapshot   # slot_plan precedente: le iniziative in sviluppo ne ereditano lo slot
+    emit_distributed_reports  # la roadmap trimestrale distribuita: la promessa contro cui misurare gli slot
     emit_pending
     emit_reports_index
     footer

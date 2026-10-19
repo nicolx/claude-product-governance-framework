@@ -1,6 +1,6 @@
 ---
 name: iteration-planning
-description: Conduce e registra il meeting di Roadmap Update & Iteration Planning — qualche giorno dopo il Backlog Refinement, quando il team tech conferma l'agenda concreta, fa la valutazione 80/20 rischio-rendimento sulle user story, stima la delivery delle iniziative in iterazione per competenza (persona-settimane + durata), verifica che il piano stia nella capacità reale del team (team.yaml) registrando ogni sforamento accettato, conferma/aggiusta il Piano di Iterazione (spostamenti tra bucket → proposta aggiornata in pending/) e dichiara la capacità dedicata al debito tecnico. Punto d'ingresso dedicato: fissa ceremony_type e periodo, poi delega a log-ceremony per la registrazione.
+description: Conduce e registra il meeting di Roadmap Update & Iteration Planning — qualche giorno dopo il Backlog Refinement, quando il team tech conferma l'agenda concreta, fa la valutazione 80/20 rischio-rendimento sulle user story, stima la delivery delle iniziative in iterazione per competenza (persona-settimane + durata), verifica che il piano stia nella capacità reale del team (team.yaml) registrando ogni sforamento accettato, mostra in anteprima come le nuove stime spostano gli slot della roadmap (mandate/scadenze a rischio, scostamenti dalla roadmap trimestrale distribuita), conferma/aggiusta il Piano di Iterazione (spostamenti tra bucket → proposta aggiornata in pending/) e dichiara la capacità dedicata al debito tecnico. Punto d'ingresso dedicato: fissa ceremony_type e periodo, poi delega a log-ceremony per la registrazione.
 ---
 
 # iteration-planning
@@ -39,6 +39,11 @@ in aggiunta, i passi specifici sotto.
    connettori esterni (`jira`, `metrics`), **verificali** con lo stesso
    criterio del Backlog Refinement (playbook, "Connettori esterni:
    dichiarati, verificati a inizio processo, mai un fallback silenzioso").
+   Poi leggi in blocco con `bash .claude/hooks/governance-dump.sh sweep`:
+   idee, piani, coda `pending/`, `team.yaml` (l'offerta), l'ultimo
+   snapshot approvato (lo `slot_plan` di partenza) e i metadati delle
+   roadmap distribuite (la promessa fatta agli stakeholder) in una tool
+   call.
 
 2. **Carica il Piano di Iterazione della settimana.** Cerca, nell'ordine:
    una proposta `type: iteration_plan` per questa settimana in
@@ -53,7 +58,10 @@ in aggiunta, i passi specifici sotto.
    **Checkpoint** (playbook, "Diritto di parola dopo ogni passo"): mostra
    i quattro bucket con l'identificatore in prima colonna, `summary` e
    R · I · C · E + RICE totale (playbook, "Ogni riga che parla di un'idea si capisce da sola"), il
-   `tech_reference` (referente tecnico) accanto a ogni voce, e apri il
+   `tech_reference` (referente tecnico) accanto a ogni voce, lo **slot
+   attuale** dallo `slot_plan` dell'ultimo snapshot approvato (*sviluppo
+   W46–W50 (stima)*, *slitta per {competenza}*, *da dimensionare*, *oltre
+   il trimestre* — come in `iteration-board`), e apri il
    diritto di parola prima di procedere alle stime. Se una voce con un
    PRD non ha `tech_reference`, segnalalo — il team può assegnarlo ora
    (passo 4).
@@ -134,12 +142,41 @@ in aggiunta, i passi specifici sotto.
    `over_capacity_decision` e in `decisions.yaml` (`capacity_overrides`)
    — **mai presunti**. Una decisione di sforamento già presa al Backlog
    Refinement resta valida solo se il quadro non è peggiorato: se la
-   domanda è cresciuta, richiedila. È anche il momento per un'anteprima
-   di **quando** atterrano le voci in `analysis_todo`: applica lo
-   slotting dello snapshot (stesso algoritmo) e mostra inizio/fine
-   stimati — utile per rispondere alla domanda della checklist sulle date
-   di rilascio, senza scrivere nulla (lo slot plan vero lo produce
-   `roadmap-snapshot`).
+   domanda è cresciuta, richiedila.
+
+4c. **Slot dopo le nuove stime.** Le stime `committed` del passo 3 e i
+   bucket del passo 4 spostano gli slot: è qui che il team vede *subito*
+   cosa la sua stima significa in date, invece di scoprirlo dallo
+   snapshot. Applica lo slotting di `roadmap-snapshot` (playbook,
+   "Capacità del team e slot della roadmap" — stesso ordine, stessa
+   regola di collocazione, stesso orizzonte) sullo stato appena
+   aggiornato, **in memoria**, e confrontalo con lo `slot_plan`
+   dell'ultimo snapshot approvato. Mostra solo ciò che cambia:
+   - voci la cui fine stimata si sposta di almeno 2 settimane — *PG-042
+     fine W48 → W51*, con la causa: *nuova stima*, *capacità
+     {competenza}* (un'altra voce ha preso la capacità), *riordino del
+     piano*;
+   - voci che entrano o escono dal trimestre, o diventano `infeasible`;
+   - **mandate e deadline che diventano `at_risk`** (fine stimata oltre
+     la `due_date`), in evidenza: è il momento di decidere — ridurre lo
+     scope con l'80/20, anticiparle nel piano, o accettare il rischio e
+     dirlo;
+   - voci che si allontanano dalla **roadmap trimestrale distribuita**
+     (stesso confronto di "Rispetto alla roadmap del trimestre"
+     nell'aggiornamento settimanale): sono le aspettative degli
+     stakeholder da riallineare (checklist del playbook).
+   **Checkpoint**: la parola al team su ogni spostamento prima del passo
+   5 — una stima che fa slittare un mandate si discute ora, non si
+   scopre in MBR. Registra in `decisions.yaml` una `decision` per ogni
+   spostamento discusso (cosa si è deciso, `impacts.idea_ids`). Non
+   scrivi nessuno slot: lo `slot_plan` ufficiale lo produce
+   `roadmap-snapshot` con lo stesso algoritmo — se i dati non cambiano
+   nel frattempo, darà gli stessi numeri. Non prepari comunicazioni:
+   gli stakeholder da riallineare finiscono tra le azioni aperte del PM
+   nel riepilogo, e lo spostamento comparirà comunque nell'aggiornamento
+   settimanale dopo lo snapshot. Se `team.yaml` non ha capacità o non
+   c'è uno snapshot precedente, dillo e salta il confronto (mostra solo
+   gli slot calcolati, se c'è la capacità).
 
 5. **Produci la proposta di Piano di Iterazione aggiornata**, se il passo
    3, il passo 4 o il 4b hanno cambiato qualcosa (stime di delivery
@@ -186,4 +223,7 @@ in aggiunta, i passi specifici sotto.
   `pending-approval` la rigenera di nuovo.
 - Il passo naturale successivo è un nuovo **`roadmap-snapshot`** che tiene
   conto del Piano di Iterazione rifinito, delle stime di delivery
-  raccolte e della capacità platform dichiarata.
+  raccolte e della capacità platform dichiarata: rende ufficiale lo
+  `slot_plan` che il passo 4c ha mostrato in anteprima, e alla sua
+  approvazione `pending-approval` prepara l'aggiornamento settimanale con
+  gli spostamenti discussi qui.
