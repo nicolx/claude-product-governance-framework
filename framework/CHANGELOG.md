@@ -69,8 +69,13 @@ Tipi di impatto:
   `duedate`, priorità, sprint, fixVersion ed epic nelle note, data di
   creazione della card. Nel triage del backfill il PM risolve i possibili
   duplicati (la card passa all'idea giusta, l'abbozzo si rimuove) e
-  conferma la scadenza. Con un cron notturno il framework ogni mattina
-  rispecchia su cosa il team sta lavorando.
+  conferma la scadenza. Si automatizza solo il caso univoco: un
+  riferimento ambiguo, a un'idea chiusa o a un'idea che ha già un'altra
+  card, o un giro che creerebbe più di `backfill_max_per_run` idee
+  (default 10), lascia la card **in sospeso** (`backfill_held` in
+  `product/reference/delivery-watch.yaml`) senza scrivere nulla, e la
+  decide il PM; l'hook la ricorda. Con un cron notturno il framework
+  ogni mattina rispecchia su cosa il team sta lavorando.
 - **Cosa fare nell'istanza**: solo se `delivery_watch.board_jql` è
   valorizzata. Controlla che descriva l'agenda del team e non l'intero
   backlog (es. `project = ABC AND (sprint in openSprints() OR

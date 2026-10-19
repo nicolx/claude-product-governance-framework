@@ -97,3 +97,22 @@ queue: []
 #   sent_at: null           # data dichiarata dal PM dopo l'invio manuale (triage_status: sent)
 #   dismiss_reason: null    # se dismissed: perché il PM non comunica questo evento
 #   notes: null
+
+# CARD IN SOSPESO — card non collegate dell'agenda (board_jql) su cui il
+# backfill NON è andato liscio, quindi delivery-watch non ha scritto nulla
+# (né collegamento né idea nuova): lo decide il PM. Si automatizza solo il
+# caso univoco. Ogni giro rivaluta le voci held (card collegata nel
+# frattempo o uscita da board_jql → resolved, superseded). Le voci non si
+# cancellano. L'hook check-delivery-queue.sh conta le held.
+backfill_held: []
+# Esempio di singola voce:
+# - card_id: ""             # chiave del ticket — una voce per card
+#   url: ""
+#   card_summary: ""        # summary della card, per riconoscerla senza aprire Jira
+#   reason: ""              # ambiguous_reference | idea_has_other_card | idea_closed | too_many
+#   detail: ""              # una riga: es. "citata da PG-012 e PG-031", "PG-007 è done dal 2026-05-02"
+#   ideas_involved: []      # slug delle idee coinvolte (vuoto per too_many)
+#   first_held_at: ""       # ISO del primo giro che l'ha sospesa
+#   hold_status: held       # held | resolved
+#   resolution: null        # le parole del PM, o "superseded" se risolta da sola (card collegata / uscita dalla board)
+#   resolved_at: null

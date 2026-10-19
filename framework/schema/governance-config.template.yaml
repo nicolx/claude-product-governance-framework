@@ -82,6 +82,8 @@ delivery_watch:
                                   #   "" = solo idee con jira.card_id
   backfill_scope: "active"        # active = ogni card non collegata di board_jql non ancora done diventa un'idea
                                   #   (sync con l'agenda del team) | on_event = solo quelle su cui scatta un evento
+  backfill_max_per_run: 10        # oltre questo numero di idee da creare in un giro non se ne crea nessuna: le card
+                                  #   restano in sospeso (backfill_held) e decide il PM — tipico del primo giro o di una JQL troppo larga
   default_product_line: ""        # product line assegnata alle idee di backfill quando non inferibile dalla card
   blocked_status_names: []        # nomi di stato che indicano "bloccata" oltre al flag Impediment (es. ["Blocked", "On Hold"])
   review_status_names: []         # nomi di stato che indicano "in review" (es. ["Code Review", "QA"]); [] = ogni stato il cui nome contiene "review"

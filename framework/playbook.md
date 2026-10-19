@@ -2792,6 +2792,16 @@ che si muovono):
    note, data di creazione della card come `created_at`, eventuali
    candidati (`backfill_candidates`). `backfill_review_needed: true`.
 
+**Si automatizza solo ciò che scorre senza intoppi.** Il collegamento
+per riferimento e la creazione partono da soli solo quando la strada è
+univoca. Un riferimento che punta a più idee, a un'idea chiusa o a
+un'idea che ha già un'altra card, o un giro che creerebbe più idee di
+`backfill_max_per_run` (di solito il primo giro, o una JQL più larga
+dell'agenda), non si risolve con un default: la card resta **in
+sospeso** (`backfill_held` in `product/reference/delivery-watch.yaml`),
+nessuna scrittura, e la decide il PM — subito se è in conversazione,
+altrimenti nel triage; l'hook la ricorda a inizio sessione.
+
 Il PM rivede ogni backfill al triage: se un candidato è davvero la stessa
 iniziativa, la card passa a quell'idea e l'abbozzo si rimuove; altrimenti
 conferma o corregge classificazione, product line, descrizione e

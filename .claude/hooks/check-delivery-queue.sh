@@ -2,7 +2,8 @@
 # Promemoria (non bloccante): quante transizioni di delivery rilevate da
 # delivery-watch aspettano il PM — bozze di mail pronte da mandare
 # (drafted) e voci da smarcare (pending) — e da quanto tempo
-# delivery-watch non gira.
+# delivery-watch non gira, più le card dell'agenda non tracciate rimaste in
+# sospeso (backfill_held: hold_status held).
 #
 # Perché serve. delivery-watch scrive gli eventi del tracker di esecuzione
 # (bug risolto, in sviluppo, bloccata, in produzione, regressione) in una
@@ -49,6 +50,9 @@ count_status() {
 DRAFTED="$(count_status drafted)"
 PENDING="$(count_status pending)"
 OPEN=$(( DRAFTED + PENDING ))
+# Card dell'agenda in sospeso: backfill non univoco, lo decide il PM.
+HELD="$(grep -cE "^[[:space:]]*(- )?hold_status:[[:space:]]*held[[:space:]]*(#.*)?$" "$STATE" 2>/dev/null || true)"
+case "$HELD" in ''|*[!0-9]*) HELD=0 ;; esac
 
 # Giorni dall'ultimo giro (last_watch.run_at, prime 10 cifre della data).
 RUN_AT="$(sed -n 's/^[[:space:]]*run_at:[[:space:]]*"\{0,1\}\([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\).*/\1/p' "$STATE" | head -n1)"
@@ -62,7 +66,7 @@ if [ -n "$RUN_AT" ]; then
 fi
 
 # Niente in coda e giro recente → silenzio.
-if [ "$OPEN" -eq 0 ] && { [ -z "$DAYS" ] || [ "$DAYS" -lt 7 ]; }; then
+if [ "$OPEN" -eq 0 ] && [ "$HELD" -eq 0 ] && { [ -z "$DAYS" ] || [ "$DAYS" -lt 7 ]; }; then
   exit 0
 fi
 
@@ -79,6 +83,9 @@ if [ "$OPEN" -gt 0 ]; then
   MSG="$MSG $PARTS in \`product/reference/delivery-watch.yaml\`"
 else
   MSG="$MSG coda di triage vuota"
+fi
+if [ "$HELD" -gt 0 ]; then
+  if [ "$HELD" -eq 1 ]; then MSG="$MSG · 1 card Jira non tracciata in sospeso (decidi tu come collegarla)"; else MSG="$MSG · $HELD card Jira non tracciate in sospeso (decidi tu come collegarle)"; fi
 fi
 [ -n "$DAYS" ] && MSG="$MSG · ultimo giro $DAYS gg fa ($RUN_AT)"
 

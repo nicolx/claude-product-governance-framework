@@ -165,6 +165,8 @@ per raccogliere:
        dell'agenda diventa un'idea, il framework resta allineato a ciò
        su cui il team lavora davvero) o `on_event` (solo le card che si
        muovono — per una `board_jql` larga);
+     - `backfill_max_per_run` — oltre quante idee nuove in un giro il
+       backfill si ferma e lascia decidere il PM (default 10);
      - `default_product_line` — a quale product line assegnare le idee
        create per backfill quando non è inferibile dalla card;
      - `blocked_status_names` / `regression_labels` — se la board usa

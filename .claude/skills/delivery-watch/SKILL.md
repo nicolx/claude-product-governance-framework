@@ -179,6 +179,16 @@ e le label (item non di stato) producono gli eventi indicati sotto.
    creazione. Ogni card si tratta una volta sola: dal giro successivo è
    collegata a un'idea ed entra nel perimetro di default.
 
+   **Si automatizza solo il caso che scorre senza intoppi.** Ogni volta
+   che la strada non è univoca — un riferimento che punta a più idee, a
+   un'idea chiusa o a un'idea che ha già un'altra card, o un giro che
+   creerebbe troppe idee insieme — la watch **non scrive nulla** su
+   idee e card: mette la card in `backfill_held[]` di
+   `product/reference/delivery-watch.yaml` con il motivo, e la decide il
+   PM (in un run interattivo subito, altrimenti nel triage). Un run non
+   presidiato (cron) non risolve mai un intoppo da solo, né con un
+   default.
+
    a. **Riconciliazione certa → collega, non creare.** Una card è
       certamente di un'idea esistente se c'è un **riferimento esplicito**,
       non una somiglianza: la card cita lo `short_ref` (`PG-042`) o lo
@@ -188,14 +198,21 @@ e le label (item non di stato) producono gli eventi indicati sotto.
       di una card già collegata a un'idea. Nel caso **figlia**, il lavoro
       è già tracciato dall'idea dell'epic: niente idea nuova, niente
       scrittura — una riga nel recap. Negli altri casi, se l'idea ha
-      `jira.card_id: null`, scrivi `jira.card_id`/`url`/`status`/
-      `last_polled_at` sull'idea (fatto osservato, stessa esenzione di
-      `jira-sync`; **non** toccare `status` dell'idea: l'allineamento lo
-      conferma il PM, come nella Riconciliazione di `jira-sync`, passo
-      4); se l'idea ha già un'altra card, non sovrascrivere — riporta il
-      caso nel recap come card aggiuntiva della stessa idea. Più idee che
-      rivendicano la stessa card → nessuna scrittura, passa al punto b
-      con quelle idee come candidati.
+      `jira.card_id: null` ed è attiva (non `done`/`declined`/
+      `aborted`), scrivi `jira.card_id`/`url`/`status`/`last_polled_at`
+      sull'idea (fatto osservato, stessa esenzione di `jira-sync`;
+      **non** toccare `status` dell'idea: l'allineamento lo conferma il
+      PM, come nella Riconciliazione di `jira-sync`, passo 4). La chiave
+      si cerca a parola intera (`ABC-12` non è `ABC-123`). Intoppi →
+      `backfill_held[]`, nessuna scrittura e nessuna idea creata:
+      - più idee rivendicano la stessa card → `reason:
+        ambiguous_reference`;
+      - l'idea citata ha già un'altra card → `reason:
+        idea_has_other_card` (card aggiuntiva della stessa iniziativa o
+        lavoro distinto? lo dice il PM);
+      - l'idea citata è `done`/`declined`/`aborted` → `reason:
+        idea_closed` (lavoro ripartito su un'idea chiusa: riaprirla,
+        farne una nuova o è un seguito? lo dice il PM).
    b. **Riconciliazione plausibile → candidati.** Cerca tra le idee non
       `declined`/`aborted`/`done` e senza `jira.card_id` quelle che
       potrebbero essere la stessa iniziativa (parole chiave di summary e
@@ -203,7 +220,15 @@ e le label (item non di stato) producono gli eventi indicati sotto.
       product line). Sono **ipotesi**: non si collega nulla, si
       passano a `idea-intake` come `backfill_candidates` (`idea_id` +
       motivo del match in una riga). Le risolve il PM nel triage.
-   c. **Crea l'idea**: invoca `idea-intake` in **modalità backfill** (non
+   c. **Tetto per giro.** Se le card da creare in questo giro sono più
+      di `delivery_watch.backfill_max_per_run` (default 10), non crearne
+      nessuna: è il segno di una `board_jql` più larga dell'agenda (o del
+      primo giro su una board già piena). Vanno tutte in
+      `backfill_held[]` con `reason: too_many`. In un run interattivo
+      chiedi subito al PM: creare tutte, solo alcune, o correggere la
+      `board_jql` / passare a `backfill_scope: on_event`. Sotto il
+      tetto, procedi.
+   d. **Crea l'idea**: invoca `idea-intake` in **modalità backfill** (non
       interattiva) passando la card e gli eventuali candidati.
       `idea-intake` crea `product/ideas/{data}-{slug}/` con
       `source.type: jira_backfill`, `source.ref` = chiave card,
@@ -214,6 +239,12 @@ e le label (item non di stato) producono gli eventi indicati sotto.
       di questo giro sulla card si associano all'idea nuova
       (`backfilled_idea: true`); senza eventi la card entra comunque in
       `tickets[]` come baseline.
+
+   **Ogni giro rivaluta `backfill_held[]`**: una voce `held` la cui card
+   nel frattempo è stata collegata a un'idea (dal PM o da `jira-sync`), o
+   è uscita da `board_jql`, passa a `hold_status: resolved` con
+   `resolution: superseded`; le altre restano, senza duplicarle (chiave =
+   `card_id`). Le voci `resolved` non si cancellano (audit).
 
    Con `backfill_scope: on_event`, una card non collegata senza eventi
    in questo giro **non** si tratta (né riconciliazione né creazione).
@@ -326,6 +357,10 @@ e le label (item non di stato) producono gli eventi indicati sotto.
       **idee create per backfill** — slug, card, `summary`,
       classificazione e scadenza abbozzate, ed eventuali possibili
       duplicati. Ricorda al PM di rivederle al triage.
+    - **Card in sospeso** (`backfill_held[]` `held`): chiave, summary
+      della card, motivo in parole semplici, da quando. In un run
+      interattivo risolvile adesso con il PM (stesse scelte del triage,
+      passo 3b); in un run non presidiato elencale e basta.
     - **Coda**: bozze pronte da mandare (`drafted`) e voci da smarcare
       (`pending`), comprese quelle dei run precedenti — con l'invito a
       mandarle: ogni movimento ha il suo aggiornamento.
@@ -451,6 +486,25 @@ e le label (item non di stato) producono gli eventi indicati sotto.
      PM); se è lavoro spurio → `status: declined`/`aborted` +
      `decline_reason`. In ogni caso azzera `backfill_review_needed`.
 
+3b. **Per ogni voce `backfill_held[]` con `hold_status: held`** — il PM
+   sceglie, la skill applica, la voce passa a `resolved` con
+   `resolution` (una riga, le parole del PM) e `resolved_at`:
+   - `ambiguous_reference` → quale delle idee citate è quella giusta
+     (collega come al passo 6a) o nessuna (crea il backfill, passo 6d);
+   - `idea_has_other_card` → stessa iniziativa (la card si annota in
+     `notes` dell'idea come card aggiuntiva; resta fuori da
+     `jira.card_id`, che è una sola) o lavoro distinto (crea il
+     backfill);
+   - `idea_closed` → riaprire l'idea (collega la card; lo `status`
+     torna a uno attivo solo su conferma del PM, e per un'idea `done`
+     la misurazione già chiusa resta com'è), farne una nuova (crea il
+     backfill, con l'idea chiusa in `notes`), o lavoro spurio;
+   - `too_many` → creare tutte (passo 6d, senza tetto per questo giro),
+     solo quelle indicate dal PM (le altre `resolved` con `resolution:
+     escluse dal PM`), o correggere `board_jql`/`backfill_scope` (lo fa
+     il PM, la config non la scrive questa skill — le voci restano
+     `held` e il giro successivo le rivaluta).
+
 4. **Sincronizza il repo**:
    `bash .claude/hooks/governance-sync.sh push "delivery-watch: triage — <k> bozze, <s> inviate, <j> dismiss, <d> idee done" product/reference/delivery-watch.yaml product/ideas/`.
 
@@ -500,6 +554,9 @@ verità per l'esecuzione.
 - **Mai collegare una card a un'idea per somiglianza.** Solo un
   riferimento esplicito collega da solo (passo 6a); una somiglianza è un
   candidato che decide il PM.
+- **Mai risolvere un intoppo del backfill in un run non presidiato.**
+  Riferimento ambiguo, idea chiusa o con un'altra card, troppe idee in
+  un giro → `backfill_held[]`, nessuna scrittura, nessun default.
 - **Mai archiviare (dismiss) un `delivered`/`bug_resolved`** e mai
   scrivere `status: done` senza una voce `conclusion_notices` `sent` o
   `waived` — e mai un `waived` senza motivo dato dal PM.
