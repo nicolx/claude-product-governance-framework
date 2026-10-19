@@ -53,6 +53,7 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `product/ideas/*/deadline.due_date`, `product/ideas/*/deadline.note` | Istanza | Qualunque skill che la incontra in conversazione (tipicamente `idea-intake`/`inbox-triage` all'origine) — cattura di un fatto dichiarato dal PM, mai presunto; impostarlo non cambia la priorità, stessa logica di `rice_status`, nessuna approvazione |
 | `product/ideas/*/deadline.escalation_status`, `deadline.escalation_basis`, `deadline.start_by` | Istanza | Solo `deadline-watch` (dal calendario, dalla durata stimata e dallo `slot_plan` dell'ultimo snapshot approvato) — fatto calcolato, scrittura diretta senza approvazione (stesso principio di `mandate.escalation_status`) |
 | `product/prds/*/README.md` (brief d'iniziativa), `product/prds/*/allegato-*.md`, `product/prds/*/assets/` | Istanza | `prd-draft` (il brief anche in bozza dalla Preliminary analysis) — creazione diretta come i PRD, non passa da approvazione. Devono reggersi senza la sessione che li ha scritti (playbook, "Scrivere per il lettore", P7) |
+| `product/ideas/*/discovery/` (`questions.yaml`, guide `{YYYY-MM-DD}-{interlocutore}.md`) | Istanza, **tracciata da git** | `discovery-questions` (proprietario), più `idea-intake`/`inbox-triage` (domande del deep dive all'intake), `backlog-refinement` (domande delle idee che entrano in analisi, stati al checkpoint della sweep), `prd-draft` (lacune di stesura e della lettura a freddo) — registro delle domande di Discovery per gli stakeholder e guide degli incontri. Registro del lavoro di analisi, scrittura diretta, non passa da `pending/` (stessa logica di `key-points.yaml`); ciò che una risposta **cambia** segue la regola del suo target (RICE via `rice-update` → `pending/`, mandate via `mandate_update`, contesto via `context-intake`, identikit via `stakeholder-profile` su conferma). L'invito/pre-read nella guida è una bozza che il PM manda a mano (stessa logica di `requester_reply`); nessun contenuto del rapporto individuale entra mai nella guida — vedi playbook, "Discovery socratica: le domande agli stakeholder" |
 | `product/prds/*/.reviews/` | Istanza, **tracciata da git** | Solo `prd-draft`: esito delle letture a freddo (chi ha letto cosa, lacune → correzioni, domande residue). Fatto osservato, scrittura diretta. Non scritto in dry-run |
 | `product/ideas/*/source/key-points.yaml` | Istanza | `idea-intake`/`inbox-triage` all'origine; `prd-draft` aggiorna `status`/`covered_by`/`exclusion_reason` e aggiunge i punti nati dall'analisi o dalle decisioni del PM. Un'esclusione è confermata dal PM in conversazione. Scrittura diretta (registro del lavoro, non decisione di priorità) |
 | `product/prds/*/measurement*.yaml` (creazione) | Istanza | Solo `prd-draft`, contestualmente alla creazione del PRD — non passa da approvazione (stessa logica della creazione di idee/PRD) |
@@ -215,8 +216,8 @@ commit remoto senza committare il puntatore. Vedi playbook, sezione
 "Sincronizzazione dell'istanza (`origin`)".
 
 Helper gemello per la **lettura in blocco**: `.claude/hooks/governance-dump.sh`
-(`sweep`|`backlog`|`ideas`|`measurements`|`iterations`|`pending`|
-`reference`|`delivery`) concatena in **una sola tool call** i file YAML rilevanti,
+(`sweep`|`backlog`|`ideas`|`discovery`|`measurements`|`iterations`|
+`pending`|`reference`|`delivery`) concatena in **una sola tool call** i file YAML rilevanti,
 così una skill non fa glob-e-leggi-ognuna N volte. Sola lettura, no-op sul
 canonico. La sweep di apertura del Backlog Refinement lo usa una volta e
 calcola tutte le watch inline; le scritture risultanti

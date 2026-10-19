@@ -186,8 +186,8 @@ Tre macro fasi di lavoro per ogni prodotto:
 | Ideas intake | As needed | PM, PMM, Design/Discovery, Users, Leaders | Lista non ordinata di richieste; bug loggati direttamente nel tracker di esecuzione; Strategic Exception approvate |
 | Ideas prioritization | ASAP | PM, IT, Leaders | Lista prioritizzata (RICE) |
 | Product Backlog Refinement | Settimanale | PM, IT | Piano di Iterazione (4 bucket, diff dalla settimana prima) |
-| Preliminary analysis | ASAP dopo il Refinement | PM, IT, Domain expert | Why chiaro; decisione di procedere o abort |
-| Complete analysis | ASAP dopo la Preliminary | PM, Domain expert, Leaders | What/GTM, metriche, PRD; decisione di procedere (+ROI) |
+| Preliminary analysis | ASAP dopo il Refinement | PM, IT, Domain expert, Stakeholder | Why chiaro; domande per gli stakeholder e risposte recepite; decisione di procedere o abort |
+| Complete analysis | ASAP dopo la Preliminary | PM, Domain expert, Leaders, Stakeholder | What/GTM, metriche, PRD; domande residue chiuse o dichiarate; decisione di procedere (+ROI) |
 | Roadmap update | Settimanale | PM | Report su cosa conta per Prodotto e IT; snapshot roadmap; viste per gli stakeholder dai modelli di reporting dichiarati |
 | Iteration planning | Settimanale | PM, Design, IT | User stories, valutazione 80/20, Piano di Iterazione confermato/aggiustato |
 | Product Design | ASAP se necessario | Designer | Design pronto per l'implementazione |
@@ -875,7 +875,8 @@ della misurazione generano un avviso obbligatorio agli stakeholder — vedi
 Ogni bozza che il framework prepara perché il PM la mandi dal **suo**
 client di posta — `requester_reply`, `followup_replies`,
 `clarification.draft_message`, le mail di `delivery-watch`, gli avvisi
-di `conclusion_notices` — deve arrivare al PM **già leggibile** e
+di `conclusion_notices`, gli inviti e i pre-read degli incontri di
+Discovery — deve arrivare al PM **già leggibile** e
 passare nel client con **un solo copia-incolla**, senza ritocchi di
 formato. Il PM rivede e adatta il contenuto; non deve ripulire il testo.
 
@@ -1137,7 +1138,11 @@ non le sblocca — le sblocca solo il PM che fissa quel meeting. Vanno
 marcate esplicitamente (`rice_status.deep_dive`) all'intake o quando
 `rice-watch` le rileva, e `rice-watch` le tiene in cima ai suoi
 promemoria — con un'escalation se il meeting è riconosciuto necessario da
-settimane e non è ancora nemmeno in calendario.
+settimane e non è ancora nemmeno in calendario. Il meeting non si
+improvvisa: le domande per quotare Reach, Impact e Confidence sono già
+nel registro dalla presa in carico, e dopo l'incontro le risposte si
+recepiscono prima di proporre il RICE (vedi "Discovery socratica: le
+domande agli stakeholder").
 
 Lo slot plan ("Capacità del team e slot della roadmap") aggiunge due
 segnali a questo controllo. Un'idea senza RICE che ha già uno slot —
@@ -1611,7 +1616,9 @@ iniziare a sviluppare, ma probabilmente mancano molte informazioni.
 È il momento di rispondere ai quesiti chiave che guidino la comprensione
 del problema. Finora il Prodotto ha accettato senza troppe domande le
 proposte degli stakeholder (o le proprie intuizioni). Inizia la fase di
-messa in discussione.
+messa in discussione — con metodo socratico, e sempre con le domande
+giuste per gli stakeholder coinvolti (vedi "Discovery socratica: le
+domande agli stakeholder", sotto).
 
 Il primo obiettivo è compilare il box del **Why**. Tempo stimato: 15
 minuti. In 15 minuti bisogna capire se la richiesta ha coerenza con la
@@ -1651,6 +1658,189 @@ comunque prima dei PRD.
 - [ ] Ci sono segnali tecnici evidenti che potrebbero cambiare il ROI?
 - [ ] La decisione di procedere o abortire è stata registrata?
 - [ ] Se si procede: il team tech è stato informato che l'analisi completa inizierà a breve?
+- [ ] Le domande per gli stakeholder sono state raccomandate (`discovery-questions`), il prossimo incontro ha una guida, e le risposte già avute sono state recepite e propagate?
+
+## Discovery socratica: le domande agli stakeholder
+
+*"Non posso insegnare niente a nessuno, posso solo farli pensare." —
+attribuita a Socrate*
+
+Ogni fase di analisi si chiude solo con informazioni che il PM non ha:
+il dato che conosce il richiedente, il vincolo che conosce Legal, il
+comportamento che conosce chi sta a contatto con gli utenti. Il
+framework quindi, **in ogni fase di analisi, raccomanda sempre le domande
+da porre agli stakeholder coinvolti**, prepara il prossimo incontro, e
+dopo l'incontro **recepisce le risposte e aggiorna tutti i materiali**.
+Non è un passo facoltativo: un'analisi che non ha chiesto niente a
+nessuno ha solo riorganizzato le ipotesi di partenza.
+
+Le fasi di analisi a cui si applica:
+
+| Fase | Quando | Domanda guida |
+|---|---|---|
+| `deep_dive` | idea senza RICE con `rice_status.deep_dive.needed` | cosa serve sapere per quotare Reach/Impact/Confidence onestamente? |
+| `preliminary` | idea in *analisi da avviare*, brief `stage: preliminary` | qual è il problema reale, e regge contro la strategia? (Why) |
+| `complete` | brief da completare, PRD in stesura | cosa va fatto, per chi, come lo misuriamo, come lo comunichiamo? (What, KPI, GTM) |
+| `prd_review` | PRD `draft`/`in_review` con domande residue della lettura a freddo | cosa non regge per chi deve costruirlo o approvarlo? |
+| `measurement` | idea `done` con misurazione aperta | l'impatto atteso si è visto? cosa ci dicono le persone, oltre ai numeri? |
+
+### Perché il metodo socratico
+
+Il metodo socratico non è "fare tante domande": è **far emergere il
+sapere dell'interlocutore mettendo alla prova, con rispetto, ciò che si
+dà per scontato** — il suo e il nostro. Due mosse classiche, tradotte nel
+lavoro di prodotto:
+
+- **maieutica** — l'interlocutore arriva da solo al problema, raccontando
+  casi concreti, invece di confermare la soluzione che gli si propone.
+  Uno stakeholder che chiede "un report" spesso, raccontando l'ultima
+  volta in cui gli è mancato, scopre che gli serve una decisione più
+  rapida, non un report;
+- **elenchos** (la verifica per conseguenze) — se un'affermazione è vera,
+  qualcos'altro dev'essere osservabile; se non lo è, c'è una
+  contraddizione da capire. "Se il 30% dei clienti abbandona per questo,
+  dovremmo vederlo nei ticket di supporto: li vediamo?" Lo scopo è
+  capire, mai vincere la discussione.
+
+Il PM parte da una posizione di **ignoranza dichiarata** ("aiutami a
+capire"): è la postura che fa parlare le persone e che protegge dal bias
+di conferma — chi propone un'idea e chi la deve valutare tendono
+entrambi a sentire ciò che si aspettano.
+
+### Le sei famiglie di domande
+
+| Famiglia (`socratic_kind`) | Serve a | Esempi |
+|---|---|---|
+| `clarification` — chiarire i concetti | un termine vago, un "tutti", un "sempre" | "Cosa intende esattamente per cliente attivo?" · "Mi fa un esempio?" |
+| `assumption` — far emergere le assunzioni | un'ipotesi data per scontata | "Cosa stiamo dando per scontato perché funzioni?" · "Cosa succederebbe se non fosse vero?" |
+| `evidence` — ragioni ed evidenze | un numero o una convinzione senza fonte | "Mi racconta l'ultima volta che è successo?" · "Da dove viene questo dato, chi lo misura?" |
+| `viewpoint` — punti di vista alternativi | un attore mai sentito, una visione unica | "Come la vedrebbe chi paga il rinnovo?" · "Chi non sarebbe d'accordo, e perché?" |
+| `implication` — implicazioni e conseguenze | una soluzione già decisa, un impatto atteso | "Se lo facessimo, cosa cambierebbe per lei il giorno dopo?" · "Come ci accorgeremmo che ha funzionato?" |
+| `meta` — domande sulla domanda | un problema mal posto, una priorità non chiara | "Perché è importante risolverlo adesso?" · "È la domanda giusta, o ce n'è una prima?" |
+
+La famiglia si sceglie **dal tipo di lacuna**, non dalla varietà: una
+guida fatta solo di `evidence` va benissimo se ciò che manca sono fatti.
+
+### Le regole
+
+1. **Si parte dalle lacune, non da un questionario.** Le domande nascono
+   da ciò che manca negli artefatti: punti `open_question`/`hypothesis`
+   del registro dei punti chiave, "Cosa non sappiamo" del brief,
+   parametri RICE che poggiano su un'opinione, domande residue delle
+   letture a freddo, voci scoperte del checklist di fase. Ciò che è già
+   in `source/`, `context/` o `apps/` **non si chiede**: costa fiducia.
+2. **Ogni domanda dice perché conta** (`why_it_matters`): quale decisione
+   o artefatto cambia a seconda della risposta. Una domanda la cui
+   risposta non cambia nulla è curiosità, non discovery — si scarta.
+3. **Passato e fatti, non futuro ipotetico.** "L'ultima volta che…",
+   "come lo fa oggi", "quanto le è costato" — non "userebbe…?",
+   "le piacerebbe…?". Una risposta ipotetica si registra come `opinion`.
+4. **Aperte e non suggerite.** Mai "Non pensa che…?", mai la soluzione
+   dentro la domanda. Una domanda alla volta.
+5. **La scala.** Ogni domanda prevede i follow-up (`follow_ups`) per le
+   risposte tipiche — un'opinione, un "tutti", un numero detto a voce,
+   una soluzione al posto di un problema — fino al fatto o al limite di
+   ciò che l'interlocutore sa. Il "5 whys" ne è un caso particolare.
+6. **Poche, nell'ordine giusto.** Un incontro di 30 minuti ha 5-7
+   domande, dalla più bloccante. Le altre restano nel registro per il
+   prossimo. Prima una domanda larga che lascia raccontare, in fondo il
+   teach-back ("ho capito bene che…?"), "chi altro dovremmo sentire?" e
+   "cosa non le ho chiesto?".
+7. **Calibrate su chi c'è.** Le domande e l'eventuale invito si
+   calibrano sull'identikit dello stakeholder e sul rapporto del PM con
+   lui (vedi "L'identikit degli stakeholder e il rapporto individuale"):
+   si apre da ciò che gli importa, si evitano le formulazioni che i suoi
+   `watch_out` sconsigliano. La sostanza della domanda non cambia.
+8. **Vale anche con il PM.** Quando l'agente intervista il PM (all'intake,
+   in `prd-draft`, in cerimonia) usa le stesse famiglie: chiede l'evidenza
+   dietro una stima, l'assunzione dietro una scelta, la conseguenza
+   osservabile di un impatto atteso — una volta, dicendo perché, senza
+   trasformare la conversazione in un interrogatorio.
+
+### Il ciclo: prepara → incontro → recepisci
+
+```
+lacune negli artefatti ──► domande raccomandate ──► guida dell'incontro
+        ▲                     (per interlocutore)       (+ invito, a mano)
+        │                                                     │
+        │                                                  incontro
+        │                                                     │
+artefatti aggiornati ◄── propagazione confermata ◄── risposte recepite
+ (+ nuove domande)         (punti chiave, brief,       (da trascrizione,
+                            PRD, RICE in pending/…)     appunti o PM)
+```
+
+**Il registro delle domande** (`product/ideas/{slug}/discovery/questions.yaml`,
+template `framework/schema/discovery-questions.template.yaml`) tiene per
+ogni domanda la lacuna, il perché, a chi, la famiglia, la scala, lo stato
+e la risposta con la sua natura (`info_kind`, tabella "Tipi
+d'informazione") e dove è stata propagata; e per ogni incontro la guida,
+la data, la fonte delle risposte. Scrittura diretta: è il registro del
+lavoro di analisi, come quello dei punti chiave.
+
+**La guida dell'incontro** (`discovery/{YYYY-MM-DD}-{interlocutore}.md`,
+template `framework/schema/discovery-meeting.template.md`) è ciò che il
+PM porta in riunione: la decisione che l'incontro deve rendere possibile,
+cosa sappiamo già, l'apertura, le domande con la scala, le ipotesi da
+mettere alla prova con la loro conseguenza osservabile, la chiusura. Se
+serve, contiene la bozza dell'invito o del pre-read — scopo e temi, mai
+la scala socratica — che il PM manda **a mano** (stessa logica di
+`requester_reply`: nessun `outbound_comm`, nessun invio automatico).
+
+**Recepire le risposte** significa tre cose, in quest'ordine:
+
+1. **Registrarle fedelmente**: la trascrizione o gli appunti vanno in
+   `source/` dell'idea; ogni risposta si associa alla sua domanda con la
+   natura dell'informazione (un numero detto a voce è una stima, un
+   esempio è illustrativo, un "secondo me" è un'opinione) e il punto
+   della fonte. Mai completare una risposta che non c'è.
+2. **Propagarle a tutti i materiali**, con un piano mostrato al PM e
+   confermato in una volta: registro dei punti chiave, brief, PRD non
+   ancora approvati, misurazioni (baseline/target solo da fatti o stime
+   verificate), glossario, scadenze. Ciò che tocca una **decisione di
+   priorità** segue la sua regola: un RICE cambia solo via `rice-update`
+   → `pending/`, un mandate via `mandate_update`; un cambiamento di
+   contesto aziendale passa da `context-intake`; un comportamento
+   osservato dello stakeholder si propone come episodio a
+   `stakeholder-profile`. Un Why che entra in conflitto con la strategia
+   si segnala come possibile abort: decide il PM.
+3. **Salire di un gradino**: le risposte generano domande nuove, scritte
+   subito nel registro, e il framework raccomanda il prossimo incontro.
+   Quando non restano domande `blocking` per la fase, lo dice: è il
+   segnale che la fase può chiudersi.
+
+### Dove il framework lo fa da solo
+
+- **All'intake** (`idea-intake`, `inbox-triage`): se serve un deep dive,
+  le prime domande del meeting di approfondimento sono già nel registro;
+  la bozza di risposta al richiedente propone l'incontro.
+- **Nel Backlog Refinement**: per ogni idea che entra in *analisi da
+  avviare*, le prime domande della Preliminary; nella sweep di apertura,
+  il blocco "Discovery" elenca domande bloccanti aperte, incontri da
+  preparare, incontri tenuti e non ancora recepiti.
+- **In `prd-draft`**: le lacune che solo uno stakeholder può chiudere —
+  in stesura e dalla lettura a freddo — diventano domande del registro e
+  la sezione "Cosa chiediamo, a chi, e quando" del brief le riflette.
+- **Quando arrivano le risposte** (appunti incollati, una mail in
+  `product/inbox/` che risponde a domande aperte): `discovery-questions`
+  in modalità `recepisci`, anche richiamata da `inbox-triage`.
+- **`rice-watch`** continua a ricordare il deep dive finché non è
+  avvenuto, e segnala quelli avvenuti ma non ancora recepiti.
+
+*Principi Agile da incarnare in questa fase:*
+- *Committenti e sviluppatori devono lavorare insieme quotidianamente per
+  tutta la durata del progetto.*
+- *Una conversazione faccia a faccia è il modo più efficiente per
+  comunicare.*
+
+**Checklist operativa**
+- [ ] Ogni idea in una fase di analisi ha un registro delle domande, con almeno le domande `blocking` della fase?
+- [ ] Ogni domanda ha un perché (la decisione o l'artefatto che cambia) e un interlocutore?
+- [ ] Le domande sono aperte, sul passato e sui fatti, senza la risposta dentro, con la loro scala di follow-up?
+- [ ] Il prossimo incontro ha una guida di 5-7 domande, calibrata su chi c'è?
+- [ ] Le risposte dell'ultimo incontro sono state registrate con la loro natura e propagate (punti chiave, brief, PRD, RICE via `pending/`)?
+- [ ] Le contraddizioni emerse sono state portate al PM, non risolte in silenzio?
+- [ ] Le domande nuove nate dalle risposte sono nel registro?
 
 ## Complete analysis
 
@@ -1756,7 +1946,10 @@ vanno portate a lui prima di correggere. Al massimo due iterazioni. Mai
 saltata in silenzio: senza subagent, si fa con una persona del ruolo.
 
 **Gate di stato del PRD.** `draft` → `in_review`: almeno una lettura a
-freddo registrata e registro dei punti chiave senza punti `open`.
+freddo registrata, registro dei punti chiave senza punti `open`, e
+nessuna domanda `blocking` del registro delle domande ancora aperta — o,
+se resta aperta, accettata esplicitamente dal PM come rischio dichiarato
+nel PRD.
 `in_review` → `approved`: decisione umana — PM e `tech_reference`, più un
 rappresentante del lettore primario quando conta.
 
@@ -1842,6 +2035,7 @@ approfondimento potrebbe cambiare il RICE Score.
 - [ ] Ogni PRD dichiara il suo `primary_reader` e `prd_kind`, e ha uno Scenario?
 - [ ] Il registro dei punti chiave non ha punti `open` (ogni punto coperto o escluso con motivo confermato)?
 - [ ] La lettura a freddo è stata fatta e registrata in `.reviews/`, e le decisioni emerse sono state prese dal PM?
+- [ ] Le lacune che solo uno stakeholder può chiudere sono diventate domande del registro, con un incontro preparato, e le risposte avute sono state propagate al brief e ai PRD?
 - [ ] I documenti si reggono senza la sessione, la memoria locale e `context/` (P7)?
 - [ ] Il PRD rispetta il vincolo A3 (circa due facciate A4 in PDF)? Se no, è stato spaccato lungo le cuciture del problema?
 - [ ] Se il PRD fa parte di una sequenza: sono dichiarate separatamente sequenza di lettura e di rilascio?
@@ -3381,7 +3575,23 @@ necessaria per inquadrare un'idea abbastanza da farne un RICE serio.
 Marcata in `rice_status.deep_dive`; `rice-watch` la ricorda con
 insistenza — con escalation — finché il meeting non è fissato e
 avvenuto. È il sotto-caso più actionable di "idea senza RICE": non
-aspetta un dato, aspetta che il PM metta il meeting in calendario.
+aspetta un dato, aspetta che il PM metta il meeting in calendario. Le
+sue domande le prepara `discovery-questions` (fase `deep_dive`).
+
+**Discovery socratica** — Il modo in cui il framework conduce ogni fase
+di analisi: raccomanda le domande per gli stakeholder coinvolti partendo
+dalle lacune degli artefatti, le formula con le sei famiglie socratiche
+(chiarimento, assunzioni, evidenze, punti di vista, implicazioni, domande
+sulla domanda) — aperte, sul passato, con la loro scala di follow-up —,
+prepara la guida del prossimo incontro e, dopo, recepisce le risposte e
+le propaga a tutti i materiali. Skill `discovery-questions`. Vedi
+"Discovery socratica: le domande agli stakeholder".
+
+**Registro delle domande** — `product/ideas/{slug}/discovery/questions.yaml`:
+per ogni domanda la lacuna, perché conta, a chi, la famiglia socratica,
+lo stato e la risposta con la sua natura e dove è stata propagata; per
+ogni incontro la guida e la fonte delle risposte. Scrittura diretta,
+come il registro dei punti chiave.
 
 **Product Backlog Refinement** — Cerimonia settimanale in cui PM e tech
 lead allineano le priorità e preparano il backlog per l'iterazione

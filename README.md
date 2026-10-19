@@ -71,7 +71,9 @@ inizializzata) e scaffolda `apps/` e `product/`.
     │                              analizza, classifica e smista, poi la svuota
     ├── ideas/{YYYY-MM-DD}-{slug}/
     │   ├── idea.yaml           (con analytics collegato: blocco monitoring — i path utente da monitorare, suggeriti e applicati da path-watch)
-    │   └── source/            (email, trascrizioni, allegati — arrivati via inbox-triage o diretti)
+    │   ├── source/            (email, trascrizioni, allegati — arrivati via inbox-triage o diretti)
+    │   └── discovery/         (domande per gli stakeholder in ogni fase di analisi e guide degli incontri, metodo socratico — skill discovery-questions;
+    │                            dopo l'incontro le risposte si recepiscono e si propagano a punti chiave, brief, PRD, RICE in pending/)
     ├── prds/{slug}/
     │   ├── prd.md              (o prd-1-*.md, prd-2-*.md se spaccato)
     │   └── source/
@@ -212,7 +214,9 @@ Il playbook genericizzato è in
 PRD, specifiche scritte per il loro lettore (brief d'iniziativa, registro
 dei punti chiave della fonte, lettura a freddo con lettori simulati prima
 di condividere un PRD con persone o agenti che non erano nella
-conversazione), cerimonie, meccanismo di approvazione, modalità dry-run per simulare
+conversazione), Discovery socratica (in ogni fase di analisi le domande
+per gli stakeholder, la guida del prossimo incontro e il recepimento
+delle risposte in tutti i materiali), cerimonie, meccanismo di approvazione, modalità dry-run per simulare
 una cerimonia senza scrivere nulla (e `rollback-ceremony` per annullarne
 una lanciata per errore), gestione delle frizioni con gli stakeholder.
 È la fonte normativa che ogni skill deve rispettare.

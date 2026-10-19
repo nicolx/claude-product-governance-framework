@@ -1,0 +1,99 @@
+# Template per product/ideas/{slug}/discovery/questions.yaml
+#
+# Registro delle domande di Discovery di un'iniziativa: cosa non sappiamo
+# ancora, a chi lo chiediamo, perché conta, cosa è stato risposto e dove
+# la risposta è andata a finire. Playbook, "Discovery socratica: le domande
+# agli stakeholder".
+#
+# Serve a tre cose:
+#   1. che ogni fase di analisi (deep dive pre-RICE, Preliminary, Complete,
+#      revisione del PRD, misurazione) arrivi alla riunione con le domande
+#      giuste per CHI c'è, non con una lista generica;
+#   2. che nessuna risposta resti nella testa di chi era in riunione: ogni
+#      risposta si propaga agli artefatti (registro dei punti chiave, brief,
+#      PRD, RICE via pending/, scadenze, glossario, identikit) e il registro
+#      dice dove (propagated_to);
+#   3. che una domanda senza risposta non sparisca: resta open/asked finché
+#      non è answered o dropped con un motivo del PM.
+#
+# Chi scrive:
+#   - discovery-questions (prepara / recepisci / stato) — il proprietario;
+#   - idea-intake / inbox-triage all'origine, quando serve un deep dive
+#     (prime domande del meeting di approfondimento);
+#   - prd-draft (lacune emerse in stesura e dalla lettura a freddo che solo
+#     uno stakeholder può chiudere);
+#   - backlog-refinement (prime domande delle idee che entrano in
+#     "analisi da avviare").
+# Scrittura DIRETTA, nessuna approvazione: è il registro del lavoro di
+# analisi, non una decisione di priorità (stessa logica di key-points.yaml).
+# Ciò che una risposta CAMBIA segue invece la regola del suo target: un
+# RICE passa da pending/ (rice-update), un mandate da mandate_update, un
+# cambiamento materiale del contesto da context-intake con conferma.
+#
+# Gli id (DQ-01…, M-01…) sono stabili: non si rinumerano.
+
+idea_id: ""                            # slug della cartella idea
+updated_at: ""
+
+questions:
+  - id: "DQ-01"
+    text: ""                           # la domanda come la si pone, in linguaggio dell'interlocutore — aperta, mai suggerita
+    socratic_kind: clarification       # clarification | assumption | evidence | viewpoint | implication | meta
+                                       # (playbook, tabella "Le sei famiglie di domande")
+    gap: ""                            # cosa non sappiamo, in una riga ("chi paga il rinnovo e quando decide")
+    gap_ref: null                      # da dove nasce: "KP-07" | "brief#cosa-non-sappiamo" | "rice.reach" |
+                                       # "cold-read 2026-…-iterazione-1" | "conversazione col PM, <data>"
+    why_it_matters: ""                 # quale decisione o artefatto cambia a seconda della risposta.
+                                       # Se nessuna: la domanda non va posta (curiosità, non discovery)
+    affects: []                        # rice.reach | rice.impact | rice.confidence | rice.entanglement |
+                                       # brief | prd | scope | measurement | deadline | mandate | go_no_go | context | glossary
+    ask_to: []                         # id dell'identikit (product/reference/stakeholders.yaml) o "Nome — ruolo"
+    phase: preliminary                 # deep_dive | preliminary | complete | prd_review | measurement
+    priority: important                # blocking (senza, la fase non si chiude) | important | nice
+    follow_ups: []                     # la scala socratica: cosa chiedere dopo, a seconda della risposta
+    # - if: "risponde con un'opinione o un 'tutti'"
+    #   ask: "Mi racconti l'ultima volta che è successo? Chi c'era?"
+    expected_answer_kind: fact         # fact | estimate | intent | opinion — cosa SERVE per chiudere il gap
+                                       # (un'opinione non chiude un gap di Reach: serve un fatto o una stima)
+    status: open                       # open | planned (in una guida) | asked | answered | partially_answered | dropped
+    meeting_refs: []                   # M-.. in cui è stata pianificata/posta
+    answer: null
+    # answer:
+    #   summary: ""                    # parafrasi fedele, 1-3 righe
+    #   quote: null                    # testuale, se la formulazione conta
+    #   by: ""                         # chi ha risposto
+    #   at: ""                         # data ISO
+    #   info_kind: fact                # fact | estimate | illustrative | intent | opinion (tabella "Tipi d'informazione")
+    #   source_locator: ""             # "source/<file>#<timestamp|paragrafo>" o "dichiarato dal PM, <data>"
+    #   new_questions: []              # DQ-.. nate da questa risposta (la discovery è una scala, non una lista)
+    propagated_to: []                  # dove è finita la risposta: "key-points#KP-12", "README.md#chi-e-coinvolto",
+                                       # "prd-1-….md#scenario", "pending/2026-…-rice-<slug>.yaml", "deadline", "glossary#<termine>",
+                                       # "stakeholders#<id> (episodio, su conferma)"
+    drop_reason: null                  # obbligatorio se dropped — dato dal PM (mai presunto)
+
+meetings:
+  - id: "M-01"
+    with: []                           # chi partecipa (id identikit o "Nome — ruolo")
+    purpose: ""                        # la decisione che l'incontro deve rendere possibile, in una riga
+    phase: preliminary                 # come sopra
+    planned_for: null                  # data, quando fissata (null = da fissare: azione aperta del PM)
+    guide_ref: ""                      # "discovery/{YYYY-MM-DD}-{interlocutore}.md" — la guida preparata
+    status: prepared                   # prepared | held | ingested | cancelled
+    held_at: null
+    source_ref: null                   # trascrizione/appunti in source/ dell'idea (mai dentro discovery/)
+    ingested_at: null                  # quando le risposte sono state recepite e propagate
+    invite_status: not_needed          # not_needed | drafted | sent | waived — bozza d'invito/pre-read nella guida,
+                                       # mandata a mano dal PM (stessa logica di requester_reply)
+    sent_at: null
+    waived_reason: null
+
+# Regole che contano più delle altre:
+# - Ogni domanda ha un why_it_matters. Una domanda la cui risposta non
+#   cambia nulla non si pone: costa fiducia e tempo dello stakeholder.
+# - Domande sul passato e sui fatti, non sul futuro ipotetico ("l'ultima
+#   volta che…", non "useresti…?"). Una risposta ipotetica si registra
+#   come opinion.
+# - Una risposta non è mai inventata né completata: answered solo con
+#   source_locator (trascrizione in source/ o dichiarazione del PM).
+# - Un esempio numerico dato in riunione è illustrative: si usa come
+#   narrativa, mai come stima (playbook, P4).

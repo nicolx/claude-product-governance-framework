@@ -54,6 +54,38 @@ Tipi di impatto:
 
 ---
 
+### 2026-10-19-discovery-socratica · Ogni fase di analisi raccomanda le domande per gli stakeholder, e le risposte aggiornano i materiali
+
+- **Impatto**: nessuna
+- **Cosa cambia**: in ogni fase di analisi — meeting di approfondimento
+  prima del RICE, Preliminary e Complete analysis, revisione del PRD,
+  misurazione — il framework parte da cosa non sappiamo ancora e
+  raccomanda **a chi chiederlo e con quali domande**, con metodo
+  socratico (domande aperte, sul passato e sui fatti, ciascuna con il
+  perché conta e la sua scala di follow-up). Prepara la guida del
+  prossimo incontro, calibrata sull'identikit dello stakeholder, con
+  l'eventuale invito da mandare a mano. Dopo l'incontro **recepisce le
+  risposte** (trascrizione, appunti, o racconto del PM) e le propaga a
+  punti chiave, brief, PRD, glossario e scadenze; ciò che tocca il RICE
+  o un mandate va in coda di approvazione come sempre. Nuova skill
+  `discovery-questions`; nuova sezione del playbook "Discovery socratica:
+  le domande agli stakeholder"; nuova cartella per idea
+  `product/ideas/{slug}/discovery/` (registro `questions.yaml` + guide),
+  creata alla prima domanda. Le skill esistenti lo fanno da sole:
+  `idea-intake`/`inbox-triage` scrivono le domande del deep dive e
+  riconoscono le risposte che arrivano in inbox, il Backlog Refinement
+  propone le prime domande per le idee che entrano in analisi e ha un
+  blocco "Discovery" nella sweep, `prd-draft` trasforma le lacune (anche
+  della lettura a freddo) in domande e non passa a `in_review` con
+  domande bloccanti aperte non accettate dal PM, `rice-watch` segnala i
+  deep dive avvenuti ma non recepiti.
+- **Cosa fare nell'istanza**: niente di obbligatorio. Per le idee già in
+  analisi, alla prossima occasione lancia `discovery-questions {ID}`:
+  costruisce il registro dalle lacune di brief e punti chiave. Se hai
+  appunti di incontri già fatti, `discovery-questions {ID} recepisci`.
+- **Già a posto se**: sempre (la cartella `discovery/` nasce da sola alla
+  prima domanda).
+
 ### 2026-10-19-identikit-stakeholder · Le bozze si calibrano sullo stakeholder e sul tuo rapporto con lui
 
 - **Impatto**: setup

@@ -19,6 +19,7 @@
 #   governance-dump.sh pending       # contenuto di product/approvals/pending/*.yaml
 #   governance-dump.sh reference     # product/reference/*.yaml
 #   governance-dump.sh delivery      # delivery-watch.yaml + product-lines.yaml + le idea.yaml + ultimo snapshot (per delivery-watch)
+#   governance-dump.sh discovery     # idee + registri delle domande (discovery/questions.yaml) + identikit (per discovery-questions stato)
 #   governance-dump.sh reports       # viste dichiarate + ultimi report + tutte le fonti dei modelli (ultimi due snapshot) + ultime cerimonie + indice pending (per report-render)
 #
 # SOLA LETTURA: non scrive niente, non fa commit, non tocca git. Stampa su
@@ -92,6 +93,23 @@ emit_closed_with_drafted_replies() {
     esac
     grep -qE '^[[:space:]-]*reply_status:[[:space:]]*"?drafted"?[[:space:]]*(#.*)?$' "$d" 2>/dev/null || continue
     emit_file "$d"
+  done
+}
+
+emit_discovery() {
+  # i registri delle domande di Discovery delle idee attive (playbook,
+  # "Discovery socratica: le domande agli stakeholder") — salta
+  # declined/aborted salvo INCLUDE_ALL, come emit_ideas
+  local f st
+  [ -d "product/ideas" ] || return 0
+  find product/ideas -mindepth 3 -maxdepth 3 -path '*/discovery/questions.yaml' 2>/dev/null | sort | while IFS= read -r f; do
+    if [ "$INCLUDE_ALL" -eq 0 ]; then
+      st="$(idea_status "${f%/discovery/questions.yaml}/idea.yaml")"
+      case "$st" in
+        declined|aborted) continue ;;
+      esac
+    fi
+    emit_file "$f"
   done
 }
 
@@ -205,6 +223,7 @@ case "$MODE" in
     emit_reference
     emit_ideas
     emit_closed_with_drafted_replies
+    emit_discovery         # domande di Discovery aperte, incontri da preparare/recepire
     emit_glob "product/prds" 'measurement*.yaml'
     emit_iterations
     emit_latest_snapshot   # slot_plan precedente: le iniziative in sviluppo ne ereditano lo slot
@@ -224,6 +243,14 @@ case "$MODE" in
   ideas)
     printf '# governance-dump: ideas%s — SOLA LETTURA\n' "$([ "$INCLUDE_ALL" -eq 1 ] && printf ' (--all)')"
     emit_ideas
+    footer
+    ;;
+  discovery)
+    printf '# governance-dump: discovery — SOLA LETTURA\n'
+    emit_file "product/reference/stakeholders.yaml"
+    emit_ideas
+    emit_discovery
+    emit_iterations        # chi è in analysis_todo / analysis_in_progress
     footer
     ;;
   measurements)
@@ -268,7 +295,7 @@ case "$MODE" in
     footer
     ;;
   *)
-    echo "Uso: governance-dump.sh sweep|backlog|ideas [--all]|measurements|iterations|pending|reference|delivery|reports" >&2
+    echo "Uso: governance-dump.sh sweep|backlog|ideas [--all]|discovery [--all]|measurements|iterations|pending|reference|delivery|reports" >&2
     exit 2
     ;;
 esac

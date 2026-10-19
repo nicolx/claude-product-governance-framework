@@ -245,6 +245,15 @@ soli non coprono. In sintesi:
      cambia la stima" — mai anticipare l'esito di un `rice-update`).
      Nessuna data, nessuna promessa. Salta solo se il mittente è il PM
      stesso (`reply_status: not_needed`).
+     **Risposte a domande di Discovery.** Se l'idea ha un registro
+     `discovery/questions.yaml` e il materiale risponde a domande
+     `planned`/`asked` (la mail di risposta dello stakeholder, gli appunti
+     o la trascrizione di un incontro preparato), dillo al PM con le
+     domande toccate e — alla conferma — esegui `discovery-questions` in
+     modalità `recepisci` su quel file (già in `source/`): le risposte
+     vanno registrate e propagate a tutti i materiali, non solo
+     archiviate. La bozza al mittente ringrazia e dice cosa ne faremo,
+     senza anticipare l'esito.
 
    - **Aggiornamento/integrazione di un PRD esistente** — sposta il
      materiale in `product/prds/{slug}/source/` (nome file che non

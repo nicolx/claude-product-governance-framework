@@ -69,6 +69,15 @@ silenzio.
    `deep_dive.requested_at` risale a più di ~2 settimane fa e
    `scheduled_for` è ancora `null`, marcala **in ritardo**: il meeting è
    stato riconosciuto necessario e non è ancora nemmeno in calendario.
+   Leggi anche il registro `discovery/questions.yaml` dell'idea, se
+   esiste (playbook, "Discovery socratica: le domande agli
+   stakeholder"): se non ha domande di fase `deep_dive`, il meeting
+   partirebbe vuoto — raccomanda `discovery-questions {ID}`; se ha un
+   incontro `held` non ancora `ingested`, o `done_at` valorizzato senza
+   risposte registrate, lo stato è **`deep_dive_not_ingested`**: il
+   meeting c'è stato ma le risposte non sono arrivate ai materiali né al
+   RICE — raccomanda `discovery-questions {ID} recepisci`, poi
+   `rice-update`.
 
 3. **Per le idee che rilevi per la prima volta come non quotate**
    (`rice_status.flagged_since` ancora `null`), scrivi
@@ -116,7 +125,8 @@ silenzio.
 5. **Presenta un riepilogo ordinato per urgenza**: in testa la riga di
    capacità libera del passo 4b, se c'è; poi le idee che **consumano
    capacità senza RICE**; poi le **`needs_deep_dive`** (specie quelle in ritardo — il meeting è
-   riconosciuto necessario ma non ancora in calendario), poi `stale`,
+   riconosciuto necessario ma non ancora in calendario) e le
+   **`deep_dive_not_ingested`**, poi `stale`,
    poi `blocked_on`, poi `aging`, `fresh` solo se rilevante o richiesto.
    **Prima colonna: l'identificatore** — `short_ref` se assegnato,
    altrimenti lo slug `idea_id` (mai vuoto — vedi playbook, "Ogni elenco

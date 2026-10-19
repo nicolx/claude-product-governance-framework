@@ -151,7 +151,8 @@ segnalalo e fermati.
 Le skill che preparano un testo che il PM manda a mano (`idea-intake`,
 `inbox-triage`, `delivery-watch`, `jira-sync`, `measurement-watch`,
 `backlog-refinement`, `report-render`, `pending-approval` per gli
-`outbound_comm`) leggono **in sola lettura** i due file e calibrano la
+`outbound_comm`, `discovery-questions` per le guide degli incontri e gli
+inviti) leggono **in sola lettura** i due file e calibrano la
 bozza come da playbook, mostrando la riga `Calibrazione: …` fuori dal
 testo. Quando il PM dà una versione finale diversa dalla bozza o
 racconta la reazione dello stakeholder, propongono in una riga di

@@ -377,7 +377,16 @@ Fuori da questa modalità, la skill si comporta come descritto nei
      problema da inquadrare meglio): se sì, `deep_dive_meeting_needed:
      true` e compila `rice_status.deep_dive` (`needed: true`,
      `requested_at:` oggi) — è così che `rice-watch` te lo ricorda finché
-     non avviene; (c) **prima ipotesi onesta di quando potrebbe essere
+     non avviene. In quel caso il meeting **non parte vuoto**: applica
+     la logica di `discovery-questions` (modalità `prepara`, passi 3-5,
+     fase `deep_dive`) e scrivi in
+     `product/ideas/{slug}/discovery/questions.yaml` le domande che
+     servono a quotare Reach/Impact/Confidence, con interlocutore,
+     perché contano e scala di follow-up (playbook, "Discovery
+     socratica: le domande agli stakeholder"); mostrale nel riepilogo.
+     La guida dell'incontro si scrive quando il PM fissa la data. La
+     bozza al richiedente propone l'incontro con 1-2 temi in parole
+     sue, mai la lista delle domande; (c) **prima ipotesi onesta di quando potrebbe essere
      prioritizzata**: leggi il backlog ordinato (come fa `backlog-list`)
      e dai una forbice realistica ("con ~N idee davanti a RICE più alto e
      nessuna quotazione ancora, non prima di [trimestre/periodo]") — mai

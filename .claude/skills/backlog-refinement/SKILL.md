@@ -183,6 +183,24 @@ piano passa **sempre** da `product/approvals/pending/`
          setup per dichiararne una"*. Se il file non esiste, una riga:
          *"nessun modello di reporting dichiarato — `report-render` in
          modalità setup"* (playbook, "Modelli di reporting").
+      10. **Discovery: domande agli stakeholder** — per le idee nelle
+         fasi di analisi (bucket `analysis_todo`/`analysis_in_progress`
+         del piano precedente, `needs_deep_dive`, PRD `draft`/
+         `in_review`), dai registri `discovery/questions.yaml` nel dump:
+         domande `blocking` aperte (con interlocutore e da quanto),
+         incontri `prepared` non ancora tenuti, incontri `held` **non
+         ancora recepiti** (in evidenza: le risposte non sono arrivate ai
+         materiali), inviti `drafted` non mandati, e idee in analisi
+         **senza registro** (l'analisi sta procedendo senza chiedere
+         niente a nessuno). Colonne: ID, `summary`, fase, domande
+         bloccanti aperte, prossimo incontro (con chi, quando), stato.
+         Al checkpoint il PM può dichiarare un invito inviato
+         (`invite_status: sent`), un incontro avvenuto (`held_at`, e la
+         fonte delle risposte se c'è), o lasciare cadere una domanda
+         (`dropped` + `drop_reason` suo). La preparazione delle guide e il
+         recepimento delle risposte **non** si fanno qui: si raccomandano
+         nel riepilogo (`discovery-questions {ID}` / `… recepisci`)
+         (playbook, "Discovery socratica: le domande agli stakeholder").
       Le **formule sono quelle documentate nelle rispettive skill**
       (`nsm-watch`, `measurement-watch`, `mandate-watch`, `deadline-watch`,
       `rice-watch`, `path-watch`) — applicale, non reinventarle; se un caso
@@ -232,7 +250,8 @@ piano passa **sempre** da `product/approvals/pending/`
    f. **Una sola scrittura, un solo commit.** Applica *tutti* i valori
       calcolati (`escalation_status`, `rice_status.*`, `alert.*`,
       `closure`, i blocchi `monitoring` e gli `analytics_dashboard`
-      restituiti da `path-watch`) e *tutte* le azioni di checkpoint
+      restituiti da `path-watch`, gli stati dei registri delle domande)
+      e *tutte* le azioni di checkpoint
       concordate. Le scritture di `path-watch` **nello strumento di
       analytics** (path e dashboard per Product Line) si eseguono qui,
       *prima* di scrivere `idea.yaml`/`product-lines.yaml`, perché id e
@@ -395,6 +414,16 @@ piano passa **sempre** da `product/approvals/pending/`
           `decisions.yaml` come `reprioritization` con
           `reason_type: qualitative_team_call` — nessuna proposta
           `strategic_exception_flag`.
+   4b. **Domande raccomandate per le idee che entrano in analisi.** Per
+      ogni idea nuova in `analysis_todo` (e per quelle `urgent_priority`
+      che entrano in analisi), applica la logica di
+      `discovery-questions` (modalità `prepara`, passi 3-5, fase
+      `preliminary`; `complete` se il brief è già `preliminary`) e mostra
+      al PM le **prime 3-5 domande** per interlocutore — quelle che
+      servono a chiudere il Why — con il perché. Non è una formalità: è
+      il punto in cui il team decide con chi parlare questa settimana. Le
+      domande confermate si scrivono nel registro dell'idea **dopo** la
+      proposta del piano (passo 6.9), non nel `payload`.
    5. **Chiedi il `iteration_goal`** — una frase: focus della settimana /
       iniziativa o metrica che si cerca di impattare.
    6. **Capacity check, poi il PM conferma la board finale.** Prima della
@@ -437,6 +466,14 @@ piano passa **sempre** da `product/approvals/pending/`
       come `roadmap_snapshot`).
    8. Sincronizza `pending/`:
       `bash .claude/hooks/governance-sync.sh push "backlog-refinement: proposta Piano di Iterazione <settimana>" product/approvals/pending/`.
+   9. **Scrivi le domande confermate al punto 4b** nei registri
+      `product/ideas/{slug}/discovery/questions.yaml` (scrittura diretta,
+      registro del lavoro di analisi — non dipende dall'approvazione del
+      piano, e `rollback-ceremony` lo annulla con il resto del run) e
+      `bash .claude/hooks/governance-sync.sh push "backlog-refinement: domande di discovery <settimana>" product/ideas/`.
+      Nel riepilogo, per ciascuna idea, raccomanda di preparare la guida
+      del primo incontro (`discovery-questions {ID}`) appena il PM fissa
+      la data.
 
 7. **`retro_notes`** — % completamento dell'iterazione precedente,
    impedimenti riscontrati, informazioni mancate — se presenti nella

@@ -73,8 +73,9 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
 > playbook: esegui letture, analisi e anche la lettura a freddo
 > normalmente, **non** creare né modificare file sotto `product/` (brief,
 > PRD, allegati, `assets/`, `measurement*.yaml`, `.reviews/`, registro dei
-> punti chiave, glossario), **non** invocare `governance-sync.sh push`,
-> mostra come testo il contenuto completo che avresti scritto, e chiudi con
+> punti chiave, registro delle domande, glossario), **non** invocare
+> `governance-sync.sh push`, mostra come testo il contenuto completo che
+> avresti scritto, e chiudi con
 > `🔍 DRY-RUN — nessun file scritto, nessun commit, nessun push.`
 
 > **Retrofit.** Con l'argomento `retrofit` la skill lavora su PRD già
@@ -110,6 +111,26 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
    - per un `discovery`: a chi verrà mostrato, e quale decisione deve
      permettere.
    Non presumere mai le risposte: il lettore cambia cosa va scritto.
+   **Con metodo socratico** (playbook, "Discovery socratica: le domande
+   agli stakeholder", regola 8): quando il PM dà una stima, un'ipotesi o
+   una soluzione già decisa, chiedi una volta l'evidenza, l'assunzione o
+   la conseguenza osservabile ("come ce ne accorgeremmo che ha
+   funzionato?"), dicendo perché. Ciò che il PM **non sa** e che solo uno
+   stakeholder può dire non si inventa e non blocca la stesura: diventa
+   una domanda del registro (passo 3b).
+
+3b. **Domande per gli stakeholder.** Carica il registro
+   `product/ideas/{slug}/discovery/questions.yaml` (se manca, crealo da
+   `framework/schema/discovery-questions.template.yaml`). Se ha incontri
+   `held` non ancora `ingested`, **recepiscili prima di scrivere**
+   (`discovery-questions` modalità `recepisci`): scrivere un PRD
+   ignorando risposte già avute è il modo più rapido di perderle. Poi
+   applica la logica di `discovery-questions` (modalità `prepara`, passi
+   3-5, fase `complete`) alle lacune che restano — dal registro dei punti
+   chiave, dal brief, dall'intervista — e mostrale al PM per
+   interlocutore. Le domande `blocking` ancora aperte si dichiarano nel
+   brief ("Cosa non sappiamo", "Cosa chiediamo, a chi, e quando") e nei
+   Rischi del PRD; non si colmano con un'ipotesi presentata come fatto.
 
 4. **Piano dei documenti, da far confermare al PM prima di scrivere:**
    - **brief** (`README.md`): obbligatorio se i PRD saranno più di uno o se un
@@ -235,12 +256,18 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
     - **porta al PM le decisioni** prima di correggere — una lettura a freddo
       fa emergere scelte che solo lui può fare (scope, termini di paragone,
       liceità, date), non solo refusi;
+    - le lacune che **né il PM né i documenti** possono chiudere (un dato,
+      un vincolo, un'approvazione che ha uno stakeholder) diventano
+      domande del registro, fase `prd_review`, con `gap_ref` alla lettura
+      a freddo e l'interlocutore;
     - correggi, poi seconda iterazione (massimo 2);
     - registra ogni iterazione in
       `product/prds/{slug}/.reviews/cold-read-{YYYY-MM-DD}-iterazione-{N}.md`.
     Se i subagent non sono disponibili, dillo e proponi una lettura a freddo
     umana: **mai saltata in silenzio**. Lo `status: in_review` si raggiunge
-    solo dopo almeno una lettura a freddo e con la copertura completa.
+    solo dopo almeno una lettura a freddo, con la copertura completa e
+    senza domande `blocking` aperte nel registro — o con quelle rimaste
+    accettate esplicitamente dal PM come rischio dichiarato nel PRD.
 
 12. **Aggiorna `idea.yaml`**: aggiungi lo slug della cartella PRD a
     `links.prd_ids`, valuta `status: in_prd`, e aggiungi in `notes` una riga
@@ -296,6 +323,10 @@ che esiste già. Se è visivo, copialo in `assets/` (passo 6).
       residue accettate, "potrebbe iniziare domani?" per ciascun lettore;
     - **cosa hai aggiunto rispetto alla fonte** (P5) e quali decisioni ha
       preso il PM;
+    - **domande per gli stakeholder** (sempre, anche se nessuna è
+      bloccante): aperte per interlocutore con la loro priorità, e il
+      prossimo incontro raccomandato — offri di preparare subito la guida
+      (`discovery-questions`);
     - **azioni aperte del PM** (materiali da allegare, date, verifiche,
       eventi da strumentare per i path `to_instrument`);
     - path da monitorare applicati/rifiniti e KPI legate a un path;
