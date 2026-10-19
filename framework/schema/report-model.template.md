@@ -43,6 +43,14 @@ fields: []
 #  - field: "Now"
 #    source: "iterations: in_development + urgent_priority"
 #    rule: "raggruppato per product_line"
+#  - field: "Rilascio previsto"
+#    source: "slot_plan.slots dell'ultimo snapshot approvato (end_week)"
+#    rule: "trimestre in cui cade end_week, marcato 'stima'; senza slot: motivo da slot_plan.unslotted"
+#
+# Tempi e capacità si mappano SOLO su slot_plan / capacity_allocation
+# dello snapshot (playbook, "Capacità del team e slot della roadmap"):
+# mai date scritte a mano, mai carico o utilizzo per persona — al più per
+# competenza o per squad. Vedi report-render, modalità setup, punto 6.
 
 # Campi del formato che il framework NON tiene (tipico dei modelli
 # aziendali: "budget speso", "owner commerciale", "RAG status di

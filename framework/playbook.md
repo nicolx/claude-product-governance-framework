@@ -2184,6 +2184,20 @@ campi finisce in `gaps`, il formato chiede dati che il processo non
 produce: è una conversazione da fare con chi lo ha imposto, non un buco
 da tappare a ogni report.
 
+**Tempi e capacità di un formato aziendale.** Gantt, date di rilascio,
+trimestre di consegna, FTE allocati, utilizzo del team, semafori di
+stato: sono i campi in cui un formato aziendale rischia di promettere
+più di quanto il team possa mantenere. Si mappano solo sullo
+`slot_plan` e sulla `capacity_allocation` dello snapshot approvato
+("Capacità del team e slot della roadmap"), nella granularità del
+formato e sempre come "stima"; una data esatta di consegna pretesa come
+impegno, o il carico per singola persona, non esistono nel framework e
+finiscono in `gaps` (la capacità si mostra per competenza o per squad,
+mai per persona). Un semaforo si può derivare dagli slot solo con una
+regola approvata dal PM. Se la capacità del team non è ancora
+dichiarata, `report-render` setup lo dice prima di confermare la vista:
+quelle colonne resteranno vuote finché non passa da `team-roster`.
+
 **Dichiarare le viste.** `product/reference/reporting-models.yaml`
 (template `framework/schema/reporting-models.template.yaml`) elenca le
 viste dell'istanza: per ciascuna il modello, il pubblico, i destinatari,

@@ -1,6 +1,6 @@
 ---
 name: report-render
-description: Genera le viste per gli stakeholder (roadmap di lavoro, Now/Next/Later o trimestrale, scorecard delle metriche, aggiornamento settimanale, o un formato aziendale trascritto) a partire dai modelli di reporting dichiarati in product/reference/reporting-models.yaml. Scrive il report derivato in product/reports/ e, per un pubblico fuori dal team, prepara la comunicazione in product/approvals/pending/ (outbound_comm) — non pubblica né invia mai nulla. In modalità setup aggiunge, modifica o rimuove una vista, o trascrive un modello aziendale (slide, pagina Confluence, foglio) mappandone i campi sui dati del framework. Le viste con cadenza per_ceremony (la roadmap aggiornata dell'istanza, nel formato standard o in quello aziendale) le rigenera da sola alla fine di ogni cerimonia e a ogni approvazione che tocca la roadmap, richiamata da log-ceremony e pending-approval. Usala a mano quando un report è in scadenza o per configurare i modelli.
+description: Genera le viste per gli stakeholder (roadmap di lavoro, Now/Next/Later o trimestrale, scorecard delle metriche, aggiornamento settimanale, o un formato aziendale trascritto) a partire dai modelli di reporting dichiarati in product/reference/reporting-models.yaml. Scrive il report derivato in product/reports/ e, per un pubblico fuori dal team, prepara la comunicazione in product/approvals/pending/ (outbound_comm) — non pubblica né invia mai nulla. In modalità setup aggiunge, modifica o rimuove una vista, o trascrive un modello aziendale (slide, pagina Confluence, foglio) mappandone i campi sui dati del framework — tempi e capacità solo sullo slot plan e sulla capacità per competenza o squad dello snapshot, mai date a mano né carico per persona; avvisa se la capacità del team non è ancora dichiarata. Le viste con cadenza per_ceremony (la roadmap aggiornata dell'istanza, nel formato standard o in quello aziendale) le rigenera da sola alla fine di ogni cerimonia e a ogni approvazione che tocca la roadmap, richiamata da log-ceremony e pending-approval. Usala a mano quando un report è in scadenza o per configurare i modelli.
 ---
 
 # report-render
@@ -196,6 +196,18 @@ inizializzata o per aggiungere viste dopo.
 - **Aggiungi / modifica / rimuovi una vista**: scrittura diretta su
   conferma. Rimuovere una vista non cancella i report già in
   `product/reports/<name>/` (sono storico).
+- **Controllo di capacità**, ogni volta che dichiari o modifichi una
+  vista che mostra **tempi o carico** (roadmap di lavoro, trimestrale,
+  Now/Next/Later, aggiornamento settimanale, scorecard con "Impatti in
+  arrivo", o un modello aziendale con campi mappati sullo `slot_plan`):
+  leggi `product/reference/team.yaml`. Se manca il catalogo
+  `competencies` o nessun membro ha `capacity.fte`, dillo prima di
+  confermare: quelle colonne usciranno "slot non disponibili" finché la
+  capacità non è dichiarata — proponi `team-roster` (playbook, "Capacità
+  del team e slot della roadmap"). Non bloccare la vista. Se l'istanza ha
+  `squads`, chiedi se la vista va divisa anche per squad (oltre che per
+  Product Line): è un `filters`/raggruppamento della vista, non un
+  modello nuovo.
 - **Trascrivi un modello aziendale.** Il PM fornisce il formato che
   l'azienda usa (file droppato, link a una pagina o a una cartella di un
   connettore dichiarato, o una descrizione):
@@ -219,6 +231,48 @@ inizializzata o per aggiungere viste dopo.
      se tenere anche quella (es. per il team) o toglierla. Se il formato
      ha campi per scadenze, RICE o commenti, mappali sulle stesse fonti
      di `roadmap-di-lavoro` (`fields`), non su fonti nuove.
+  6. **Tempi e capacità del formato aziendale.** I formati di roadmap
+     aziendali chiedono quasi sempre *quando* (Gantt, inizio/fine,
+     trimestre di rilascio, sprint) e a volte *quanto* (FTE allocati,
+     utilizzo del team, swimlane per team). Mappali così, mai su date
+     scritte a mano:
+     - **inizio / fine / periodo di rilascio** → `slot_plan.slots`
+       (`start_week`/`end_week`) dell'ultimo snapshot approvato,
+       convertiti nella granularità del formato (mese, trimestre,
+       sprint — chiedi la durata e la settimana di partenza degli sprint
+       se il formato li usa) e sempre marcati "stima" ("stima grezza" se
+       `estimate_basis: rough`). Le voci senza slot vanno nel campo del
+       formato per "non pianificato/backlog" con il motivo da
+       `unslotted`, o in `gaps` se il formato non ne ha uno;
+     - **una data esatta di consegna** che il formato pretende come
+       impegno → non esiste nel framework (le uniche date esatte sono le
+       scadenze dichiarate): `gaps`, e dillo al PM — è una conversazione
+       su cosa l'azienda chiama "data di rilascio", non un campo da
+       riempire;
+     - **capacità / utilizzo / FTE** → `capacity_allocation`
+       (`total_capacity_weeks`, `by_competency`) e
+       `slot_plan.saturation_by_month`, per competenza o per squad.
+       **Mai per persona**: `team.yaml` è descrittivo e non valutativo,
+       un report per gli stakeholder non mostra il carico o l'utilizzo
+       dei singoli. Se il formato lo chiede, proponi la stessa colonna
+       per competenza o per squad; se il PM insiste, è un `gaps`;
+     - **quota sul debito tecnico** → `capacity_allocation.platform_pct`;
+     - **swimlane per team** → `delivery.squad` / `team.yaml squads[].label`
+       (o `platform.squad`); senza squad dichiarate, la swimlane è la
+       Product Line;
+     - **"owner" / "assegnatario" di un'iniziativa** → non è un dato di
+       capacità: il framework ha solo il referente tecnico
+       (`tech_reference`, chi valida l'How, non chi implementa —
+       l'assegnazione vive nel tracker). Mappalo con questa etichetta,
+       o in `gaps`: chiedi al PM.
+     - **RAG / semaforo di stato** → si può derivare, se il PM approva la
+       regola: verde = slot in linea e non `at_risk`, giallo =
+       `delayed_by` o competenza `tight`, rosso = `at_risk` o
+       `over_capacity`. Scrivi la regola nel `rule` del campo; senza
+       accordo del PM, è un `gaps`.
+     Mostra questa parte della mappatura a parte: è quella in cui un
+     formato aziendale rischia di promettere più di quanto il team possa
+     mantenere.
   Se più di un terzo dei campi finisce in `gaps`, dillo: il formato
   chiede dati che il processo non produce, ed è una conversazione da
   fare con chi lo ha imposto, non un buco da tappare a ogni report.
