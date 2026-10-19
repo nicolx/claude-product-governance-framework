@@ -98,7 +98,9 @@ Due modalità:
    `product/approvals/pending/{data}-report-<name>-<periodo>.yaml`
    (`framework/schema/approval.template.yaml`, `type: outbound_comm`,
    `proposed_by: report-render`, `target_file: null`) con `payload`:
-   `report_ref` (il path del report), `recipients`, `destination`,
+   `report_ref` (il path del report), `view` e `period`, `sources` (i
+   path del piano/snapshot usati, gli stessi del blocco di provenienza),
+   `recipients`, `destination`,
    `subject` e il corpo pronto all'invio/pubblicazione. Il framework
    **non pubblica né invia**: dopo l'approvazione è il PM a mandare la
    mail o aggiornare la pagina/il deck.

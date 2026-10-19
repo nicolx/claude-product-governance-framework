@@ -65,16 +65,20 @@ _Dallo snapshot {settimana} e dal Piano di Iterazione {settimana}._
 ## Timeline
 | Product Line | {mese 1} | {mese 2} | {mese 3} |
 |---|---|---|---|
-| {Product Line} | {short_ref} {summary} (stima) | … | … |
+| {Product Line} | {short_ref} {summary} (stima){ · slitta per {competenza}}{ · ⚠ oltre la scadenza} | … | … |
 
+## Capacità per competenza
+| Competenza | {mese 1} | {mese 2} | {mese 3} |
+|---|---|---|---|
+| {competenza} | {saturation_pct}% | … | … |
 
 ## Scadenze nel trimestre
 | Data | Iniziativa | Tipo | Stato |
 |---|---|---|---|
 | {due_date} | {short_ref} · {summary} | mandate / scadenza | {escalation_status} |
 
-## In lavorazione, non ancora dimensionate
-- {short_ref} · {summary} — stima attesa dall'Iteration Planning
+## Non collocate nel trimestre
+- {short_ref} · {summary} — {non dimensionata: stima attesa dal team tech | oltre il trimestre: Later | non fattibile con il team attuale}
 
 ## Scadenze del trimestre successivo
 - {due_date} · {short_ref} · {summary}
@@ -82,10 +86,14 @@ _Dallo snapshot {settimana} e dal Piano di Iterazione {settimana}._
 
 ## Regole di composizione
 
-- Una voce va in un mese **solo** se ha `delivery.estimated_effort_weeks`
-  (stima del team tech dall'Iteration Planning). Tutte le altre vanno in
-  "non ancora dimensionate": è un'informazione, non un buco da coprire.
-- Ogni collocazione nella timeline porta la dicitura "stima". Le uniche
+- Una voce va in un mese **solo** se ha uno slot nello `slot_plan` dello
+  snapshot (inizio e fine ricavati dalla capacità del team, playbook
+  "Capacità del team e slot della roadmap"). Tutte le altre vanno in
+  "Non collocate nel trimestre" con il motivo: è un'informazione, non un
+  buco da coprire. Non si ricalcola lo slotting qui: se non piace, si
+  cambia l'ordine o la stima, e si rigenera lo snapshot.
+- Ogni collocazione nella timeline porta la dicitura "stima" ("stima
+  grezza" se `estimate_basis: rough`). Le uniche
   date esatte sono le scadenze dichiarate (`mandate.due_date`,
   `deadline.due_date`).
 - I segnali si copiano dallo snapshot approvato più recente. Se lo
@@ -93,4 +101,19 @@ _Dallo snapshot {settimana} e dal Piano di Iterazione {settimana}._
   `roadmap-snapshot` prima di distribuire la vista.
 - Se `total_capacity_weeks` non è stato dichiarato nello snapshot, la
   riga sulla capacità mostra le settimane senza percentuale — non si
-  stima la capacità del team.
+  stima la capacità del team. Se lo `slot_plan` è vuoto (`team.yaml`
+  senza capacità), la timeline lo dice in testa e rimanda a
+  `team-roster`: niente collocazioni senza capacità dichiarata.
+- La versione da distribuire porta nell'`outbound_comm` i `sources`
+  (snapshot e piano usati): è ciò che rende confrontabile, settimana per
+  settimana, la promessa con lo stato reale (regola sotto).
+- **Una volta distribuita, è la promessa del trimestre.** L'aggiornamento
+  settimanale (`framework:aggiornamento-settimanale`, opzione
+  `compare_to_quarterly`) confronta ogni settimana lo `slot_plan`
+  corrente con quello dello snapshot su cui poggiava la versione
+  distribuita (in `sources` dell'`outbound_comm` approvato): in linea, in
+  ritardo, in anticipo, uscite, aggiunte. Rigenerare il report in
+  `product/reports/` non sposta la base; la sposta solo una nuova
+  distribuzione approvata — una scelta del PM, da fare quando gli
+  scostamenti sono tali che la promessa va riformulata, non per far
+  sparire i ritardi dalla mail.

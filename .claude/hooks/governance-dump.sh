@@ -137,6 +137,22 @@ emit_last_two_snapshots() {
     | while IFS= read -r f; do emit_file "$f"; done
 }
 
+emit_distributed_reports() {
+  # le comunicazioni di report già approvate (decided/, outbound_comm
+  # approved): solo i metadati — vista, periodo, fonti, data — non il
+  # corpo. Servono all'aggiornamento settimanale per ritrovare su quale
+  # snapshot poggiava la roadmap trimestrale distribuita (la "promessa")
+  local f
+  [ -d "product/approvals/decided" ] || return 0
+  printf '\n━━━ report distribuiti (outbound_comm approvati, solo metadati) ━━━\n'
+  grep -l '^type:[[:space:]]*outbound_comm' product/approvals/decided/*.yaml 2>/dev/null \
+    | xargs grep -l '^decision:[[:space:]]*approved' 2>/dev/null | sort \
+    | while IFS= read -r f; do
+        printf -- '- %s\n' "$f"
+        sed -n -E '/^[[:space:]]*(view|period|report_ref|decided_at):/p; /^[[:space:]]*sources:/,/^[[:space:]]*[a-z_]+:/{/^[[:space:]]*- /p;}' "$f" | sed 's/^/    /'
+      done
+}
+
 emit_reports_index() {
   # per ogni vista in product/reports/, il periodo dell'ultimo report generato
   # (serve a capire quali viste sono in scadenza — non il contenuto)
@@ -241,6 +257,7 @@ case "$MODE" in
     emit_glob "product/prds" 'measurement*.yaml'
     emit_iterations
     emit_last_two_snapshots   # corrente + precedente: confronto degli slot nell'aggiornamento settimanale
+    emit_distributed_reports  # base del confronto con la roadmap trimestrale distribuita
     emit_recent_ceremonies
     emit_pending_index
     footer

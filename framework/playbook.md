@@ -2271,7 +2271,16 @@ cambiato), la mail legge lo snapshot: i segnali di attenzione e
 **"Quando arriva"** — le consegne stimate a breve, ciò che si è spostato
 rispetto allo snapshot precedente e perché (capacità di una competenza,
 nuova stima, priorità), ciò che è entrato nel trimestre. Sempre al mese e
-con "stima", mai una data promessa. È una proposta in `pending/`
+con "stima", mai una data promessa. E dice dove si è **rispetto alla
+roadmap trimestrale distribuita**: una volta approvata e mandata, quella
+è la promessa del trimestre, e ogni settimana la mail riporta quante
+iniziative sono in linea, in ritardo, in anticipo, uscite o aggiunte
+rispetto a lei — confrontando lo `slot_plan` corrente con quello dello
+snapshot su cui poggiava (registrato in `sources` dell'`outbound_comm`
+approvato, così la base non cambia se il report viene rigenerato). Uno
+slittamento piccolo ogni settimana non si nota da una mail all'altra, ma
+si accumula qui. La base si sposta solo con una nuova distribuzione
+della roadmap trimestrale, decisa dal PM. È una proposta in `pending/`
 (`outbound_comm`) come ogni comunicazione in uscita: la manda il PM.
 
 **Principi delle viste standard** (valgono anche come buona pratica per

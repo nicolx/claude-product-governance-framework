@@ -30,8 +30,13 @@ proposed_by: ""                     # nome della skill che ha generato la propos
 #   punta al file di iterazione.
 # - outbound_comm: oggetto + corpo della comunicazione, e a chi. Se nasce
 #   da una vista di report-render: anche report_ref (il path in
-#   product/reports/{vista}/{periodo}.md) e destination (dove il PM la
-#   pubblica). Il framework non invia né pubblica: dopo l'approvazione lo
+#   product/reports/{vista}/{periodo}.md), view e period (la vista e il
+#   periodo), sources (i path del piano/snapshot da cui è stato composto)
+#   e destination (dove il PM la pubblica). sources serve a ritrovare,
+#   anche dopo che il report è stato rigenerato, su quali dati poggiava
+#   la versione distribuita: la roadmap trimestrale approvata è la base
+#   del confronto "Rispetto alla roadmap del trimestre" dell'aggiornamento
+#   settimanale. Il framework non invia né pubblica: dopo l'approvazione lo
 #   fa il PM (playbook, "Modelli di reporting")
 # - strategic_exception_flag: la nuova voce da appendere a
 #   strategic_exceptions di un'idea (es. invoked_at_stage:
