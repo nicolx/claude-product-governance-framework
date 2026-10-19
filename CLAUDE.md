@@ -212,7 +212,7 @@ mai, no-op sul canonico. Ogni skill che scrive in `product/`/`context/`
 deve chiudere con `governance-sync.sh push`; quelle elencate nel playbook
 come "read-critical" devono aprire con `governance-sync.sh pull`. Le skill
 che ragionano sul codice (`inbox-triage`, `idea-intake`, `prd-draft`,
-`rice-update`, `path-watch`, `prd-review-panel`) eseguono `governance-sync.sh apps` prima di leggerlo, che porta i submodule di `apps/` all'ultimo
+`rice-update`, `path-watch`, `prd-review-panel`, `jira-sync` Push) eseguono `governance-sync.sh apps` prima di leggerlo, che porta i submodule di `apps/` all'ultimo
 commit remoto senza committare il puntatore. Vedi playbook, sezione
 "Sincronizzazione dell'istanza (`origin`)".
 

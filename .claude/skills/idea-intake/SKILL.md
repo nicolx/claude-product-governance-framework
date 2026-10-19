@@ -188,6 +188,12 @@ Fuori da questa modalità, la skill si comporta come descritto nei
        includendo un **impatto stimato** (chiedilo al PM se non ricavabile
        dal materiale; per un tema di security segnala che va gestito ASAP).
        Delega a `jira-sync` Push (passi 3-6) per i dettagli del connettore.
+       Se dalla lettura di `apps/` (passo di diagnosi) hai un'ipotesi di
+       causa e la zona del codice, aggiungila come *Proposta di
+       implementazione — da validare con il team*, marcata come ipotesi
+       (playbook, "La proposta di implementazione nella card"); senza
+       ipotesi fondata, ometti la sezione — mai ritardare il filing per
+       costruirla.
      - **Popola `jira.card_id`/`jira.url`/`jira.status`** sull'idea e porta
        `status: in_jira`. È un fatto (il ticket esiste), scrittura diretta,
        **non** passa da `product/approvals/pending/` — segnalalo all'utente.

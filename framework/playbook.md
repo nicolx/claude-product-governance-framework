@@ -459,7 +459,8 @@ puntatore, che invecchia a ogni rilascio dei team tech. Le skill che
 già risolto? è debito tecnico?), `prd-draft` (l'How), `rice-update`
 (l'Entanglement da ispezione), `path-watch` (le rotte e gli eventi già
 tracciati nel codice), `prd-review-panel` (il revisore IT che controlla
-l'How contro il codice) — prima di leggerlo eseguono quindi
+l'How contro il codice), `jira-sync` Push (la proposta di
+implementazione nella card) — prima di leggerlo eseguono quindi
 `governance-sync.sh apps`, che porta ogni submodule all'ultimo commit
 del suo branch remoto (`submodule.<nome>.branch` in `.gitmodules`,
 altrimenti il branch di default del remote). Stessi principi del pull: non blocca mai (fetch
@@ -2178,6 +2179,44 @@ Quando usarla: `prd-draft` la esegue già dentro la stesura (non serve
 lanciarla a mano dopo un PRD appena scritto); a mano quando il roster
 cambia, il PRD evolve, o all'Iteration Planning si riconfermano i
 referenti.
+
+### La proposta di implementazione nella card
+
+Quando un'iniziativa (o un bug) diventa una card sul tracker di
+esecuzione, la card **può portare una proposta di implementazione**,
+scritta come se alla stesura avesse già contribuito un esperto tecnico:
+dove si interviene nel codice, un approccio possibile, le alternative
+scartate e perché, i punti dove serve una decisione del team. Serve a
+**facilitare il dialogo** con gli sviluppatori — si discute su qualcosa
+di concreto invece di partire dal foglio bianco — non a decidere al loro
+posto.
+
+Regole:
+
+- **Fondata, non inventata.** Parte dall'How del PRD e dal codice reale
+  di `apps/` all'ultimo commit (`governance-sync.sh apps`), citando i
+  file/moduli toccati e il commit letto. Se il codice non è leggibile
+  (app non collegata, accesso negato) lo dice, e la proposta resta al
+  livello dell'How.
+- **Dichiarata come proposta.** Sezione separata e titolata (es.
+  *Proposta di implementazione — da validare con il team*), mai
+  mescolata ai requisiti o ai criteri di accettazione: il *cosa* e il
+  *perché* sono vincolanti, il *come* è un punto di partenza.
+- **Stato di validazione esplicito.** Una riga dice se la proposta è
+  già stata vista dal `tech_reference` ("validata con Gastone il …")
+  oppure no ("non ancora validata — prima scelta per discuterla:
+  Gastone"). Mai presentare come validato un How che nessuno del team ha
+  visto.
+- **Proporzionata.** Bullet, non una specifica: il PRD resta linkato e
+  non si copia nella card. Per un bug: ipotesi di causa e zona del
+  codice, marcate come ipotesi, accanto ai passi di riproduzione.
+- **Non è assegnazione né stima.** Non dice chi la fa né quanto ci vuole
+  — quelle restano dell'Iteration Planning e del team (blocco `delivery`).
+- **L'ultima parola è del team.** Se gli sviluppatori scelgono un'altra
+  strada, la card si aggiorna sul tracker (che resta la fonte di verità
+  dell'esecuzione); se la scelta cambia il footprint o l'Entanglement, il
+  PRD si riallinea con `prd-draft` e l'eventuale revisione RICE passa da
+  `rice-update`.
 
 ## Capacità del team e slot della roadmap
 

@@ -93,7 +93,22 @@ Planning).
    procedere, che esista in `product/prds/`.
 2. Prepara il contenuto del ticket (titolo, descrizione sintetica, link
    al PRD e/o alla cartella idea nel repo — non copiare il contenuto
-   integrale del PRD dentro Jira, linkalo). Se l'idea ha un `short_ref`,
+   integrale del PRD dentro Jira, linkalo).
+   **Proposta di implementazione (consigliata).** Aggiungi in coda una
+   sezione separata *Proposta di implementazione — da validare con il
+   team*, come l'avrebbe abbozzata un esperto tecnico, per dare agli
+   sviluppatori qualcosa di concreto su cui discutere — regole complete
+   in playbook, "La proposta di implementazione nella card". In breve:
+   esegui prima `bash .claude/hooks/governance-sync.sh apps` e parti
+   dall'How del PRD e dal codice reale di `apps/` (file/moduli toccati,
+   commit letto); approccio possibile, alternative scartate, punti aperti
+   per il team; una riga sullo stato di validazione (validata con il
+   `tech_reference` o "non ancora validata — prima scelta per
+   discuterla: {tech_reference}"). Bullet, mai requisiti o criteri di
+   accettazione, mai assegnazione o stima. Per un bug: ipotesi di causa
+   e zona del codice, marcate come ipotesi. Se il codice non è
+   leggibile, dillo nella sezione e resta al livello dell'How.
+   Se l'idea ha un `short_ref`,
    mettilo in testa al titolo del ticket (es. `[PG-042] …`) — è il
    cross-reference tra la governance e l'esecuzione. Funziona **proprio
    perché** `short_ref_prefix` è un namespace distinto da

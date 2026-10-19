@@ -54,6 +54,22 @@ Tipi di impatto:
 
 ---
 
+### 2026-10-19-proposta-implementazione-card · Le card per i dev possono portare una proposta di implementazione
+
+- **Impatto**: nessuna
+- **Cosa cambia**: quando `jira-sync` (o il filing di un bug
+  all'intake) crea una card, può aggiungere una sezione *Proposta di
+  implementazione — da validare con il team*: dove intervenire nel
+  codice, un approccio possibile, alternative, punti aperti — come se al
+  PRD avesse contribuito un esperto tecnico. Parte dall'How del PRD e dal
+  codice di `apps/`, dichiara se il `tech_reference` l'ha già vista, e
+  resta una proposta: il come lo decide il team. Vedi playbook, "La
+  proposta di implementazione nella card".
+- **Cosa fare nell'istanza**: niente.
+- **Già a posto se**: sempre.
+
+---
+
 ### 2026-10-19-backfill-agenda-team · Il sync con Jira tiene il framework allineato all'agenda del team
 
 - **Impatto**: setup
