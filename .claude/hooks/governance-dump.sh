@@ -119,6 +119,7 @@ emit_reference() {
   emit_file "product/reference/delivery-watch.yaml"
   emit_file "product/reference/reporting-models.yaml"
   emit_file "product/reference/team.yaml"          # offerta di capacità per competenza (capacity_check, slot_plan)
+  emit_file "product/reference/test-environments.yaml"   # ambienti e utenti di prova (solo riferimenti, mai credenziali)
 }
 
 emit_latest_snapshot() {

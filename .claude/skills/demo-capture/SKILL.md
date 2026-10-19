@@ -84,6 +84,14 @@ nota per la card — non nascosti.
      mai nel repo tracciato (stesso vincolo dell'integrazione analytics
      — `framework/docs/future-work.md`). Se trovi un segreto scritto
      nella recipe, fermati e segnalalo.
+   - **Ambiente e utente dal registro.** Per `mode: deployed` la recipe
+     punta di preferenza a `deployed.environment` e
+     `deployed.account_ref` di `product/reference/test-environments.yaml`
+     (playbook, "Ambienti e utenti di prova"). Allo scaffold, proponi
+     ambiente e utente dal registro; se l'utente adatto non c'è, registralo
+     come `status: wanted` (`wanted_by: "demo-capture <idea>"`, come fa
+     `app-test` al passo 2) e dillo al PM. I campi `base_url`/`auth.*_env`
+     restano solo come ripiego per recipe scritte prima del registro.
 
 3. **Scegli la modalità di cattura** (`capture.mode` nella recipe):
    - **`deployed`** (fedeltà massima, preferita): la recipe ha un
@@ -102,7 +110,14 @@ nota per la card — non nascosti.
    PM quale ref è servito da quell'ambiente.
 
 5. **Porta su l'app.**
-   - `deployed`: nessun bring-up, usa `base_url` + autenticati.
+   - `deployed`: nessun bring-up. Con `environment`/`account_ref`, fai
+     login seguendo la procedura di `app-test` (passi 3-5: host in
+     `allowed_hosts` prima di digitare, credenziali risolte al momento con
+     `bash .claude/hooks/test-credentials.sh resolve <ref>`, mai ripetute,
+     un solo nuovo tentativo poi `broken`); altrimenti usa `base_url` + le
+     env var di `auth`. Se l'ambiente è `tier: production`, la cattura è
+     sola lettura (regole di produzione di `app-test`, passo 6), e a fine
+     cattura fai logout.
    - `local`: esegui `local.bring_up`, attendi `local.ready_check`,
      esegui `local.seed`. **Build di produzione, non dev server**: se
      `bring_up` avvia un dev server, segnala la perdita di fedeltà (CSS
@@ -130,7 +145,8 @@ nota per la card — non nascosti.
 
 8. **Scrivi `product/demos/captures/<idea-slug>/manifest.yaml`** (da
    `framework/schema/demo-recipe.template.yaml`, blocco `# --- manifest`):
-   ref iniziativa, app slug, `mode`, commit SHA / release tag, driver,
+   ref iniziativa, app slug, `mode`, ambiente e utente (gli `id` del
+   registro, mai credenziali), commit SHA / release tag, driver,
    data, elenco screenshot (path, flow ref, viewport, didascalia), e i
    quattro caveat di fedeltà applicabili. È un **fatto osservato** (cosa
    è stato catturato e da dove), non una decisione di priorità: scrittura
@@ -149,9 +165,10 @@ nota per la card — non nascosti.
    richiedente"). Se l'iniziativa ha `jira.card_id`, cita la card nella
    bozza per comodità del PM.
 
-10. **Sincronizza il repo**: se hai scritto il manifest o scaffoldato la
-    recipe, esegui
-    `bash .claude/hooks/governance-sync.sh push "demo-capture: <idea-slug>" product/demos/`
+10. **Sincronizza il repo**: se hai scritto il manifest, scaffoldato la
+    recipe o aggiornato il registro degli utenti di prova (`wanted`,
+    `last_verified_at`, `broken`), esegui
+    `bash .claude/hooks/governance-sync.sh push "demo-capture: <idea-slug>" product/demos/ product/reference/test-environments.yaml`
     (vedi playbook, "Sincronizzazione dell'istanza (`origin`)").
 
 ## Cosa NON fare

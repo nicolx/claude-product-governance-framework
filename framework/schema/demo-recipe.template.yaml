@@ -49,9 +49,16 @@ capture:
 
 # --- Solo per mode: deployed ---
 deployed:
-  base_url: ""                     # URL del deployment reale (staging, o pattern della preview per-PR). NIENTE credenziali nell'URL.
+  # Preferito: punta a un ambiente e a un utente di prova del registro
+  # product/reference/test-environments.yaml — base_url, allowed_hosts,
+  # login e riferimenti alle credenziali vengono da lì (skill test-accounts),
+  # e il login segue la procedura di app-test. I campi sotto restano come
+  # ripiego per una recipe scritta prima del registro.
+  environment: ""                  # → environments[].id (es. "wallet-web-stg")
+  account_ref: ""                  # → accounts[].id (es. "wallet-stg-merchant-admin"). Se manca, demo-capture lo registra come wanted.
+  base_url: ""                     # ripiego se environment è vuoto. URL del deployment reale (staging, o pattern della preview per-PR). NIENTE credenziali nell'URL.
   ref_note: ""                     # come si sa quale commit serve quell'ambiente (es. "staging = ultimo tag release", "preview = HEAD della PR")
-  auth:
+  auth:                            # ripiego se account_ref è vuoto
     method: ""                     # "none" | "form" | "cookie" | "basic" | "header"
     # Per form login: selettori del form + NOMI delle env var con le credenziali (mai i valori).
     login_url: ""

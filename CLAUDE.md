@@ -60,6 +60,10 @@ dominio) che si sommano al playbook generico senza sostituirlo.
 | `product/demos/recipes/*.yaml` | Istanza, **tracciata da git** | `demo-capture` scaffolda al primo uso, PM/team tech completano — contratto tecnico per-app (come portare su l'app in modalità demo, quali flussi catturare), non una decisione di priorità: scrittura diretta, nessuna approvazione. **Mai segreti** dentro (env var per nome, non valori) — stesso vincolo di `framework/docs/future-work.md` |
 | `product/demos/captures/*/manifest.yaml` | Istanza, **tracciata da git** | Solo `demo-capture` — record di audit di cosa è stato catturato, da quale commit, quando: fatto osservato, non decisione (stessa logica di `jira.card_id`), scrittura diretta senza approvazione |
 | `product/demos/captures/*/screenshots/` | Istanza, **NON tracciata da git** (`.gitignore` di root) | Solo `demo-capture` — artefatti binari, mai committati. `demo-capture` non fa **nessuna azione in uscita**: è il PM ad allegarli alla card del tracker di esecuzione / al deck per gli stakeholder, a mano (stessa logica di `requester_reply`) |
+| `product/reference/test-environments.yaml` | Istanza, **tracciata da git** | Creato da `init-governance-project` (passo 5b dell'intervista, anche solo con `accounts: []`); fatto evolvere da `test-accounts` (aggiunta, attivazione, verifica, rotazione, ritiro). `app-test` e `demo-capture` vi scrivono solo le voci `status: wanted` (un utente che serve e non c'è), `last_verified_at` e `status: broken`/`environments[].status`. Ambienti (dev/stg/prod/preview: URL, `allowed_hosts`, `tier`) e utenti di prova (persona, ruoli, login, MFA, owner, stato). **Mai credenziali**: solo riferimenti (`local:`/`env:`/`keychain:`/`op://`) risolti da `.claude/hooks/test-credentials.sh`, nessuno schema a comando. Dato di riferimento condiviso come `team.yaml`: scrittura diretta, non passa da approvazione — vedi playbook, "Ambienti e utenti di prova" |
+| `.governance/test-credentials.local.env` | Istanza, **NON tracciata da git** (`.gitignore` di root: `.governance/*.local.env`) | Creato da `test-credentials.sh init-local` (permessi 600); i valori li inserisce il PM con un editor, o `test-accounts` se il PM li ha dati in conversazione. Archivio locale delle credenziali per i riferimenti `local:`, solo di questo clone. Mai letto da altro che dall'helper, mai copiato altrove |
+| `product/tests/runs/*/run.yaml` | Istanza, **tracciata da git** | Solo `app-test` — record di un giro di navigazione con un utente di prova (ambiente, utente per id, passi, esito, errori di console/rete in sintesi, azioni confermate in produzione): fatto osservato, scrittura diretta senza approvazione. Mai credenziali |
+| `product/tests/runs/*/screenshots/` | Istanza, **NON tracciata da git** (`.gitignore` di root) | Solo `app-test` — artefatti binari (in produzione possono contenere dati reali), mai committati, nessuna azione in uscita |
 | `product/reference/nsm-tracking.yaml` | Istanza | Solo `nsm-watch` — creato lazy al primo run (non da `init-governance-project`), scritto direttamente: `readings`/`trend_status`/`alert.status` sono fatti/calcoli osservati, `discovery_focus_confirmed`/`resolved_*` sono cattura di decisioni già espresse dal PM in conversazione. Nessuno di questi passa da approvazione |
 | `product/reference/delivery-watch.yaml` | Istanza, **tracciata da git** | Solo `delivery-watch` (poll+detect e triage) — creato lazy al primo run (non da `init-governance-project`, richiede `jira.configured: true` + `delivery_watch.enabled: true`). `last_watch`/`tickets` sono fatti osservati dal tracker; le voci `queue` (un evento per **ogni** movimento di una card) sono fatti osservati; le bozze di mail (`draft_*`) le prepara la watch al rilevamento per ogni evento (tranne le consegne, nel triage dopo il giudizio DoD del PM), il loro esito (`sent_at`, `dismiss_reason`) è cattura di decisioni già espresse dal PM (mai presunte). Nessuno passa da approvazione. Le mail non partono mai in automatico: bozza nella voce di coda, la manda il PM (stessa logica di `requester_reply`); il testo inviato resta come trail |
 | `product/ideas/*/backfill_review_needed` | Istanza | `delivery-watch` lo mette a `true` alla creazione di un'idea di backfill; qualunque skill/PM lo azzera al triage dopo aver confermato classificazione/product_line (o archiviato l'idea). Fatto di provenienza, scrittura diretta, non passa da approvazione (stessa logica di `rice_status`) |
@@ -151,6 +155,17 @@ l'evidenza esce verso gli stakeholder è sempre un atto manuale del PM
 (stessa logica di `requester_reply`): non c'è comunicazione in uscita da
 far passare da `pending/`.
 
+Corollario: `app-test` e `test-accounts` non rientrano nella regola —
+navigare un ambiente con un utente di prova e registrare cosa si è visto
+sono fatti osservati, e non c'è comunicazione in uscita (stessa logica di
+`demo-capture`). Il loro vincolo è un altro: in **produzione** ogni
+azione che crea/modifica/cancella dati, invia messaggi, muove denaro o
+tocca integrazioni esterne richiede la conferma esplicita del PM prima,
+per quella singola azione, in conversazione (conferma operativa, non
+decisione di priorità: non passa da `pending/`); e nessuna credenziale
+entra mai nel repo tracciato — vedi playbook, "Ambienti e utenti di
+prova".
+
 Corollario: `delivery-watch` non rientra nella regola. Osserva il tracker
 di esecuzione e mette **ogni movimento** delle card (in sviluppo, in
 review, ogni altro cambio di stato, bloccata, in produzione, bug
@@ -235,7 +250,10 @@ per un bug confermato — la creazione del ticket. Vanno pre-autorizzate nei
 permessi: la parte stack-agnostica (helper, git read-only) è in
 `.claude/settings.json` (framework); i tool del connettore dichiarato li
 scrive `init-governance-project` in `.claude/settings.local.json` (istanza,
-non tracciato). Restano interattivi solo le decisioni di priorità
+non tracciato). Il blocco `browser:` (driver con cui `app-test`/
+`demo-capture` navigano gli ambienti con gli utenti di prova) segue la
+stessa disciplina; `test-credentials.sh resolve` (l'unico sottocomando
+che espone un valore) si pre-autorizza solo se il PM lo chiede. Restano interattivi solo le decisioni di priorità
 (`pending/`), le comunicazioni verso persone, e la conferma di
 classificazione del bug.
 

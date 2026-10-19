@@ -1,0 +1,45 @@
+# Template per product/tests/runs/{YYYY-MM-DD}-{slug}/run.yaml
+#
+# Record di un giro di app-test: cosa si è guardato, dove, con quale
+# utente di prova, cosa si è visto. Fatto osservato (come il manifest di
+# demo-capture): scrittura diretta di app-test, nessuna approvazione via
+# product/approvals/pending/. Tracciato da git; gli screenshot accanto
+# (screenshots/) NO — .gitignore di root.
+#
+# NESSUNA CREDENZIALE QUI: l'utente si cita con l'id del registro
+# (product/reference/test-environments.yaml), mai username riservati,
+# password, codici MFA, token o cookie.
+
+run_id: ""                        # = nome della cartella
+date: ""                          # data ISO
+task: repro                       # repro | verify | explore | debug | screenshot
+goal: ""                          # la domanda a cui il giro risponde, in una riga
+idea_ref: ""                      # slug o short_ref dell'idea, se c'è
+jira_card_id: ""                  # se il compito riguarda una card
+
+environment: ""                   # → environments[].id
+tier: ""                          # copiato dall'ambiente al momento del giro
+account: ""                       # → accounts[].id (MAI credenziali)
+account_limits: ""                # se l'utente non era quello ideale: in cosa differisce e cosa non dice l'esito
+code_ref: ""                      # commit/tag servito dall'ambiente, se noto ("" = non verificato)
+driver: ""                        # claude-in-chrome | playwright-mcp | manuale
+
+steps: []                         # i passi eseguiti, in parole (minimi, riproducibili)
+# - "Login come wallet-stg-merchant-admin"
+# - "Ricevute → filtra 'non riconosciute' → apri la prima"
+
+outcome: ""                       # reproduced | not_reproduced | verified | not_verified | inconclusive | done (explore/screenshot)
+observations: ""                  # cosa si è visto, in prosa breve
+console_errors: []                # sintesi: messaggio, sorgente — niente dati personali
+network_errors: []                # sintesi: metodo, endpoint (senza query string con dati), status
+screenshots: []
+# - file: "screenshots/01-lista-ricevute.png"
+#   caption: ""
+#   contains_real_data: false     # true in produzione / con utenti che vedono dati di clienti
+
+production_actions: []            # solo tier production: ogni azione di scrittura eseguita, con la conferma del PM
+# - action: "Rimborso di 0,01 € sulla transazione di test T-123"
+#   confirmed_by: ""              # il PM che ha confermato
+#   confirmed_at: ""              # timestamp ISO
+
+follow_ups: []                    # es. "commento con passi di repro preparato per EPITA-121", "utente wanted aggiunto: wallet-prod-support"

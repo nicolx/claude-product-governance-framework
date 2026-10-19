@@ -116,6 +116,21 @@ metrics:
       dashboards:
         enabled: true             # una dashboard per Product Line con NSM + i path active delle idee attive, riallineata a ogni giro (riferimento in product-lines.yaml → analytics_dashboard)
 
+# --- Driver browser (lo usano app-test, demo-capture, test-accounts verify) ---
+# Con cosa il framework naviga gli ambienti delle app (dev, stg, prod…) con
+# gli utenti di prova del registro product/reference/test-environments.yaml.
+# Stessa disciplina degli altri connettori: verificato a inizio processo,
+# dichiarato ma irraggiungibile ≠ manuale. Le credenziali degli utenti di
+# prova NON stanno qui né nel registro: solo riferimenti, risolti da
+# .claude/hooks/test-credentials.sh — vedi playbook, "Ambienti e utenti di prova".
+browser:
+  configured: false               # true quando c'è un driver collegato
+  integration: ""                 # "claude-in-chrome" (guida il Chrome reale — consigliato un profilo Chrome dedicato ai test)
+                                  # | "playwright-mcp" (headless, pinnabile) | "manuale" (app-test prepara passi e URL, il PM esegue)
+  probe: ""                       # es. "mcp__claude-in-chrome__" (prefisso dei tool)
+  reauth: ""                      # es. "apri Chrome sul profilo di test e riattiva l'estensione Claude"
+  note: ""                        # es. nome del profilo Chrome di test, VPN necessarie
+
 # --- Altri connettori (design, SQL ad-hoc, sorgenti di contesto, ecc.) ---
 # Stessa disciplina. check-connectors.sh li segnala a inizio sessione.
 # Una voce con `folders:` non vuoto è una SORGENTE DI CONTESTO: context-watch

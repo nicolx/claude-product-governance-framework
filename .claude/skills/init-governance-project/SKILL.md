@@ -89,6 +89,45 @@ per raccogliere:
      l'eccezione.
    Sostituire con un vero submodule non appena il codice sarà distribuito
    via git.
+5b. **Ambienti e utenti di prova** — serve perché il framework possa
+   navigare le applicazioni con un utente di prova, via Chrome, per
+   testare, riprodurre un bug, fare debug, verificare una consegna e fare
+   screenshot (`app-test`, `demo-capture`; playbook, "Ambienti e utenti di
+   prova"). Per ogni app collegata al passo 5:
+   - **Ambienti**: quali livelli esistono (dev, stg, prod, preview
+     per-PR…) e per ciascuno `base_url`, `allowed_hosts` (incluso il
+     dominio del login federato), `tier`, che dati contiene, come ci si
+     arriva (VPN, IP allowlist). Non inventare URL: se il PM non li sa,
+     l'ambiente resta con `base_url: ""` e una nota.
+   - **Utenti di prova già esistenti**: per ciascuno ambiente, persona
+     (chi è, cosa vede), ruoli, metodo di login, MFA, owner, e **dove sta
+     la password**. Proponi in quest'ordine: il password manager del team
+     (`op://…`) o il Portachiavi (`keychain:…`) — l'unico modo in cui i
+     colleghi che clonano le ritrovano; altrimenti il file locale
+     `.governance/test-credentials.local.env` (non tracciato, permessi
+     600), che il PM riempie **lui** con un editor dopo che l'hai creato.
+     Chiedi di non incollare password in conversazione; se lo fa
+     comunque, scrivile solo nel file locale. Segui i passi 2-4 di
+     `test-accounts`.
+   - **Utenti che servirebbero ma non esistono ancora** (un admin su stg,
+     un utente in sola lettura in produzione…): registrali come `status:
+     wanted` con il motivo. È normale partire senza utenti: **non
+     bloccare l'inizializzazione**. Quando qualcuno li crea e le
+     credenziali compaiono nell'archivio, l'hook di sessione lo segnala e
+     `test-accounts` li attiva — da lì `app-test` sa usarli.
+   - **Driver browser** (blocco `browser:` in
+     `framework/schema/governance-config.template.yaml`): di default
+     `claude-in-chrome` (estensione Claude in Chrome, guida il Chrome
+     reale — consiglia un **profilo Chrome dedicato ai test**, così i
+     login di prova non toccano le sessioni personali del PM), oppure
+     `playwright-mcp` (headless), o `manuale`. Chiedi il nome del profilo
+     e annotalo in `note`.
+   - **Produzione**: spiega che in produzione `app-test` resta in sola
+     lettura e chiede conferma per ogni singola azione di scrittura;
+     chiedi se esistono utenti creati apposta per agire in produzione
+     (`production_writes: true`).
+   Se l'istanza non ha ancora app né ambienti, crea il registro con
+   `environments: []` e `accounts: []` — `test-accounts` lo popola dopo.
 6. **Jira** (o altro tracker di esecuzione) — project key, URL board, e
    **come l'istanza si connette** (blocco `jira` in
    `framework/schema/governance-config.template.yaml`). Nessun
@@ -296,7 +335,8 @@ che serve da lì e chiedi solo quello che manca.
    `pm_roster`, `framework.upstream_ref` (`git rev-parse upstream/main`
    se disponibile, altrimenti `HEAD`), il blocco `jira` e — se il PM lo
    attiva — il blocco `delivery_watch` (passo 6), il
-   blocco `metrics` e la lista `connectors` (passo 7 — solo ciò che
+   blocco `browser` (passo 5b — `configured: false` se il PM non ha ancora
+   un driver), il blocco `metrics` e la lista `connectors` (passo 7 — solo ciò che
    esiste; se non c'è una fonte metriche, `metrics.configured: false` e
    stop; se il PM ha dichiarato cartelle di contesto al passo 9, una o più
    voci `connectors:` con `ecosystem` e la lista `folders:`), `apps`.
@@ -344,6 +384,16 @@ che serve da lì e chiedi solo quello che manca.
    all'init: i dati ancora non ci sono; la prima roadmap aggiornata esce
    da sola alla chiusura del primo Backlog Refinement, le altre viste le
    produce `report-render`.
+   `product/reference/test-environments.yaml` (da
+   `framework/schema/test-environments.template.yaml`) — ambienti e
+   utenti di prova del passo 5b, anche solo `environments: []` /
+   `accounts: []`. **Nessun valore di credenziale**: solo riferimenti.
+   Se il PM userà riferimenti `local:`, crea l'archivio locale con
+   `bash .claude/hooks/test-credentials.sh init-local` (permessi 600,
+   escluso dal `.gitignore` di root — l'helper si rifiuta se non lo è) e
+   digli di aprirlo con un editor per inserire i valori; poi
+   `bash .claude/hooks/test-credentials.sh status` per verificare che si
+   risolvano.
    Non creare qui `product/reference/nsm-tracking.yaml`: baseline e
    target delle NSM spesso richiedono un giro su DataBricks/analytics
    che non è pratico fare a metà di questa intervista — lo scaffolda la
@@ -355,6 +405,7 @@ che serve da lì e chiedi solo quello che manca.
    `product/ceremonies/`,
    `product/approvals/pending/`, `product/approvals/decided/`,
    `product/demos/recipes/`, `product/demos/captures/`,
+   `product/tests/runs/`,
    `product/inbox/` (con `.gitkeep` dove servono, git non traccia
    cartelle vuote). `product/inbox/` è già coperta dal `.gitignore` di
    root (contenuto non tracciato — vedi skill `inbox-triage`): non
@@ -394,6 +445,16 @@ che serve da lì e chiedi solo quello che manca.
    - connettore `cli:<nome>` → `Bash(<nome> <sottocomando>:*)` per i
      sottocomandi di ricerca/lettura e creazione ticket.
    - connettore `manuale` o assente → non scrivere nulla qui.
+   - **driver browser** (`browser.integration`, passo 5b) → per
+     `claude-in-chrome` i tool `mcp__claude-in-chrome__*` di navigazione e
+     lettura (aprire/cambiare tab, navigare, leggere la pagina, trovare
+     elementi, compilare form, cliccare, screenshot, console e rete); per
+     `playwright-mcp` gli equivalenti col suo prefisso. **E**, solo se il
+     PM lo vuole, `Bash(bash .claude/hooks/test-credentials.sh resolve:*)`:
+     senza, ogni login di `app-test` chiederà il permesso di leggere la
+     credenziale (una rete di sicurezza in più, utile se l'istanza ha
+     utenti di produzione). `status`/`check`/`init-local` sono già in
+     `.claude/settings.json` (non espongono valori).
    - **fonte metriche** (`metrics.integration` `mcp:*`/`cli:*`) → i tool
      di **lettura** (elenco del catalogo: eventi, pagine/schermate, funnel
      o report salvati; metadati di un oggetto; query di aggregati) e, se
@@ -435,7 +496,9 @@ che serve da lì e chiedi solo quello che manca.
   (`product/reference/annual-target.yaml`, `value: null`), materiale di
   contesto aziendale non ancora fornito se `context/` è rimasta vuota,
   **anagrafica del team non ancora popolata** se `team.yaml` ha
-  `members: []`, o **capacità non dichiarata** se mancano il catalogo
+  `members: []`, **utenti di prova** ancora `wanted` o senza credenziali
+  su questo clone (`test-credentials.sh status` — `test-accounts` li
+  completa; i colleghi che clonano non ricevono il file locale), o **capacità non dichiarata** se mancano il catalogo
   `competencies` o gli `fte` — `team-roster` la riempie (senza, il
   capacity check e lo slot plan non si calcolano); **modelli di reporting**
   dichiarati come ponte su un modello standard in attesa del formato

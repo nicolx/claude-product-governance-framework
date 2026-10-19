@@ -12,6 +12,18 @@ product/inbox/*
 # resta invece tracciato.
 product/demos/captures/*/screenshots/
 
+# .governance/*.local.env: archivio LOCALE delle credenziali degli utenti
+# di prova (riferimenti `local:` di product/reference/test-environments.yaml,
+# creato da `test-credentials.sh init-local` con permessi 600). Mai in Git:
+# nel registro tracciato ci sono solo i riferimenti, mai i valori.
+.governance/*.local.env
+
+# product/tests/runs/<run-id>/screenshots/: catture fatte da app-test
+# navigando un ambiente con un utente di prova (in produzione possono
+# contenere dati reali). Artefatti binari, restano nel clone; il run.yaml
+# accanto (record di cosa si è guardato e con quale esito) è tracciato.
+product/tests/runs/*/screenshots/
+
 # .claude/settings.local.json: permessi/override locali a un'istanza —
 # init-governance-project ci scrive le allow entries dei tool del connettore
 # dichiarato (vedi CLAUDE.md, tabella "Confini di proprietà"). Locale al clone,

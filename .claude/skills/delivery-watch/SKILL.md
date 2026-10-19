@@ -277,7 +277,12 @@ e le label (item non di stato) producono gli eventi indicati sotto.
 
 11. Per un evento `delivered` su un'iniziativa con **UI visibile** →
     **suggerisci `demo-capture`** (non invocarla) per allegare "cosa si
-    vede adesso" alla futura mail.
+    vede adesso" alla futura mail. Se il registro degli utenti di prova
+    ha un utente sull'ambiente di produzione, suggerisci anche `app-test`
+    (`verify`, sola lettura) per confermare che la consegna si veda
+    davvero prima del giudizio DoD — un suggerimento, non un gate. Per
+    un `bug_resolved`, lo stesso con `app-test` (`repro`): se il bug non
+    si riproduce più, la chiusura è più solida.
 
 12. **Sincronizza il repo**: se hai scritto qualcosa, esegui
     `bash .claude/hooks/governance-sync.sh push "delivery-watch: <n> eventi, coda <m>, <k> backfill" product/reference/delivery-watch.yaml product/ideas/`

@@ -357,6 +357,22 @@ soli non coprono. In sintesi:
    quell'elemento. Vale indipendentemente dalla classificazione scelta
    sopra (può capitare anche per un elemento che diventa una nuova idea).
 
+6b. **Credenziali e utenti di prova.** Se un elemento contiene password,
+   token, codici o link di accesso, applica la regola di `idea-intake`
+   (passo 6, eccezione sulle credenziali): nella copia in `source/` il
+   valore diventa `[credenziale rimossa → registro utenti di prova]`, mai
+   copiato altrove; se riguarda un utente di prova (tipico: un collega
+   tech scrive "ho creato l'utente admin su stg"), proponi di registrarlo
+   con `test-accounts` — se nel registro c'era già come `wanted`, è
+   proprio il momento in cui il framework diventa capace di usarlo. Un
+   elemento che parla **solo** di un utente di prova non è un'idea: non
+   creare cartelle in `product/ideas/`, passa a `test-accounts` e, a
+   registrazione fatta, rimuovi l'elemento da `product/inbox/` (con il
+   valore ancora dentro, non deve restare in giro). Credenziali di un
+   utente reale: non si registrano, si rimuovono e si segnala al PM.
+   Per i **bug**, dopo il filing vale la stessa proposta facoltativa di
+   riproduzione con `app-test` di `idea-intake`.
+
 7. **Chiudi il run con un riepilogo**, non solo con le scritture fatte:
    quanti elementi processati, in quante unità si sono decomposti, quante
    nuove idee / aggiornamenti / bug / strategic exception / mandate /

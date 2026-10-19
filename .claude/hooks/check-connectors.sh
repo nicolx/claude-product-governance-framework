@@ -4,7 +4,9 @@
 #
 # Perché serve. `.governance/config.yaml` può dichiarare connettori a
 # sistemi esterni — `jira:` (tracker di esecuzione), `metrics:`
-# (analytics per NSM/KPI) e voci in `connectors:` (fra cui le sorgenti di
+# (analytics per NSM/KPI), `browser:` (il driver con cui app-test e
+# demo-capture navigano gli ambienti con gli utenti di prova) e voci in
+# `connectors:` (fra cui le sorgenti di
 # contesto: `connectors[].folders`, lette da context-watch/context-intake). Le skill
 # che li usano ne verificano la
 # raggiungibilità a inizio processo (playbook, "Connettori esterni:
@@ -69,6 +71,7 @@ add_connector() {
 
 add_connector jira
 add_connector metrics
+add_connector browser
 
 # Connettori custom in `connectors:` — conta le voci (`- name:`) e, se ce
 # ne sono, riporta i loro `reauth:` uno per riga (parsing best-effort).

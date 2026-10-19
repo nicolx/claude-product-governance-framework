@@ -180,5 +180,25 @@ segnalalo invece di procedere.
      declared`) e `roadmap_weeks` sommava durate — non confrontabile 1:1
      con i nuovi, dillo se il PM ne guarda la serie storica.
 
+   - "il framework naviga gli ambienti con utenti di prova" (registro
+     `product/reference/test-environments.yaml`, blocco `browser:` in
+     config, archivio locale `.governance/test-credentials.local.env`,
+     skill `test-accounts` e `app-test` — playbook, "Ambienti e utenti di
+     prova") → **nessuna migrazione obbligatoria, un setup da proporre**:
+     senza registro `app-test` si ferma e rimanda a `test-accounts`, e
+     `demo-capture` continua a usare le env var della recipe. Proponi,
+     senza applicarlo da solo:
+     1. `test-accounts` (modalità setup) per dichiarare ambienti e utenti
+        di prova esistenti — anche nessun utente, solo i `wanted`;
+     2. il blocco `browser:` in `.governance/config.yaml` (scrittura in
+        config solo su richiesta esplicita) e, se il PM lo vuole, le allow
+        entries del driver in `.claude/settings.local.json`;
+     3. per le recipe `deployed` con credenziali in env var, il passaggio
+        a `deployed.environment`/`account_ref` — le env var restano un
+        ripiego valido.
+     Se `.governance/test-credentials.local.env` esiste già, verifica con
+     `git check-ignore` che sia escluso (lo è dal `.gitignore` di root
+     aggiornato).
+
 6. Chiudi con un riepilogo breve: cosa è cambiato, cosa richiede
    attenzione da parte dell'utente, cosa non richiede nulla.

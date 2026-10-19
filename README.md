@@ -83,6 +83,9 @@ inizializzata) e scaffolda `apps/` e `product/`.
     │                                           secondo i modelli dichiarati in reference/reporting-models.yaml — derivate, mai editate a mano.
     │                                           La roadmap (vista per_ceremony, formato standard o aziendale) si rigenera da sola a fine di ogni cerimonia
     ├── approvals/{pending,decided}/
+    ├── tests/runs/{data}-{slug}/  ← giri di app-test con un utente di prova (repro bug, verifica consegna, debug)
+    │   ├── run.yaml                       (ambiente, utente per id, passi, esito — tracciato, NIENTE credenziali)
+    │   └── screenshots/                   (NON tracciati, .gitignore)
     ├── demos/                    ← evidenza visiva di delivery (skill demo-capture)
     │   ├── recipes/{app-slug}.yaml        (come portare su ogni app in modalità demo — tracciato, NIENTE segreti)
     │   └── captures/{idea-slug}/
@@ -94,6 +97,7 @@ inizializzata) e scaffolda `apps/` e `product/`.
         ├── reporting-models.yaml ← quali viste produce l'istanza, per chi, ogni quanto: modelli standard (framework/models/) o aziendali
         ├── models/               ← formati aziendali trascritti (MBR, roadmap, KPI) con la mappatura campo → dato del framework
         ├── team.yaml             ← anagrafica del team di sviluppo: presidio apps/, competenze, disponibilità e capacità per competenza (FTE, assenze, squad — skill team-roster per popolarla), su cui si pianificano gli slot della roadmap. team-fit la incrocia con un PRD e ne fissa il `tech_reference` — il referente tecnico, mostrato poi in backlog-list / iteration-board / cerimonie
+        ├── test-environments.yaml ← ambienti (dev/stg/prod/preview) e utenti di prova con cui il framework naviga le app via Chrome (skill test-accounts / app-test). Solo RIFERIMENTI alle credenziali: i valori stanno nel password manager o in .governance/test-credentials.local.env (non tracciato)
         └── delivery-watch.yaml   ← coda di triage delle transizioni di delivery da comunicare (skill delivery-watch; lazy, richiede jira + delivery_watch.enabled)
 ```
 

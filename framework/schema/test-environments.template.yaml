@@ -1,0 +1,112 @@
+# Template per product/reference/test-environments.yaml
+#
+# Registro degli AMBIENTI (dev, stg, prod, preview…) delle applicazioni
+# collegate in apps/ e degli UTENTI DI PROVA con cui il framework li
+# naviga via browser — per test, debug, riproduzione di un bug, verifica
+# di una consegna, screenshot (skill app-test e demo-capture).
+#
+# Creato da init-governance-project (passo "Ambienti e utenti di prova"
+# dell'intervista, anche solo con gli ambienti e accounts: []), fatto
+# evolvere da test-accounts (aggiunta, rotazione, verifica, ritiro di un
+# utente) e — per le sole voci `wanted` e per `last_verified_at`/`status`
+# — da app-test quando scopre che manca un utente o che un login non va.
+#
+# Scrittura DIRETTA, come team.yaml: è un dato di riferimento condiviso,
+# non una decisione di priorità — NON passa da product/approvals/pending/.
+# Tracciato da git: ogni collega che clona vede quali utenti esistono,
+# a cosa servono e dove trovarne le credenziali.
+#
+# ┌─────────────────────────────────────────────────────────────────────┐
+# │ NESSUN SEGRETO QUI DENTRO.                                           │
+# │ Password, token, segreti TOTP, cookie di sessione: SOLO dietro un   │
+# │ riferimento (`*_ref`) risolto da .claude/hooks/test-credentials.sh  │
+# │ — mai il valore. Schemi ammessi:                                     │
+# │   local:<CHIAVE>          riga CHIAVE=valore nel file locale         │
+# │                           .governance/test-credentials.local.env     │
+# │                           (non tracciato, permessi 600)              │
+# │   env:<NOME>              variabile d'ambiente                       │
+# │   keychain:<servizio>/<account>   Portachiavi macOS                  │
+# │   op://<vault>/<item>/<campo>     1Password CLI (`op read`) — il     │
+# │                           modo consigliato per condividerle nel team │
+# │ Niente `cmd:` o comandi arbitrari: questo file è tracciato, chiunque │
+# │ abbia push lo modifica — un comando qui sarebbe codice eseguito su  │
+# │ ogni clone.                                                          │
+# └─────────────────────────────────────────────────────────────────────┘
+#
+# SOLO utenti di prova. Mai l'account personale di un collega, mai
+# l'account di un cliente reale: se l'unico modo di vedere una schermata
+# è un account reale, app-test si ferma e lo dice.
+
+updated_at: ""                    # data ISO dell'ultimo aggiornamento (test-accounts la riscrive a ogni modifica)
+
+# --- Ambienti ---
+#
+# Un ambiente per app × livello. `tier` decide le regole di app-test:
+#   development / staging / preview → si naviga e si agisce liberamente su
+#     dati sintetici (mai azioni che escono dall'app verso persone reali);
+#   production → SOLA LETTURA di default: navigare, leggere, fotografare.
+#     Ogni azione che crea/modifica/cancella dati, invia messaggi o
+#     notifiche, muove denaro o tocca integrazioni esterne chiede la
+#     conferma esplicita del PM PRIMA, per quella singola azione, in
+#     conversazione (senza PM in conversazione non si esegue) — stesso
+#     criterio di irreversibilità di path-watch.
+environments: []
+# Esempio di singola voce:
+# - id: "wallet-web-stg"            # univoco, kebab-case: <app>-<livello>
+#   app_slug: "wallet-web"          # deve corrispondere a una voce apps[].slug in .governance/config.yaml ("" se l'app non è in apps/)
+#   tier: staging                   # development | staging | preview | production
+#   base_url: "https://stg.wallet.example.com"   # NIENTE credenziali nell'URL
+#   allowed_hosts: ["stg.wallet.example.com", "auth.stg.example.com"]
+#                                   # domini su cui app-test può digitare le credenziali di questo ambiente
+#                                   # (login federato incluso). Una pagina fuori da qui che chiede la password → stop.
+#   code_ref_note: "ultimo tag di release"   # come si sa quale commit serve quell'ambiente (lo usa anche demo-capture)
+#   data_note: "dati sintetici, reset ogni lunedì"   # che dati ci sono: sintetici, copia anonimizzata, reali (production)
+#   access_note: ""                 # VPN, IP allowlist, basic auth davanti all'ambiente — come arrivarci (mai la password: un `*_ref` in un account)
+#   status: active                  # active | unreachable (rilevato da app-test/test-accounts) | retired
+
+# --- Utenti di prova ---
+#
+# Un utente = un'identità su UN ambiente. Lo stesso indirizzo usato su
+# stg e prod sono due voci (credenziali diverse, rischi diversi).
+#
+# status:
+#   wanted  → serve ma non esiste ancora (o non ce l'abbiamo): è il "buco"
+#             che app-test registra quando un test ha bisogno di un ruolo
+#             che non c'è. Quando qualcuno lo crea, test-accounts lo porta
+#             ad active — e da lì app-test sa usarlo.
+#   active  → esiste, ha un riferimento alle credenziali.
+#   broken  → l'ultimo login è fallito (password cambiata, utente
+#             bloccato, MFA cambiata) — ripararlo con test-accounts.
+#   retired → non più usato; resta come storico, app-test lo ignora.
+#
+# La DISPONIBILITÀ delle credenziali è un fatto del singolo clone (il file
+# locale di un collega non è il tuo): non si scrive qui, la calcola
+# `test-credentials.sh status` a ogni sessione.
+accounts: []
+# Esempio di singola voce:
+# - id: "wallet-stg-merchant-admin"         # univoco, kebab-case: <app>-<livello>-<persona>
+#   environment: "wallet-web-stg"           # → environments[].id
+#   persona: "merchant admin con 2 punti vendita"   # chi è, in parole: cosa vede e cosa può fare
+#   roles: ["merchant_admin"]               # ruoli/permessi applicativi, come li chiama l'app
+#   data_profile: "2 store, 40 transazioni sintetiche, 1 rimborso in corso"   # lo stato dei dati dell'utente che rende utile il test
+#   username: "qa+merchant-admin@example.com"   # identificativo di login: in chiaro è ammesso (non è un segreto)…
+#   username_ref: ""                        # …oppure dietro un riferimento, se anche l'identificativo è riservato (tipico in production)
+#   password_ref: "local:WALLET_STG_MERCHANT_ADMIN_PASSWORD"   # MAI il valore
+#   login:
+#     method: form                          # form | sso | magic_link | basic | none
+#     url: "/login"                         # relativo a base_url (o assoluto, purché in allowed_hosts)
+#     notes: ""                             # selettori o passi non ovvi (es. "prima scegliere 'Accedi con email'")
+#   mfa:
+#     type: none                            # none | totp | sms | email | push
+#     otp_ref: ""                           # solo totp: riferimento che restituisce il CODICE corrente (es. op://QA/wallet-stg/one-time password?attribute=otp)
+#                                           # sms/email/push o totp senza ref → il codice lo dà il PM in conversazione
+#   production_writes: false                # solo tier production: true se questo utente è stato creato apposta per agire in prod
+#                                           # (es. un merchant di test con carta di test). Anche con true, ogni azione chiede conferma.
+#   owner: ""                               # chi l'ha creato / chi rigenera la password (nome o handle)
+#   created_at: ""                          # data ISO in cui l'utente è stato registrato qui
+#   status: active                          # wanted | active | broken | retired
+#   status_note: ""                         # es. "login fallito il 2026-10-19: password scaduta"
+#   last_verified_at: ""                    # data ISO dell'ultimo login riuscito (scritta da app-test / test-accounts verify)
+#   wanted_since: ""                        # solo wanted: da quando serve
+#   wanted_by: ""                           # solo wanted: cosa lo richiede (es. "repro bug PG-051", "demo-capture PG-042")
+#   notes: ""

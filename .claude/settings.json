@@ -11,6 +11,9 @@
       "Bash(bash .claude/hooks/check-conclusion-notices.sh:*)",
       "Bash(bash .claude/hooks/check-requester-replies.sh:*)",
       "Bash(bash .claude/hooks/copy-to-clipboard.sh:*)",
+      "Bash(bash .claude/hooks/test-credentials.sh status:*)",
+      "Bash(bash .claude/hooks/test-credentials.sh check:*)",
+      "Bash(bash .claude/hooks/test-credentials.sh init-local:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
@@ -42,6 +45,12 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-connectors.sh\"",
             "timeout": 10,
             "statusMessage": "Verifica connettori esterni dichiarati…"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/test-credentials.sh\" status --hook",
+            "timeout": 10,
+            "statusMessage": "Verifica utenti di prova e credenziali…"
           },
           {
             "type": "command",

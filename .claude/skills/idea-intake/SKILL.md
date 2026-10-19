@@ -172,6 +172,12 @@ Fuori da questa modalità, la skill si comporta come descritto nei
        se il bug fosse stato filato.
      - Prepara al passo 8 una bozza di risposta al richiedente
        (`requester_reply`, `kind: bug_ack`).
+     - **Riproduzione (facoltativa, dopo il filing).** Se il registro
+       `product/reference/test-environments.yaml` ha un ambiente e un
+       utente adatti a riprodurlo, proponi al PM di lanciare `app-test`
+       (`repro`): i passi minimi di riproduzione e l'ambiente in cui il
+       bug c'è davvero sono il complemento più utile al ticket. Non
+       ritarda mai l'apertura del ticket, che resta immediata.
    - **Strategic Exception** — se il proponente è a un livello che nel
      `product/reference/` (o dichiarato dall'utente) qualifica per bypass
      del RICE. Crea comunque la cartella idea (serve comunque traccia),
@@ -288,6 +294,17 @@ Fuori da questa modalità, la skill si comporta come descritto nei
    In questo caso, aggiungi in cima al file copiato una riga tipo `<!--
    Questa fonte ha generato anche: {altri slug} -->` così chi la legge sa
    che esistono record collegati dalla stessa origine.
+   **Unica eccezione al "non parafrasare": le credenziali.** Se il
+   materiale contiene password, token, codici o link di accesso (tipico:
+   "ho creato l'utente di test, la password è…", o una segnalazione di
+   bug con le credenziali dell'utente con cui si riproduce), nella copia
+   in `source/` sostituisci il valore con `[credenziale rimossa → registro
+   utenti di prova]` e proponi al PM di registrare l'utente con
+   `test-accounts` (il valore va solo nell'archivio locale o nel password
+   manager — playbook, "Ambienti e utenti di prova"). Se sono le
+   credenziali di un **utente reale** (un cliente che ha mandato la sua
+   password), non registrarle affatto: rimuovile e segnala al PM che il
+   mittente va invitato a cambiarla.
 
    **Registro dei punti chiave.** Se la fonte è ricca — trascrizione,
    workshop, thread con più interlocutori, o oltre ~400 parole — estrai
